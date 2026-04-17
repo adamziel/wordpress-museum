@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordPress Museum — Three Exhibits</title>
+<style>
+  :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem;background:radial-gradient(1200px 600px at 20% 0%, #fff7e6 0%, transparent 60%), radial-gradient(900px 500px at 100% 100%, #e8f0ff 0%, transparent 55%), var(--paper);}
+  .frame{max-width:1100px;width:100%}
+  header{text-align:center;margin-bottom:3rem}
+  .eyebrow{letter-spacing:.35em;font-size:.75rem;color:#6b6b72;text-transform:uppercase}
+  h1{font-family:"Cochin",Didot,Bodoni,serif;font-weight:700;font-size:clamp(2.8rem,6vw,4.6rem);line-height:1;margin:.4em 0 .2em}
+  .sub{font-style:italic;color:#57575e;max-width:56ch;margin:0 auto;line-height:1.55}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-top:2.25rem}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border-radius:18px;padding:1.5rem;box-shadow:0 1px 2px rgba(0,0,0,.04),0 20px 40px -20px rgba(0,0,0,.15);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s;position:relative;overflow:hidden}
+  a.card:hover{transform:translateY(-4px);box-shadow:0 1px 2px rgba(0,0,0,.04),0 30px 60px -20px rgba(0,0,0,.22)}
+  .pill{display:inline-block;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#6b6b72;border:1px solid #e3e3e8;padding:.3rem .55rem;border-radius:999px;margin-bottom:.8rem}
+  .card h2{margin:.2rem 0 .4rem;font-family:"Cochin",Didot,Bodoni,serif;font-size:1.6rem}
+  .card p{margin:0;color:#494951;line-height:1.55;font-size:.97rem}
+  .card .art{aspect-ratio:16/10;border-radius:12px;margin-bottom:1rem;background:#f2f2f5;position:relative;overflow:hidden}
+  .v1 .art{background:linear-gradient(#5B92E5,#245EDB 40%, #3A81F3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+  .v1 .art::after{content:"start";position:absolute;left:6px;bottom:6px;font-family:"Trebuchet MS",sans-serif;font-weight:700;color:#fff;background:linear-gradient(#7cc04a,#2b7d20);padding:3px 12px;border-radius:10px 3px 3px 10px;font-size:.75rem;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .v1 .art::before{content:"";position:absolute;inset:8px 8px auto 8px;height:50px;background:linear-gradient(#fafafa,#dcdcdc);border:1px solid #8aa;border-radius:6px 6px 0 0}
+  .v2 .art{background:radial-gradient(circle at 30% 30%,#201028,#06060c);color:#0f0}
+  .v2 .art::after{content:"▸ NOW PLAYING: 7.0 Monk";position:absolute;left:8px;top:10px;font-family:"Courier New",monospace;font-size:.75rem;color:#00ff66;text-shadow:0 0 6px #0f0;letter-spacing:.1em}
+  .v2 .art::before{content:"";position:absolute;left:8px;bottom:10px;right:8px;height:30px;background:repeating-linear-gradient(90deg,#0f0 0 3px,transparent 3px 7px);opacity:.8;mask:linear-gradient(#000,#000) top/100% 100% no-repeat;}
+  .v3 .art{background:#fbf5e5;box-shadow:inset 0 0 0 1px #e5dcc4}
+  .v3 .art::after{content:"since 2003";position:absolute;right:14px;bottom:12px;font-family:"Brush Script MT",cursive;font-size:1.1rem;color:#8a5a30;transform:rotate(-6deg)}
+  .v3 .art::before{content:"scrapbook";position:absolute;left:14px;top:12px;font-family:"Didot","Cochin",serif;font-style:italic;font-size:1.05rem;color:#2e2a22}
+  footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
+  footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <div class="eyebrow">wordpress.org / museum</div>
+    <h1>Three ways to see a history</h1>
+    <p class="sub">Every WordPress release from 2003 to today, rendered as three wildly different exhibits. Pick a door.</p>
+  </header>
+  <div class="grid">
+    <a class="card v1" href="v1-desktop/">
+      <div class="art"></div>
+      <span class="pill">Exhibit I</span>
+      <h2>Desktop Museum</h2>
+      <p>Boot into a Windows XP desktop where every version is a shortcut, the Start menu is a time machine, and the taskbar keeps ticking.</p>
+    </a>
+    <a class="card v2" href="v2-winamp/">
+      <div class="art"></div>
+      <span class="pill">Exhibit II</span>
+      <h2>Winamp Timeline</h2>
+      <p>A skeumorphic music player where every release is a track. Cue up 2003, drop the needle, and the Playground picks up the beat.</p>
+    </a>
+    <a class="card v3" href="v3-scrapbook/">
+      <div class="art"></div>
+      <span class="pill">Exhibit III</span>
+      <h2>Scrapbook Time Machine</h2>
+      <p>A handmade scrapbook you scroll through — polaroids that develop into live Playgrounds, handwritten margin notes, wax seals, coffee rings.</p>
+    </a>
+  </div>
+  <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
+</div>
+</body>
+</html>
