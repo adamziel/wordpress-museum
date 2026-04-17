@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Seven Exhibits</title>
+<title>WordPress Museum — Eight Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -46,6 +46,10 @@
   .v7 .art::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#f3d472 0%,transparent);transform:translateX(-50%)}
   .v7 .art::after{content:"The Jazz Corridor";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#f3d472;font-size:.95rem}
 
+  .v8 .art{background:radial-gradient(circle at 30% 30%,#ff3cac,transparent 55%),radial-gradient(circle at 75% 70%,#00e0ff,transparent 55%),linear-gradient(160deg,#120826 0%,#05020f 80%);position:relative;overflow:hidden}
+  .v8 .art::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 6px,rgba(255,255,255,.05) 6px 7px)}
+  .v8 .art::after{content:"Deep Dive · jump · fall · shrink";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:ui-monospace,Menlo,monospace;color:#ffd2f2;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 0 10px #ff3cac}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -54,7 +58,7 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Seven ways to see a history</h1>
+    <h1>Eight ways to see a history</h1>
     <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
@@ -99,6 +103,12 @@
       <span class="pill">Exhibit VII · 3D</span>
       <h2>The Jazz Corridor</h2>
       <p>A first-person walk through a 3D CSS museum. Every frame a release, every plaque a codename portrait. Step into any painting and the Playground fills the room.</p>
+    </a>
+    <a class="card v8" href="v8-corridor-deep/">
+      <div class="art"></div>
+      <span class="pill">Exhibit VIII · Deep Dive</span>
+      <h2>The Impossible Museum</h2>
+      <p>The corridor breaks open. You jump, fall, shrink, walk the ceiling, and drift through nine releases as gravity and scale rewrite themselves between rooms. Each stop zooms in — pixel portraits, lost screenshots, deeper trivia.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
