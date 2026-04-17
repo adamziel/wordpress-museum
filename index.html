@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Three Exhibits</title>
+<title>WordPress Museum — Four Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -30,6 +30,9 @@
   .v3 .art{background:#fbf5e5;box-shadow:inset 0 0 0 1px #e5dcc4}
   .v3 .art::after{content:"since 2003";position:absolute;right:14px;bottom:12px;font-family:"Brush Script MT",cursive;font-size:1.1rem;color:#8a5a30;transform:rotate(-6deg)}
   .v3 .art::before{content:"scrapbook";position:absolute;left:14px;top:12px;font-family:"Didot","Cochin",serif;font-style:italic;font-size:1.05rem;color:#2e2a22}
+  .v4 .art{background:radial-gradient(800px 220px at 50% 120%, #6ea5d0 0%, transparent 70%), linear-gradient(#73a0c5,#244776);position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+  .v4 .art::before{content:"The WordPress Museum";position:absolute;left:16px;top:14px;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:1.2rem;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+  .v4 .art::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(#5c8c3f,#3e6826)}
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -38,8 +41,8 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Three ways to see a history</h1>
-    <p class="sub">Every WordPress release from 2003 to today, rendered as three wildly different exhibits. Pick a door.</p>
+    <h1>Four ways to see a history</h1>
+    <p class="sub">Every WordPress release from 2003 to today, rendered as four wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
     <a class="card v1" href="v1-desktop/">
@@ -59,6 +62,12 @@
       <span class="pill">Exhibit III</span>
       <h2>Scrapbook Time Machine</h2>
       <p>A handmade scrapbook you scroll through — polaroids that develop into live Playgrounds, handwritten margin notes, wax seals, coffee rings.</p>
+    </a>
+    <a class="card v4" href="v4-kubrick/">
+      <div class="art"></div>
+      <span class="pill">Exhibit IV</span>
+      <h2>Kubrick Weblog</h2>
+      <p>A period-accurate early-WordPress blog where every release is a post. Click the Dashboard to open a working fake wp-admin: draggable widgets, color schemes, QuickPress, and the Hello Dolly plugin.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
