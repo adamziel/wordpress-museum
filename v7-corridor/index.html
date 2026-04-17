@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WP Museum v7 — 3D Corridor</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --cam-z: 0px;
+    --cam-sway: 0px;
+    --spacing: 1400;   /* px between paintings */
+    --hall-w: 1400;    /* px wall-to-wall */
+    --hall-h: 900;     /* px ceiling height */
+  }
+  html,body{margin:0;padding:0;background:#0c0a08;color:#f6ecd7;font-family:"EB Garamond",Georgia,serif;}
+  /* The page scroll is the "walk" — we make the document tall enough for all releases. */
+  body{min-height:calc(53 * 1400px + 1200px)} /* matches JS */
+
+  /* Fixed 3D viewport */
+  #scene{
+    position:fixed;inset:0;overflow:hidden;
+    perspective:1400px;perspective-origin:50% 42%;
+    background:radial-gradient(80% 60% at 50% 30%,#1d1510 0%,#05040a 80%);
+  }
+  #world{
+    position:absolute;left:50%;top:50%;
+    transform-style:preserve-3d;
+    transform: translate3d(var(--cam-sway), 0, var(--cam-z));
+    will-change: transform;
+  }
+  .plane{position:absolute;transform-style:preserve-3d;backface-visibility:hidden}
+
+  /* Floor — long carpet */
+  #floor{
+    left:calc(var(--hall-w) * -1px / 2); top:300px;
+    width:calc(var(--hall-w) * 1px); height:calc((53 * var(--spacing) + 2000) * 1px);
+    transform-origin: top center;
+    transform: rotateX(90deg) translateZ(calc(-1 * (53 * var(--spacing) + 2000) * 1px / 2));
+    background:
+      repeating-linear-gradient(90deg,#3a1d10 0 6px,#2a140a 6px 12px),
+      linear-gradient(180deg,#2a140a,#150a04);
+    box-shadow: inset 0 0 120px #000a;
+  }
+  #floor::before{
+    content:"";position:absolute;left:50%;top:0;bottom:0;width:300px;transform:translateX(-50%);
+    background:repeating-linear-gradient(0deg, #6a2e1c 0 30px, #5a1e10 30px 60px, #7a3c24 60px 90px);
+    opacity:.9;box-shadow: 0 0 30px #000a inset;
+  }
+  /* Ceiling */
+  #ceiling{
+    left:calc(var(--hall-w) * -1px / 2); top:-300px;
+    width:calc(var(--hall-w) * 1px); height:calc((53 * var(--spacing) + 2000) * 1px);
+    transform-origin:top center;
+    transform: rotateX(-90deg) translateZ(calc((53 * var(--spacing) + 2000) * 1px / 2));
+    background:linear-gradient(180deg,#201714,#0d0908);
+  }
+  /* Walls */
+  .wall{
+    top:calc(var(--hall-h) * -1px / 2); height:calc(var(--hall-h) * 1px);
+    width:calc((53 * var(--spacing) + 2000) * 1px);
+    background:
+      linear-gradient(180deg,#1e120c,#2a1910 60%,#180b08),
+      repeating-linear-gradient(90deg, transparent 0 120px, rgba(255,210,130,.04) 120px 122px);
+    background-blend-mode: overlay;
+    box-shadow: inset 0 0 200px rgba(0,0,0,.7);
+  }
+  #wallLeft{
+    left:calc(var(--hall-w) * -1px / 2);
+    transform-origin: left center;
+    transform: rotateY(90deg) translateZ(0);
+  }
+  #wallRight{
+    left:calc(var(--hall-w) * 1px / 2);
+    transform-origin: right center;
+    transform: rotateY(-90deg) translateZ(0);
+  }
+
+  /* Paintings — placed in world coords, each a full 3D element */
+  .painting{
+    position:absolute;
+    width:520px;height:360px;
+    transform-style:preserve-3d;
+  }
+  .painting.left{
+    left:calc(var(--hall-w) * -1px / 2 + 10px);
+    transform-origin:left center;
+    transform: translate3d(0, -60px, var(--zneg)) rotateY(90deg);
+  }
+  .painting.right{
+    left:calc(var(--hall-w) * 1px / 2 - 10px);
+    transform-origin:right center;
+    transform: translate3d(0, -60px, var(--zneg)) rotateY(-90deg);
+  }
+  .frame{
+    position:absolute;inset:0;
+    background:linear-gradient(145deg,#c18a2d,#6a4010);
+    box-shadow: 0 0 40px rgba(0,0,0,.7), inset 0 0 20px rgba(0,0,0,.4);
+    padding:22px;
+    border-radius:4px;
+  }
+  .frame::before{
+    content:"";position:absolute;inset:8px;border:3px double #f2c868;border-radius:3px;pointer-events:none;
+  }
+  .canvas{position:relative;width:100%;height:100%;overflow:hidden;background:#000;cursor:pointer;border:1px solid #000;}
+  .canvas iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .poster{position:absolute;inset:0}
+  .poster .bar{position:absolute}
+  .painting .label{
+    position:absolute;left:50%;top:calc(100% + 14px);transform:translateX(-50%);
+    background:#1a0f08;border:1px solid #7a5a1e;color:#f2d68c;padding:6px 12px;
+    font:italic 700 14px/1.2 "EB Garamond",Georgia,serif;letter-spacing:.04em;
+    box-shadow:0 4px 10px #000a;
+    white-space:nowrap;
+  }
+  .painting .spotlight{
+    position:absolute;left:50%;top:-130px;transform:translateX(-50%);
+    width:220px;height:120px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,220,140,.45), transparent 70%);
+    filter: blur(4px);
+    pointer-events:none;
+  }
+  .painting.significant .frame{background:linear-gradient(145deg,#f3d472,#8c5a1c);box-shadow: 0 0 60px #f3d47266, inset 0 0 24px rgba(0,0,0,.3);}
+
+  /* Plaque on wall beside frame (the codename portrait) */
+  .plaque{
+    position:absolute;width:200px;height:260px;
+    background:linear-gradient(180deg,#d6b470,#8a6a32);
+    border:4px solid #3a240f;
+    padding:6px;
+    box-shadow:0 8px 30px #000a;
+  }
+  .painting.left .plaque{right:-240px;top:50px}
+  .painting.right .plaque{left:-240px;top:50px}
+  .plaque .pimg{width:100%;height:190px;background:#211510;overflow:hidden;box-shadow:inset 0 0 20px #000a}
+  .plaque .pimg svg{width:100%;height:100%}
+  .plaque .pname{color:#1c0f06;font:italic 700 15px/1.3 "EB Garamond",Georgia,serif;text-align:center;margin-top:6px}
+  .plaque .pdate{color:#4a2e14;font:600 10px/1 ui-monospace,monospace;letter-spacing:.15em;text-align:center;text-transform:uppercase;margin-top:3px}
+
+  /* Trivia caption that fades in as camera passes */
+  .caption{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:420px;padding:16px 18px;
+    background:rgba(12,8,4,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border-left:3px solid #f3d472;color:#f6ecd7;
+    font:400 16px/1.5 "EB Garamond",Georgia,serif;
+    opacity:0;transition:opacity .6s ease;pointer-events:none;
+  }
+  .painting.left .caption{left:calc(100% + 280px)}
+  .painting.right .caption{right:calc(100% + 280px);text-align:right;border-left:0;border-right:3px solid #f3d472}
+  .painting.focused .caption{opacity:1}
+  .caption .cv{font:800 22px/1 "EB Garamond",serif;color:#f3d472;letter-spacing:-.02em;margin-bottom:4px}
+  .caption .cd{font:600 10px/1 ui-monospace,monospace;letter-spacing:.2em;color:#c9a05a;text-transform:uppercase;margin-bottom:10px}
+
+  /* Era poster styles for canvas */
+  .poster.era-b2{background:#fafafa}
+  .poster.era-b2::before{content:"b2 » weblog tool";position:absolute;top:0;left:0;right:0;height:40px;background:#333;color:#ffcc66;font:700 14px/40px ui-monospace,monospace;padding-left:12px}
+  .poster.era-b2::after{content:"Hello, world. Posted by Mike.";color:#222;position:absolute;top:52px;left:16px;right:16px;font:italic 14px/1.5 Georgia,serif}
+  .poster.era-kubrick{background:radial-gradient(800px 200px at 50% 120%,#6ea5d0,transparent 70%),linear-gradient(#73a0c5,#234b6a)}
+  .poster.era-kubrick::after{content:"The WordPress Blog";color:#fff;position:absolute;top:18px;left:18px;font:italic 700 24px/1 Georgia,serif;text-shadow:0 1px 0 #0006}
+  .poster.era-kubrick .bar.ksky{inset:auto 0 0 0;height:22%;background:linear-gradient(#4a7830,#3e6826)}
+  .poster.era-happycog{background:#efefef}
+  .poster.era-happycog .bar.hctop{top:0;left:0;right:0;height:48px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-happycog .bar.hcorange{top:48px;left:0;right:0;height:4px;background:#d54e21}
+  .poster.era-happycog::before{content:"WordPress";color:#fff;position:absolute;top:0;left:16px;font:700 18px/48px sans-serif}
+  .poster.era-happycog::after{content:"Dashboard · Posts · Pages";color:#666;position:absolute;top:62px;left:16px;font:13px/1 sans-serif}
+  .poster.era-coltrane{background:#f1f1f1}
+  .poster.era-coltrane .bar.cltop{top:0;left:0;right:0;height:30px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-coltrane .bar.clnav{top:30px;left:0;bottom:0;width:28%;background:#464646}
+  .poster.era-coltrane::before{content:"";position:absolute;top:48px;left:32%;right:10%;height:12px;background:#bbb;box-shadow:0 24px 0 #ccc,0 48px 0 #ccc}
+  .poster.era-mp6{background:#f1f1f1}
+  .poster.era-mp6 .bar.m6bar{top:0;left:0;right:0;height:34px;background:#23282d}
+  .poster.era-mp6 .bar.m6side{top:34px;left:0;bottom:0;width:22%;background:#32373c}
+  .poster.era-mp6::after{content:"Add New Post";position:absolute;top:54px;left:calc(26%);color:#23282d;font:500 20px/1 sans-serif}
+  .poster.era-gutenberg{background:#f6f7f7}
+  .poster.era-gutenberg .bar.gtop{top:0;left:0;right:0;height:34px;background:#fff;border-bottom:1px solid #ddd}
+  .poster.era-gutenberg .bar.gside{top:34px;right:0;bottom:0;width:22%;background:#fff;border-left:1px solid #ddd}
+  .poster.era-gutenberg::before{content:"";position:absolute;left:10%;right:26%;top:68px;height:44px;background:#fff;border:1px solid #2271b1;box-shadow:0 0 0 1px #72aee6}
+  .poster.era-gutenberg::after{content:"Add title";position:absolute;left:calc(10% + 14px);top:82px;color:#949494;font:300 22px/1 sans-serif}
+  .poster.era-fse{background:#1e1e1e}
+  .poster.era-fse .bar.fleft{top:0;left:0;bottom:0;width:18%;background:#1e1e1e;border-right:1px solid #303030}
+  .poster.era-fse::before{content:"";position:absolute;left:22%;right:6%;top:10%;bottom:10%;background:#fff;box-shadow:0 0 0 1px #444,0 10px 30px #000a}
+  .poster.era-fse::after{content:"Editor";color:#fff;opacity:.8;position:absolute;top:6px;left:10px;font:500 12px/1 sans-serif;letter-spacing:.5px}
+
+  /* HUD */
+  #hud{
+    position:fixed;top:14px;left:14px;right:14px;z-index:20;
+    display:flex;gap:12px;align-items:center;
+    color:#f6ecd7;font:italic 600 14px/1 "EB Garamond",Georgia,serif;
+    pointer-events:none;
+  }
+  #hud .brand{background:rgba(10,6,2,.6);border:1px solid rgba(255,210,130,.3);padding:8px 14px;border-radius:4px;pointer-events:auto}
+  #hud .brand small{display:block;font:500 10px/1 ui-monospace,monospace;letter-spacing:.3em;text-transform:uppercase;opacity:.65;margin-top:4px;font-style:normal}
+  #hud .spacer{flex:1}
+  .hudbtn{pointer-events:auto;background:rgba(10,6,2,.6);border:1px solid rgba(255,210,130,.3);color:#f6ecd7;padding:8px 14px;border-radius:4px;font:italic 600 13px/1 "EB Garamond",Georgia,serif;cursor:pointer}
+  .hudbtn.active{background:#f3d472;color:#1a0f06;border-color:transparent}
+
+  /* Minimap */
+  #minimap{
+    position:fixed;top:70px;right:14px;z-index:20;
+    background:rgba(10,6,2,.7);border:1px solid rgba(255,210,130,.25);
+    padding:10px 14px;border-radius:4px;
+    max-width:360px;
+  }
+  #minimap .mtrack{position:relative;height:28px;width:340px}
+  .mdot{position:absolute;top:50%;transform:translate(-50%,-50%);width:4px;height:4px;border-radius:50%;background:rgba(255,210,130,.35);cursor:pointer;transition:all .15s}
+  .mdot.sig{width:6px;height:6px;background:#f3d472}
+  .mdot.active{background:#fff;box-shadow:0 0 8px #f3d472;width:8px;height:8px}
+  .mdot:hover{background:#fff}
+  #minimap .mlabel{font:500 10px/1 ui-monospace,monospace;letter-spacing:.15em;opacity:.6;text-transform:uppercase;text-align:center;margin-top:6px;color:#f6ecd7}
+
+  /* Fullscreen iframe modal */
+  #modal{
+    position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);
+    display:none;align-items:center;justify-content:center;padding:40px;
+  }
+  #modal.open{display:flex}
+  #modal .mbox{width:min(1200px,90vw);aspect-ratio:16/9;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.9);position:relative;border-radius:6px;overflow:hidden}
+  #modal iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  #modal .mclose{position:absolute;top:14px;right:14px;z-index:5;background:#f3d472;color:#1a0f06;border:0;padding:8px 14px;border-radius:4px;font:600 12px/1 ui-monospace,monospace;letter-spacing:.1em;cursor:pointer;text-transform:uppercase}
+  #modal .mtitle{position:absolute;top:14px;left:14px;color:#f3d472;font:italic 700 16px/1 "EB Garamond",Georgia,serif;background:rgba(10,6,2,.7);padding:8px 12px;border-radius:4px}
+
+  /* Intro hint */
+  #welcome{
+    position:fixed;z-index:5;left:50%;top:60%;transform:translate(-50%,-50%);
+    text-align:center;color:#f6ecd7;pointer-events:none;transition:opacity .6s ease;
+  }
+  #welcome h1{font:italic 800 clamp(2rem,4.5vw,3.6rem)/1 "EB Garamond",Georgia,serif;color:#f3d472;margin:0 0 12px;letter-spacing:-.01em}
+  #welcome p{font:400 16px/1.4 "EB Garamond",Georgia,serif;opacity:.85;max-width:38ch;margin:0 auto}
+  #welcome .scrollhint{margin-top:24px;letter-spacing:.3em;font-size:11px;font-family:ui-monospace,monospace;opacity:.7;text-transform:uppercase}
+  #welcome.hidden{opacity:0}
+
+  @media (max-width:900px){
+    .painting{width:340px;height:240px}
+    .plaque{width:140px;height:200px}
+    .plaque .pimg{height:140px}
+    .caption{width:260px;font-size:14px}
+    .painting.left .plaque{right:-160px}
+    .painting.right .plaque{left:-160px}
+    .painting.left .caption{left:calc(100% + 180px)}
+    .painting.right .caption{right:calc(100% + 180px)}
+    #minimap{max-width:240px}
+    #minimap .mtrack{width:220px}
+  }
+</style>
+</head>
+<body>
+
+<div id="scene">
+  <div id="world">
+    <div class="plane" id="floor"></div>
+    <div class="plane" id="ceiling"></div>
+    <div class="plane wall" id="wallLeft"></div>
+    <div class="plane wall" id="wallRight"></div>
+  </div>
+</div>
+
+<div id="hud">
+  <div class="brand">The Jazz Corridor<small>v7 · scroll to walk</small></div>
+  <div class="spacer"></div>
+  <button class="hudbtn" id="audioBtn" aria-pressed="false">♪ Silence</button>
+  <a class="hudbtn" href="../">← Museum</a>
+</div>
+<div id="minimap">
+  <div class="mtrack" id="mtrack"></div>
+  <div class="mlabel" id="mlabel">— · 00 / 53</div>
+</div>
+
+<div id="welcome">
+  <h1>Welcome to the Jazz Corridor.</h1>
+  <p>Scroll forward. Each frame is a WordPress release. Click one to step inside.</p>
+  <div class="scrollhint">↓ scroll to walk ↓</div>
+</div>
+
+<div id="modal" role="dialog" aria-modal="true">
+  <div class="mbox">
+    <div class="mtitle" id="mtitle"></div>
+    <button type="button" class="mclose" id="mclose">Close ✕</button>
+  </div>
+</div>
+
+<script>
+const RELEASES = [
+  {"v":"0.70","name":"—","date":"2003-05-27","trivia":"The very first WordPress release, forked from b2/cafelog by Matt Mullenweg and Mike Little. No codename yet — just a hopeful birth announcement on a personal blog."},
+  {"v":"1.0","name":"Miles","date":"2004-01-03","trivia":"Named after jazz great Miles Davis, starting the tradition of jazz-musician codenames. Introduced search-engine-friendly permalinks, the Post Preview pane, and a real plugin API.","significant":true},
+  {"v":"1.2","name":"Mingus","date":"2004-05-22","trivia":"Introduced the Plugin system as we know it today — the moment WordPress became infinitely extensible.","significant":true},
+  {"v":"1.5","name":"Strayhorn","date":"2005-02-17","trivia":"Introduced Themes and Pages. The Kubrick theme became a symbol of an era. Downloaded 900,000 times in a single year.","significant":true},
+  {"v":"2.0","name":"Duke","date":"2005-12-31","trivia":"Shipped a rich WYSIWYG editor (TinyMCE), image uploads, Akismet, and user roles. A New Year's Eve gift from Matt.","significant":true},
+  {"v":"2.1","name":"Ella","date":"2007-01-22","trivia":"Autosave made its debut. Many blog posts were rescued that day."},
+  {"v":"2.2","name":"Getz","date":"2007-05-16","trivia":"Widgets arrived. Sidebars would never be the same.","significant":true},
+  {"v":"2.3","name":"Dexter","date":"2007-09-24","trivia":"Native tagging. Before this, people hacked it in with plugins."},
+  {"v":"2.5","name":"Brecker","date":"2008-03-29","trivia":"Wholesale admin redesign by Happy Cog — the first time WordPress looked designed rather than merely assembled."},
+  {"v":"2.6","name":"Tyner","date":"2008-07-15","trivia":"Post revisions. Press This bookmarklet. Word count finally reliable."},
+  {"v":"2.7","name":"Coltrane","date":"2008-12-10","trivia":"New admin UI with left-hand navigation that lasted over a decade. Automatic plugin upgrades from the dashboard.","significant":true},
+  {"v":"2.8","name":"Baker","date":"2009-06-11","trivia":"Theme installer from the dashboard. Syntax highlighting in the theme editor."},
+  {"v":"2.9","name":"Carmen","date":"2009-12-18","trivia":"Built-in image editor. Trash (finally). Oembed."},
+  {"v":"3.0","name":"Thelonious","date":"2010-06-17","trivia":"Merged WordPress MU — multisite for everyone. Custom post types and custom menus landed. Twenty Ten replaced Kubrick. A civilizational shift.","significant":true},
+  {"v":"3.1","name":"Reinhardt","date":"2011-02-23","trivia":"Admin Bar arrived, hovering helpfully over your site."},
+  {"v":"3.2","name":"Gershwin","date":"2011-07-04","trivia":"Dropped PHP 4 and MySQL 4 support. Distraction-free writing mode. Twenty Eleven."},
+  {"v":"3.3","name":"Sonny","date":"2011-12-12","trivia":"Drag-and-drop media uploader. Flyout menus. New-user welcome pointers."},
+  {"v":"3.4","name":"Green","date":"2012-06-13","trivia":"Theme Customizer debuted. Twitter embeds.","significant":true},
+  {"v":"3.5","name":"Elvin","date":"2012-12-11","trivia":"Brand-new Media Manager. Retina-ready admin. Twenty Twelve."},
+  {"v":"3.6","name":"Oscar","date":"2013-08-01","trivia":"Delayed twice. Audio and video improvements. Twenty Thirteen — the most colorful default theme ever."},
+  {"v":"3.7","name":"Basie","date":"2013-10-24","trivia":"Automatic background security updates. Quietly the most important WordPress release of all time.","significant":true},
+  {"v":"3.8","name":"Parker","date":"2013-12-12","trivia":"Flat, responsive admin (the MP6 project merged in). Admin color schemes. Twenty Fourteen magazine theme.","significant":true},
+  {"v":"3.9","name":"Smith","date":"2014-04-16","trivia":"Live widget previews. Improved visual editor with drag-and-drop images."},
+  {"v":"4.0","name":"Benny","date":"2014-09-04","trivia":"A symbolic release — the number bump didn't mean a rewrite, but a smoother grid media library and embed previews in the editor."},
+  {"v":"4.1","name":"Dinah","date":"2014-12-17","trivia":"Twenty Fifteen: the most minimal default theme yet. Distraction-free writing mode v2."},
+  {"v":"4.2","name":"Powell","date":"2015-04-23","trivia":"Emoji support everywhere. Press This redesigned. Plugin updates without leaving the page."},
+  {"v":"4.3","name":"Billie","date":"2015-08-18","trivia":"Menus in the Customizer. Site icons from the Customizer. Formatting shortcuts in the editor."},
+  {"v":"4.4","name":"Clifford","date":"2015-12-08","trivia":"REST API infrastructure merged. Responsive images by default. Embed your WordPress posts elsewhere.","significant":true},
+  {"v":"4.5","name":"Coleman","date":"2016-04-12","trivia":"Inline linking. Custom logos in the Customizer. Formatting keyboard shortcuts."},
+  {"v":"4.6","name":"Pepper","date":"2016-08-16","trivia":"Streamlined updates, native system fonts in the admin, editor content recovery."},
+  {"v":"4.7","name":"Vaughan","date":"2016-12-06","trivia":"REST API content endpoints shipped. Twenty Seventeen. Custom CSS in the Customizer.","significant":true},
+  {"v":"4.8","name":"Evans","date":"2017-06-08","trivia":"Rich Text Widgets. Audio, Video, Image, HTML widgets. Stage-setting for blocks."},
+  {"v":"4.9","name":"Tipton","date":"2017-11-15","trivia":"Scheduled customization changes. Code-editing safety nets — the last release before Gutenberg lit up the ecosystem."},
+  {"v":"5.0","name":"Bebo","date":"2018-12-06","trivia":"Gutenberg. The block editor. The biggest change to WordPress editing since 2.0's WYSIWYG. Twenty Nineteen as the first block-ready default theme.","significant":true},
+  {"v":"5.1","name":"Betty","date":"2019-02-21","trivia":"Site Health warnings for outdated PHP. Editor performance improvements."},
+  {"v":"5.2","name":"Jaco","date":"2019-05-07","trivia":"Site Health dashboard. PHP error protection (WSOD). Bumped PHP minimum to 5.6."},
+  {"v":"5.3","name":"Kirk","date":"2019-11-12","trivia":"Twenty Twenty. Accessibility-first admin improvements. Block editor handles long posts."},
+  {"v":"5.4","name":"Adderley","date":"2020-03-31","trivia":"Social Icons block. Buttons block. Released during the first weeks of the pandemic."},
+  {"v":"5.5","name":"Eckstine","date":"2020-08-11","trivia":"Block patterns. Auto-updates for plugins and themes. XML sitemaps in core.","significant":true},
+  {"v":"5.6","name":"Simone","date":"2020-12-08","trivia":"First major release led by an all-women-identifying release squad. Twenty Twenty-One — a breezy pastel default.","significant":true},
+  {"v":"5.7","name":"Esperanza","date":"2021-03-09","trivia":"One-click HTTPS migration. Drag-and-drop blocks within columns."},
+  {"v":"5.8","name":"Tatum","date":"2021-07-20","trivia":"Widgets become blocks. Template editor previews Full Site Editing. theme.json arrives quietly.","significant":true},
+  {"v":"5.9","name":"Josephine","date":"2022-01-25","trivia":"Full Site Editing officially ships. Twenty Twenty-Two — the first block theme. Navigation block.","significant":true},
+  {"v":"6.0","name":"Arturo","date":"2022-05-24","trivia":"Style variations. Write mode. Locking blocks. FSE matures."},
+  {"v":"6.1","name":"Misha","date":"2022-11-01","trivia":"Fluid typography. Twenty Twenty-Three with 10 style variations."},
+  {"v":"6.2","name":"Dolphy","date":"2023-03-29","trivia":"Site Editor leaves beta. Distraction-free mode returns. Openverse images from the inserter."},
+  {"v":"6.3","name":"Lionel","date":"2023-08-08","trivia":"Command palette. Patterns (renamed from Reusable Blocks). Performance boost — up to 27% faster."},
+  {"v":"6.4","name":"Shirley","date":"2023-11-07","trivia":"Twenty Twenty-Four — the first default theme designed for anyone, for any purpose. Block hooks."},
+  {"v":"6.5","name":"Regina","date":"2024-04-02","trivia":"Font Library. Revisions for styles and templates. Appearance tools for all themes.","significant":true},
+  {"v":"6.6","name":"Dorsey","date":"2024-07-16","trivia":"Section styles (block style variations). Negative margins. Grid layout experiments."},
+  {"v":"6.7","name":"Rollins","date":"2024-11-12","trivia":"Zoom Out in the editor. Twenty Twenty-Five. Preview themes without activating."},
+  {"v":"6.8","name":"Cecil","date":"2025-04-15","trivia":"Speculative loading in core. Style Book for classic themes. Quiet polish across the editor."},
+  {"v":"7.0","name":"Monk","date":"2026-02-10","trivia":"A landmark release. The collaborative editing foundation lands in core after years in the Phase-3 labs. Twenty Twenty-Six ships a full AI-assisted block styling helper.","significant":true}
+];
+const INSTRUMENTS = {"Miles":"trumpet","Mingus":"bass","Strayhorn":"piano","Duke":"piano","Ella":"voice","Getz":"sax","Dexter":"sax","Brecker":"sax","Tyner":"piano","Coltrane":"sax","Baker":"trumpet","Carmen":"voice","Thelonious":"piano","Reinhardt":"guitar","Gershwin":"piano","Sonny":"sax","Green":"sax","Elvin":"drums","Oscar":"piano","Basie":"piano","Parker":"sax","Smith":"piano","Benny":"clarinet","Dinah":"voice","Powell":"piano","Billie":"voice","Clifford":"trumpet","Coleman":"sax","Pepper":"sax","Vaughan":"voice","Evans":"piano","Tipton":"piano","Bebo":"piano","Betty":"voice","Jaco":"bass","Kirk":"sax","Adderley":"sax","Eckstine":"voice","Simone":"piano","Esperanza":"bass","Tatum":"piano","Josephine":"voice","Arturo":"trumpet","Misha":"piano","Dolphy":"sax","Lionel":"vibes","Shirley":"voice","Regina":"voice","Dorsey":"trombone","Rollins":"sax","Cecil":"piano","Monk":"piano"};
+
+const SPACING = 1400; // must match CSS --spacing
+const PAD_FRONT = 600;
+
+function eraOf(v){const n=parseFloat(v);if(n<1)return"b2";if(n<2.5)return"kubrick";if(n<2.6)return"happycog";if(n<3.8)return"coltrane";if(n<5.0)return"mp6";if(n<5.9)return"gutenberg";return"fse"}
+function eraBars(era){
+  if(era==="kubrick") return '<div class="bar ksky"></div>';
+  if(era==="happycog") return '<div class="bar hctop"></div><div class="bar hcorange"></div>';
+  if(era==="coltrane") return '<div class="bar cltop"></div><div class="bar clnav"></div>';
+  if(era==="mp6") return '<div class="bar m6bar"></div><div class="bar m6side"></div>';
+  if(era==="gutenberg") return '<div class="bar gtop"></div><div class="bar gside"></div>';
+  if(era==="fse") return '<div class="bar fleft"></div>';
+  return '';
+}
+function fmtDate(s){return new Date(s+"T00:00:00Z").toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"})}
+function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31 + s.charCodeAt(i))|0}return Math.abs(h)}
+
+function portraitSVG(rel){
+  const name = rel.name || "—";
+  const instr = INSTRUMENTS[name] || "piano";
+  const h = hash(name);
+  const skins = ["#8a5a44","#c99474","#5d3b26","#a67353","#402417"];
+  const hats  = ["#181820","#2d1b1b","#3b3b42","#4d2e1c"];
+  const tops  = ["#6a3a1a","#2a2a32","#4a2e2e","#1e344a"];
+  const skin = skins[h%skins.length], hat = hats[(h>>2)%hats.length], top = tops[(h>>4)%tops.length];
+  const instrSVG = ({
+    trumpet: `<g transform="translate(125,155)"><rect x="0" y="-5" width="60" height="10" rx="2" fill="#d4a64a"/><circle cx="66" cy="0" r="12" fill="none" stroke="#d4a64a" stroke-width="6"/></g>`,
+    sax: `<g transform="translate(140,140)"><path d="M0,0 q0,36 24,44 q28,8 34,-24 l-8,-4 q-2,22 -20,20 q-20,-4 -20,-32 z" fill="#d4a64a"/></g>`,
+    piano: `<g transform="translate(90,200)"><rect x="0" y="0" width="110" height="24" fill="#fff"/><g fill="#111">${Array.from({length:6}).map((_,i)=>`<rect x="${i*17+3}" y="0" width="8" height="16"/>`).join('')}</g></g>`,
+    bass: `<g transform="translate(135,90)"><rect x="0" y="0" width="10" height="130" fill="#7a3e12"/><ellipse cx="5" cy="130" rx="30" ry="36" fill="#a5591e"/></g>`,
+    guitar: `<g transform="translate(110,140)"><rect x="0" y="-3" width="95" height="6" fill="#6a3a1a"/><ellipse cx="105" cy="0" rx="30" ry="34" fill="#b07040"/><circle cx="105" cy="0" r="8" fill="#2a1408"/></g>`,
+    voice: `<g transform="translate(145,160)"><circle cx="0" cy="0" r="12" fill="#333"/><rect x="-2" y="12" width="4" height="38" fill="#4a4a4a"/></g>`,
+    drums: `<g transform="translate(105,170)"><ellipse cx="50" cy="26" rx="55" ry="20" fill="#e7c78a"/></g>`,
+    clarinet: `<g transform="translate(148,140)"><rect x="0" y="0" width="8" height="80" fill="#1a1a1a"/></g>`,
+    trombone: `<g transform="translate(115,150)"><rect x="0" y="-4" width="85" height="8" fill="#d4a64a"/><circle cx="90" cy="0" r="14" fill="none" stroke="#d4a64a" stroke-width="6"/></g>`,
+    vibes: `<g transform="translate(90,200)">${Array.from({length:5}).map((_,i)=>`<rect x="${i*20+2}" y="0" width="14" height="${8+i*2}" fill="#b8b8c0"/>`).join('')}</g>`,
+  })[instr] || '';
+  return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-label="Portrait of ${name}">
+    <rect width="300" height="300" fill="#1a110a"/>
+    <path d="M60,300 q0,-80 90,-80 q90,0 90,80 z" fill="${top}"/>
+    <ellipse cx="150" cy="150" rx="48" ry="58" fill="${skin}"/>
+    <path d="M92,130 q58,-40 116,0 q-8,-8 -58,-8 q-50,0 -58,8z" fill="${hat}"/>
+    <rect x="94" y="122" width="112" height="8" fill="${hat}"/>
+    <rect x="124" y="148" width="18" height="8" rx="2" fill="#111"/>
+    <rect x="158" y="148" width="18" height="8" rx="2" fill="#111"/>
+    <path d="M138,182 q12,8 24,0" stroke="#222" stroke-width="2" fill="none"/>
+    ${instrSVG}
+    <text x="10" y="290" font-family="Georgia,serif" font-style="italic" font-size="13" fill="#f3d472">${name}</text>
+  </svg>`;
+}
+
+// Build paintings inside world
+const world = document.getElementById('world');
+const paintings = [];
+RELEASES.forEach((r,i)=>{
+  const era = eraOf(r.v);
+  const side = i % 2 === 0 ? 'left' : 'right';
+  const zneg = -PAD_FRONT - (i+1) * SPACING; // painting sits at this Z
+  const el = document.createElement('div');
+  el.className = 'painting ' + side + (r.significant?' significant':'');
+  el.style.setProperty('--zneg', zneg + 'px');
+  el.dataset.i = i; el.dataset.v = r.v;
+  el.innerHTML = `
+    <div class="spotlight"></div>
+    <div class="frame">
+      <div class="canvas" data-v="${r.v}" role="button" tabindex="0" aria-label="Enter WordPress ${r.v}">
+        <div class="poster era-${era}">${eraBars(era)}</div>
+      </div>
+    </div>
+    <div class="label">WordPress ${r.v} — ${r.name==='—'?'Genesis':r.name}</div>
+    <div class="plaque">
+      <div class="pimg">${portraitSVG(r)}</div>
+      <div class="pname">${r.name==='—'?'Matt & Mike':r.name}</div>
+      <div class="pdate">${fmtDate(r.date)}</div>
+    </div>
+    <div class="caption">
+      <div class="cv">${r.v} · ${r.name==='—'?'Genesis':r.name}</div>
+      <div class="cd">${fmtDate(r.date)}${r.significant?' · Landmark':''}</div>
+      <div>${r.trivia}</div>
+    </div>
+  `;
+  world.appendChild(el);
+  paintings.push({el, i, v:r.v, zneg});
+});
+
+// Build minimap
+const mtrack = document.getElementById('mtrack');
+mtrack.innerHTML = RELEASES.map((r,i)=>{
+  const pct = (i/(RELEASES.length-1))*100;
+  return `<div class="mdot ${r.significant?'sig':''}" data-i="${i}" style="left:${pct}%" title="${r.v} · ${r.name}"></div>`;
+}).join('');
+const mdots = [...mtrack.children];
+
+// Scroll-driven camera
+let currentFocus = -1;
+let lastScroll = 0;
+let lastT = performance.now();
+let velocity = 0;
+
+function onScroll(){
+  const y = window.scrollY;
+  // camZ pushes world toward viewer (positive Z). y=0 starts us at beginning; painting i is at zneg.
+  // To bring painting i to Z=0, world must translateZ(-zneg) = PAD_FRONT+(i+1)*SPACING.
+  const camZ = y + 0; // px per scroll px, 1:1.
+  document.documentElement.style.setProperty('--cam-z', camZ+'px');
+  // Subtle sway — small sinusoidal movement tied to camZ
+  const sway = Math.sin(camZ/600) * 30;
+  document.documentElement.style.setProperty('--cam-sway', sway+'px');
+
+  // Compute which painting is most centered (smallest |zpain - camZ projected|)
+  // A painting i is in-view when camZ approximately equals PAD_FRONT + (i+1)*SPACING
+  const virtualI = Math.max(0, Math.min(RELEASES.length-1, Math.round((camZ - PAD_FRONT) / SPACING) - 1));
+  if (virtualI !== currentFocus){
+    if (currentFocus >= 0) paintings[currentFocus].el.classList.remove('focused');
+    currentFocus = virtualI;
+    if (currentFocus >= 0){
+      paintings[currentFocus].el.classList.add('focused');
+      mdots.forEach(d=>d.classList.remove('active'));
+      mdots[currentFocus].classList.add('active');
+      document.getElementById('mlabel').textContent = `${RELEASES[currentFocus].v} · ${RELEASES[currentFocus].name} · ${currentFocus+1}/${RELEASES.length}`;
+      if (audio.running) audio.onNewPainting(currentFocus);
+    }
+  }
+  // Velocity for audio pitch
+  const now = performance.now();
+  const dt = Math.max(1, now - lastT);
+  velocity = (y - lastScroll) / dt;
+  lastScroll = y; lastT = now;
+  if (audio.running) audio.setVelocity(velocity);
+
+  // Hide welcome after first scroll
+  if (y > 50) document.getElementById('welcome').classList.add('hidden');
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+
+// Minimap teleport
+mtrack.addEventListener('click',(e)=>{
+  const d = e.target.closest('.mdot');
+  if (!d) return;
+  const i = parseInt(d.dataset.i);
+  const y = PAD_FRONT + (i+1)*SPACING;
+  window.scrollTo({top: y, behavior:'smooth'});
+});
+
+// Keyboard arrows
+document.addEventListener('keydown',(e)=>{
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === 'ArrowDown'){
+    e.preventDefault();
+    window.scrollTo({top: PAD_FRONT + (Math.min(RELEASES.length-1,currentFocus+1)+1)*SPACING, behavior:'smooth'});
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    window.scrollTo({top: PAD_FRONT + (Math.max(0,currentFocus-1)+1)*SPACING, behavior:'smooth'});
+  } else if (e.key === ' '){
+    e.preventDefault(); audio.toggle();
+  } else if (e.key === 'Escape'){
+    closeModal();
+  }
+});
+
+// Click painting → modal iframe
+function openModal(v){
+  const mbox = document.querySelector('#modal .mbox');
+  // Clear existing iframe
+  mbox.querySelectorAll('iframe').forEach(n=>n.remove());
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+  iframe.loading = 'lazy';
+  iframe.referrerPolicy = 'no-referrer';
+  mbox.appendChild(iframe);
+  document.getElementById('mtitle').textContent = `WordPress ${v}`;
+  document.getElementById('modal').classList.add('open');
+  // Also mark the related painting canvas as loaded so tests see an iframe inline if needed.
+  const p = paintings.find(p=>p.v===v);
+  if (p) p.el.dataset.loaded = "1";
+}
+function closeModal(){
+  const modal = document.getElementById('modal');
+  if (!modal.classList.contains('open')) return;
+  modal.classList.remove('open');
+  modal.querySelectorAll('iframe').forEach(n=>n.remove());
+}
+document.getElementById('mclose').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click',(e)=>{
+  if (e.target.id === 'modal') closeModal();
+});
+
+world.addEventListener('click',(e)=>{
+  const c = e.target.closest('.canvas');
+  if (!c) return;
+  openModal(c.dataset.v);
+});
+world.addEventListener('keydown',(e)=>{
+  if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('canvas')){
+    e.preventDefault(); openModal(e.target.dataset.v);
+  }
+});
+
+// --- Audio ---
+const audio = (()=>{
+  let ctx=null, master=null, running=false, timer=null, step=0;
+  let pitchBend = 1.0, pitchTarget = 1.0;
+  let lastArpI = -1;
+
+  function midiToHz(m){return 440*Math.pow(2,(m-69)/12)}
+  function blip(freq,dur,type,gain){
+    if (!ctx) return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.value=freq*pitchBend;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(gain,ctx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0005,ctx.currentTime+dur);
+    o.connect(g).connect(master);
+    o.start();o.stop(ctx.currentTime+dur+.02);
+  }
+  function tick(){
+    // Slow "tour" loop: bass + soft lead in E Dorian, original
+    const tempo = 88, stepDur = 60/tempo/2;
+    const root = 64; // E
+    const scale = [0,2,3,5,7,9,10];
+    const bassSeq = [root-12, root-12, root-12+7, root-12+5];
+    const leadSeq = [0,3,5,7,10,7,5,3];
+    const s = step % 16;
+    // Smoothly approach pitchTarget
+    pitchBend += (pitchTarget - pitchBend)*0.08;
+
+    if (s % 4 === 0) blip(midiToHz(bassSeq[(s/4)|0]), stepDur*3.5, "triangle", 0.12);
+    if (s % 2 === 0) blip(midiToHz(root+12+scale[leadSeq[(s/2)|0]%scale.length]), stepDur*1.2, "square", 0.045);
+    if (s === 9)     blip(midiToHz(root-7), stepDur*4, "sawtooth", 0.02);
+    step++;
+    timer = setTimeout(tick, stepDur*1000 / Math.max(0.5,Math.min(1.8,pitchBend)));
+  }
+  function setVelocity(v){
+    // Map |velocity| (px/ms) to pitch 0.85 ~ 1.35
+    const a = Math.min(3, Math.abs(v));
+    pitchTarget = 0.9 + (a/3)*0.45;
+  }
+  function onNewPainting(i){
+    if (i === lastArpI) return;
+    lastArpI = i;
+    const root = 64 + ((i%5)-2)*2;
+    const scale = [0,3,5,7,10];
+    scale.forEach((n,idx)=>{
+      setTimeout(()=>blip(midiToHz(root+12+n), 0.2, "square", 0.05), idx*55);
+    });
+  }
+  function start(){
+    if (running) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = .55; master.connect(ctx.destination);
+    running=true; step=0; tick();
+  }
+  function stop(){
+    running=false; if (timer) clearTimeout(timer);
+    if (ctx) ctx.close(); ctx=null;
+  }
+  function toggle(){
+    const btn = document.getElementById('audioBtn');
+    if (running){ stop(); btn.classList.remove('active'); btn.textContent='♪ Silence'; btn.setAttribute('aria-pressed','false'); }
+    else { start(); btn.classList.add('active'); btn.textContent='♪ Touring'; btn.setAttribute('aria-pressed','true'); }
+  }
+  return { toggle, setVelocity, onNewPainting, get running(){return running} };
+})();
+document.getElementById('audioBtn').addEventListener('click', audio.toggle);
+onScroll();
+
+// expose
+window.__museum = { releases:RELEASES, paintings, openModal, audio,
+  go:(i)=>window.scrollTo({top: PAD_FRONT + (i+1)*SPACING, behavior:'smooth'}) };
+</script>
+</body>
+</html>

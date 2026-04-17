@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WP Museum v6 — Pinned Storytelling</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#faf7f2;color:#111;font-family:"SF Pro Display",Inter,system-ui,sans-serif;scroll-behavior:smooth}
+  :root{--ink:#0f1115;--muted:#5b6068;--accent:#1d1d1f;--paper:#faf7f2}
+  img,svg{display:block}
+
+  /* Era header */
+  #eraBar{position:sticky;top:0;z-index:10;background:rgba(250,247,242,.85);backdrop-filter:saturate(120%) blur(14px);-webkit-backdrop-filter:saturate(120%) blur(14px);border-bottom:1px solid rgba(0,0,0,.08);padding:12px 20px;display:flex;align-items:center;gap:16px;font:500 14px/1 "SF Pro Display",system-ui,sans-serif;}
+  #eraBar .left{flex:1;display:flex;gap:14px;align-items:baseline}
+  #eraBar .home{font:700 14px/1 "SF Pro Display",system-ui,sans-serif;letter-spacing:-.01em;color:#111;text-decoration:none}
+  #eraBar .chapterLabel{color:var(--muted);letter-spacing:.2em;text-transform:uppercase;font-size:11px}
+  #eraBar .eraName{font-weight:600;letter-spacing:-.01em}
+  #eraBar .progress{width:160px;height:3px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden}
+  #eraBar .progress i{display:block;height:100%;background:#111;width:0%}
+  #eraBar .audio{background:#111;color:#fff;border:0;padding:8px 14px;border-radius:999px;font:600 12px/1 inherit;cursor:pointer;letter-spacing:.02em}
+  #eraBar .audio.active{background:#e66}
+  #eraBar .audio .layers{display:inline-block;margin-left:6px;font-family:ui-monospace,monospace;font-weight:400;opacity:.8;letter-spacing:.05em}
+
+  /* Intro */
+  #intro{min-height:90vh;display:grid;place-items:center;text-align:center;padding:120px 20px 80px}
+  #intro h1{font:800 clamp(2.8rem,8vw,6.4rem)/0.98 "SF Pro Display",system-ui,sans-serif;letter-spacing:-.035em;margin:0 0 18px;background:linear-gradient(180deg,#111 40%,#4a4a4a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #intro p{font:400 clamp(1rem,1.6vw,1.3rem)/1.5 "SF Pro Display",system-ui,sans-serif;color:var(--muted);max-width:46ch;margin:0 auto}
+  #intro .hint{margin-top:60px;color:var(--muted);font-size:12px;letter-spacing:.35em;text-transform:uppercase}
+  #intro .hint::after{content:"";display:block;width:1px;height:40px;background:#111;margin:14px auto 0;animation:drop 1.6s infinite}
+  @keyframes drop{0%,100%{transform:scaleY(1);opacity:.2}50%{transform:scaleY(1.6);opacity:1}}
+
+  /* Chapter */
+  .chapter{position:relative;height:200vh;padding:0}
+  .pinbox{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:40px;padding:80px 6vw 40px;}
+  .pinbox .stage{position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center}
+  .pinbox .text{position:relative}
+
+  .port-stage{position:relative;width:min(460px,40vw);aspect-ratio:1/1;}
+  .port-stage svg{width:100%;height:100%}
+  .port-path{stroke-dasharray:4000;stroke-dashoffset:4000;transition:stroke-dashoffset 1s ease}
+  .bigV{font:900 clamp(3rem,10vw,9rem)/0.9 "SF Pro Display",system-ui,sans-serif;letter-spacing:-.05em;margin:0 0 0 -4px;background:linear-gradient(180deg,#111 30%,#4a4a4a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .codename{font:italic 700 clamp(1.8rem,3vw,2.8rem)/1 "New York","Times New Roman",serif;color:#b88536;margin:.1em 0 .2em}
+  .date{font:600 12px/1 ui-monospace,monospace;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  .trivia{font:400 clamp(1rem,1.3vw,1.2rem)/1.5 "SF Pro Display",system-ui,sans-serif;color:#2a2e36;max-width:44ch;margin:18px 0 0}
+  .sig-flag{display:inline-block;background:#fff6c9;color:#8a6d12;border:1px solid #efd87a;border-radius:999px;padding:4px 10px;font:600 10px/1 ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+  .nrel{font:600 11px/1 ui-monospace,monospace;color:var(--muted);letter-spacing:.3em;text-transform:uppercase;margin-bottom:8px}
+
+  /* Beats: opacity on each block */
+  .beat{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease}
+  .beat.in{opacity:1;transform:none}
+
+  /* Screenshot stage */
+  .screen-wrap{position:relative;width:min(600px,44vw);aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 30px 80px -30px rgba(0,0,0,.3);transform:scale(.9);transition:transform .8s ease, opacity .6s ease;opacity:0;cursor:pointer}
+  .screen-wrap.breathe{animation:breathe 3.6s ease-in-out infinite}
+  @keyframes breathe{50%{transform:scale(.94)}}
+  .screen-wrap.in{opacity:1;transform:scale(1)}
+  .screen-wrap iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .poster{position:absolute;inset:0}
+  .poster .bar{position:absolute}
+  .hint-cta{position:absolute;inset:auto 0 0 0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font:500 12px/1.3 inherit;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+  .hint-cta button{pointer-events:auto;cursor:pointer;border:0;background:#fff;color:#111;font:600 11px/1 inherit;padding:7px 11px;border-radius:6px;letter-spacing:.05em}
+
+  /* Era poster styles (same templates) */
+  .poster.era-b2{background:#fafafa}
+  .poster.era-b2::before{content:"b2 » weblog tool";position:absolute;top:0;left:0;right:0;height:30px;background:#333;color:#ffcc66;font:700 11px/30px ui-monospace,monospace;padding-left:10px}
+  .poster.era-b2::after{content:"Hello, world. Posted by Mike.";color:#222;position:absolute;top:40px;left:12px;right:12px;font:italic 11px/1.5 Georgia,serif}
+  .poster.era-kubrick{background:radial-gradient(600px 200px at 50% 120%,#6ea5d0,transparent 70%),linear-gradient(#73a0c5,#234b6a)}
+  .poster.era-kubrick::after{content:"The WordPress Blog";color:#fff;position:absolute;top:14px;left:16px;font:italic 700 20px/1 Georgia,serif;text-shadow:0 1px 0 #0006}
+  .poster.era-kubrick .bar.ksky{inset:auto 0 0 0;height:22%;background:linear-gradient(#4a7830,#3e6826)}
+  .poster.era-happycog{background:#efefef}
+  .poster.era-happycog .bar.hctop{top:0;left:0;right:0;height:36px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-happycog .bar.hcorange{top:36px;left:0;right:0;height:3px;background:#d54e21}
+  .poster.era-happycog::before{content:"WordPress";color:#fff;position:absolute;top:0;left:12px;font:700 14px/36px sans-serif}
+  .poster.era-happycog::after{content:"Dashboard · Posts · Pages";color:#666;position:absolute;top:46px;left:12px;font:11px/1 sans-serif}
+  .poster.era-coltrane{background:#f1f1f1}
+  .poster.era-coltrane .bar.cltop{top:0;left:0;right:0;height:22px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-coltrane .bar.clnav{top:22px;left:0;bottom:0;width:28%;background:#464646}
+  .poster.era-coltrane::before{content:"";position:absolute;top:32px;left:32%;right:6%;height:8px;background:#bbb;box-shadow:0 18px 0 #ccc,0 36px 0 #ccc}
+  .poster.era-mp6{background:#f1f1f1}
+  .poster.era-mp6 .bar.m6bar{top:0;left:0;right:0;height:26px;background:#23282d}
+  .poster.era-mp6 .bar.m6side{top:26px;left:0;bottom:0;width:22%;background:#32373c}
+  .poster.era-mp6::after{content:"Add New Post";position:absolute;top:40px;left:calc(26%);color:#23282d;font:500 15px/1 sans-serif}
+  .poster.era-gutenberg{background:#f6f7f7}
+  .poster.era-gutenberg .bar.gtop{top:0;left:0;right:0;height:28px;background:#fff;border-bottom:1px solid #ddd}
+  .poster.era-gutenberg .bar.gside{top:28px;right:0;bottom:0;width:22%;background:#fff;border-left:1px solid #ddd}
+  .poster.era-gutenberg::before{content:"";position:absolute;left:10%;right:26%;top:56px;height:34px;background:#fff;border:1px solid #2271b1;box-shadow:0 0 0 1px #72aee6}
+  .poster.era-gutenberg::after{content:"Add title";position:absolute;left:calc(10% + 10px);top:66px;color:#949494;font:300 16px/1 sans-serif}
+  .poster.era-fse{background:#1e1e1e}
+  .poster.era-fse .bar.fleft{top:0;left:0;bottom:0;width:18%;background:#1e1e1e;border-right:1px solid #303030}
+  .poster.era-fse::before{content:"";position:absolute;left:22%;right:6%;top:10%;bottom:10%;background:#fff;box-shadow:0 0 0 1px #444,0 10px 30px #000a}
+  .poster.era-fse::after{content:"Editor";color:#fff;opacity:.8;position:absolute;top:5px;left:8px;font:500 10px/1 sans-serif;letter-spacing:.5px}
+
+  /* Era background tints for pinbox */
+  .chapter[data-era="b2"] .pinbox{background:linear-gradient(180deg,#faf7f2,#eee)}
+  .chapter[data-era="kubrick"] .pinbox{background:linear-gradient(180deg,#e7eef5,#c5d9ea)}
+  .chapter[data-era="happycog"] .pinbox{background:linear-gradient(180deg,#fff,#f3dbc9)}
+  .chapter[data-era="coltrane"] .pinbox{background:linear-gradient(180deg,#f4f4f4,#dcdcdc)}
+  .chapter[data-era="mp6"] .pinbox{background:linear-gradient(180deg,#eef5fb,#c8dff3)}
+  .chapter[data-era="gutenberg"] .pinbox{background:linear-gradient(180deg,#ffffff,#eef1f4)}
+  .chapter[data-era="fse"] .pinbox{background:linear-gradient(180deg,#1b1720,#2b213a);color:#f5f0ff}
+  .chapter[data-era="fse"] .bigV{background:linear-gradient(180deg,#fff,#a999c8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .chapter[data-era="fse"] .trivia{color:#ece3fb}
+  .chapter[data-era="fse"] .date{color:#bba6dc}
+  .chapter[data-era="fse"] .codename{color:#ffcf77}
+
+  /* Finale */
+  #finale{min-height:80vh;display:grid;place-items:center;text-align:center;padding:80px 20px}
+  #finale h2{font:700 clamp(1.8rem,4vw,3rem)/1.1 inherit;margin:0 0 10px;letter-spacing:-.02em}
+  #finale p{color:var(--muted);max-width:50ch;margin:0 auto}
+  #finale a{color:#111;text-decoration:underline;text-underline-offset:4px}
+
+  @media (max-width:900px){
+    .pinbox{grid-template-columns:1fr;grid-template-rows:auto auto;gap:20px;padding:72px 5vw 20px}
+    .port-stage{width:60vw;max-width:340px}
+    .screen-wrap{width:90vw}
+    .chapter{height:260vh}
+  }
+</style>
+</head>
+<body>
+<div id="eraBar">
+  <a class="home" href="../">WP / Museum</a>
+  <div class="left">
+    <span class="chapterLabel">Chapter</span>
+    <span class="eraName" id="eraName">Genesis · b2</span>
+  </div>
+  <div class="progress"><i id="prog"></i></div>
+  <button class="audio" id="audioBtn" aria-pressed="false">♪ Audio Off<span class="layers" id="layers"></span></button>
+</div>
+
+<section id="intro">
+  <div>
+    <div style="letter-spacing:.4em;font-size:12px;color:#999;text-transform:uppercase;margin-bottom:20px">Fifty-three releases. One story.</div>
+    <h1>WordPress, one pin at a time.</h1>
+    <p>Scroll slowly. Each release pins, draws itself, and hands you a live preview before the next chapter begins. Music accretes features the same way the product did.</p>
+    <div class="hint">Scroll to begin</div>
+  </div>
+</section>
+
+<main id="main"></main>
+
+<section id="finale">
+  <div>
+    <h2>End of catalog.</h2>
+    <p>Fifty-three releases, from a Saturday-night fork to a collaborative-editing launch. <a href="../">Back to the museum</a>.</p>
+  </div>
+</section>
+
+<script>
+const RELEASES = [
+  {"v":"0.70","name":"—","date":"2003-05-27","trivia":"The very first WordPress release, forked from b2/cafelog by Matt Mullenweg and Mike Little. No codename yet — just a hopeful birth announcement on a personal blog."},
+  {"v":"1.0","name":"Miles","date":"2004-01-03","trivia":"Named after jazz great Miles Davis, starting the tradition of jazz-musician codenames. Introduced search-engine-friendly permalinks, the Post Preview pane, and a real plugin API.","significant":true},
+  {"v":"1.2","name":"Mingus","date":"2004-05-22","trivia":"Introduced the Plugin system as we know it today — the moment WordPress became infinitely extensible.","significant":true},
+  {"v":"1.5","name":"Strayhorn","date":"2005-02-17","trivia":"Introduced Themes and Pages. The Kubrick theme became a symbol of an era. Downloaded 900,000 times in a single year.","significant":true},
+  {"v":"2.0","name":"Duke","date":"2005-12-31","trivia":"Shipped a rich WYSIWYG editor (TinyMCE), image uploads, Akismet, and user roles. A New Year's Eve gift from Matt.","significant":true},
+  {"v":"2.1","name":"Ella","date":"2007-01-22","trivia":"Autosave made its debut. Many blog posts were rescued that day."},
+  {"v":"2.2","name":"Getz","date":"2007-05-16","trivia":"Widgets arrived. Sidebars would never be the same.","significant":true},
+  {"v":"2.3","name":"Dexter","date":"2007-09-24","trivia":"Native tagging. Before this, people hacked it in with plugins."},
+  {"v":"2.5","name":"Brecker","date":"2008-03-29","trivia":"Wholesale admin redesign by Happy Cog — the first time WordPress looked designed rather than merely assembled."},
+  {"v":"2.6","name":"Tyner","date":"2008-07-15","trivia":"Post revisions. Press This bookmarklet. Word count finally reliable."},
+  {"v":"2.7","name":"Coltrane","date":"2008-12-10","trivia":"New admin UI with left-hand navigation that lasted over a decade. Automatic plugin upgrades from the dashboard.","significant":true},
+  {"v":"2.8","name":"Baker","date":"2009-06-11","trivia":"Theme installer from the dashboard. Syntax highlighting in the theme editor."},
+  {"v":"2.9","name":"Carmen","date":"2009-12-18","trivia":"Built-in image editor. Trash (finally). Oembed."},
+  {"v":"3.0","name":"Thelonious","date":"2010-06-17","trivia":"Merged WordPress MU — multisite for everyone. Custom post types and custom menus landed. Twenty Ten replaced Kubrick. A civilizational shift.","significant":true},
+  {"v":"3.1","name":"Reinhardt","date":"2011-02-23","trivia":"Admin Bar arrived, hovering helpfully over your site."},
+  {"v":"3.2","name":"Gershwin","date":"2011-07-04","trivia":"Dropped PHP 4 and MySQL 4 support. Distraction-free writing mode. Twenty Eleven."},
+  {"v":"3.3","name":"Sonny","date":"2011-12-12","trivia":"Drag-and-drop media uploader. Flyout menus. New-user welcome pointers."},
+  {"v":"3.4","name":"Green","date":"2012-06-13","trivia":"Theme Customizer debuted. Twitter embeds.","significant":true},
+  {"v":"3.5","name":"Elvin","date":"2012-12-11","trivia":"Brand-new Media Manager. Retina-ready admin. Twenty Twelve."},
+  {"v":"3.6","name":"Oscar","date":"2013-08-01","trivia":"Delayed twice. Audio and video improvements. Twenty Thirteen — the most colorful default theme ever."},
+  {"v":"3.7","name":"Basie","date":"2013-10-24","trivia":"Automatic background security updates. Quietly the most important WordPress release of all time.","significant":true},
+  {"v":"3.8","name":"Parker","date":"2013-12-12","trivia":"Flat, responsive admin (the MP6 project merged in). Admin color schemes. Twenty Fourteen magazine theme.","significant":true},
+  {"v":"3.9","name":"Smith","date":"2014-04-16","trivia":"Live widget previews. Improved visual editor with drag-and-drop images."},
+  {"v":"4.0","name":"Benny","date":"2014-09-04","trivia":"A symbolic release — the number bump didn't mean a rewrite, but a smoother grid media library and embed previews in the editor."},
+  {"v":"4.1","name":"Dinah","date":"2014-12-17","trivia":"Twenty Fifteen: the most minimal default theme yet. Distraction-free writing mode v2."},
+  {"v":"4.2","name":"Powell","date":"2015-04-23","trivia":"Emoji support everywhere. Press This redesigned. Plugin updates without leaving the page."},
+  {"v":"4.3","name":"Billie","date":"2015-08-18","trivia":"Menus in the Customizer. Site icons from the Customizer. Formatting shortcuts in the editor."},
+  {"v":"4.4","name":"Clifford","date":"2015-12-08","trivia":"REST API infrastructure merged. Responsive images by default. Embed your WordPress posts elsewhere.","significant":true},
+  {"v":"4.5","name":"Coleman","date":"2016-04-12","trivia":"Inline linking. Custom logos in the Customizer. Formatting keyboard shortcuts."},
+  {"v":"4.6","name":"Pepper","date":"2016-08-16","trivia":"Streamlined updates, native system fonts in the admin, editor content recovery."},
+  {"v":"4.7","name":"Vaughan","date":"2016-12-06","trivia":"REST API content endpoints shipped. Twenty Seventeen. Custom CSS in the Customizer.","significant":true},
+  {"v":"4.8","name":"Evans","date":"2017-06-08","trivia":"Rich Text Widgets. Audio, Video, Image, HTML widgets. Stage-setting for blocks."},
+  {"v":"4.9","name":"Tipton","date":"2017-11-15","trivia":"Scheduled customization changes. Code-editing safety nets — the last release before Gutenberg lit up the ecosystem."},
+  {"v":"5.0","name":"Bebo","date":"2018-12-06","trivia":"Gutenberg. The block editor. The biggest change to WordPress editing since 2.0's WYSIWYG. Twenty Nineteen as the first block-ready default theme.","significant":true},
+  {"v":"5.1","name":"Betty","date":"2019-02-21","trivia":"Site Health warnings for outdated PHP. Editor performance improvements."},
+  {"v":"5.2","name":"Jaco","date":"2019-05-07","trivia":"Site Health dashboard. PHP error protection (WSOD). Bumped PHP minimum to 5.6."},
+  {"v":"5.3","name":"Kirk","date":"2019-11-12","trivia":"Twenty Twenty. Accessibility-first admin improvements. Block editor handles long posts."},
+  {"v":"5.4","name":"Adderley","date":"2020-03-31","trivia":"Social Icons block. Buttons block. Released during the first weeks of the pandemic."},
+  {"v":"5.5","name":"Eckstine","date":"2020-08-11","trivia":"Block patterns. Auto-updates for plugins and themes. XML sitemaps in core.","significant":true},
+  {"v":"5.6","name":"Simone","date":"2020-12-08","trivia":"First major release led by an all-women-identifying release squad. Twenty Twenty-One — a breezy pastel default.","significant":true},
+  {"v":"5.7","name":"Esperanza","date":"2021-03-09","trivia":"One-click HTTPS migration. Drag-and-drop blocks within columns."},
+  {"v":"5.8","name":"Tatum","date":"2021-07-20","trivia":"Widgets become blocks. Template editor previews Full Site Editing. theme.json arrives quietly.","significant":true},
+  {"v":"5.9","name":"Josephine","date":"2022-01-25","trivia":"Full Site Editing officially ships. Twenty Twenty-Two — the first block theme. Navigation block.","significant":true},
+  {"v":"6.0","name":"Arturo","date":"2022-05-24","trivia":"Style variations. Write mode. Locking blocks. FSE matures."},
+  {"v":"6.1","name":"Misha","date":"2022-11-01","trivia":"Fluid typography. Twenty Twenty-Three with 10 style variations."},
+  {"v":"6.2","name":"Dolphy","date":"2023-03-29","trivia":"Site Editor leaves beta. Distraction-free mode returns. Openverse images from the inserter."},
+  {"v":"6.3","name":"Lionel","date":"2023-08-08","trivia":"Command palette. Patterns (renamed from Reusable Blocks). Performance boost — up to 27% faster."},
+  {"v":"6.4","name":"Shirley","date":"2023-11-07","trivia":"Twenty Twenty-Four — the first default theme designed for anyone, for any purpose. Block hooks."},
+  {"v":"6.5","name":"Regina","date":"2024-04-02","trivia":"Font Library. Revisions for styles and templates. Appearance tools for all themes.","significant":true},
+  {"v":"6.6","name":"Dorsey","date":"2024-07-16","trivia":"Section styles (block style variations). Negative margins. Grid layout experiments."},
+  {"v":"6.7","name":"Rollins","date":"2024-11-12","trivia":"Zoom Out in the editor. Twenty Twenty-Five. Preview themes without activating."},
+  {"v":"6.8","name":"Cecil","date":"2025-04-15","trivia":"Speculative loading in core. Style Book for classic themes. Quiet polish across the editor."},
+  {"v":"7.0","name":"Monk","date":"2026-02-10","trivia":"A landmark release. The collaborative editing foundation lands in core after years in the Phase-3 labs. Twenty Twenty-Six ships a full AI-assisted block styling helper.","significant":true}
+];
+
+const INSTRUMENTS = {"Miles":"trumpet","Mingus":"bass","Strayhorn":"piano","Duke":"piano","Ella":"voice","Getz":"sax","Dexter":"sax","Brecker":"sax","Tyner":"piano","Coltrane":"sax","Baker":"trumpet","Carmen":"voice","Thelonious":"piano","Reinhardt":"guitar","Gershwin":"piano","Sonny":"sax","Green":"sax","Elvin":"drums","Oscar":"piano","Basie":"piano","Parker":"sax","Smith":"piano","Benny":"clarinet","Dinah":"voice","Powell":"piano","Billie":"voice","Clifford":"trumpet","Coleman":"sax","Pepper":"sax","Vaughan":"voice","Evans":"piano","Tipton":"piano","Bebo":"piano","Betty":"voice","Jaco":"bass","Kirk":"sax","Adderley":"sax","Eckstine":"voice","Simone":"piano","Esperanza":"bass","Tatum":"piano","Josephine":"voice","Arturo":"trumpet","Misha":"piano","Dolphy":"sax","Lionel":"vibes","Shirley":"voice","Regina":"voice","Dorsey":"trombone","Rollins":"sax","Cecil":"piano","Monk":"piano"};
+
+const ERA_NAMES = { b2:"Genesis · b2", kubrick:"Kubrick · 1.x–2.4", happycog:"Happy Cog · 2.5", coltrane:"Coltrane · 2.6–3.7", mp6:"MP6 · 3.8–4.9", gutenberg:"Gutenberg · 5.0–5.8", fse:"Full-Site Editing · 5.9+"};
+
+function eraOf(v){const n=parseFloat(v);if(n<1)return"b2";if(n<2.5)return"kubrick";if(n<2.6)return"happycog";if(n<3.8)return"coltrane";if(n<5.0)return"mp6";if(n<5.9)return"gutenberg";return"fse"}
+function eraBars(era){
+  if(era==="kubrick") return '<div class="bar ksky"></div>';
+  if(era==="happycog") return '<div class="bar hctop"></div><div class="bar hcorange"></div>';
+  if(era==="coltrane") return '<div class="bar cltop"></div><div class="bar clnav"></div>';
+  if(era==="mp6") return '<div class="bar m6bar"></div><div class="bar m6side"></div>';
+  if(era==="gutenberg") return '<div class="bar gtop"></div><div class="bar gside"></div>';
+  if(era==="fse") return '<div class="bar fleft"></div>';
+  return '';
+}
+function fmtDate(s){return new Date(s+"T00:00:00Z").toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"})}
+
+/* --- Portrait with animated strokes --- */
+function portraitSVG(rel){
+  const name = rel.name || "—";
+  const instr = INSTRUMENTS[name] || "piano";
+  const instrPath = ({
+    trumpet: `<path class="port-path" d="M140,200 L220,200 M220,185 a14,14 0 1,1 0,30" stroke="#b77e2a" stroke-width="7" fill="none" stroke-linecap="round"/>`,
+    sax: `<path class="port-path" d="M210,150 q-6,50 20,70 q40,14 54,-30" stroke="#b77e2a" stroke-width="7" fill="none" stroke-linecap="round"/>`,
+    piano: `<g stroke="#222" stroke-width="2" fill="none"><path class="port-path" d="M120,260 H280 V300 H120 Z"/><path class="port-path" d="M135,260 v30 M155,260 v30 M175,260 v30 M195,260 v30 M215,260 v30 M235,260 v30 M255,260 v30"/></g>`,
+    bass: `<path class="port-path" d="M200,90 v170 M200,260 a40,44 0 1,0 14,-2" stroke="#5b2e0c" stroke-width="6" fill="none"/>`,
+    guitar: `<path class="port-path" d="M140,210 h100 m0,0 a38,40 0 1,1 -0.1,0" stroke="#5b2e0c" stroke-width="6" fill="none"/>`,
+    voice: `<g stroke="#333" stroke-width="4" fill="none"><circle class="port-path" cx="200" cy="210" r="16"/><path class="port-path" d="M200,230 v54 M180,290 h40"/></g>`,
+    drums: `<g stroke="#7a5a1e" stroke-width="4" fill="none"><ellipse class="port-path" cx="200" cy="260" rx="66" ry="20"/><path class="port-path" d="M148,250 l-12,-50 M252,250 l12,-50"/></g>`,
+    clarinet: `<path class="port-path" d="M210,180 v90" stroke="#111" stroke-width="9" fill="none"/>`,
+    trombone: `<path class="port-path" d="M130,210 h110 m0,0 a18,18 0 1,1 -0.1,0" stroke="#b77e2a" stroke-width="7" fill="none"/>`,
+    vibes: `<g stroke="#666" stroke-width="3" fill="none">${[0,1,2,3,4,5].map(i=>`<path class="port-path" d="M${130+i*24},260 v${16+i*3}"/>`).join('')}</g>`
+  })[instr]||'';
+  return `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-label="Stylized portrait of ${name}">
+    <defs><filter id="grain${name}"><feTurbulence baseFrequency=".8"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .06 0"/></filter></defs>
+    <g fill="none" stroke="#111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path class="port-path" d="M120,380 q0,-100 80,-100 q80,0 80,100"/>
+      <ellipse class="port-path" cx="200" cy="180" rx="56" ry="66"/>
+      <path class="port-path" d="M140,156 q60,-50 120,0"/>
+      <path class="port-path" d="M132,150 h136"/>
+      <path class="port-path" d="M164,172 h30 M206,172 h30"/>
+      <path class="port-path" d="M180,218 q20,12 40,0"/>
+    </g>
+    ${instrPath}
+    <rect width="400" height="400" filter="url(#grain${name})"/>
+  </svg>`;
+}
+
+/* --- Build chapters --- */
+const main = document.getElementById('main');
+main.innerHTML = RELEASES.map((r,i)=>{
+  const era = eraOf(r.v);
+  const sig = r.significant ? '<div class="sig-flag">★ Landmark</div>' : '';
+  return `<article class="chapter" data-i="${i}" data-era="${era}" data-v="${r.v}">
+    <div class="pinbox">
+      <div class="stage">
+        <div class="port-stage beat" data-beat="1">${portraitSVG(r)}</div>
+      </div>
+      <div class="text">
+        <div class="nrel beat" data-beat="1">Release ${String(i+1).padStart(2,"0")} · ${ERA_NAMES[era].split(' · ')[0]}</div>
+        <div class="beat" data-beat="1">
+          ${sig}
+          <div class="bigV">${r.v}</div>
+          <div class="codename">${r.name === "—" ? "No codename" : r.name}</div>
+        </div>
+        <div class="beat" data-beat="2">
+          <div class="date">${fmtDate(r.date)}</div>
+          <p class="trivia">${r.trivia}</p>
+        </div>
+        <div class="beat" data-beat="3">
+          <div class="screen-wrap" data-v="${r.v}" data-era="${era}" role="button" tabindex="0" aria-label="Boot WordPress ${r.v}">
+            <div class="poster era-${era}">${eraBars(era)}</div>
+            <div class="hint-cta"><span>WordPress ${r.v} preview</span><button type="button" class="activate">Boot live ▸</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}).join('');
+
+/* --- Progress / beat driver --- */
+const chapters = [...document.querySelectorAll('.chapter')];
+let currentChapter = 0;
+let currentEra = "b2";
+
+function updateProgress(){
+  const vh = window.innerHeight;
+  let activeIdx = 0, activeProg = 0;
+  for (let i=0;i<chapters.length;i++){
+    const c = chapters[i];
+    const r = c.getBoundingClientRect();
+    const total = r.height - vh;
+    if (r.top <= 0 && r.top > -total){
+      // Active
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      activeIdx = i; activeProg = p;
+      // beats: b1 appears at start, b2 at 0.25, b3 at 0.55, breathe/iframe at 0.85
+      const beats = c.querySelectorAll('[data-beat]');
+      beats.forEach(el=>{
+        const b = parseInt(el.dataset.beat);
+        const threshold = b===1? 0 : b===2? 0.22 : 0.55;
+        el.classList.toggle('in', p >= threshold);
+      });
+      const sw = c.querySelector('.screen-wrap');
+      if (sw){
+        sw.classList.toggle('in', p >= 0.55);
+        sw.classList.toggle('breathe', p >= 0.7 && p < 0.92);
+        if (p >= 0.92 && !sw.classList.contains('loaded') && !sw.classList.contains('auto-off')){
+          autoActivate(sw);
+        }
+        if (p < 0.55 && sw.classList.contains('loaded')){
+          unload(sw);
+        }
+      }
+      // Stroke draw — the portrait
+      const paths = c.querySelectorAll('.port-path');
+      const drawn = Math.min(1, p/0.22);
+      paths.forEach(pp=>{
+        pp.style.strokeDashoffset = (1-drawn)*4000;
+      });
+    }
+  }
+  if (activeIdx !== currentChapter){
+    currentChapter = activeIdx;
+    const era = chapters[activeIdx].dataset.era;
+    if (era !== currentEra){
+      currentEra = era;
+      document.getElementById('eraName').textContent = ERA_NAMES[era];
+      audio.onEra(era);
+    }
+  }
+  document.getElementById('prog').style.width = ((currentChapter + activeProg) / chapters.length * 100) + "%";
+  requestAnimationFrame(updateProgress);
+}
+requestAnimationFrame(updateProgress);
+
+/* --- iframe swap (one-at-a-time) --- */
+let liveWrap = null;
+function autoActivate(wrap){
+  // Only one live iframe at a time
+  if (liveWrap && liveWrap !== wrap) unload(liveWrap);
+  const v = wrap.dataset.v;
+  const iframe = document.createElement('iframe');
+  iframe.loading = "lazy";
+  iframe.referrerPolicy = "no-referrer";
+  iframe.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+  // Preserve original poster HTML for unload
+  if (!wrap.dataset.originalHtml) wrap.dataset.originalHtml = wrap.innerHTML;
+  wrap.innerHTML = '';
+  wrap.appendChild(iframe);
+  wrap.classList.add('loaded');
+  liveWrap = wrap;
+}
+function unload(wrap){
+  if (!wrap.classList.contains('loaded')) return;
+  if (wrap.dataset.originalHtml){
+    wrap.innerHTML = wrap.dataset.originalHtml;
+  }
+  wrap.classList.remove('loaded');
+  if (liveWrap === wrap) liveWrap = null;
+}
+document.addEventListener('click',(e)=>{
+  const btn = e.target.closest('.activate');
+  if (btn){
+    const wrap = btn.closest('.screen-wrap');
+    if (wrap) autoActivate(wrap);
+    e.preventDefault();
+    return;
+  }
+});
+document.addEventListener('keydown',(e)=>{
+  if (e.key === ' ' && e.target.tagName !== 'INPUT'){
+    e.preventDefault();
+    audio.toggle();
+  }
+});
+
+/* --- Audio (accretion) --- */
+const audio = (()=>{
+  let ctx=null, master=null, running=false, step=0, timer=null;
+  let layers = { bass:true, pad:false, lead:false, arp:false, fx:false };
+
+  function setLayersForEra(era){
+    layers.bass = true;
+    layers.pad  = ["kubrick","happycog","coltrane","mp6","gutenberg","fse"].includes(era);
+    layers.lead = ["coltrane","mp6","gutenberg","fse"].includes(era);
+    layers.arp  = ["gutenberg","fse"].includes(era);
+    layers.fx   = era === "fse";
+    if (running){
+      const on = Object.entries(layers).filter(([,v])=>v).map(([k])=>k.toUpperCase().slice(0,1)).join('');
+      document.getElementById('layers').textContent = " ["+on+"]";
+    }
+  }
+  function midiToHz(m){return 440*Math.pow(2,(m-69)/12)}
+  function blip(freq,dur,type,gain){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(gain,ctx.currentTime+0.015);
+    g.gain.exponentialRampToValueAtTime(0.0005,ctx.currentTime+dur);
+    o.connect(g).connect(master);
+    o.start();o.stop(ctx.currentTime+dur+0.02);
+  }
+  function pad(freq,dur){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type="sawtooth";o.frequency.value=freq;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.018,ctx.currentTime+.4);
+    g.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
+    o.connect(g).connect(master);
+    o.start();o.stop(ctx.currentTime+dur+.02);
+  }
+  function tick(){
+    const tempo = 108, stepDur = 60/tempo/2;
+    const root=60; // C
+    const scale = [0,2,3,5,7,8,10]; // minor-ish
+    const bassSeq = [root-12, root-12+3, root-12+5, root-12+3];
+    const leadSeq = [0,5,3,7,5,3,0,10,7,5,3,2,0,3,5,7];
+    const arpSeq  = [0,3,7,10];
+    const s = step % 16;
+    if (layers.bass && s%4===0) blip(midiToHz(bassSeq[(s/4)|0]),stepDur*3.5,"triangle",0.16);
+    if (layers.pad  && s===0)  pad(midiToHz(root-5), stepDur*16);
+    if (layers.pad  && s===8)  pad(midiToHz(root-2), stepDur*8);
+    if (layers.lead && s%2===0) blip(midiToHz(root+12+scale[leadSeq[s]%scale.length]),stepDur*1.4,"square",0.06);
+    if (layers.arp)  blip(midiToHz(root+24+scale[arpSeq[s%4]%scale.length]),stepDur*.8,"sawtooth",0.03);
+    if (layers.fx && s===6) blip(midiToHz(80+Math.random()*30),stepDur*.6,"square",0.04);
+    if (layers.fx && s===13) blip(midiToHz(900+Math.random()*400),0.05,"square",0.025);
+    step++;
+    timer = setTimeout(tick, stepDur*1000);
+  }
+  function start(){
+    if (running) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value=.55; master.connect(ctx.destination);
+    running=true; step=0; setLayersForEra(currentEra); tick();
+  }
+  function stop(){
+    running=false; if (timer) clearTimeout(timer);
+    if (ctx) ctx.close(); ctx=null;
+  }
+  function toggle(){
+    const btn=document.getElementById('audioBtn');
+    if (running){ stop(); btn.classList.remove('active'); btn.textContent="♪ Audio Off"; btn.setAttribute('aria-pressed','false'); document.getElementById('layers').textContent=""; }
+    else { start(); btn.classList.add('active'); btn.innerHTML='♪ Audio On<span class="layers" id="layers"></span>'; btn.setAttribute('aria-pressed','true'); setLayersForEra(currentEra); }
+  }
+  function onEra(era){ setLayersForEra(era); }
+  return { toggle, start, stop, onEra, get running(){return running} };
+})();
+document.getElementById('audioBtn').addEventListener('click', audio.toggle);
+
+// expose for verifier
+window.__museum = { releases: RELEASES, audio, chapters,
+  activate:(i)=>{ const w=chapters[i].querySelector('.screen-wrap'); autoActivate(w); },
+  scrollTo:(i)=>{ chapters[i].scrollIntoView({behavior:"smooth"}); } };
+</script>
+</body>
+</html>

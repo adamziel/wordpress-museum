@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Four Exhibits</title>
+<title>WordPress Museum — Seven Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -33,6 +33,19 @@
   .v4 .art{background:radial-gradient(800px 220px at 50% 120%, #6ea5d0 0%, transparent 70%), linear-gradient(#73a0c5,#244776);position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
   .v4 .art::before{content:"The WordPress Museum";position:absolute;left:16px;top:14px;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:1.2rem;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3)}
   .v4 .art::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(#5c8c3f,#3e6826)}
+
+  .v5 .art{background:radial-gradient(400px 260px at 30% 40%,#ffd27a 0%,transparent 55%),linear-gradient(100deg,#0b0d18,#1a1636 40%,#26163a);color:#fff}
+  .v5 .art::before{content:"→ ← ↔";position:absolute;left:14px;bottom:10px;font:700 22px/1 ui-monospace,monospace;color:#ffd27a;letter-spacing:.15em}
+  .v5 .art::after{content:"v5 · horizontal scroll";position:absolute;right:14px;top:12px;font-family:"Playfair Display",Didot,serif;font-style:italic;color:#ffd27a;font-size:1rem}
+
+  .v6 .art{background:linear-gradient(180deg,#fafafa 0%,#f4ece0 60%,#e2d4b8);position:relative}
+  .v6 .art::before{content:"";position:absolute;left:10%;right:10%;top:14%;height:10px;background:#111;border-radius:2px}
+  .v6 .art::after{content:"pinned";position:absolute;left:16px;bottom:10px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.03em;color:#111}
+
+  .v7 .art{background:linear-gradient(180deg,#1d1510 0%,#0a0604 70%);position:relative;overflow:hidden}
+  .v7 .art::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#f3d472 0%,transparent);transform:translateX(-50%)}
+  .v7 .art::after{content:"The Jazz Corridor";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#f3d472;font-size:.95rem}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -41,8 +54,8 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Four ways to see a history</h1>
-    <p class="sub">Every WordPress release from 2003 to today, rendered as four wildly different exhibits. Pick a door.</p>
+    <h1>Seven ways to see a history</h1>
+    <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
     <a class="card v1" href="v1-desktop/">
@@ -68,6 +81,24 @@
       <span class="pill">Exhibit IV</span>
       <h2>Kubrick Weblog</h2>
       <p>A period-accurate early-WordPress blog where every release is a post. Click the Dashboard to open a working fake wp-admin: draggable widgets, color schemes, QuickPress, and the Hello Dolly plugin.</p>
+    </a>
+    <a class="card v5" href="v5-horizontal/">
+      <div class="art"></div>
+      <span class="pill">Exhibit V · scrollytelling</span>
+      <h2>Horizontal Magnetic</h2>
+      <p>Scroll left-to-right through fifty-three full-viewport slides. Parallax portraits, chiptune that shifts key per decade, and a ribbon that snaps to any release.</p>
+    </a>
+    <a class="card v6" href="v6-pinned/">
+      <div class="art"></div>
+      <span class="pill">Exhibit VI · scrollytelling</span>
+      <h2>Pinned Storytelling</h2>
+      <p>Each release pins to the screen while it unfolds in four beats — portrait drawing in, trivia surfacing, screenshot breathing, Playground booting. Music layers features as the product does.</p>
+    </a>
+    <a class="card v7" href="v7-corridor/">
+      <div class="art"></div>
+      <span class="pill">Exhibit VII · 3D</span>
+      <h2>The Jazz Corridor</h2>
+      <p>A first-person walk through a 3D CSS museum. Every frame a release, every plaque a codename portrait. Step into any painting and the Playground fills the room.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>

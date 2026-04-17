@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WP Museum v5 — Horizontal Scroll</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0b0d18;color:#eee;font-family:Inter,system-ui,-apple-system,sans-serif;}
+  :root{--accent:#ffd27a}
+  a{color:inherit}
+
+  /* Horizontal scroller */
+  #rail{
+    position:fixed;inset:0 0 60px 0;
+    display:flex;flex-direction:row;
+    overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+  }
+  #rail::-webkit-scrollbar{display:none}
+
+  .slide{
+    flex:0 0 100vw;height:calc(100vh - 60px);
+    scroll-snap-align:center;position:relative;overflow:hidden;
+    display:grid;grid-template-columns:48% 52%;align-items:center;
+    padding:0 6vw;
+  }
+  /* Background layer (parallax 0) */
+  .slide .bg{position:absolute;inset:-10% -20%;z-index:0;filter:blur(0);transition:transform .3s ease}
+  /* Mid layer */
+  .slide .mid{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:14px;will-change:transform}
+  /* Foreground */
+  .slide .fg{position:relative;z-index:2;padding:2vw;will-change:transform}
+
+  .portrait{width:min(380px,36vw);height:min(380px,36vw);display:block}
+  .instrGlyph{width:96px;height:96px;opacity:.85}
+
+  .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .chip{font:600 11px/1 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(255,255,255,.3);border-radius:999px;color:#fff}
+  .chip.sig{background:var(--accent);color:#2a1a00;border-color:transparent}
+  .vnum{font:800 clamp(3rem,10vw,7.5rem)/0.9 "Playfair Display",Didot,serif;letter-spacing:-.02em}
+  .cname{font:italic 700 clamp(1.6rem,3.5vw,2.8rem)/1 "Playfair Display",Didot,serif;color:var(--accent);margin:.1em 0 .2em}
+  .date{font:500 14px/1 ui-monospace,monospace;letter-spacing:.14em;opacity:.7;text-transform:uppercase}
+  .triv{max-width:46ch;font:400 17px/1.55 Georgia,serif;margin-top:14px;opacity:.95}
+
+  /* Era background gradients */
+  .era-b2        { background:radial-gradient(60% 60% at 30% 40%,#1a1a22,#0b0b10); }
+  .era-kubrick   { background:radial-gradient(60% 60% at 70% 30%,#3c6d96,#0e1e30); }
+  .era-happycog  { background:radial-gradient(60% 60% at 30% 60%,#d54e21,#1a1512); }
+  .era-coltrane  { background:radial-gradient(60% 60% at 70% 60%,#464646,#111); }
+  .era-mp6       { background:radial-gradient(60% 60% at 30% 30%,#2271b1,#0e1a24); }
+  .era-gutenberg { background:radial-gradient(60% 60% at 70% 50%,#eef0f2,#4a5168);color:#111 }
+  .era-gutenberg .chip{border-color:rgba(0,0,0,.3)}
+  .era-gutenberg .triv{color:#222}
+  .era-gutenberg .date{color:#333}
+  .era-fse       { background:radial-gradient(60% 60% at 30% 40%,#7c4dff,#1a0e2e); }
+
+  /* Era-styled screenshot inside the card (mini) */
+  .screen-wrap{position:relative;width:min(560px,48vw);aspect-ratio:16/10;border-radius:12px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);margin-top:22px;background:#000;cursor:pointer}
+  .screen-wrap.loaded{cursor:default}
+  .screen-wrap iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .poster{position:absolute;inset:0}
+  .poster .bar{position:absolute}
+  .activate-hint{position:absolute;inset:auto 0 0 0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;font:italic 12px/1.3 Georgia,serif;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+  .activate-hint button{pointer-events:auto;cursor:pointer;border:0;background:var(--accent);color:#2a1a00;font:700 11px/1 ui-monospace,monospace;letter-spacing:.15em;padding:7px 11px;border-radius:3px;text-transform:uppercase}
+
+  /* Era screenshot styles (subset from v4, compact) */
+  .poster.era-b2{background:#fafafa}
+  .poster.era-b2::before{content:"b2 » weblog tool";position:absolute;top:0;left:0;right:0;height:30px;background:#333;color:#ffcc66;font:700 11px/30px ui-monospace,monospace;padding-left:10px}
+  .poster.era-b2::after{content:"Hello, world. Posted by Mike.";color:#222;position:absolute;top:40px;left:12px;right:12px;font:italic 11px/1.5 Georgia,serif}
+  .poster.era-kubrick{background:radial-gradient(600px 200px at 50% 120%,#6ea5d0,transparent 70%),linear-gradient(#73a0c5,#234b6a)}
+  .poster.era-kubrick::before{content:"";position:absolute;left:0;right:0;bottom:22%;height:1px;background:rgba(255,255,255,.5)}
+  .poster.era-kubrick::after{content:"The WordPress Blog";color:#fff;position:absolute;top:12px;left:14px;font:italic 700 18px/1 Georgia,serif;text-shadow:0 1px 0 #0006}
+  .poster.era-kubrick .bar.ksky{inset:auto 0 0 0;height:22%;background:linear-gradient(#4a7830,#3e6826)}
+  .poster.era-happycog{background:#efefef}
+  .poster.era-happycog .bar.hctop{top:0;left:0;right:0;height:36px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-happycog .bar.hcorange{top:36px;left:0;right:0;height:3px;background:#d54e21}
+  .poster.era-happycog::before{content:"WordPress";color:#fff;position:absolute;top:0;left:12px;font:700 14px/36px sans-serif}
+  .poster.era-happycog::after{content:"Dashboard · Posts · Pages";color:#666;position:absolute;top:46px;left:12px;font:11px/1 sans-serif}
+  .poster.era-coltrane{background:#f1f1f1}
+  .poster.era-coltrane .bar.cltop{top:0;left:0;right:0;height:22px;background:linear-gradient(#464646,#2d2d2d)}
+  .poster.era-coltrane .bar.clnav{top:22px;left:0;bottom:0;width:28%;background:#464646}
+  .poster.era-coltrane::before{content:"";position:absolute;top:32px;left:32%;right:6%;height:8px;background:#bbb;box-shadow:0 18px 0 #ccc,0 36px 0 #ccc}
+  .poster.era-mp6{background:#f1f1f1}
+  .poster.era-mp6 .bar.m6bar{top:0;left:0;right:0;height:26px;background:#23282d}
+  .poster.era-mp6 .bar.m6side{top:26px;left:0;bottom:0;width:22%;background:#32373c}
+  .poster.era-mp6::after{content:"Add New Post";position:absolute;top:40px;left:calc(26%);color:#23282d;font:500 15px/1 sans-serif}
+  .poster.era-gutenberg{background:#f6f7f7}
+  .poster.era-gutenberg .bar.gtop{top:0;left:0;right:0;height:28px;background:#fff;border-bottom:1px solid #ddd}
+  .poster.era-gutenberg .bar.gside{top:28px;right:0;bottom:0;width:22%;background:#fff;border-left:1px solid #ddd}
+  .poster.era-gutenberg::before{content:"";position:absolute;left:10%;right:26%;top:56px;height:34px;background:#fff;border:1px solid #2271b1;box-shadow:0 0 0 1px #72aee6}
+  .poster.era-gutenberg::after{content:"Add title";position:absolute;left:calc(10% + 10px);top:66px;color:#949494;font:300 16px/1 sans-serif}
+  .poster.era-fse{background:#1e1e1e}
+  .poster.era-fse .bar.fleft{top:0;left:0;bottom:0;width:18%;background:#1e1e1e;border-right:1px solid #303030}
+  .poster.era-fse::before{content:"";position:absolute;left:22%;right:6%;top:10%;bottom:10%;background:#fff;box-shadow:0 0 0 1px #444,0 10px 30px #000a}
+  .poster.era-fse::after{content:"Editor";color:#fff;opacity:.8;position:absolute;top:5px;left:8px;font:500 10px/1 sans-serif;letter-spacing:.5px}
+
+  /* Ribbon */
+  #ribbon{
+    position:fixed;left:0;right:0;bottom:0;height:60px;
+    background:linear-gradient(180deg,rgba(8,10,20,0),#07080f 30%,#07080f);
+    border-top:1px solid rgba(255,255,255,.08);
+    display:flex;align-items:center;gap:10px;padding:0 16px;z-index:5;
+  }
+  #ribbon .track{flex:1;position:relative;height:46px;display:flex;align-items:center}
+  .tick{position:absolute;top:50%;transform:translate(-50%,-50%);width:2px;height:10px;background:rgba(255,255,255,.28);cursor:pointer;transition:height .15s,background .15s}
+  .tick.sig{height:18px;background:rgba(255,210,122,.75)}
+  .tick.active{height:26px;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  .tick:hover{background:#fff}
+  .tick .tt{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1f2e;border:1px solid rgba(255,255,255,.15);color:#fff;padding:4px 8px;border-radius:4px;font:600 11px/1 ui-monospace,monospace;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+  .tick:hover .tt{opacity:1}
+  #posLabel{font:600 12px/1 ui-monospace,monospace;letter-spacing:.12em;opacity:.85;min-width:90px}
+
+  /* Controls */
+  #controls{position:fixed;top:14px;right:14px;z-index:20;display:flex;gap:8px}
+  .btn{background:#141827;color:#eee;border:1px solid rgba(255,255,255,.15);font:600 12px/1 ui-monospace,monospace;padding:9px 13px;border-radius:6px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase}
+  .btn:hover{background:#1e2338}
+  .btn.active{background:var(--accent);color:#1a1100;border-color:transparent}
+
+  #title{position:fixed;top:14px;left:18px;z-index:20;font:italic 700 16px/1 "Playfair Display",Georgia,serif;opacity:.9}
+  #title small{display:block;font:500 10px/1 ui-monospace,monospace;letter-spacing:.3em;opacity:.55;margin-top:4px;font-style:normal}
+
+  #hint{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);font:500 11px/1.5 ui-monospace,monospace;color:rgba(255,255,255,.55);letter-spacing:.15em;text-transform:uppercase;z-index:10;pointer-events:none;transition:opacity .4s}
+  #hint.hidden{opacity:0}
+
+  /* Reveal animations for fg content */
+  .slide .fg .vnum,.slide .fg .cname,.slide .fg .date,.slide .fg .triv,.slide .fg .meta,.slide .fg .screen-wrap{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+  .slide.active .fg .vnum{opacity:1;transform:none;transition-delay:.05s}
+  .slide.active .fg .meta{opacity:1;transform:none;transition-delay:.15s}
+  .slide.active .fg .cname{opacity:1;transform:none;transition-delay:.2s}
+  .slide.active .fg .date{opacity:1;transform:none;transition-delay:.3s}
+  .slide.active .fg .triv{opacity:1;transform:none;transition-delay:.4s}
+  .slide.active .fg .screen-wrap{opacity:1;transform:none;transition-delay:.5s}
+  .slide .mid{opacity:0;transform:translateX(-30px);transition:opacity .7s,transform .9s}
+  .slide.active .mid{opacity:1;transform:none}
+
+  @media (max-width:900px){
+    .slide{grid-template-columns:1fr;grid-template-rows:auto auto;padding:60px 6vw 20px}
+    .portrait{width:200px;height:200px}
+    .screen-wrap{width:90vw}
+  }
+</style>
+</head>
+<body>
+<div id="title">WordPress · horizontal<small>v5 — magnetic scroll</small></div>
+<div id="controls">
+  <button class="btn" id="audioBtn" aria-pressed="false" aria-label="Toggle ambient chiptune">♪ Audio Off</button>
+  <button class="btn" id="helpBtn" aria-label="Back to museum">← Museum</button>
+</div>
+<div id="hint">Scroll · or ← →</div>
+<div id="rail" tabindex="0" aria-label="WordPress releases horizontal timeline"></div>
+<div id="ribbon">
+  <span id="posLabel">0.70 / 53</span>
+  <div class="track" id="track"></div>
+</div>
+
+<script>
+const RELEASES = [
+  {"v":"0.70","name":"—","date":"2003-05-27","trivia":"The very first WordPress release, forked from b2/cafelog by Matt Mullenweg and Mike Little. No codename yet — just a hopeful birth announcement on a personal blog."},
+  {"v":"1.0","name":"Miles","date":"2004-01-03","trivia":"Named after jazz great Miles Davis, starting the tradition of jazz-musician codenames. Introduced search-engine-friendly permalinks, the Post Preview pane, and a real plugin API.","significant":true},
+  {"v":"1.2","name":"Mingus","date":"2004-05-22","trivia":"Introduced the Plugin system as we know it today — the moment WordPress became infinitely extensible.","significant":true},
+  {"v":"1.5","name":"Strayhorn","date":"2005-02-17","trivia":"Introduced Themes and Pages. The Kubrick theme became a symbol of an era. Downloaded 900,000 times in a single year.","significant":true},
+  {"v":"2.0","name":"Duke","date":"2005-12-31","trivia":"Shipped a rich WYSIWYG editor (TinyMCE), image uploads, Akismet, and user roles. A New Year's Eve gift from Matt.","significant":true},
+  {"v":"2.1","name":"Ella","date":"2007-01-22","trivia":"Autosave made its debut. Many blog posts were rescued that day."},
+  {"v":"2.2","name":"Getz","date":"2007-05-16","trivia":"Widgets arrived. Sidebars would never be the same.","significant":true},
+  {"v":"2.3","name":"Dexter","date":"2007-09-24","trivia":"Native tagging. Before this, people hacked it in with plugins."},
+  {"v":"2.5","name":"Brecker","date":"2008-03-29","trivia":"Wholesale admin redesign by Happy Cog — the first time WordPress looked designed rather than merely assembled."},
+  {"v":"2.6","name":"Tyner","date":"2008-07-15","trivia":"Post revisions. Press This bookmarklet. Word count finally reliable."},
+  {"v":"2.7","name":"Coltrane","date":"2008-12-10","trivia":"New admin UI with left-hand navigation that lasted over a decade. Automatic plugin upgrades from the dashboard.","significant":true},
+  {"v":"2.8","name":"Baker","date":"2009-06-11","trivia":"Theme installer from the dashboard. Syntax highlighting in the theme editor."},
+  {"v":"2.9","name":"Carmen","date":"2009-12-18","trivia":"Built-in image editor. Trash (finally). Oembed."},
+  {"v":"3.0","name":"Thelonious","date":"2010-06-17","trivia":"Merged WordPress MU — multisite for everyone. Custom post types and custom menus landed. Twenty Ten replaced Kubrick. A civilizational shift.","significant":true},
+  {"v":"3.1","name":"Reinhardt","date":"2011-02-23","trivia":"Admin Bar arrived, hovering helpfully over your site."},
+  {"v":"3.2","name":"Gershwin","date":"2011-07-04","trivia":"Dropped PHP 4 and MySQL 4 support. Distraction-free writing mode. Twenty Eleven."},
+  {"v":"3.3","name":"Sonny","date":"2011-12-12","trivia":"Drag-and-drop media uploader. Flyout menus. New-user welcome pointers."},
+  {"v":"3.4","name":"Green","date":"2012-06-13","trivia":"Theme Customizer debuted. Twitter embeds.","significant":true},
+  {"v":"3.5","name":"Elvin","date":"2012-12-11","trivia":"Brand-new Media Manager. Retina-ready admin. Twenty Twelve."},
+  {"v":"3.6","name":"Oscar","date":"2013-08-01","trivia":"Delayed twice. Audio and video improvements. Twenty Thirteen — the most colorful default theme ever."},
+  {"v":"3.7","name":"Basie","date":"2013-10-24","trivia":"Automatic background security updates. Quietly the most important WordPress release of all time.","significant":true},
+  {"v":"3.8","name":"Parker","date":"2013-12-12","trivia":"Flat, responsive admin (the MP6 project merged in). Admin color schemes. Twenty Fourteen magazine theme.","significant":true},
+  {"v":"3.9","name":"Smith","date":"2014-04-16","trivia":"Live widget previews. Improved visual editor with drag-and-drop images."},
+  {"v":"4.0","name":"Benny","date":"2014-09-04","trivia":"A symbolic release — the number bump didn't mean a rewrite, but a smoother grid media library and embed previews in the editor."},
+  {"v":"4.1","name":"Dinah","date":"2014-12-17","trivia":"Twenty Fifteen: the most minimal default theme yet. Distraction-free writing mode v2."},
+  {"v":"4.2","name":"Powell","date":"2015-04-23","trivia":"Emoji support everywhere. Press This redesigned. Plugin updates without leaving the page."},
+  {"v":"4.3","name":"Billie","date":"2015-08-18","trivia":"Menus in the Customizer. Site icons from the Customizer. Formatting shortcuts in the editor."},
+  {"v":"4.4","name":"Clifford","date":"2015-12-08","trivia":"REST API infrastructure merged. Responsive images by default. Embed your WordPress posts elsewhere.","significant":true},
+  {"v":"4.5","name":"Coleman","date":"2016-04-12","trivia":"Inline linking. Custom logos in the Customizer. Formatting keyboard shortcuts."},
+  {"v":"4.6","name":"Pepper","date":"2016-08-16","trivia":"Streamlined updates, native system fonts in the admin, editor content recovery."},
+  {"v":"4.7","name":"Vaughan","date":"2016-12-06","trivia":"REST API content endpoints shipped. Twenty Seventeen. Custom CSS in the Customizer.","significant":true},
+  {"v":"4.8","name":"Evans","date":"2017-06-08","trivia":"Rich Text Widgets. Audio, Video, Image, HTML widgets. Stage-setting for blocks."},
+  {"v":"4.9","name":"Tipton","date":"2017-11-15","trivia":"Scheduled customization changes. Code-editing safety nets — the last release before Gutenberg lit up the ecosystem."},
+  {"v":"5.0","name":"Bebo","date":"2018-12-06","trivia":"Gutenberg. The block editor. The biggest change to WordPress editing since 2.0's WYSIWYG. Twenty Nineteen as the first block-ready default theme.","significant":true},
+  {"v":"5.1","name":"Betty","date":"2019-02-21","trivia":"Site Health warnings for outdated PHP. Editor performance improvements."},
+  {"v":"5.2","name":"Jaco","date":"2019-05-07","trivia":"Site Health dashboard. PHP error protection (WSOD). Bumped PHP minimum to 5.6."},
+  {"v":"5.3","name":"Kirk","date":"2019-11-12","trivia":"Twenty Twenty. Accessibility-first admin improvements. Block editor handles long posts."},
+  {"v":"5.4","name":"Adderley","date":"2020-03-31","trivia":"Social Icons block. Buttons block. Released during the first weeks of the pandemic."},
+  {"v":"5.5","name":"Eckstine","date":"2020-08-11","trivia":"Block patterns. Auto-updates for plugins and themes. XML sitemaps in core.","significant":true},
+  {"v":"5.6","name":"Simone","date":"2020-12-08","trivia":"First major release led by an all-women-identifying release squad. Twenty Twenty-One — a breezy pastel default.","significant":true},
+  {"v":"5.7","name":"Esperanza","date":"2021-03-09","trivia":"One-click HTTPS migration. Drag-and-drop blocks within columns."},
+  {"v":"5.8","name":"Tatum","date":"2021-07-20","trivia":"Widgets become blocks. Template editor previews Full Site Editing. theme.json arrives quietly.","significant":true},
+  {"v":"5.9","name":"Josephine","date":"2022-01-25","trivia":"Full Site Editing officially ships. Twenty Twenty-Two — the first block theme. Navigation block.","significant":true},
+  {"v":"6.0","name":"Arturo","date":"2022-05-24","trivia":"Style variations. Write mode. Locking blocks. FSE matures."},
+  {"v":"6.1","name":"Misha","date":"2022-11-01","trivia":"Fluid typography. Twenty Twenty-Three with 10 style variations."},
+  {"v":"6.2","name":"Dolphy","date":"2023-03-29","trivia":"Site Editor leaves beta. Distraction-free mode returns. Openverse images from the inserter."},
+  {"v":"6.3","name":"Lionel","date":"2023-08-08","trivia":"Command palette. Patterns (renamed from Reusable Blocks). Performance boost — up to 27% faster."},
+  {"v":"6.4","name":"Shirley","date":"2023-11-07","trivia":"Twenty Twenty-Four — the first default theme designed for anyone, for any purpose. Block hooks."},
+  {"v":"6.5","name":"Regina","date":"2024-04-02","trivia":"Font Library. Revisions for styles and templates. Appearance tools for all themes.","significant":true},
+  {"v":"6.6","name":"Dorsey","date":"2024-07-16","trivia":"Section styles (block style variations). Negative margins. Grid layout experiments."},
+  {"v":"6.7","name":"Rollins","date":"2024-11-12","trivia":"Zoom Out in the editor. Twenty Twenty-Five. Preview themes without activating."},
+  {"v":"6.8","name":"Cecil","date":"2025-04-15","trivia":"Speculative loading in core. Style Book for classic themes. Quiet polish across the editor."},
+  {"v":"7.0","name":"Monk","date":"2026-02-10","trivia":"A landmark release. The collaborative editing foundation lands in core after years in the Phase-3 labs. Twenty Twenty-Six ships a full AI-assisted block styling helper.","significant":true}
+];
+
+const INSTRUMENTS = {
+  "Miles":"trumpet","Mingus":"bass","Strayhorn":"piano","Duke":"piano","Ella":"voice",
+  "Getz":"sax","Dexter":"sax","Brecker":"sax","Tyner":"piano","Coltrane":"sax",
+  "Baker":"trumpet","Carmen":"voice","Thelonious":"piano","Reinhardt":"guitar",
+  "Gershwin":"piano","Sonny":"sax","Green":"sax","Elvin":"drums","Oscar":"piano",
+  "Basie":"piano","Parker":"sax","Smith":"piano","Benny":"clarinet","Dinah":"voice",
+  "Powell":"piano","Billie":"voice","Clifford":"trumpet","Coleman":"sax","Pepper":"sax",
+  "Vaughan":"voice","Evans":"piano","Tipton":"piano","Bebo":"piano","Betty":"voice",
+  "Jaco":"bass","Kirk":"sax","Adderley":"sax","Eckstine":"voice","Simone":"piano",
+  "Esperanza":"bass","Tatum":"piano","Josephine":"voice","Arturo":"trumpet","Misha":"piano",
+  "Dolphy":"sax","Lionel":"vibes","Shirley":"voice","Regina":"voice","Dorsey":"trombone",
+  "Rollins":"sax","Cecil":"piano","Monk":"piano"
+};
+
+function eraOf(v){
+  const n = parseFloat(v);
+  if (n < 1) return "b2";
+  if (n < 2.5) return "kubrick";
+  if (n < 2.6) return "happycog";
+  if (n < 3.8) return "coltrane";
+  if (n < 5.0) return "mp6";
+  if (n < 5.9) return "gutenberg";
+  return "fse";
+}
+function eraBars(era){
+  if(era==="kubrick") return '<div class="bar ksky"></div>';
+  if(era==="happycog") return '<div class="bar hctop"></div><div class="bar hcorange"></div>';
+  if(era==="coltrane") return '<div class="bar cltop"></div><div class="bar clnav"></div>';
+  if(era==="mp6") return '<div class="bar m6bar"></div><div class="bar m6side"></div>';
+  if(era==="gutenberg") return '<div class="bar gtop"></div><div class="bar gside"></div>';
+  if(era==="fse") return '<div class="bar fleft"></div>';
+  return '';
+}
+function fmtDate(s){
+  const d = new Date(s+"T00:00:00Z");
+  return d.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"});
+}
+function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31 + s.charCodeAt(i))|0}return Math.abs(h)}
+
+// ---------- Portrait SVG ----------
+function portraitSVG(rel){
+  const name = rel.name || "—";
+  const instr = INSTRUMENTS[name] || "piano";
+  const h = hash(name);
+  const skins = ["#8a5a44","#c99474","#5d3b26","#a67353","#402417","#d7a584"];
+  const hats  = ["#181820","#2d1b1b","#3b3b42","#4d2e1c","#101014"];
+  const tops  = ["#c87b4a","#37406c","#2d2d32","#6a3a4a","#0e3c4a","#7a4e2a"];
+  const bg    = ["#f6d17a","#f4a261","#e76f51","#86b3a7","#b5838d","#ffd27a"];
+  const skin = skins[h%skins.length], hat = hats[(h>>2)%hats.length],
+        top = tops[(h>>4)%tops.length], col = bg[(h>>6)%bg.length];
+
+  const instrSVG = ({
+    trumpet: `<g transform="translate(165,180)"><rect x="0" y="-6" width="70" height="12" rx="2" fill="#d4a64a" stroke="#7a5a1e"/><circle cx="78" cy="0" r="14" fill="none" stroke="#d4a64a" stroke-width="7"/><rect x="-18" y="-4" width="18" height="8" fill="#b88a3c"/></g>`,
+    sax: `<g transform="translate(170,170)"><path d="M0,0 q0,40 30,50 q34,10 40,-30 l-8,-4 q-2,28 -24,24 q-24,-4 -24,-38 z" fill="#d4a64a" stroke="#7a5a1e" stroke-width="1.5"/><circle cx="62" cy="18" r="5" fill="#5a3a10"/></g>`,
+    piano: `<g transform="translate(130,220)"><rect x="0" y="0" width="120" height="28" fill="#fff" stroke="#222"/><g fill="#111">${Array.from({length:7}).map((_,i)=>`<rect x="${i*17+4}" y="0" width="9" height="18"/>`).join('')}</g></g>`,
+    bass: `<g transform="translate(175,100)"><rect x="0" y="0" width="14" height="150" fill="#7a3e12" rx="3"/><ellipse cx="7" cy="150" rx="36" ry="42" fill="#a5591e" stroke="#4a2808"/><line x1="3" y1="4" x2="3" y2="150" stroke="#fff" stroke-width="0.6"/><line x1="11" y1="4" x2="11" y2="150" stroke="#fff" stroke-width="0.6"/></g>`,
+    guitar: `<g transform="translate(150,160)"><rect x="0" y="-4" width="110" height="8" fill="#6a3a1a"/><ellipse cx="120" cy="0" rx="36" ry="40" fill="#b07040" stroke="#4a2600"/><circle cx="120" cy="0" r="10" fill="#2a1408"/></g>`,
+    voice: `<g transform="translate(185,180)"><circle cx="0" cy="0" r="14" fill="#333" stroke="#888"/><rect x="-3" y="14" width="6" height="44" fill="#4a4a4a"/><rect x="-14" y="58" width="28" height="4" fill="#2a2a2a"/></g>`,
+    drums: `<g transform="translate(135,200)"><ellipse cx="55" cy="30" rx="60" ry="22" fill="#e7c78a" stroke="#7a5a1e"/><rect x="-4" y="-10" width="4" height="70" fill="#5a3a10" transform="rotate(-18 -2 25)"/><rect x="110" y="-10" width="4" height="70" fill="#5a3a10" transform="rotate(18 112 25)"/></g>`,
+    clarinet: `<g transform="translate(188,170)"><rect x="0" y="0" width="10" height="90" fill="#1a1a1a"/><rect x="-2" y="0" width="14" height="6" fill="#b88a3c"/><rect x="-3" y="86" width="16" height="10" fill="#1a1a1a"/></g>`,
+    trombone: `<g transform="translate(150,180)"><rect x="0" y="-4" width="100" height="8" fill="#d4a64a" stroke="#7a5a1e"/><rect x="-30" y="-3" width="30" height="6" fill="#b88a3c"/><circle cx="106" cy="0" r="18" fill="none" stroke="#d4a64a" stroke-width="7"/></g>`,
+    vibes: `<g transform="translate(120,220)">${Array.from({length:6}).map((_,i)=>`<rect x="${i*22+2}" y="0" width="16" height="${8+i*2}" fill="#b8b8c0" stroke="#444"/>`).join('')}</g>`
+  })[instr] || '';
+
+  return `<svg class="portrait" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg" aria-label="Stylized portrait of ${name}">
+    <defs><radialGradient id="bg${h}" cx="50%" cy="40%"><stop offset="0%" stop-color="${col}"/><stop offset="100%" stop-color="#1a1a22"/></radialGradient></defs>
+    <rect width="360" height="360" fill="url(#bg${h})"/>
+    <!-- torso -->
+    <path d="M80,340 q0,-90 100,-90 q100,0 100,90 z" fill="${top}"/>
+    <!-- collar -->
+    <path d="M155,268 q25,20 50,0 l-3,16 q-22,14 -44,0 z" fill="#fff" opacity=".85"/>
+    <!-- head -->
+    <ellipse cx="180" cy="180" rx="60" ry="70" fill="${skin}"/>
+    <!-- hat -->
+    <path d="M108,150 q72,-60 144,0 q-10,-10 -72,-10 q-62,0 -72,10z" fill="${hat}"/>
+    <rect x="112" y="142" width="136" height="10" fill="${hat}"/>
+    <rect x="108" y="150" width="144" height="6" fill="#000" opacity=".35"/>
+    <!-- shades -->
+    <rect x="148" y="172" width="26" height="12" rx="4" fill="#111"/>
+    <rect x="186" y="172" width="26" height="12" rx="4" fill="#111"/>
+    <rect x="172" y="177" width="16" height="3" fill="#111"/>
+    <!-- subtle cheek -->
+    <ellipse cx="180" cy="214" rx="18" ry="6" fill="#000" opacity=".15"/>
+    <!-- mouth -->
+    <path d="M164,216 q16,12 32,0" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/>
+    ${instrSVG}
+    <!-- signature -->
+    <text x="20" y="340" font-family="Georgia,serif" font-style="italic" font-size="18" fill="#fff" opacity=".85">${name}</text>
+  </svg>`;
+}
+
+// ---------- Build slides ----------
+const rail = document.getElementById('rail');
+const track = document.getElementById('track');
+rail.innerHTML = RELEASES.map((r,i)=>{
+  const era = eraOf(r.v);
+  const bars = eraBars(era);
+  const sig = r.significant ? '<span class="chip sig">Significant release</span>' : '';
+  return `<section class="slide era-${era}" data-i="${i}" data-v="${r.v}">
+    <div class="bg"></div>
+    <div class="mid">${portraitSVG(r)}</div>
+    <div class="fg">
+      <div class="meta"><span class="chip">№ ${String(i+1).padStart(2,"0")} / 53</span>${sig}</div>
+      <div class="vnum">${r.v}</div>
+      <div class="cname">${r.name === "—" ? "Genesis" : r.name}</div>
+      <div class="date">${fmtDate(r.date)}</div>
+      <p class="triv">${r.trivia}</p>
+      <div class="screen-wrap" data-v="${r.v}" role="button" tabindex="0" aria-label="Launch WordPress ${r.v} in Playground">
+        <div class="poster era-${era}">${bars}</div>
+        <div class="activate-hint"><span>WordPress ${r.v} · ${era.toUpperCase()}</span><button type="button" class="activate">Boot ▸</button></div>
+      </div>
+    </div>
+  </section>`;
+}).join('');
+
+// ---------- Ribbon ticks ----------
+track.innerHTML = RELEASES.map((r,i)=>{
+  const pct = (i/(RELEASES.length-1))*100;
+  return `<div class="tick ${r.significant?'sig':''}" data-i="${i}" style="left:${pct}%"><span class="tt">${r.v} · ${r.name}</span></div>`;
+}).join('');
+
+const slides = [...rail.children];
+const ticks  = [...track.children];
+let current = 0;
+
+function updateActive(){
+  const sw = rail.clientWidth;
+  const i = Math.max(0, Math.min(RELEASES.length-1, Math.round(rail.scrollLeft / sw)));
+  if (i !== current){
+    slides[current]?.classList.remove('active');
+    ticks[current]?.classList.remove('active');
+    current = i;
+    slides[i].classList.add('active');
+    ticks[i].classList.add('active');
+    document.getElementById('posLabel').textContent = `${RELEASES[i].v} · ${i+1}/${RELEASES.length}`;
+    if (audio.running) audio.onIndex(i);
+  }
+  // Parallax within current section
+  const rel = rail.scrollLeft - current*sw;
+  const p = rel / sw; // -1..1 roughly when drifting
+  const s = slides[current];
+  if (s){
+    s.querySelector('.bg').style.transform = `translateX(${p*-40}px)`;
+    s.querySelector('.mid').style.transform = `translateX(${p*-80}px)`;
+    s.querySelector('.fg').style.transform  = `translateX(${p*-20}px)`;
+  }
+}
+rail.addEventListener('scroll', updateActive, {passive:true});
+
+// Scroll-hijack: vertical wheel -> horizontal
+rail.addEventListener('wheel', (e)=>{
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+    rail.scrollLeft += e.deltaY;
+    e.preventDefault();
+    hideHint();
+  }
+}, {passive:false});
+
+// Keyboard
+function goTo(i){
+  i = Math.max(0,Math.min(RELEASES.length-1,i));
+  rail.scrollTo({left: i*rail.clientWidth, behavior:"smooth"});
+}
+document.addEventListener('keydown',(e)=>{
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); goTo(current+1); hideHint(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); goTo(current-1); hideHint(); }
+  else if (e.key === 'Home'){ e.preventDefault(); goTo(0) }
+  else if (e.key === 'End'){ e.preventDefault(); goTo(RELEASES.length-1) }
+  else if (e.key === ' '){ e.preventDefault(); audio.toggle(); }
+});
+
+// Tick click
+track.addEventListener('click',(e)=>{
+  const t = e.target.closest('.tick');
+  if (!t) return;
+  goTo(parseInt(t.dataset.i));
+});
+
+// Iframe swap
+rail.addEventListener('click',(e)=>{
+  const wrap = e.target.closest('.screen-wrap');
+  if (!wrap) return;
+  activate(wrap);
+});
+rail.addEventListener('keydown',(e)=>{
+  if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('screen-wrap')){
+    e.preventDefault();
+    activate(e.target);
+  }
+});
+function activate(wrap){
+  if (wrap.classList.contains('loaded')) return;
+  const v = wrap.dataset.v;
+  wrap.innerHTML = "";
+  const iframe = document.createElement('iframe');
+  iframe.loading = "lazy";
+  iframe.referrerPolicy = "no-referrer";
+  iframe.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+  wrap.appendChild(iframe);
+  wrap.classList.add('loaded');
+}
+
+function hideHint(){ document.getElementById('hint').classList.add('hidden') }
+
+// ---------- Audio (chiptune) ----------
+const audio = (()=>{
+  let ctx=null, master=null, timer=null, running=false, step=0;
+  let currentKey = null;
+
+  // Eras → scale sets (originals). Root midi + intervals.
+  // keyForIndex maps release decade to a key+mode.
+  function keyForIndex(i){
+    const y = parseInt(RELEASES[i].date.slice(0,4));
+    if (y <= 2006) return {root:60, scale:[0,3,5,6,7,10],  tempo:92, tag:"C minor blues"};   // C minor pent + blue
+    if (y <= 2010) return {root:65, scale:[0,2,4,5,7,9,11],tempo:104,tag:"F major swing"};
+    if (y <= 2015) return {root:62, scale:[0,2,3,5,7,9,10],tempo:116,tag:"D dorian"};
+    if (y <= 2019) return {root:67, scale:[0,2,4,5,7,9,10],tempo:124,tag:"G mixolydian"};
+    return {root:69, scale:[0,2,3,5,6,7,9,11],tempo:134,tag:"A lydian-minor"};
+  }
+  // Deterministic but original melody pattern — generated from scale.
+  function pattern(keyObj){
+    // 16-step pattern; pick scale degrees with a repeatable pseudo-random walk.
+    const seq = [0, 4, 2, 5, 3, 4, 1, 0, 5, 2, 4, 3, 0, 5, 2, 4];
+    return seq.map(d => keyObj.root + 12 + keyObj.scale[d % keyObj.scale.length]);
+  }
+  function bass(keyObj){
+    // Walking bass in quarters, 4 notes/bar.
+    return [keyObj.root-12, keyObj.root-12+keyObj.scale[2], keyObj.root-12+keyObj.scale[4], keyObj.root-12+keyObj.scale[2]];
+  }
+  function midiToHz(m){ return 440*Math.pow(2,(m-69)/12); }
+
+  function blip(freq, dur, type, gain){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(gain, ctx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime+dur);
+    o.connect(g).connect(master);
+    o.start(); o.stop(ctx.currentTime+dur+0.02);
+  }
+
+  function tick(){
+    const k = keyForIndex(current);
+    currentKey = k;
+    const stepDur = 60/k.tempo/2; // eighth note
+    const mel = pattern(k);
+    const bss = bass(k);
+    const s = step % 16;
+    // Lead (square) every other eighth
+    if (s % 2 === 0) blip(midiToHz(mel[s]), stepDur*1.3, "square", 0.06);
+    // Bass (triangle) on beats
+    if (s % 4 === 0) blip(midiToHz(bss[(s/4)|0]), stepDur*2.5, "triangle", 0.12);
+    // Offbeat chord tone (saw whisper)
+    if (s % 4 === 2) blip(midiToHz(mel[(s+4)%16]-12), stepDur*1.1, "sawtooth", 0.025);
+    // Hat click (noise-ish via short high blip)
+    if (s % 2 === 1) blip(4000 + (s*50), 0.03, "square", 0.012);
+    step++;
+    timer = setTimeout(tick, stepDur*1000);
+  }
+
+  function start(){
+    if (running) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.6; master.connect(ctx.destination);
+    running = true; step = 0; tick();
+  }
+  function stop(){
+    running = false;
+    if (timer) clearTimeout(timer);
+    if (ctx) ctx.close();
+    ctx = null;
+  }
+  function toggle(){
+    const btn = document.getElementById('audioBtn');
+    if (running){ stop(); btn.classList.remove('active'); btn.textContent="♪ Audio Off"; btn.setAttribute('aria-pressed','false'); }
+    else { start(); btn.classList.add('active'); btn.textContent="♪ "+ keyForIndex(current).tag; btn.setAttribute('aria-pressed','true'); }
+  }
+  function onIndex(i){
+    if (running){
+      const k = keyForIndex(i);
+      if (!currentKey || k.tag !== currentKey.tag){
+        document.getElementById('audioBtn').textContent = "♪ "+k.tag;
+      }
+    }
+  }
+  return { toggle, start, stop, onIndex, get running(){return running} };
+})();
+
+document.getElementById('audioBtn').addEventListener('click', audio.toggle);
+document.getElementById('helpBtn').addEventListener('click', ()=>location.href="../");
+
+// Initial
+slides[0].classList.add('active');
+ticks[0].classList.add('active');
+rail.focus();
+window.addEventListener('resize', ()=>{ rail.scrollLeft = current*rail.clientWidth; });
+
+// Debug helper used by verifier
+window.__museum = { releases: RELEASES, go: goTo, activate:(i)=>activate(slides[i].querySelector('.screen-wrap')), audio };
+</script>
+</body>
+</html>
