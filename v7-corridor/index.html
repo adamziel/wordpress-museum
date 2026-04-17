@@ -3,608 +3,1075 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WP Museum v7 — 3D Corridor</title>
+<title>WP Museum v7 — Corridor of Versions</title>
 <style>
-  *{box-sizing:border-box}
-  :root{
-    --cam-z: 0px;
-    --cam-sway: 0px;
-    --spacing: 1400;   /* px between paintings */
-    --hall-w: 1400;    /* px wall-to-wall */
-    --hall-h: 900;     /* px ceiling height */
-  }
-  html,body{margin:0;padding:0;background:#0c0a08;color:#f6ecd7;font-family:"EB Garamond",Georgia,serif;}
-  /* The page scroll is the "walk" — we make the document tall enough for all releases. */
-  body{min-height:calc(53 * 1400px + 1200px)} /* matches JS */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#000;color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+  body{height: 700vh; /* 7 rooms × 100vh */}
+  #stage{position:fixed;inset:0;overflow:hidden;background:#000;z-index:1}
+  canvas#view{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;display:block}
+  /* Click-to-start overlay */
+  #splash{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(60% 50% at 50% 50%,#120609,#000);color:#f5e8c8;font-family:"Courier New",monospace;cursor:pointer;transition:opacity .6s}
+  #splash .box{text-align:center;padding:40px;border:2px solid #8a1818;box-shadow:0 0 0 6px #300,0 0 60px #600 inset;background:#1a0808}
+  #splash h1{font-size:42px;letter-spacing:4px;color:#ffbe66;text-shadow:2px 2px 0 #600;margin-bottom:14px}
+  #splash p{font-size:13px;line-height:1.7;max-width:420px;color:#dcc9a0}
+  #splash .k{color:#ffd27f;font-weight:bold}
+  #splash.gone{opacity:0;pointer-events:none}
 
-  /* Fixed 3D viewport */
-  #scene{
-    position:fixed;inset:0;overflow:hidden;
-    perspective:1400px;perspective-origin:50% 42%;
-    background:radial-gradient(80% 60% at 50% 30%,#1d1510 0%,#05040a 80%);
-  }
-  #world{
-    position:absolute;left:50%;top:50%;
-    transform-style:preserve-3d;
-    transform: translate3d(var(--cam-sway), 0, var(--cam-z));
-    will-change: transform;
-  }
-  .plane{position:absolute;transform-style:preserve-3d;backface-visibility:hidden}
-
-  /* Floor — long carpet */
-  #floor{
-    left:calc(var(--hall-w) * -1px / 2); top:300px;
-    width:calc(var(--hall-w) * 1px); height:calc((53 * var(--spacing) + 2000) * 1px);
-    transform-origin: top center;
-    transform: rotateX(90deg) translateZ(calc(-1 * (53 * var(--spacing) + 2000) * 1px / 2));
-    background:
-      repeating-linear-gradient(90deg,#3a1d10 0 6px,#2a140a 6px 12px),
-      linear-gradient(180deg,#2a140a,#150a04);
-    box-shadow: inset 0 0 120px #000a;
-  }
-  #floor::before{
-    content:"";position:absolute;left:50%;top:0;bottom:0;width:300px;transform:translateX(-50%);
-    background:repeating-linear-gradient(0deg, #6a2e1c 0 30px, #5a1e10 30px 60px, #7a3c24 60px 90px);
-    opacity:.9;box-shadow: 0 0 30px #000a inset;
-  }
-  /* Ceiling */
-  #ceiling{
-    left:calc(var(--hall-w) * -1px / 2); top:-300px;
-    width:calc(var(--hall-w) * 1px); height:calc((53 * var(--spacing) + 2000) * 1px);
-    transform-origin:top center;
-    transform: rotateX(-90deg) translateZ(calc((53 * var(--spacing) + 2000) * 1px / 2));
-    background:linear-gradient(180deg,#201714,#0d0908);
-  }
-  /* Walls */
-  .wall{
-    top:calc(var(--hall-h) * -1px / 2); height:calc(var(--hall-h) * 1px);
-    width:calc((53 * var(--spacing) + 2000) * 1px);
-    background:
-      linear-gradient(180deg,#1e120c,#2a1910 60%,#180b08),
-      repeating-linear-gradient(90deg, transparent 0 120px, rgba(255,210,130,.04) 120px 122px);
-    background-blend-mode: overlay;
-    box-shadow: inset 0 0 200px rgba(0,0,0,.7);
-  }
-  #wallLeft{
-    left:calc(var(--hall-w) * -1px / 2);
-    transform-origin: left center;
-    transform: rotateY(90deg) translateZ(0);
-  }
-  #wallRight{
-    left:calc(var(--hall-w) * 1px / 2);
-    transform-origin: right center;
-    transform: rotateY(-90deg) translateZ(0);
-  }
-
-  /* Paintings — placed in world coords, each a full 3D element */
-  .painting{
-    position:absolute;
-    width:520px;height:360px;
-    transform-style:preserve-3d;
-  }
-  .painting.left{
-    left:calc(var(--hall-w) * -1px / 2 + 10px);
-    transform-origin:left center;
-    transform: translate3d(0, -60px, var(--zneg)) rotateY(90deg);
-  }
-  .painting.right{
-    left:calc(var(--hall-w) * 1px / 2 - 10px);
-    transform-origin:right center;
-    transform: translate3d(0, -60px, var(--zneg)) rotateY(-90deg);
-  }
-  .frame{
-    position:absolute;inset:0;
-    background:linear-gradient(145deg,#c18a2d,#6a4010);
-    box-shadow: 0 0 40px rgba(0,0,0,.7), inset 0 0 20px rgba(0,0,0,.4);
-    padding:22px;
-    border-radius:4px;
-  }
-  .frame::before{
-    content:"";position:absolute;inset:8px;border:3px double #f2c868;border-radius:3px;pointer-events:none;
-  }
-  .canvas{position:relative;width:100%;height:100%;overflow:hidden;background:#000;cursor:pointer;border:1px solid #000;}
-  .canvas iframe{width:100%;height:100%;border:0;display:block;background:#fff}
-  .poster{position:absolute;inset:0}
-  .poster .bar{position:absolute}
-  .painting .label{
-    position:absolute;left:50%;top:calc(100% + 14px);transform:translateX(-50%);
-    background:#1a0f08;border:1px solid #7a5a1e;color:#f2d68c;padding:6px 12px;
-    font:italic 700 14px/1.2 "EB Garamond",Georgia,serif;letter-spacing:.04em;
-    box-shadow:0 4px 10px #000a;
-    white-space:nowrap;
-  }
-  .painting .spotlight{
-    position:absolute;left:50%;top:-130px;transform:translateX(-50%);
-    width:220px;height:120px;
-    background:radial-gradient(ellipse at 50% 0%, rgba(255,220,140,.45), transparent 70%);
-    filter: blur(4px);
-    pointer-events:none;
-  }
-  .painting.significant .frame{background:linear-gradient(145deg,#f3d472,#8c5a1c);box-shadow: 0 0 60px #f3d47266, inset 0 0 24px rgba(0,0,0,.3);}
-
-  /* Plaque on wall beside frame (the codename portrait) */
-  .plaque{
-    position:absolute;width:200px;height:260px;
-    background:linear-gradient(180deg,#d6b470,#8a6a32);
-    border:4px solid #3a240f;
-    padding:6px;
-    box-shadow:0 8px 30px #000a;
-  }
-  .painting.left .plaque{right:-240px;top:50px}
-  .painting.right .plaque{left:-240px;top:50px}
-  .plaque .pimg{width:100%;height:190px;background:#211510;overflow:hidden;box-shadow:inset 0 0 20px #000a}
-  .plaque .pimg svg{width:100%;height:100%}
-  .plaque .pname{color:#1c0f06;font:italic 700 15px/1.3 "EB Garamond",Georgia,serif;text-align:center;margin-top:6px}
-  .plaque .pdate{color:#4a2e14;font:600 10px/1 ui-monospace,monospace;letter-spacing:.15em;text-align:center;text-transform:uppercase;margin-top:3px}
-
-  /* Trivia caption that fades in as camera passes */
-  .caption{
-    position:absolute;top:50%;transform:translateY(-50%);
-    width:420px;padding:16px 18px;
-    background:rgba(12,8,4,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-    border-left:3px solid #f3d472;color:#f6ecd7;
-    font:400 16px/1.5 "EB Garamond",Georgia,serif;
-    opacity:0;transition:opacity .6s ease;pointer-events:none;
-  }
-  .painting.left .caption{left:calc(100% + 280px)}
-  .painting.right .caption{right:calc(100% + 280px);text-align:right;border-left:0;border-right:3px solid #f3d472}
-  .painting.focused .caption{opacity:1}
-  .caption .cv{font:800 22px/1 "EB Garamond",serif;color:#f3d472;letter-spacing:-.02em;margin-bottom:4px}
-  .caption .cd{font:600 10px/1 ui-monospace,monospace;letter-spacing:.2em;color:#c9a05a;text-transform:uppercase;margin-bottom:10px}
-
-  /* Era poster styles for canvas */
-  .poster.era-b2{background:#fafafa}
-  .poster.era-b2::before{content:"b2 » weblog tool";position:absolute;top:0;left:0;right:0;height:40px;background:#333;color:#ffcc66;font:700 14px/40px ui-monospace,monospace;padding-left:12px}
-  .poster.era-b2::after{content:"Hello, world. Posted by Mike.";color:#222;position:absolute;top:52px;left:16px;right:16px;font:italic 14px/1.5 Georgia,serif}
-  .poster.era-kubrick{background:radial-gradient(800px 200px at 50% 120%,#6ea5d0,transparent 70%),linear-gradient(#73a0c5,#234b6a)}
-  .poster.era-kubrick::after{content:"The WordPress Blog";color:#fff;position:absolute;top:18px;left:18px;font:italic 700 24px/1 Georgia,serif;text-shadow:0 1px 0 #0006}
-  .poster.era-kubrick .bar.ksky{inset:auto 0 0 0;height:22%;background:linear-gradient(#4a7830,#3e6826)}
-  .poster.era-happycog{background:#efefef}
-  .poster.era-happycog .bar.hctop{top:0;left:0;right:0;height:48px;background:linear-gradient(#464646,#2d2d2d)}
-  .poster.era-happycog .bar.hcorange{top:48px;left:0;right:0;height:4px;background:#d54e21}
-  .poster.era-happycog::before{content:"WordPress";color:#fff;position:absolute;top:0;left:16px;font:700 18px/48px sans-serif}
-  .poster.era-happycog::after{content:"Dashboard · Posts · Pages";color:#666;position:absolute;top:62px;left:16px;font:13px/1 sans-serif}
-  .poster.era-coltrane{background:#f1f1f1}
-  .poster.era-coltrane .bar.cltop{top:0;left:0;right:0;height:30px;background:linear-gradient(#464646,#2d2d2d)}
-  .poster.era-coltrane .bar.clnav{top:30px;left:0;bottom:0;width:28%;background:#464646}
-  .poster.era-coltrane::before{content:"";position:absolute;top:48px;left:32%;right:10%;height:12px;background:#bbb;box-shadow:0 24px 0 #ccc,0 48px 0 #ccc}
-  .poster.era-mp6{background:#f1f1f1}
-  .poster.era-mp6 .bar.m6bar{top:0;left:0;right:0;height:34px;background:#23282d}
-  .poster.era-mp6 .bar.m6side{top:34px;left:0;bottom:0;width:22%;background:#32373c}
-  .poster.era-mp6::after{content:"Add New Post";position:absolute;top:54px;left:calc(26%);color:#23282d;font:500 20px/1 sans-serif}
-  .poster.era-gutenberg{background:#f6f7f7}
-  .poster.era-gutenberg .bar.gtop{top:0;left:0;right:0;height:34px;background:#fff;border-bottom:1px solid #ddd}
-  .poster.era-gutenberg .bar.gside{top:34px;right:0;bottom:0;width:22%;background:#fff;border-left:1px solid #ddd}
-  .poster.era-gutenberg::before{content:"";position:absolute;left:10%;right:26%;top:68px;height:44px;background:#fff;border:1px solid #2271b1;box-shadow:0 0 0 1px #72aee6}
-  .poster.era-gutenberg::after{content:"Add title";position:absolute;left:calc(10% + 14px);top:82px;color:#949494;font:300 22px/1 sans-serif}
-  .poster.era-fse{background:#1e1e1e}
-  .poster.era-fse .bar.fleft{top:0;left:0;bottom:0;width:18%;background:#1e1e1e;border-right:1px solid #303030}
-  .poster.era-fse::before{content:"";position:absolute;left:22%;right:6%;top:10%;bottom:10%;background:#fff;box-shadow:0 0 0 1px #444,0 10px 30px #000a}
-  .poster.era-fse::after{content:"Editor";color:#fff;opacity:.8;position:absolute;top:6px;left:10px;font:500 12px/1 sans-serif;letter-spacing:.5px}
+  /* DOM plaque */
+  #plaque{position:fixed;left:50%;bottom:14%;transform:translateX(-50%) translateY(30px);z-index:20;
+    width:min(720px,92vw);pointer-events:none;opacity:0;transition:opacity .4s ease,transform .5s ease}
+  #plaque.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  #plaque .card{display:grid;grid-template-columns:160px 1fr;gap:18px;padding:18px 22px;
+    background:linear-gradient(180deg,rgba(18,14,10,.94),rgba(6,4,3,.94));
+    border:1px solid var(--accent,#e9c97a);box-shadow:0 0 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05) inset;
+    border-radius:6px;color:#f3ead6}
+  #plaque .port{width:160px;height:200px;background:#0a0806;border-radius:4px;overflow:hidden;box-shadow:inset 0 0 20px rgba(0,0,0,.8)}
+  #plaque .port svg{width:100%;height:100%;display:block}
+  #plaque h2{font:700 22px/1.1 Georgia,serif;color:var(--accent,#e9c97a);margin-bottom:2px;letter-spacing:.5px}
+  #plaque .sub{font:500 12px/1.4 "Courier New",monospace;opacity:.7;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+  #plaque .body{font:400 13.5px/1.55 Georgia,serif;color:#e5dcc6;margin-bottom:12px}
+  #plaque button{pointer-events:auto;font:600 11px/1 "Courier New",monospace;letter-spacing:2px;padding:9px 14px;
+    border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;
+    text-transform:uppercase;transition:all .15s}
+  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706}
 
   /* HUD */
-  #hud{
-    position:fixed;top:14px;left:14px;right:14px;z-index:20;
-    display:flex;gap:12px;align-items:center;
-    color:#f6ecd7;font:italic 600 14px/1 "EB Garamond",Georgia,serif;
-    pointer-events:none;
-  }
-  #hud .brand{background:rgba(10,6,2,.6);border:1px solid rgba(255,210,130,.3);padding:8px 14px;border-radius:4px;pointer-events:auto}
-  #hud .brand small{display:block;font:500 10px/1 ui-monospace,monospace;letter-spacing:.3em;text-transform:uppercase;opacity:.65;margin-top:4px;font-style:normal}
-  #hud .spacer{flex:1}
-  .hudbtn{pointer-events:auto;background:rgba(10,6,2,.6);border:1px solid rgba(255,210,130,.3);color:#f6ecd7;padding:8px 14px;border-radius:4px;font:italic 600 13px/1 "EB Garamond",Georgia,serif;cursor:pointer}
-  .hudbtn.active{background:#f3d472;color:#1a0f06;border-color:transparent}
+  #hud{position:fixed;left:0;right:0;bottom:0;height:90px;z-index:15;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(0,0,0,.75));display:flex;align-items:flex-end}
+  #hud .bar{width:100%;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;font-family:"Courier New",monospace;color:#d9c488}
+  #hud .era{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.85}
+  #hud .room{font-size:22px;font-weight:700;color:var(--accent,#e9c97a);text-shadow:0 0 12px var(--accent,#e9c97a)}
+  #hud .year{font-size:11px;letter-spacing:2px;opacity:.7}
+  #hud .face{width:48px;height:48px;border:2px solid #8a1818;background:#2a0a0a;display:flex;align-items:center;justify-content:center;
+    font-size:24px;color:#ffb05a;font-weight:900;box-shadow:inset 0 0 10px #500}
+  #hud .stat{display:flex;gap:10px;align-items:center}
 
   /* Minimap */
-  #minimap{
-    position:fixed;top:70px;right:14px;z-index:20;
-    background:rgba(10,6,2,.7);border:1px solid rgba(255,210,130,.25);
-    padding:10px 14px;border-radius:4px;
-    max-width:360px;
-  }
-  #minimap .mtrack{position:relative;height:28px;width:340px}
-  .mdot{position:absolute;top:50%;transform:translate(-50%,-50%);width:4px;height:4px;border-radius:50%;background:rgba(255,210,130,.35);cursor:pointer;transition:all .15s}
-  .mdot.sig{width:6px;height:6px;background:#f3d472}
-  .mdot.active{background:#fff;box-shadow:0 0 8px #f3d472;width:8px;height:8px}
-  .mdot:hover{background:#fff}
-  #minimap .mlabel{font:500 10px/1 ui-monospace,monospace;letter-spacing:.15em;opacity:.6;text-transform:uppercase;text-align:center;margin-top:6px;color:#f6ecd7}
+  #minimap{position:fixed;top:14px;right:14px;z-index:15;width:210px;height:64px;
+    background:rgba(0,0,0,.7);border:1px solid #c69b4a;padding:6px;font-family:"Courier New",monospace;color:#e9c97a;font-size:10px}
+  #minimap .title{font-size:9px;letter-spacing:2px;opacity:.7;margin-bottom:4px}
+  #minimap .dots{display:flex;gap:4px;align-items:center;height:18px}
+  #minimap .d{flex:1;height:10px;background:#2a1a0a;border:1px solid #4a3820;transition:all .3s;position:relative}
+  #minimap .d.past{background:#4a3010;border-color:#8a5a20}
+  #minimap .d.now{background:#e9c97a;border-color:#fff;box-shadow:0 0 10px #ffc94a}
+  #minimap .label{font-size:9px;margin-top:3px;opacity:.6;letter-spacing:1px}
 
-  /* Fullscreen iframe modal */
-  #modal{
-    position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);
-    display:none;align-items:center;justify-content:center;padding:40px;
-  }
-  #modal.open{display:flex}
-  #modal .mbox{width:min(1200px,90vw);aspect-ratio:16/9;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.9);position:relative;border-radius:6px;overflow:hidden}
-  #modal iframe{width:100%;height:100%;border:0;display:block;background:#fff}
-  #modal .mclose{position:absolute;top:14px;right:14px;z-index:5;background:#f3d472;color:#1a0f06;border:0;padding:8px 14px;border-radius:4px;font:600 12px/1 ui-monospace,monospace;letter-spacing:.1em;cursor:pointer;text-transform:uppercase}
-  #modal .mtitle{position:absolute;top:14px;left:14px;color:#f3d472;font:italic 700 16px/1 "EB Garamond",Georgia,serif;background:rgba(10,6,2,.7);padding:8px 12px;border-radius:4px}
+  /* Crosshair */
+  #xhair{position:fixed;left:50%;top:48%;width:14px;height:14px;margin-left:-7px;margin-top:-7px;z-index:10;pointer-events:none;opacity:.4}
+  #xhair::before,#xhair::after{content:"";position:absolute;background:#f5e8c8}
+  #xhair::before{left:6px;top:0;width:2px;height:14px}
+  #xhair::after{left:0;top:6px;width:14px;height:2px}
 
-  /* Intro hint */
-  #welcome{
-    position:fixed;z-index:5;left:50%;top:60%;transform:translate(-50%,-50%);
-    text-align:center;color:#f6ecd7;pointer-events:none;transition:opacity .6s ease;
-  }
-  #welcome h1{font:italic 800 clamp(2rem,4.5vw,3.6rem)/1 "EB Garamond",Georgia,serif;color:#f3d472;margin:0 0 12px;letter-spacing:-.01em}
-  #welcome p{font:400 16px/1.4 "EB Garamond",Georgia,serif;opacity:.85;max-width:38ch;margin:0 auto}
-  #welcome .scrollhint{margin-top:24px;letter-spacing:.3em;font-size:11px;font-family:ui-monospace,monospace;opacity:.7;text-transform:uppercase}
-  #welcome.hidden{opacity:0}
+  /* Scroll hint */
+  #hint{position:fixed;left:50%;top:55%;transform:translateX(-50%);z-index:12;color:#f5e8c8;
+    font-family:"Courier New",monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;
+    opacity:0;transition:opacity .6s;text-shadow:0 2px 8px #000;pointer-events:none}
+  #hint.show{opacity:.7}
+  #hint::after{content:"▼";display:block;text-align:center;margin-top:8px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
-  @media (max-width:900px){
-    .painting{width:340px;height:240px}
-    .plaque{width:140px;height:200px}
-    .plaque .pimg{height:140px}
-    .caption{width:260px;font-size:14px}
-    .painting.left .plaque{right:-160px}
-    .painting.right .plaque{left:-160px}
-    .painting.left .caption{left:calc(100% + 180px)}
-    .painting.right .caption{right:calc(100% + 180px)}
-    #minimap{max-width:240px}
-    #minimap .mtrack{width:220px}
-  }
+  /* Playground iframe overlay */
+  #playground{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);display:none;flex-direction:column}
+  #playground.open{display:flex}
+  #playground .pg-head{height:40px;background:#0a0806;border-bottom:1px solid #c69b4a;display:flex;align-items:center;padding:0 14px;color:#e9c97a;font-family:"Courier New",monospace;font-size:12px;letter-spacing:2px}
+  #playground .pg-head button{margin-left:auto;background:transparent;border:1px solid #e9c97a;color:#e9c97a;padding:6px 14px;font:inherit;cursor:pointer;letter-spacing:2px}
+  #playground .pg-head button:hover{background:#e9c97a;color:#0a0706}
+  #playground iframe{flex:1;border:0;background:#fff;width:100%}
+
+  #flash{position:fixed;inset:0;background:#fff;pointer-events:none;opacity:0;z-index:8;mix-blend-mode:screen;transition:opacity .8s}
 </style>
 </head>
 <body>
-
-<div id="scene">
-  <div id="world">
-    <div class="plane" id="floor"></div>
-    <div class="plane" id="ceiling"></div>
-    <div class="plane wall" id="wallLeft"></div>
-    <div class="plane wall" id="wallRight"></div>
-  </div>
+<div id="stage">
+  <canvas id="view"></canvas>
 </div>
-
-<div id="hud">
-  <div class="brand">The Jazz Corridor<small>v7 · scroll to walk</small></div>
-  <div class="spacer"></div>
-  <button class="hudbtn" id="audioBtn" aria-pressed="false">♪ Silence</button>
-  <a class="hudbtn" href="../">← Museum</a>
-</div>
+<div id="flash"></div>
+<div id="xhair"></div>
+<div id="hint">Scroll to walk</div>
 <div id="minimap">
-  <div class="mtrack" id="mtrack"></div>
-  <div class="mlabel" id="mlabel">— · 00 / 53</div>
+  <div class="title">CORRIDOR MAP</div>
+  <div class="dots" id="dots"></div>
+  <div class="label" id="mini-label">—</div>
 </div>
-
-<div id="welcome">
-  <h1>Welcome to the Jazz Corridor.</h1>
-  <p>Scroll forward. Each frame is a WordPress release. Click one to step inside.</p>
-  <div class="scrollhint">↓ scroll to walk ↓</div>
-</div>
-
-<div id="modal" role="dialog" aria-modal="true">
-  <div class="mbox">
-    <div class="mtitle" id="mtitle"></div>
-    <button type="button" class="mclose" id="mclose">Close ✕</button>
+<div id="hud">
+  <div class="bar">
+    <div class="stat">
+      <div class="face" id="face">W</div>
+      <div>
+        <div class="era" id="era">WORDPRESS</div>
+        <div class="room" id="hud-room">—</div>
+      </div>
+    </div>
+    <div class="year" id="year">—</div>
   </div>
+</div>
+<div id="plaque">
+  <div class="card">
+    <div class="port" id="portrait"></div>
+    <div>
+      <div class="sub" id="p-sub">VERSION · DATE</div>
+      <h2 id="p-name">—</h2>
+      <div class="body" id="p-body">—</div>
+      <button id="p-btn">▶ ACTIVATE IN PLAYGROUND</button>
+    </div>
+  </div>
+</div>
+<div id="splash">
+  <div class="box">
+    <h1>CORRIDOR OF VERSIONS</h1>
+    <p>Seven doors. Twenty-two years of WordPress. A first-person walk through the major releases, one decade of rendering tech at a time.</p>
+    <p style="margin-top:14px"><span class="k">SCROLL</span> to move forward. <span class="k">CLICK</span> to begin.</p>
+  </div>
+</div>
+<div id="playground">
+  <div class="pg-head"><span id="pg-label">—</span><button id="pg-close">✕ CLOSE</button></div>
+  <iframe id="pg-frame" title="Playground" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
 </div>
 
 <script>
-const RELEASES = [
-  {"v":"0.70","name":"—","date":"2003-05-27","trivia":"The very first WordPress release, forked from b2/cafelog by Matt Mullenweg and Mike Little. No codename yet — just a hopeful birth announcement on a personal blog."},
-  {"v":"1.0","name":"Miles","date":"2004-01-03","trivia":"Named after jazz great Miles Davis, starting the tradition of jazz-musician codenames. Introduced search-engine-friendly permalinks, the Post Preview pane, and a real plugin API.","significant":true},
-  {"v":"1.2","name":"Mingus","date":"2004-05-22","trivia":"Introduced the Plugin system as we know it today — the moment WordPress became infinitely extensible.","significant":true},
-  {"v":"1.5","name":"Strayhorn","date":"2005-02-17","trivia":"Introduced Themes and Pages. The Kubrick theme became a symbol of an era. Downloaded 900,000 times in a single year.","significant":true},
-  {"v":"2.0","name":"Duke","date":"2005-12-31","trivia":"Shipped a rich WYSIWYG editor (TinyMCE), image uploads, Akismet, and user roles. A New Year's Eve gift from Matt.","significant":true},
-  {"v":"2.1","name":"Ella","date":"2007-01-22","trivia":"Autosave made its debut. Many blog posts were rescued that day."},
-  {"v":"2.2","name":"Getz","date":"2007-05-16","trivia":"Widgets arrived. Sidebars would never be the same.","significant":true},
-  {"v":"2.3","name":"Dexter","date":"2007-09-24","trivia":"Native tagging. Before this, people hacked it in with plugins."},
-  {"v":"2.5","name":"Brecker","date":"2008-03-29","trivia":"Wholesale admin redesign by Happy Cog — the first time WordPress looked designed rather than merely assembled."},
-  {"v":"2.6","name":"Tyner","date":"2008-07-15","trivia":"Post revisions. Press This bookmarklet. Word count finally reliable."},
-  {"v":"2.7","name":"Coltrane","date":"2008-12-10","trivia":"New admin UI with left-hand navigation that lasted over a decade. Automatic plugin upgrades from the dashboard.","significant":true},
-  {"v":"2.8","name":"Baker","date":"2009-06-11","trivia":"Theme installer from the dashboard. Syntax highlighting in the theme editor."},
-  {"v":"2.9","name":"Carmen","date":"2009-12-18","trivia":"Built-in image editor. Trash (finally). Oembed."},
-  {"v":"3.0","name":"Thelonious","date":"2010-06-17","trivia":"Merged WordPress MU — multisite for everyone. Custom post types and custom menus landed. Twenty Ten replaced Kubrick. A civilizational shift.","significant":true},
-  {"v":"3.1","name":"Reinhardt","date":"2011-02-23","trivia":"Admin Bar arrived, hovering helpfully over your site."},
-  {"v":"3.2","name":"Gershwin","date":"2011-07-04","trivia":"Dropped PHP 4 and MySQL 4 support. Distraction-free writing mode. Twenty Eleven."},
-  {"v":"3.3","name":"Sonny","date":"2011-12-12","trivia":"Drag-and-drop media uploader. Flyout menus. New-user welcome pointers."},
-  {"v":"3.4","name":"Green","date":"2012-06-13","trivia":"Theme Customizer debuted. Twitter embeds.","significant":true},
-  {"v":"3.5","name":"Elvin","date":"2012-12-11","trivia":"Brand-new Media Manager. Retina-ready admin. Twenty Twelve."},
-  {"v":"3.6","name":"Oscar","date":"2013-08-01","trivia":"Delayed twice. Audio and video improvements. Twenty Thirteen — the most colorful default theme ever."},
-  {"v":"3.7","name":"Basie","date":"2013-10-24","trivia":"Automatic background security updates. Quietly the most important WordPress release of all time.","significant":true},
-  {"v":"3.8","name":"Parker","date":"2013-12-12","trivia":"Flat, responsive admin (the MP6 project merged in). Admin color schemes. Twenty Fourteen magazine theme.","significant":true},
-  {"v":"3.9","name":"Smith","date":"2014-04-16","trivia":"Live widget previews. Improved visual editor with drag-and-drop images."},
-  {"v":"4.0","name":"Benny","date":"2014-09-04","trivia":"A symbolic release — the number bump didn't mean a rewrite, but a smoother grid media library and embed previews in the editor."},
-  {"v":"4.1","name":"Dinah","date":"2014-12-17","trivia":"Twenty Fifteen: the most minimal default theme yet. Distraction-free writing mode v2."},
-  {"v":"4.2","name":"Powell","date":"2015-04-23","trivia":"Emoji support everywhere. Press This redesigned. Plugin updates without leaving the page."},
-  {"v":"4.3","name":"Billie","date":"2015-08-18","trivia":"Menus in the Customizer. Site icons from the Customizer. Formatting shortcuts in the editor."},
-  {"v":"4.4","name":"Clifford","date":"2015-12-08","trivia":"REST API infrastructure merged. Responsive images by default. Embed your WordPress posts elsewhere.","significant":true},
-  {"v":"4.5","name":"Coleman","date":"2016-04-12","trivia":"Inline linking. Custom logos in the Customizer. Formatting keyboard shortcuts."},
-  {"v":"4.6","name":"Pepper","date":"2016-08-16","trivia":"Streamlined updates, native system fonts in the admin, editor content recovery."},
-  {"v":"4.7","name":"Vaughan","date":"2016-12-06","trivia":"REST API content endpoints shipped. Twenty Seventeen. Custom CSS in the Customizer.","significant":true},
-  {"v":"4.8","name":"Evans","date":"2017-06-08","trivia":"Rich Text Widgets. Audio, Video, Image, HTML widgets. Stage-setting for blocks."},
-  {"v":"4.9","name":"Tipton","date":"2017-11-15","trivia":"Scheduled customization changes. Code-editing safety nets — the last release before Gutenberg lit up the ecosystem."},
-  {"v":"5.0","name":"Bebo","date":"2018-12-06","trivia":"Gutenberg. The block editor. The biggest change to WordPress editing since 2.0's WYSIWYG. Twenty Nineteen as the first block-ready default theme.","significant":true},
-  {"v":"5.1","name":"Betty","date":"2019-02-21","trivia":"Site Health warnings for outdated PHP. Editor performance improvements."},
-  {"v":"5.2","name":"Jaco","date":"2019-05-07","trivia":"Site Health dashboard. PHP error protection (WSOD). Bumped PHP minimum to 5.6."},
-  {"v":"5.3","name":"Kirk","date":"2019-11-12","trivia":"Twenty Twenty. Accessibility-first admin improvements. Block editor handles long posts."},
-  {"v":"5.4","name":"Adderley","date":"2020-03-31","trivia":"Social Icons block. Buttons block. Released during the first weeks of the pandemic."},
-  {"v":"5.5","name":"Eckstine","date":"2020-08-11","trivia":"Block patterns. Auto-updates for plugins and themes. XML sitemaps in core.","significant":true},
-  {"v":"5.6","name":"Simone","date":"2020-12-08","trivia":"First major release led by an all-women-identifying release squad. Twenty Twenty-One — a breezy pastel default.","significant":true},
-  {"v":"5.7","name":"Esperanza","date":"2021-03-09","trivia":"One-click HTTPS migration. Drag-and-drop blocks within columns."},
-  {"v":"5.8","name":"Tatum","date":"2021-07-20","trivia":"Widgets become blocks. Template editor previews Full Site Editing. theme.json arrives quietly.","significant":true},
-  {"v":"5.9","name":"Josephine","date":"2022-01-25","trivia":"Full Site Editing officially ships. Twenty Twenty-Two — the first block theme. Navigation block.","significant":true},
-  {"v":"6.0","name":"Arturo","date":"2022-05-24","trivia":"Style variations. Write mode. Locking blocks. FSE matures."},
-  {"v":"6.1","name":"Misha","date":"2022-11-01","trivia":"Fluid typography. Twenty Twenty-Three with 10 style variations."},
-  {"v":"6.2","name":"Dolphy","date":"2023-03-29","trivia":"Site Editor leaves beta. Distraction-free mode returns. Openverse images from the inserter."},
-  {"v":"6.3","name":"Lionel","date":"2023-08-08","trivia":"Command palette. Patterns (renamed from Reusable Blocks). Performance boost — up to 27% faster."},
-  {"v":"6.4","name":"Shirley","date":"2023-11-07","trivia":"Twenty Twenty-Four — the first default theme designed for anyone, for any purpose. Block hooks."},
-  {"v":"6.5","name":"Regina","date":"2024-04-02","trivia":"Font Library. Revisions for styles and templates. Appearance tools for all themes.","significant":true},
-  {"v":"6.6","name":"Dorsey","date":"2024-07-16","trivia":"Section styles (block style variations). Negative margins. Grid layout experiments."},
-  {"v":"6.7","name":"Rollins","date":"2024-11-12","trivia":"Zoom Out in the editor. Twenty Twenty-Five. Preview themes without activating."},
-  {"v":"6.8","name":"Cecil","date":"2025-04-15","trivia":"Speculative loading in core. Style Book for classic themes. Quiet polish across the editor."},
-  {"v":"7.0","name":"Monk","date":"2026-02-10","trivia":"A landmark release. The collaborative editing foundation lands in core after years in the Phase-3 labs. Twenty Twenty-Six ships a full AI-assisted block styling helper.","significant":true}
+"use strict";
+
+/* =========================================================================
+   WordPress Museum — v7-corridor
+   A procedurally-textured raycast FPS walk through seven WordPress majors.
+   Scroll is the movement axis. Canvas-2D raycaster, procedural textures,
+   procedural SVG jazz portraits, procedural WebAudio ambient music.
+   ========================================================================= */
+
+/* ---------- Data: the seven major rooms ---------- */
+const ROOMS = [
+  {
+    v:"1.0", name:"Miles", date:"2004-01-03", musician:"Miles Davis",
+    hist:"Released January 3, 2004 as WordPress's first numbered major and the start of the jazz-codename tradition, honoring Miles Davis. 'Miles' introduced search-engine-friendly permalinks, a post preview pane, and a real plugin API — the spine that every future WordPress extension would grow on.",
+    theme:"bunker",
+    accent:"#ff6a3d",
+    key:"Dm7", bpm:70, chord:[[57,60,64,67],[55,58,62,65],[53,57,60,63]], bass:[38,36,35,34],
+    palette:{wall:[110,60,34],wall2:[70,30,18],floor:[40,22,14],ceil:[18,10,8],fog:[26,8,4],light:[255,120,50],ambient:0.18},
+    tex:"brick"
+  },
+  {
+    v:"2.0", name:"Duke", date:"2005-12-31", musician:"Duke Ellington",
+    hist:"A New Year's Eve gift in 2005 named for Duke Ellington. Duke shipped a rich TinyMCE WYSIWYG editor, image uploads, Akismet anti-spam, and the user-role system that still structures WordPress today — the release where writing in WordPress started to feel like writing, not like tagging.",
+    theme:"crypt",
+    accent:"#ffc36b",
+    key:"Ab7", bpm:84, chord:[[56,60,63,66],[54,57,61,64],[52,56,59,63]], bass:[32,31,30,33],
+    palette:{wall:[90,82,70],wall2:[50,44,36],floor:[30,26,20],ceil:[22,20,16],fog:[30,22,14],light:[255,180,90],ambient:0.24},
+    tex:"stone"
+  },
+  {
+    v:"3.0", name:"Thelonious", date:"2010-06-17", musician:"Thelonious Monk",
+    hist:"June 2010, named for Thelonious Monk. 'Thelonious' merged WordPress MU into core — multisite for everyone — and introduced custom post types and custom menus. The default theme Twenty Ten retired the long-serving Kubrick. A civilizational shift for the platform.",
+    theme:"lab",
+    accent:"#9be3d4",
+    key:"Cmaj7", bpm:96, chord:[[60,64,67,71],[62,65,69,72],[59,62,65,69]], bass:[36,38,41,43],
+    palette:{wall:[190,198,204],wall2:[120,128,138],floor:[70,80,90],ceil:[210,220,230],fog:[180,200,210],light:[230,250,255],ambient:0.55},
+    tex:"tech"
+  },
+  {
+    v:"4.0", name:"Benny", date:"2014-09-04", musician:"Benny Goodman",
+    hist:"September 2014, honoring Benny Goodman. A symbolic number bump rather than a rewrite — 'Benny' delivered a smoother grid-style media library, embed previews inside the editor, and a new plugin installer. The release that made WordPress feel, for the first time, truly modern.",
+    theme:"atrium",
+    accent:"#f0d28c",
+    key:"Fmaj9", bpm:78, chord:[[53,57,60,64],[55,59,62,65],[52,55,59,62]], bass:[29,31,33,34],
+    palette:{wall:[220,210,180],wall2:[150,135,100],floor:[110,92,62],ceil:[240,230,205],fog:[210,195,160],light:[255,230,170],ambient:0.5},
+    tex:"marble"
+  },
+  {
+    v:"5.0", name:"Bebo", date:"2018-12-06", musician:"Bebo Valdés",
+    hist:"December 2018, named for Cuban pianist Bebo Valdés. 'Bebo' shipped Gutenberg — the block editor — the biggest change to WordPress editing since 2.0. Twenty Nineteen arrived as the first block-ready default theme. The release where every post became a composition of blocks.",
+    theme:"gallery",
+    accent:"#c6f0d1",
+    key:"Bbmaj7", bpm:88, chord:[[58,62,65,69],[60,63,67,70],[56,60,63,67]], bass:[34,36,39,41],
+    palette:{wall:[240,244,248],wall2:[190,200,210],floor:[225,230,236],ceil:[250,252,254],fog:[220,230,240],light:[255,255,255],ambient:0.7},
+    tex:"glass"
+  },
+  {
+    v:"6.0", name:"Arturo", date:"2022-05-24", musician:"Arturo O'Farrill",
+    hist:"May 2022, named for Arturo O'Farrill. 'Arturo' advanced Full Site Editing with style variations, a Write mode that strips distractions, and locking controls for block patterns. The release where designers could finally shape a whole WordPress site in one visual interface.",
+    theme:"neon",
+    accent:"#ff5ad9",
+    key:"Emaj7", bpm:104, chord:[[64,68,71,75],[62,66,69,73],[67,71,74,78]], bass:[40,38,43,41],
+    palette:{wall:[28,4,40],wall2:[60,10,80],floor:[10,4,24],ceil:[14,4,40],fog:[12,4,28],light:[255,90,220],ambient:0.22},
+    tex:"neon"
+  },
+  {
+    v:"7.0", name:"Monk", date:"2026-02-10", musician:"Thelonious Monk (reprise)",
+    hist:"A landmark 2026 release completing the cycle back to Monk. 'Monk' lands the collaborative editing foundation after years of Phase-3 groundwork, and Twenty Twenty-Six ships an AI-assisted block-styling helper. A quiet, white, open-ended room where the platform starts writing with you instead of for you.",
+    theme:"void",
+    accent:"#a9b8ff",
+    key:"Cmaj9", bpm:60, chord:[[60,64,67,71,74],[62,65,69,72,76],[57,60,64,67,71]], bass:[36,38,33,34],
+    palette:{wall:[245,248,252],wall2:[210,220,235],floor:[238,242,248],ceil:[252,254,255],fog:[240,244,252],light:[250,250,255],ambient:0.85},
+    tex:"void"
+  }
 ];
-const INSTRUMENTS = {"Miles":"trumpet","Mingus":"bass","Strayhorn":"piano","Duke":"piano","Ella":"voice","Getz":"sax","Dexter":"sax","Brecker":"sax","Tyner":"piano","Coltrane":"sax","Baker":"trumpet","Carmen":"voice","Thelonious":"piano","Reinhardt":"guitar","Gershwin":"piano","Sonny":"sax","Green":"sax","Elvin":"drums","Oscar":"piano","Basie":"piano","Parker":"sax","Smith":"piano","Benny":"clarinet","Dinah":"voice","Powell":"piano","Billie":"voice","Clifford":"trumpet","Coleman":"sax","Pepper":"sax","Vaughan":"voice","Evans":"piano","Tipton":"piano","Bebo":"piano","Betty":"voice","Jaco":"bass","Kirk":"sax","Adderley":"sax","Eckstine":"voice","Simone":"piano","Esperanza":"bass","Tatum":"piano","Josephine":"voice","Arturo":"trumpet","Misha":"piano","Dolphy":"sax","Lionel":"vibes","Shirley":"voice","Regina":"voice","Dorsey":"trombone","Rollins":"sax","Cecil":"piano","Monk":"piano"};
 
-const SPACING = 1400; // must match CSS --spacing
-const PAD_FRONT = 600;
-
-function eraOf(v){const n=parseFloat(v);if(n<1)return"b2";if(n<2.5)return"kubrick";if(n<2.6)return"happycog";if(n<3.8)return"coltrane";if(n<5.0)return"mp6";if(n<5.9)return"gutenberg";return"fse"}
-function eraBars(era){
-  if(era==="kubrick") return '<div class="bar ksky"></div>';
-  if(era==="happycog") return '<div class="bar hctop"></div><div class="bar hcorange"></div>';
-  if(era==="coltrane") return '<div class="bar cltop"></div><div class="bar clnav"></div>';
-  if(era==="mp6") return '<div class="bar m6bar"></div><div class="bar m6side"></div>';
-  if(era==="gutenberg") return '<div class="bar gtop"></div><div class="bar gside"></div>';
-  if(era==="fse") return '<div class="bar fleft"></div>';
-  return '';
+/* ---------- Canvas & world setup ---------- */
+const canvas = document.getElementById('view');
+const ctx = canvas.getContext('2d', { alpha:false, willReadFrequently:true });
+let W = 800, H = 450;               // internal render resolution
+let screenW=1, screenH=1;
+function resize(){
+  screenW = window.innerWidth;
+  screenH = window.innerHeight;
+  // Scale render resolution to keep perf good on big screens
+  const scale = (screenW > 1400) ? 0.55 : (screenW > 900 ? 0.65 : 0.75);
+  W = Math.max(480, Math.floor(screenW * scale));
+  H = Math.max(270, Math.floor(screenH * scale));
+  canvas.width = W; canvas.height = H;
 }
-function fmtDate(s){return new Date(s+"T00:00:00Z").toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"})}
-function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31 + s.charCodeAt(i))|0}return Math.abs(h)}
+resize();
+window.addEventListener('resize', resize);
 
-function portraitSVG(rel){
-  const name = rel.name || "—";
-  const instr = INSTRUMENTS[name] || "piano";
-  const h = hash(name);
-  const skins = ["#8a5a44","#c99474","#5d3b26","#a67353","#402417"];
-  const hats  = ["#181820","#2d1b1b","#3b3b42","#4d2e1c"];
-  const tops  = ["#6a3a1a","#2a2a32","#4a2e2e","#1e344a"];
-  const skin = skins[h%skins.length], hat = hats[(h>>2)%hats.length], top = tops[(h>>4)%tops.length];
-  const instrSVG = ({
-    trumpet: `<g transform="translate(125,155)"><rect x="0" y="-5" width="60" height="10" rx="2" fill="#d4a64a"/><circle cx="66" cy="0" r="12" fill="none" stroke="#d4a64a" stroke-width="6"/></g>`,
-    sax: `<g transform="translate(140,140)"><path d="M0,0 q0,36 24,44 q28,8 34,-24 l-8,-4 q-2,22 -20,20 q-20,-4 -20,-32 z" fill="#d4a64a"/></g>`,
-    piano: `<g transform="translate(90,200)"><rect x="0" y="0" width="110" height="24" fill="#fff"/><g fill="#111">${Array.from({length:6}).map((_,i)=>`<rect x="${i*17+3}" y="0" width="8" height="16"/>`).join('')}</g></g>`,
-    bass: `<g transform="translate(135,90)"><rect x="0" y="0" width="10" height="130" fill="#7a3e12"/><ellipse cx="5" cy="130" rx="30" ry="36" fill="#a5591e"/></g>`,
-    guitar: `<g transform="translate(110,140)"><rect x="0" y="-3" width="95" height="6" fill="#6a3a1a"/><ellipse cx="105" cy="0" rx="30" ry="34" fill="#b07040"/><circle cx="105" cy="0" r="8" fill="#2a1408"/></g>`,
-    voice: `<g transform="translate(145,160)"><circle cx="0" cy="0" r="12" fill="#333"/><rect x="-2" y="12" width="4" height="38" fill="#4a4a4a"/></g>`,
-    drums: `<g transform="translate(105,170)"><ellipse cx="50" cy="26" rx="55" ry="20" fill="#e7c78a"/></g>`,
-    clarinet: `<g transform="translate(148,140)"><rect x="0" y="0" width="8" height="80" fill="#1a1a1a"/></g>`,
-    trombone: `<g transform="translate(115,150)"><rect x="0" y="-4" width="85" height="8" fill="#d4a64a"/><circle cx="90" cy="0" r="14" fill="none" stroke="#d4a64a" stroke-width="6"/></g>`,
-    vibes: `<g transform="translate(90,200)">${Array.from({length:5}).map((_,i)=>`<rect x="${i*20+2}" y="0" width="14" height="${8+i*2}" fill="#b8b8c0"/>`).join('')}</g>`,
-  })[instr] || '';
-  return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-label="Portrait of ${name}">
-    <rect width="300" height="300" fill="#1a110a"/>
-    <path d="M60,300 q0,-80 90,-80 q90,0 90,80 z" fill="${top}"/>
-    <ellipse cx="150" cy="150" rx="48" ry="58" fill="${skin}"/>
-    <path d="M92,130 q58,-40 116,0 q-8,-8 -58,-8 q-50,0 -58,8z" fill="${hat}"/>
-    <rect x="94" y="122" width="112" height="8" fill="${hat}"/>
-    <rect x="124" y="148" width="18" height="8" rx="2" fill="#111"/>
-    <rect x="158" y="148" width="18" height="8" rx="2" fill="#111"/>
-    <path d="M138,182 q12,8 24,0" stroke="#222" stroke-width="2" fill="none"/>
-    ${instrSVG}
-    <text x="10" y="290" font-family="Georgia,serif" font-style="italic" font-size="13" fill="#f3d472">${name}</text>
-  </svg>`;
+/* ---------- Map ----------
+   Each room is a straight hallway 7 tiles wide, roomLen long.
+   Total map: width 9 (walls at x=0, x=8), length = rooms*roomLen + 2.
+   Player advances in +y. Plaques on side walls at midroom.
+*/
+const MAP_W = 9;
+const ROOM_LEN = 18;
+const CAP = 2;
+const MAP_H = ROOMS.length * ROOM_LEN + CAP * 2;
+
+// Per-tile data: 0 = empty, otherwise a texture id (room index * 10 + wallKind)
+const map = new Uint8Array(MAP_W * MAP_H);
+function mget(x,y){ if(x<0||y<0||x>=MAP_W||y>=MAP_H) return 255; return map[y*MAP_W+x]; }
+function mset(x,y,v){ if(x<0||y<0||x>=MAP_W||y>=MAP_H) return; map[y*MAP_W+x]=v; }
+// Build walls along x=0 and x=MAP_W-1 for every y, tagged with room index+1
+for(let y=0;y<MAP_H;y++){
+  const r = Math.max(0, Math.min(ROOMS.length-1, Math.floor((y-CAP)/ROOM_LEN)));
+  mset(0,y, r+1);
+  mset(MAP_W-1,y, r+1);
+}
+// End caps (front + back wall)
+for(let x=0;x<MAP_W;x++){ mset(x,0, 1); mset(x, MAP_H-1, ROOMS.length); }
+
+// Doorway pillars between rooms (little archway bumps on inside walls)
+for(let r=1;r<ROOMS.length;r++){
+  const y = CAP + r*ROOM_LEN - 1;
+  mset(1, y, r); mset(MAP_W-2, y, r);     // previous-room corners
+  mset(1, y+1, r+1); mset(MAP_W-2, y+1, r+1); // next-room corners
 }
 
-// Build paintings inside world
-const world = document.getElementById('world');
-const paintings = [];
-RELEASES.forEach((r,i)=>{
-  const era = eraOf(r.v);
-  const side = i % 2 === 0 ? 'left' : 'right';
-  const zneg = -PAD_FRONT - (i+1) * SPACING; // painting sits at this Z
-  const el = document.createElement('div');
-  el.className = 'painting ' + side + (r.significant?' significant':'');
-  el.style.setProperty('--zneg', zneg + 'px');
-  el.dataset.i = i; el.dataset.v = r.v;
-  el.innerHTML = `
-    <div class="spotlight"></div>
-    <div class="frame">
-      <div class="canvas" data-v="${r.v}" role="button" tabindex="0" aria-label="Enter WordPress ${r.v}">
-        <div class="poster era-${era}">${eraBars(era)}</div>
-      </div>
-    </div>
-    <div class="label">WordPress ${r.v} — ${r.name==='—'?'Genesis':r.name}</div>
-    <div class="plaque">
-      <div class="pimg">${portraitSVG(r)}</div>
-      <div class="pname">${r.name==='—'?'Matt & Mike':r.name}</div>
-      <div class="pdate">${fmtDate(r.date)}</div>
-    </div>
-    <div class="caption">
-      <div class="cv">${r.v} · ${r.name==='—'?'Genesis':r.name}</div>
-      <div class="cd">${fmtDate(r.date)}${r.significant?' · Landmark':''}</div>
-      <div>${r.trivia}</div>
-    </div>
-  `;
-  world.appendChild(el);
-  paintings.push({el, i, v:r.v, zneg});
-});
+// Plaque tiles: mark mid-room side wall with special id = 200 + roomIndex
+for(let r=0;r<ROOMS.length;r++){
+  const y = CAP + r*ROOM_LEN + Math.floor(ROOM_LEN/2);
+  mset(0, y, 200 + r);   // left wall plaque
+}
 
-// Build minimap
-const mtrack = document.getElementById('mtrack');
-mtrack.innerHTML = RELEASES.map((r,i)=>{
-  const pct = (i/(RELEASES.length-1))*100;
-  return `<div class="mdot ${r.significant?'sig':''}" data-i="${i}" style="left:${pct}%" title="${r.v} · ${r.name}"></div>`;
-}).join('');
-const mdots = [...mtrack.children];
+/* Given a world y, return the room index it belongs to. */
+function roomAtY(y){
+  return Math.max(0, Math.min(ROOMS.length-1, Math.floor((y - CAP) / ROOM_LEN)));
+}
 
-// Scroll-driven camera
-let currentFocus = -1;
-let lastScroll = 0;
-let lastT = performance.now();
-let velocity = 0;
+/* ---------- Procedural textures (64×64 each) ---------- */
+const TEX = 64;
+function makeTex(drawer){
+  const c = document.createElement('canvas'); c.width=TEX; c.height=TEX;
+  const g = c.getContext('2d'); drawer(g);
+  // Flatten to Uint8ClampedArray for fast column sampling
+  const img = g.getImageData(0,0,TEX,TEX);
+  return { canvas:c, data:img.data };
+}
+function mixColors(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
+function rgb(c){ return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; }
 
-function onScroll(){
-  const y = window.scrollY;
-  // camZ pushes world toward viewer (positive Z). y=0 starts us at beginning; painting i is at zneg.
-  // To bring painting i to Z=0, world must translateZ(-zneg) = PAD_FRONT+(i+1)*SPACING.
-  const camZ = y + 0; // px per scroll px, 1:1.
-  document.documentElement.style.setProperty('--cam-z', camZ+'px');
-  // Subtle sway — small sinusoidal movement tied to camZ
-  const sway = Math.sin(camZ/600) * 30;
-  document.documentElement.style.setProperty('--cam-sway', sway+'px');
-
-  // Compute which painting is most centered (smallest |zpain - camZ projected|)
-  // A painting i is in-view when camZ approximately equals PAD_FRONT + (i+1)*SPACING
-  const virtualI = Math.max(0, Math.min(RELEASES.length-1, Math.round((camZ - PAD_FRONT) / SPACING) - 1));
-  if (virtualI !== currentFocus){
-    if (currentFocus >= 0) paintings[currentFocus].el.classList.remove('focused');
-    currentFocus = virtualI;
-    if (currentFocus >= 0){
-      paintings[currentFocus].el.classList.add('focused');
-      mdots.forEach(d=>d.classList.remove('active'));
-      mdots[currentFocus].classList.add('active');
-      document.getElementById('mlabel').textContent = `${RELEASES[currentFocus].v} · ${RELEASES[currentFocus].name} · ${currentFocus+1}/${RELEASES.length}`;
-      if (audio.running) audio.onNewPainting(currentFocus);
+function drawBrick(g, c1, c2, mortar){
+  g.fillStyle = rgb(mortar); g.fillRect(0,0,TEX,TEX);
+  const bh = 8, bw = 16;
+  for(let row=0;row<TEX/bh;row++){
+    const offset = (row%2)*8;
+    for(let col=-1;col<TEX/bw+1;col++){
+      const x = col*bw + offset, y = row*bh;
+      const t = Math.random();
+      const base = mixColors(c1,c2,t*0.7);
+      g.fillStyle = rgb(base);
+      g.fillRect(x+1,y+1,bw-2,bh-2);
+      // highlight
+      g.fillStyle = `rgba(255,255,255,${0.06+Math.random()*0.05})`;
+      g.fillRect(x+1,y+1,bw-2,1);
+      // shadow
+      g.fillStyle = `rgba(0,0,0,${0.18+Math.random()*0.1})`;
+      g.fillRect(x+1,y+bh-2,bw-2,1);
     }
   }
-  // Velocity for audio pitch
-  const now = performance.now();
-  const dt = Math.max(1, now - lastT);
-  velocity = (y - lastScroll) / dt;
-  lastScroll = y; lastT = now;
-  if (audio.running) audio.setVelocity(velocity);
-
-  // Hide welcome after first scroll
-  if (y > 50) document.getElementById('welcome').classList.add('hidden');
+  // noise
+  for(let i=0;i<400;i++){
+    g.fillStyle=`rgba(0,0,0,${Math.random()*0.15})`;
+    g.fillRect(Math.random()*TEX|0,Math.random()*TEX|0,1,1);
+  }
 }
-window.addEventListener('scroll', onScroll, {passive:true});
 
-// Minimap teleport
-mtrack.addEventListener('click',(e)=>{
-  const d = e.target.closest('.mdot');
-  if (!d) return;
-  const i = parseInt(d.dataset.i);
-  const y = PAD_FRONT + (i+1)*SPACING;
-  window.scrollTo({top: y, behavior:'smooth'});
-});
-
-// Keyboard arrows
-document.addEventListener('keydown',(e)=>{
-  if (e.target.tagName === 'INPUT') return;
-  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === 'ArrowDown'){
-    e.preventDefault();
-    window.scrollTo({top: PAD_FRONT + (Math.min(RELEASES.length-1,currentFocus+1)+1)*SPACING, behavior:'smooth'});
-  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp'){
-    e.preventDefault();
-    window.scrollTo({top: PAD_FRONT + (Math.max(0,currentFocus-1)+1)*SPACING, behavior:'smooth'});
-  } else if (e.key === ' '){
-    e.preventDefault(); audio.toggle();
-  } else if (e.key === 'Escape'){
-    closeModal();
+function drawStone(g,c1,c2){
+  g.fillStyle = rgb(c2); g.fillRect(0,0,TEX,TEX);
+  // random polygonal stones
+  for(let i=0;i<14;i++){
+    const x=Math.random()*TEX,y=Math.random()*TEX;
+    const r=6+Math.random()*10;
+    const col = mixColors(c1,c2,Math.random()*0.6);
+    g.fillStyle = rgb(col);
+    g.beginPath();
+    const pts=6+Math.floor(Math.random()*3);
+    for(let p=0;p<pts;p++){
+      const ang=p/pts*Math.PI*2;
+      const rr=r*(0.7+Math.random()*0.4);
+      g.lineTo(x+Math.cos(ang)*rr,y+Math.sin(ang)*rr);
+    }
+    g.closePath();g.fill();
+    g.strokeStyle=`rgba(0,0,0,0.4)`;g.stroke();
   }
-});
-
-// Click painting → modal iframe
-function openModal(v){
-  const mbox = document.querySelector('#modal .mbox');
-  // Clear existing iframe
-  mbox.querySelectorAll('iframe').forEach(n=>n.remove());
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
-  iframe.loading = 'lazy';
-  iframe.referrerPolicy = 'no-referrer';
-  mbox.appendChild(iframe);
-  document.getElementById('mtitle').textContent = `WordPress ${v}`;
-  document.getElementById('modal').classList.add('open');
-  // Also mark the related painting canvas as loaded so tests see an iframe inline if needed.
-  const p = paintings.find(p=>p.v===v);
-  if (p) p.el.dataset.loaded = "1";
+  // cracks
+  g.strokeStyle='rgba(0,0,0,0.3)';
+  for(let i=0;i<6;i++){
+    g.beginPath();
+    let x=Math.random()*TEX,y=Math.random()*TEX;
+    g.moveTo(x,y);
+    for(let j=0;j<4;j++){ x+=(Math.random()-0.5)*14;y+=(Math.random()-0.5)*14;g.lineTo(x,y);}
+    g.stroke();
+  }
 }
-function closeModal(){
-  const modal = document.getElementById('modal');
-  if (!modal.classList.contains('open')) return;
-  modal.classList.remove('open');
-  modal.querySelectorAll('iframe').forEach(n=>n.remove());
+
+function drawTech(g,c1,c2,accent){
+  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
+  // panel seams
+  g.strokeStyle = rgb(c2); g.lineWidth=1;
+  g.strokeRect(2,2,TEX-4,TEX-4);
+  g.strokeRect(6,6,TEX-12,TEX-12);
+  // rivets
+  g.fillStyle = rgb(c2);
+  [[8,8],[TEX-8,8],[8,TEX-8],[TEX-8,TEX-8]].forEach(([x,y])=>{g.beginPath();g.arc(x,y,1.5,0,Math.PI*2);g.fill();});
+  // Caution stripe
+  for(let i=0;i<TEX;i+=8){
+    g.fillStyle='rgba(255,200,40,0.5)';
+    g.fillRect(i, TEX-4, 4, 2);
+  }
+  // Label
+  g.fillStyle=`rgba(${accent[0]},${accent[1]},${accent[2]},0.6)`;
+  g.fillRect(TEX/2-8,TEX/2-2,16,4);
 }
-document.getElementById('mclose').addEventListener('click', closeModal);
-document.getElementById('modal').addEventListener('click',(e)=>{
-  if (e.target.id === 'modal') closeModal();
-});
 
-world.addEventListener('click',(e)=>{
-  const c = e.target.closest('.canvas');
-  if (!c) return;
-  openModal(c.dataset.v);
-});
-world.addEventListener('keydown',(e)=>{
-  if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('canvas')){
-    e.preventDefault(); openModal(e.target.dataset.v);
+function drawMarble(g,c1,c2,gold){
+  // veined marble
+  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
+  for(let i=0;i<4;i++){
+    g.strokeStyle = `rgba(${gold[0]},${gold[1]},${gold[2]},${0.3+Math.random()*0.3})`;
+    g.lineWidth = 0.5+Math.random();
+    g.beginPath();
+    let x=0,y=Math.random()*TEX;
+    g.moveTo(x,y);
+    while(x<TEX){
+      x+=4;y+=(Math.random()-0.5)*8;
+      g.lineTo(x,y);
+    }
+    g.stroke();
   }
-});
+  // soft shading
+  const grad=g.createLinearGradient(0,0,TEX,TEX);
+  grad.addColorStop(0,'rgba(255,255,255,0.12)');
+  grad.addColorStop(1,'rgba(0,0,0,0.18)');
+  g.fillStyle=grad;g.fillRect(0,0,TEX,TEX);
+  // gold trim top/bottom
+  g.fillStyle=rgb(gold);
+  g.fillRect(0,0,TEX,2);g.fillRect(0,TEX-2,TEX,2);
+}
 
-// --- Audio ---
-const audio = (()=>{
-  let ctx=null, master=null, running=false, timer=null, step=0;
-  let pitchBend = 1.0, pitchTarget = 1.0;
-  let lastArpI = -1;
+function drawGlass(g,c1,c2){
+  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
+  // frosted vertical lines
+  for(let x=0;x<TEX;x+=2){
+    g.fillStyle=`rgba(255,255,255,${0.05+Math.random()*0.08})`;
+    g.fillRect(x,0,1,TEX);
+  }
+  // grid blocks
+  g.strokeStyle=rgb(c2);g.lineWidth=1;
+  for(let x=0;x<=TEX;x+=16){ g.beginPath();g.moveTo(x,0);g.lineTo(x,TEX);g.stroke(); }
+  for(let y=0;y<=TEX;y+=16){ g.beginPath();g.moveTo(0,y);g.lineTo(TEX,y);g.stroke(); }
+  // sparkle
+  for(let i=0;i<20;i++){
+    g.fillStyle=`rgba(255,255,255,${Math.random()*0.4})`;
+    g.fillRect(Math.random()*TEX|0,Math.random()*TEX|0,1,1);
+  }
+}
 
-  function midiToHz(m){return 440*Math.pow(2,(m-69)/12)}
-  function blip(freq,dur,type,gain){
-    if (!ctx) return;
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    o.type=type;o.frequency.value=freq*pitchBend;
-    g.gain.setValueAtTime(0,ctx.currentTime);
-    g.gain.linearRampToValueAtTime(gain,ctx.currentTime+0.01);
-    g.gain.exponentialRampToValueAtTime(0.0005,ctx.currentTime+dur);
-    o.connect(g).connect(master);
-    o.start();o.stop(ctx.currentTime+dur+.02);
+function drawNeon(g,c1,c2,accent){
+  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
+  // Vaporwave grid
+  g.strokeStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.9)`;
+  g.lineWidth = 1;
+  for(let x=0;x<=TEX;x+=8){
+    g.beginPath();g.moveTo(x,0);g.lineTo(x,TEX);g.stroke();
   }
-  function tick(){
-    // Slow "tour" loop: bass + soft lead in E Dorian, original
-    const tempo = 88, stepDur = 60/tempo/2;
-    const root = 64; // E
-    const scale = [0,2,3,5,7,9,10];
-    const bassSeq = [root-12, root-12, root-12+7, root-12+5];
-    const leadSeq = [0,3,5,7,10,7,5,3];
-    const s = step % 16;
-    // Smoothly approach pitchTarget
-    pitchBend += (pitchTarget - pitchBend)*0.08;
+  for(let y=0;y<=TEX;y+=8){
+    g.beginPath();g.moveTo(0,y);g.lineTo(TEX,y);g.stroke();
+  }
+  // Glow bar
+  const grad=g.createLinearGradient(0,TEX/2,0,TEX);
+  grad.addColorStop(0,`rgba(${accent[0]},${accent[1]},${accent[2]},0.4)`);
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grad;g.fillRect(0,TEX/2,TEX,TEX/2);
+  // Sun
+  g.fillStyle=`rgba(${c2[0]},${c2[1]},${c2[2]},0.8)`;
+  g.beginPath();g.arc(TEX/2, TEX*0.38, 10, 0, Math.PI*2);g.fill();
+}
 
-    if (s % 4 === 0) blip(midiToHz(bassSeq[(s/4)|0]), stepDur*3.5, "triangle", 0.12);
-    if (s % 2 === 0) blip(midiToHz(root+12+scale[leadSeq[(s/2)|0]%scale.length]), stepDur*1.2, "square", 0.045);
-    if (s === 9)     blip(midiToHz(root-7), stepDur*4, "sawtooth", 0.02);
-    step++;
-    timer = setTimeout(tick, stepDur*1000 / Math.max(0.5,Math.min(1.8,pitchBend)));
+function drawVoid(g,c1,c2){
+  const grad=g.createLinearGradient(0,0,0,TEX);
+  grad.addColorStop(0,rgb(c2));
+  grad.addColorStop(1,rgb(c1));
+  g.fillStyle=grad;g.fillRect(0,0,TEX,TEX);
+  // very faint horizontal lines
+  for(let y=8;y<TEX;y+=16){
+    g.fillStyle='rgba(180,190,220,0.1)';
+    g.fillRect(0,y,TEX,1);
   }
-  function setVelocity(v){
-    // Map |velocity| (px/ms) to pitch 0.85 ~ 1.35
-    const a = Math.min(3, Math.abs(v));
-    pitchTarget = 0.9 + (a/3)*0.45;
+}
+
+function drawPlaqueTex(g, accent, label){
+  g.fillStyle = '#0a0806'; g.fillRect(0,0,TEX,TEX);
+  // outer frame
+  g.strokeStyle = rgb(accent); g.lineWidth = 2;
+  g.strokeRect(2,2,TEX-4,TEX-4);
+  g.strokeStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.4)`;
+  g.strokeRect(6,6,TEX-12,TEX-12);
+  // label area
+  g.fillStyle = rgb(accent);
+  g.font = 'bold 14px "Courier New",monospace';
+  g.textAlign='center';
+  g.fillText(label, TEX/2, TEX/2 - 2);
+  g.font = '8px "Courier New",monospace';
+  g.fillStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.6)`;
+  g.fillText('WP', TEX/2, TEX/2 + 12);
+  // corner lights
+  g.fillStyle = rgb(accent);
+  g.fillRect(4,4,3,3);g.fillRect(TEX-7,4,3,3);g.fillRect(4,TEX-7,3,3);g.fillRect(TEX-7,TEX-7,3,3);
+}
+
+// Build one texture per room plus plaque variants
+const textures = []; // indexed by id (1..ROOMS.length) and 200+i for plaques
+for(let r=0;r<ROOMS.length;r++){
+  const room = ROOMS[r];
+  const p = room.palette;
+  const accent = hexToRgb(room.accent);
+  let tx;
+  if(room.tex==='brick') tx = makeTex(g=>drawBrick(g, p.wall, p.wall2, [30,15,10]));
+  else if(room.tex==='stone') tx = makeTex(g=>drawStone(g, p.wall, p.wall2));
+  else if(room.tex==='tech') tx = makeTex(g=>drawTech(g, p.wall, p.wall2, accent));
+  else if(room.tex==='marble') tx = makeTex(g=>drawMarble(g, p.wall, p.wall2, accent));
+  else if(room.tex==='glass') tx = makeTex(g=>drawGlass(g, p.wall, p.wall2));
+  else if(room.tex==='neon') tx = makeTex(g=>drawNeon(g, p.wall, p.wall2, accent));
+  else tx = makeTex(g=>drawVoid(g, p.wall, p.wall2));
+  textures[r+1] = tx;
+  textures[200+r] = makeTex(g=>drawPlaqueTex(g, accent, room.v));
+}
+
+function hexToRgb(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+
+/* ---------- Player state ---------- */
+const player = {
+  x: MAP_W/2, y: CAP + 0.8,
+  targetY: CAP + 0.8,
+  yaw: Math.PI/2,       // facing +y
+  targetYaw: Math.PI/2,
+  bob: 0,
+};
+
+// FOV
+const FOV = Math.PI/2.6; // ~70°
+
+/* ---------- Raycaster ---------- */
+function renderFrame(){
+  const buf = ctx.getImageData(0,0,W,H);
+  const d = buf.data;
+
+  // Which room are we in (for ceiling/floor fog colors)
+  const rp = roomAtY(player.y);
+  const pal = ROOMS[rp].palette;
+  const fog = pal.fog;
+
+  // Clear with sky/ceiling gradient
+  for(let y=0;y<H;y++){
+    // ceiling darker, floor lighter
+    const t = y < H/2 ? (y/(H/2)) : ((H-y)/(H/2));
+    const isCeil = y < H/2;
+    const base = isCeil ? pal.ceil : pal.floor;
+    const mix = 0.3 + 0.7*t; // darker near horizon
+    const r = base[0]*mix + fog[0]*(1-mix);
+    const g = base[1]*mix + fog[1]*(1-mix);
+    const b = base[2]*mix + fog[2]*(1-mix);
+    for(let x=0;x<W;x++){
+      const i=(y*W+x)*4;
+      d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+    }
   }
-  function onNewPainting(i){
-    if (i === lastArpI) return;
-    lastArpI = i;
-    const root = 64 + ((i%5)-2)*2;
-    const scale = [0,3,5,7,10];
-    scale.forEach((n,idx)=>{
-      setTimeout(()=>blip(midiToHz(root+12+n), 0.2, "square", 0.05), idx*55);
+
+  // Camera basis
+  const dirX = Math.cos(player.yaw), dirY = Math.sin(player.yaw);
+  const planeScale = Math.tan(FOV/2);
+  const planeX =  dirY * planeScale * (W/H) * 0.65;
+  const planeY = -dirX * planeScale * (W/H) * 0.65;
+
+  const sprites = []; // plaque hits with camera x
+
+  for(let col=0; col<W; col++){
+    const camX = 2*col/W - 1;
+    const rdx = dirX + planeX*camX;
+    const rdy = dirY + planeY*camX;
+
+    let mapX = Math.floor(player.x);
+    let mapY = Math.floor(player.y);
+
+    const deltaX = Math.abs(1/rdx);
+    const deltaY = Math.abs(1/rdy);
+    let stepX, stepY, sideDistX, sideDistY;
+    if(rdx < 0){ stepX=-1; sideDistX = (player.x-mapX)*deltaX; }
+    else{ stepX=1; sideDistX=(mapX+1-player.x)*deltaX; }
+    if(rdy < 0){ stepY=-1; sideDistY=(player.y-mapY)*deltaY; }
+    else{ stepY=1; sideDistY=(mapY+1-player.y)*deltaY; }
+
+    let hit = 0, side = 0, tileId = 0;
+    for(let iter=0; iter<MAP_H*2; iter++){
+      if(sideDistX < sideDistY){ sideDistX+=deltaX; mapX+=stepX; side=0; }
+      else{ sideDistY+=deltaY; mapY+=stepY; side=1; }
+      const t = mget(mapX, mapY);
+      if(t!==0 && t!==255){ hit=1; tileId=t; break; }
+    }
+    if(!hit) continue;
+
+    const perpDist = side===0 ? (sideDistX - deltaX) : (sideDistY - deltaY);
+    if(perpDist <= 0.001) continue;
+
+    const lineH = Math.floor(H / perpDist);
+    let drawStart = -lineH/2 + H/2;
+    let drawEnd = lineH/2 + H/2;
+    const ds = Math.max(0, drawStart|0), de = Math.min(H-1, drawEnd|0);
+
+    // wallX: position along the wall
+    let wallX;
+    if(side===0) wallX = player.y + perpDist*rdy;
+    else wallX = player.x + perpDist*rdx;
+    wallX -= Math.floor(wallX);
+    let texX = Math.floor(wallX * TEX);
+    if(side===0 && rdx>0) texX = TEX - texX - 1;
+    if(side===1 && rdy<0) texX = TEX - texX - 1;
+
+    const tex = textures[tileId];
+    if(!tex) continue;
+    const texData = tex.data;
+
+    // Shading: side + distance fog + light flicker near torches for rooms 0/1
+    const rForThis = roomAtY(mapY);
+    const palH = ROOMS[rForThis].palette;
+    const fogH = palH.fog;
+    let bright = 1.0;
+    if(side===1) bright *= 0.78;
+    // flicker for bunker/crypt
+    if(rForThis<=1){
+      bright *= (0.85 + 0.15*Math.sin(time*8 + col*0.17) + 0.05*Math.sin(time*23.5));
+    }
+    // neon pulse for 6
+    if(rForThis===5){ bright *= (0.9 + 0.15*Math.sin(time*3 + mapY*0.5)); }
+    // plaque glow
+    if(tileId >= 200){ bright *= 1.2; }
+
+    const fogDist = Math.min(1, perpDist/18);
+    const ambient = palH.ambient;
+
+    for(let y=ds; y<=de; y++){
+      const texY = Math.min(TEX-1, Math.max(0, Math.floor(((y - (-lineH/2 + H/2))*TEX)/lineH)));
+      const ti = (texY*TEX + texX)*4;
+      let r = texData[ti], g = texData[ti+1], b = texData[ti+2];
+      r = r*bright; g = g*bright; b = b*bright;
+      // Fog blend
+      r = r*(1-fogDist) + fogH[0]*fogDist*(1-ambient*0.3);
+      g = g*(1-fogDist) + fogH[1]*fogDist*(1-ambient*0.3);
+      b = b*(1-fogDist) + fogH[2]*fogDist*(1-ambient*0.3);
+      const di = (y*W + col)*4;
+      d[di]=r; d[di+1]=g; d[di+2]=b;
+    }
+
+    // Collect plaque hit for DOM popup trigger
+    if(tileId >= 200){
+      const pr = tileId - 200;
+      if(!sprites[pr] || sprites[pr].dist > perpDist) sprites[pr] = { dist: perpDist, col };
+    }
+
+    // Also shade floor/ceiling for this column with distance fog (simple post pass)
+    // (done in initial fill + we do a per-column tint here)
+    for(let y=0; y<ds; y++){
+      const di = (y*W+col)*4;
+      // mix in fog as distance from horizon grows
+      const depth = Math.min(1, (H/2 - y) / (H/2) * 0.6 + 0.2);
+      d[di]   = d[di]   *(1-depth*0.3) + fogH[0]*depth*0.3;
+      d[di+1] = d[di+1] *(1-depth*0.3) + fogH[1]*depth*0.3;
+      d[di+2] = d[di+2] *(1-depth*0.3) + fogH[2]*depth*0.3;
+    }
+  }
+
+  ctx.putImageData(buf, 0, 0);
+
+  // Overlays (torches, neon, etc.) drawn on top
+  drawAmbientFx(rp);
+
+  // Record nearest plaque distance for UI
+  nearestPlaque = null;
+  for(let r=0;r<ROOMS.length;r++){
+    if(sprites[r] && sprites[r].dist < 4.5){
+      if(!nearestPlaque || sprites[r].dist < nearestPlaque.dist){
+        nearestPlaque = { room:r, dist: sprites[r].dist };
+      }
+    }
+  }
+}
+
+let nearestPlaque = null;
+
+function drawAmbientFx(rp){
+  const room = ROOMS[rp];
+  // Room-specific overlay
+  if(room.theme==='bunker'){
+    // red emergency light pulse
+    const p = 0.3 + 0.15*Math.sin(time*2);
+    ctx.fillStyle = `rgba(80,10,10,${p*0.25})`;
+    ctx.fillRect(0,0,W,H);
+    // vignette
+    radialVignette('rgba(20,0,0,0.7)');
+  } else if(room.theme==='crypt'){
+    radialVignette('rgba(0,0,0,0.55)');
+    // torch flicker overlay — warm gradient low
+    const a = 0.2 + 0.1*Math.sin(time*11);
+    const grad = ctx.createLinearGradient(0,H*0.6,0,H);
+    grad.addColorStop(0,'rgba(255,160,60,0)');
+    grad.addColorStop(1,`rgba(255,120,30,${a})`);
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  } else if(room.theme==='lab'){
+    // fluorescent cold top bar
+    const grad = ctx.createLinearGradient(0,0,0,H*0.3);
+    grad.addColorStop(0,'rgba(220,240,255,0.12)');
+    grad.addColorStop(1,'rgba(220,240,255,0)');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+    radialVignette('rgba(0,20,30,0.2)');
+  } else if(room.theme==='atrium'){
+    // skylight soft gold
+    const grad = ctx.createLinearGradient(0,0,0,H*0.5);
+    grad.addColorStop(0,'rgba(255,230,170,0.22)');
+    grad.addColorStop(1,'rgba(255,230,170,0)');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  } else if(room.theme==='gallery'){
+    // very soft white, almost nothing
+    ctx.fillStyle='rgba(255,255,255,0.05)';
+    ctx.fillRect(0,0,W,H);
+  } else if(room.theme==='neon'){
+    // scanlines
+    for(let y=0;y<H;y+=2){
+      ctx.fillStyle='rgba(255,90,220,0.04)';
+      ctx.fillRect(0,y,W,1);
+    }
+    radialVignette('rgba(30,0,40,0.5)');
+    // horizon glow
+    const g2 = ctx.createLinearGradient(0,H*0.45,0,H*0.55);
+    g2.addColorStop(0,'rgba(255,90,220,0)');
+    g2.addColorStop(0.5,'rgba(255,90,220,0.35)');
+    g2.addColorStop(1,'rgba(90,230,255,0)');
+    ctx.fillStyle=g2;ctx.fillRect(0,H*0.45,W,H*0.1);
+  } else if(room.theme==='void'){
+    // soft blue tint, overexposed
+    ctx.fillStyle='rgba(240,245,255,0.08)';
+    ctx.fillRect(0,0,W,H);
+    // bloom-ish top
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(255,255,255,0.25)');
+    grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  }
+  // head bob vertical offset overlay — canvas handled via sub-shift
+}
+
+function radialVignette(color){
+  const g = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3, W/2,H/2,Math.max(W,H)*0.7);
+  g.addColorStop(0,'rgba(0,0,0,0)');
+  g.addColorStop(1,color);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+
+/* ---------- Scroll physics ---------- */
+let time = 0;
+let lastT = performance.now();
+function frame(now){
+  const dt = Math.min(0.05, (now - lastT)/1000);
+  lastT = now;
+  time += dt;
+
+  // Map scroll position to targetY
+  const scrollMax = document.body.scrollHeight - window.innerHeight;
+  const s = scrollMax > 0 ? window.scrollY / scrollMax : 0;
+  const inner = MAP_H - 2*CAP - 1.6;
+  player.targetY = CAP + 0.8 + s * inner;
+
+  // Critically-damped-ish interpolation
+  const lerp = 1 - Math.exp(-dt * 5.0);
+  player.y += (player.targetY - player.y) * lerp;
+
+  // Auto-look: subtle yaw nudge toward left-wall plaque as we pass it
+  let targetYaw = Math.PI/2;
+  const r = roomAtY(player.y);
+  const midY = CAP + r*ROOM_LEN + ROOM_LEN/2;
+  const plaqueDelta = player.y - midY;   // -ve: approaching, +ve: past
+  if(plaqueDelta > -3 && plaqueDelta < 3){
+    const prox = 1 - Math.abs(plaqueDelta)/3;   // 0..1
+    // plaque is on the LEFT wall (x=0); after plane flip, left wall = left screen,
+    // so we turn yaw slightly to face -x: from π/2 toward π.
+    targetYaw = Math.PI/2 + 0.35 * prox;
+  }
+  player.targetYaw = targetYaw;
+  player.yaw += (player.targetYaw - player.yaw) * (1 - Math.exp(-dt*3.5));
+
+  // Bob
+  const speed = Math.abs(player.targetY - player.y);
+  player.bob = Math.sin(time*6) * Math.min(0.12, speed*4);
+  player.y += player.bob * 0.002;
+
+  renderFrame();
+  updateUI(r);
+  updateAudio(r);
+
+  requestAnimationFrame(frame);
+}
+
+/* ---------- UI updates ---------- */
+const elRoom = document.getElementById('hud-room');
+const elYear = document.getElementById('year');
+const elEra  = document.getElementById('era');
+const elFace = document.getElementById('face');
+const elDots = document.getElementById('dots');
+const elMiniLabel = document.getElementById('mini-label');
+const plaqueEl = document.getElementById('plaque');
+const pName = document.getElementById('p-name');
+const pSub  = document.getElementById('p-sub');
+const pBody = document.getElementById('p-body');
+const pBtn  = document.getElementById('p-btn');
+const portEl= document.getElementById('portrait');
+const hint = document.getElementById('hint');
+
+// Build minimap dots
+for(let i=0;i<ROOMS.length;i++){
+  const d = document.createElement('div'); d.className='d'; d.dataset.i=i; elDots.appendChild(d);
+}
+
+let currentRoom = -1;
+let lastFlashed = -1;
+function updateUI(r){
+  if(r !== currentRoom){
+    currentRoom = r;
+    const room = ROOMS[r];
+    elRoom.textContent = `WordPress ${room.v} "${room.name}"`;
+    elYear.textContent = room.date;
+    elEra.textContent = ['BUNKER / 2004','CRYPT / 2005','LABORATORY / 2010','ATRIUM / 2014','GALLERY / 2018','GRID / 2022','VOID / 2026'][r];
+    elFace.textContent = room.v.split('.')[0];
+    elFace.style.borderColor = room.accent;
+    elFace.style.color = room.accent;
+    elFace.style.background = 'rgba(0,0,0,0.5)';
+    document.documentElement.style.setProperty('--accent', room.accent);
+    document.querySelectorAll('#dots .d').forEach((el,i)=>{
+      el.classList.toggle('past', i<r);
+      el.classList.toggle('now', i===r);
     });
+    elMiniLabel.textContent = `${r+1}/7  ${room.v} — ${room.name}`;
+    // plaque content (not shown until near)
+    pName.textContent = `${room.name} — WordPress ${room.v}`;
+    pSub.textContent = `${room.date} · CODENAME ${room.musician.toUpperCase()}`;
+    pBody.textContent = room.hist;
+    pBtn.style.borderColor = room.accent;
+    pBtn.style.color = room.accent;
+    pBtn.onclick = ()=>openPlayground(room.v);
+    portEl.innerHTML = buildPortrait(r);
+    plaqueEl.style.setProperty('--accent', room.accent);
+    // HUD style morphing
+    const styleT = r/(ROOMS.length-1); // 0..1
+    elFace.style.boxShadow = styleT < 0.5
+      ? `inset 0 0 10px rgba(255,50,50,${0.6-styleT})`
+      : `0 0 14px ${room.accent}`;
+    // flash transition
+    if(lastFlashed !== r){
+      lastFlashed = r;
+      const fl = document.getElementById('flash');
+      fl.style.background = room.accent;
+      fl.style.opacity = '0.3';
+      setTimeout(()=>{ fl.style.opacity = '0'; }, 60);
+    }
   }
-  function start(){
-    if (running) return;
-    ctx = new (window.AudioContext||window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = .55; master.connect(ctx.destination);
-    running=true; step=0; tick();
+  // Show plaque DOM based on proximity to mid-room
+  const midY = CAP + r*ROOM_LEN + ROOM_LEN/2;
+  const nearPlaque = Math.abs(player.y - midY) < 3.0;
+  if(nearPlaque){
+    plaqueEl.classList.add('show');
+    hint.classList.remove('show');
+  } else {
+    plaqueEl.classList.remove('show');
+    if(window.scrollY < 40) hint.classList.add('show'); else hint.classList.remove('show');
   }
-  function stop(){
-    running=false; if (timer) clearTimeout(timer);
-    if (ctx) ctx.close(); ctx=null;
-  }
-  function toggle(){
-    const btn = document.getElementById('audioBtn');
-    if (running){ stop(); btn.classList.remove('active'); btn.textContent='♪ Silence'; btn.setAttribute('aria-pressed','false'); }
-    else { start(); btn.classList.add('active'); btn.textContent='♪ Touring'; btn.setAttribute('aria-pressed','true'); }
-  }
-  return { toggle, setVelocity, onNewPainting, get running(){return running} };
-})();
-document.getElementById('audioBtn').addEventListener('click', audio.toggle);
-onScroll();
+}
 
-// expose
-window.__museum = { releases:RELEASES, paintings, openModal, audio,
-  go:(i)=>window.scrollTo({top: PAD_FRONT + (i+1)*SPACING, behavior:'smooth'}) };
+/* ---------- Portraits (procedural SVG per musician) ---------- */
+function buildPortrait(r){
+  const room = ROOMS[r];
+  const accent = room.accent;
+  const p = room.palette;
+  const bg1 = rgb(p.wall2), bg2 = rgb(p.wall);
+  const skin = ['#4a3020','#5c3a22','#432818','#5a3a25','#3d2418','#2a1810','#3a2820'][r];
+  // Distinct composition per musician
+  const compositions = [
+    // 1. Miles — trumpet silhouette
+    `<defs><linearGradient id="bg${r}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></linearGradient></defs>
+     <rect width="200" height="260" fill="url(#bg${r})"/>
+     <circle cx="60" cy="180" r="80" fill="${accent}" opacity=".12"/>
+     <!-- head silhouette -->
+     <ellipse cx="100" cy="100" rx="44" ry="52" fill="${skin}"/>
+     <!-- hat brim -->
+     <ellipse cx="100" cy="56" rx="60" ry="10" fill="#1a1410"/>
+     <rect x="70" y="30" width="60" height="30" fill="#1a1410"/>
+     <!-- sunglasses -->
+     <rect x="70" y="92" width="60" height="14" fill="#000"/>
+     <!-- trumpet -->
+     <path d="M 130 150 L 170 130 L 195 135 L 195 155 L 170 150 L 140 170 Z" fill="${accent}" opacity=".85"/>
+     <circle cx="188" cy="145" r="10" fill="${accent}" stroke="#000" stroke-width="2"/>
+     <!-- shirt collar -->
+     <path d="M 60 180 L 100 160 L 140 180 L 140 260 L 60 260 Z" fill="${bg2}"/>
+     <text x="100" y="245" font-family="Georgia,serif" font-size="11" fill="${accent}" text-anchor="middle" opacity=".7">MILES</text>`,
+
+    // 2. Duke — piano keys + elegant silhouette
+    `<rect width="200" height="260" fill="${bg1}"/>
+     <rect width="200" height="260" fill="${accent}" opacity=".08"/>
+     <rect x="10" y="210" width="180" height="36" fill="#f0e6d0"/>
+     ${Array.from({length:10},(_,i)=>`<rect x="${12+i*18}" y="210" width="2" height="36" fill="#000"/>`).join('')}
+     ${Array.from({length:5},(_,i)=>`<rect x="${22+i*36}" y="210" width="12" height="22" fill="#000"/>`).join('')}
+     <!-- silhouette -->
+     <path d="M 70 60 Q 100 20 130 60 Q 148 110 138 160 L 62 160 Q 52 110 70 60 Z" fill="#1a1008"/>
+     <ellipse cx="100" cy="90" rx="30" ry="36" fill="${skin}"/>
+     <path d="M 72 74 Q 100 60 128 74 Q 130 82 128 88 L 72 88 Q 70 82 72 74 Z" fill="#1a1008"/>
+     <!-- hands on keys -->
+     <ellipse cx="70" cy="205" rx="10" ry="6" fill="${skin}"/>
+     <ellipse cx="130" cy="205" rx="10" ry="6" fill="${skin}"/>
+     <text x="100" y="255" font-family="Georgia,serif" font-size="10" fill="${accent}" text-anchor="middle" opacity=".8">DUKE</text>`,
+
+    // 3. Thelonious — cubist angular
+    `<rect width="200" height="260" fill="${bg1}"/>
+     <polygon points="0,0 200,0 140,130 60,130" fill="${bg2}" opacity=".5"/>
+     <polygon points="0,260 200,260 170,140 30,140" fill="${bg2}" opacity=".3"/>
+     <!-- angular head -->
+     <polygon points="70,60 130,60 145,100 135,150 100,165 65,150 55,100" fill="${skin}"/>
+     <!-- hat -->
+     <polygon points="60,40 140,40 150,62 50,62" fill="${accent}"/>
+     <rect x="60" y="30" width="80" height="14" fill="#2a2418"/>
+     <!-- beard shapes -->
+     <polygon points="80,130 120,130 110,160 90,160" fill="#1a1208"/>
+     <!-- angular sunglasses -->
+     <polygon points="70,95 95,95 95,108 70,105" fill="#000"/>
+     <polygon points="105,95 130,95 130,105 105,108" fill="#000"/>
+     <!-- piano keys at bottom -->
+     <rect x="20" y="200" width="160" height="30" fill="#f0e8d0"/>
+     ${Array.from({length:9},(_,i)=>`<rect x="${22+i*18}" y="200" width="2" height="30" fill="#000"/>`).join('')}
+     <text x="100" y="252" font-family="Georgia,serif" font-size="10" fill="${accent}" text-anchor="middle">THELONIOUS</text>`,
+
+    // 4. Benny — clarinet, deco
+    `<defs><linearGradient id="bg${r}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${bg2}"/><stop offset="1" stop-color="${bg1}"/></linearGradient></defs>
+     <rect width="200" height="260" fill="url(#bg${r})"/>
+     <!-- deco rays -->
+     ${Array.from({length:7},(_,i)=>`<polygon points="100,10 ${90+i*3},260 ${110+i*3},260" fill="${accent}" opacity=".05"/>`).join('')}
+     <circle cx="100" cy="110" r="48" fill="${skin}"/>
+     <!-- round glasses -->
+     <circle cx="84" cy="105" r="10" fill="#fff" stroke="#000" stroke-width="2"/>
+     <circle cx="116" cy="105" r="10" fill="#fff" stroke="#000" stroke-width="2"/>
+     <line x1="94" y1="105" x2="106" y2="105" stroke="#000" stroke-width="2"/>
+     <!-- hair -->
+     <path d="M 60 90 Q 80 55 120 55 Q 140 60 145 95 Q 140 80 100 80 Q 70 82 60 90 Z" fill="#1a1008"/>
+     <!-- clarinet (diagonal) -->
+     <rect x="130" y="160" width="10" height="80" fill="#0a0a0a" transform="rotate(20 135 200)"/>
+     <rect x="128" y="240" width="14" height="14" fill="${accent}" transform="rotate(20 135 246)"/>
+     <circle cx="134" cy="175" r="2" fill="${accent}"/>
+     <circle cx="138" cy="195" r="2" fill="${accent}"/>
+     <text x="100" y="255" font-family="Georgia,serif" font-size="10" fill="${accent}" text-anchor="middle">BENNY</text>`,
+
+    // 5. Bebo — minimalist block portrait
+    `<rect width="200" height="260" fill="${bg1}"/>
+     <!-- Gutenberg blocks as backdrop -->
+     ${Array.from({length:12},(_,i)=>{const x=10+(i%4)*45,y=10+Math.floor(i/4)*80;return `<rect x="${x}" y="${y}" width="40" height="74" fill="#fff" opacity=".6" stroke="${accent}" stroke-width="1"/>`;}).join('')}
+     <!-- silhouette centered -->
+     <ellipse cx="100" cy="120" rx="40" ry="50" fill="${skin}"/>
+     <path d="M 60 110 Q 100 70 140 110 Q 142 90 130 78 Q 110 65 90 68 Q 68 75 60 110 Z" fill="#2a1810"/>
+     <!-- minimalist smile -->
+     <path d="M 85 140 Q 100 148 115 140" stroke="#000" stroke-width="2" fill="none"/>
+     <circle cx="85" cy="118" r="2" fill="#000"/>
+     <circle cx="115" cy="118" r="2" fill="#000"/>
+     <!-- body as block -->
+     <rect x="70" y="170" width="60" height="60" fill="${accent}" opacity=".3" stroke="${accent}"/>
+     <text x="100" y="250" font-family="Georgia,serif" font-size="10" fill="${accent}" text-anchor="middle">BEBO</text>`,
+
+    // 6. Arturo — neon vaporwave silhouette
+    `<defs><linearGradient id="bg${r}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a0030"/><stop offset=".5" stop-color="#40015c"/><stop offset="1" stop-color="#ff5ad9"/></linearGradient></defs>
+     <rect width="200" height="260" fill="url(#bg${r})"/>
+     <!-- grid floor -->
+     ${Array.from({length:8},(_,i)=>`<line x1="${i*25}" y1="200" x2="${100-((100-i*25)*0.5)}" y2="260" stroke="#ff5ad9" stroke-width=".5" opacity=".6"/>`).join('')}
+     ${Array.from({length:5},(_,i)=>`<line x1="0" y1="${200+i*15}" x2="200" y2="${200+i*15}" stroke="#ff5ad9" stroke-width=".5" opacity=".5"/>`).join('')}
+     <!-- sun -->
+     <circle cx="100" cy="120" r="50" fill="#ffee66" opacity=".85"/>
+     <rect x="50" y="140" width="100" height="3" fill="${bg1}" opacity=".5"/>
+     <rect x="50" y="150" width="100" height="3" fill="${bg1}" opacity=".4"/>
+     <rect x="50" y="160" width="100" height="3" fill="${bg1}" opacity=".3"/>
+     <!-- piano silhouette -->
+     <path d="M 50 180 L 150 180 L 160 195 L 40 195 Z" fill="#000"/>
+     <!-- silhouette in front of sun -->
+     <ellipse cx="100" cy="105" rx="22" ry="26" fill="#000"/>
+     <path d="M 75 125 Q 100 115 125 125 L 135 180 L 65 180 Z" fill="#000"/>
+     <text x="100" y="252" font-family="Georgia,serif" font-size="10" fill="#ffee66" text-anchor="middle" opacity=".9">ARTURO</text>`,
+
+    // 7. Monk reprise — constellation
+    `<rect width="200" height="260" fill="${bg1}"/>
+     <rect width="200" height="260" fill="${accent}" opacity=".05"/>
+     <!-- constellation points forming a piano silhouette -->
+     ${[[60,80],[80,60],[100,50],[120,60],[140,80],[145,110],[140,150],[100,170],[60,150],[55,110]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.5" fill="${accent}"/>`).join('')}
+     ${[[[60,80],[80,60]],[[80,60],[100,50]],[[100,50],[120,60]],[[120,60],[140,80]],[[140,80],[145,110]],[[145,110],[140,150]],[[140,150],[100,170]],[[100,170],[60,150]],[[60,150],[55,110]],[[55,110],[60,80]]].map(([a,b])=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${accent}" stroke-width="0.5" opacity=".6"/>`).join('')}
+     <!-- stars -->
+     ${Array.from({length:30},()=>{const x=Math.random()*200,y=Math.random()*260;return `<circle cx="${x}" cy="${y}" r=".8" fill="#fff" opacity="${0.3+Math.random()*0.6}"/>`;}).join('')}
+     <!-- piano keys faded -->
+     <rect x="30" y="200" width="140" height="22" fill="#fff" opacity=".7"/>
+     ${Array.from({length:8},(_,i)=>`<rect x="${32+i*17.5}" y="200" width="1" height="22" fill="#000" opacity=".4"/>`).join('')}
+     <text x="100" y="248" font-family="Georgia,serif" font-size="10" fill="${accent}" text-anchor="middle" opacity=".8">MONK · 2026</text>`
+  ];
+  return `<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">${compositions[r]}</svg>`;
+}
+
+/* ---------- Procedural jazz ambient (WebAudio) ---------- */
+let audioCtx = null, masterGain = null, roomGains = [], roomLoops = [];
+function initAudio(){
+  if(audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.22;
+    masterGain.connect(audioCtx.destination);
+    for(let r=0;r<ROOMS.length;r++){
+      const g = audioCtx.createGain(); g.gain.value = 0; g.connect(masterGain);
+      roomGains.push(g);
+      roomLoops.push(buildRoomLoop(ROOMS[r], g));
+    }
+  } catch(e){ console.warn('audio failed', e); }
+}
+
+function midiHz(m){ return 440 * Math.pow(2, (m-69)/12); }
+
+function buildRoomLoop(room, outGain){
+  // Simple jazz-chord pad: one oscillator per chord note, triangle+sine pair.
+  // Bass: slow triangle walking line. Drums: noise burst per beat.
+  const pads = [];
+  for(let i=0;i<6;i++){
+    const o = audioCtx.createOscillator(); o.type = (i%2===0)?'triangle':'sine';
+    const g = audioCtx.createGain(); g.gain.value = 0;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type='lowpass'; filt.frequency.value = 1800 + Math.random()*600;
+    o.connect(filt); filt.connect(g); g.connect(outGain);
+    o.start();
+    pads.push({o,g,filt});
+  }
+  // bass
+  const bassOsc = audioCtx.createOscillator(); bassOsc.type='triangle';
+  const bassG = audioCtx.createGain(); bassG.gain.value = 0;
+  const bassFilt = audioCtx.createBiquadFilter(); bassFilt.type='lowpass'; bassFilt.frequency.value = 400;
+  bassOsc.connect(bassFilt); bassFilt.connect(bassG); bassG.connect(outGain);
+  bassOsc.start();
+
+  // noise buffer for brush hits
+  const bufSize = audioCtx.sampleRate * 0.3;
+  const noiseBuf = audioCtx.createBuffer(1,bufSize,audioCtx.sampleRate);
+  const nd = noiseBuf.getChannelData(0);
+  for(let i=0;i<bufSize;i++) nd[i] = (Math.random()*2-1) * Math.exp(-i/(bufSize*0.18));
+  function brush(){
+    const src = audioCtx.createBufferSource(); src.buffer = noiseBuf;
+    const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value = 4000; bp.Q.value=0.8;
+    const g = audioCtx.createGain(); g.gain.value = 0.08;
+    src.connect(bp); bp.connect(g); g.connect(outGain);
+    src.start();
+  }
+
+  const secPerBeat = 60/room.bpm;
+  let beat = 0;
+  let chordIdx = 0;
+  function tick(){
+    const ch = room.chord[chordIdx % room.chord.length];
+    // attack new chord every 4 beats
+    if(beat % 4 === 0){
+      pads.forEach((p,i)=>{
+        const note = ch[i % ch.length];
+        const detune = (i<ch.length ? 0 : 1200); // upper voice octave
+        p.o.frequency.setTargetAtTime(midiHz(note) * (i>=ch.length?2:1), audioCtx.currentTime, 0.3);
+        p.g.gain.cancelScheduledValues(audioCtx.currentTime);
+        p.g.gain.setTargetAtTime(0.07/(i+1)+0.02, audioCtx.currentTime, 0.8);
+      });
+      chordIdx++;
+    }
+    // bass every beat, walking
+    const bn = room.bass[beat % room.bass.length];
+    bassOsc.frequency.setTargetAtTime(midiHz(bn), audioCtx.currentTime, 0.05);
+    bassG.gain.cancelScheduledValues(audioCtx.currentTime);
+    bassG.gain.setTargetAtTime(0.14, audioCtx.currentTime, 0.02);
+    bassG.gain.setTargetAtTime(0.02, audioCtx.currentTime + secPerBeat*0.7, 0.1);
+    // brush on every 2nd beat
+    if(beat % 2 === 1) brush();
+    beat++;
+  }
+  const interval = setInterval(tick, secPerBeat*1000);
+  tick();
+  return { pads, bassOsc, interval };
+}
+
+function updateAudio(r){
+  if(!audioCtx) return;
+  // crossfade room gains based on distance in room-index space
+  const frac = (player.y - CAP) / ROOM_LEN; // floating room index
+  for(let i=0;i<ROOMS.length;i++){
+    const dist = Math.abs(i - frac);
+    const w = Math.max(0, 1 - dist*0.9);
+    roomGains[i].gain.setTargetAtTime(w*0.9, audioCtx.currentTime, 0.35);
+  }
+}
+
+/* ---------- Playground overlay ---------- */
+const pgEl = document.getElementById('playground');
+const pgFrame = document.getElementById('pg-frame');
+const pgLabel = document.getElementById('pg-label');
+document.getElementById('pg-close').addEventListener('click', ()=>{
+  pgEl.classList.remove('open');
+  pgFrame.src = 'about:blank';
+});
+function openPlayground(v){
+  pgLabel.textContent = `PLAYGROUND · WordPress ${v}`;
+  pgFrame.src = `https://playground.wordpress.net/?wp=${v}`;
+  pgEl.classList.add('open');
+}
+
+/* ---------- Splash / first-gesture handler ---------- */
+const splash = document.getElementById('splash');
+function start(){
+  splash.classList.add('gone');
+  initAudio();
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  setTimeout(()=>hint.classList.add('show'), 400);
+  setTimeout(()=>hint.classList.remove('show'), 6000);
+}
+splash.addEventListener('click', start, {once:true});
+window.addEventListener('keydown', (e)=>{
+  if(splash.classList.contains('gone')) return;
+  if(e.key === ' ' || e.key === 'Enter') start();
+});
+// Start on first scroll too
+window.addEventListener('scroll', ()=>{
+  if(!splash.classList.contains('gone')) start();
+}, {once:true});
+
+/* ---------- Initial render kick ---------- */
+updateUI(0);
+requestAnimationFrame(frame);
+
 </script>
 </body>
 </html>
