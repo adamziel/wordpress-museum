@@ -94,6 +94,15 @@
   #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706}
   #plaque .pg-hint{display:none}
 
+  /* ---------- WP wall-screen caption (1.0 only) ---------- */
+  #wp-caption{position:fixed;left:50%;bottom:72px;transform:translateX(-50%) translateY(10px);z-index:17;width:min(620px,90vw);opacity:0;pointer-events:none;transition:opacity .6s ease,transform .7s cubic-bezier(.2,.8,.25,1);padding:14px 20px;background:linear-gradient(180deg,rgba(18,10,6,.82),rgba(10,6,3,.88));border:1px solid rgba(255,170,90,.55);border-radius:2px;box-shadow:0 10px 32px rgba(0,0,0,.6);text-align:center}
+  #wp-caption.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  #wp-caption .wpc-meta{font:500 10px/1 var(--mono);letter-spacing:3.5px;color:#ffb070;text-transform:uppercase;margin-bottom:8px}
+  #wp-caption .wpc-body{font:400 italic 13px/1.5 var(--prose);color:#e6d7b5;margin-bottom:12px}
+  #wp-caption .wpc-body code{font:500 11.5px/1 var(--mono);color:#ffc890;background:rgba(255,170,90,.1);padding:1px 5px;border-radius:2px}
+  #wp-caption .wpc-cta{pointer-events:auto;font:500 9px/1 var(--mono);letter-spacing:3px;padding:9px 16px;border:1px solid #ffb070;background:transparent;color:#ffb070;cursor:pointer;text-transform:uppercase;transition:all .2s}
+  #wp-caption .wpc-cta:hover{background:#ffb070;color:#0a0706}
+
   /* ---------- Playground ---------- */
   #playground{position:fixed;inset:0;z-index:100;background:rgba(5,6,10,.96);display:none;flex-direction:column}
   #playground.open{display:flex;animation:pgin .4s ease}
@@ -251,6 +260,14 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- v12 polish: WP wall-screen caption (movement 0 only). Shown as a simple diegetic
+     label aligned below the in-world screen as the camera approaches it. -->
+<div id="wp-caption" aria-hidden="true">
+  <div class="wpc-meta">WordPress 1.0 · Miles Davis · 2004·01·03</div>
+  <div class="wpc-body">Forked from b2/cafelog. Introduced the plugin architecture with <code>add_filter</code> / <code>add_action</code>.</div>
+  <button class="wpc-cta" id="wpc-cta" data-v="1.0">▸ Enter Playground</button>
 </div>
 
 <div id="highlight">
@@ -1906,26 +1923,112 @@ function buildLevels(){
     }, cfg);
   };
 
-  // 1.0 Miles — Bunker
-  make("1.0", {
+  // 1.0 Miles — Bunker (v12 polish: hand-authored 12×16 maze, camera follows waypoints)
+  // Legend: 0 open, 1 concrete/brick wall, 2 accent alcove, 3 WP-screen wall tile
+  //                        col: 0 1 2 3 4 5 6 7 8 9 10 11
+  const MAZE_1_0 = [
+    /* 0  */ [1,1,1,1,1,1,1,1,1,1,1,1],
+    /* 1  */ [1,1,1,3,1,1,1,1,1,1,1,1], // WP screen tile on north wall (col 3 = centered over camera path)
+    /* 2  */ [1,0,0,0,0,0,1,1,1,1,1,1], // artifact chamber
+    /* 3  */ [1,0,0,0,0,0,1,1,1,1,1,1],
+    /* 4  */ [1,1,1,0,1,1,1,1,1,1,1,1], // doorway south
+    /* 5  */ [1,1,1,0,1,1,1,1,1,1,1,1], // antechamber neck
+    /* 6  */ [1,0,0,0,0,0,0,0,0,0,0,1], // columned room — wide
+    /* 7  */ [1,0,1,1,0,1,1,0,1,1,0,1], // columns
+    /* 8  */ [1,0,0,0,0,0,0,0,0,0,0,1],
+    /* 9  */ [1,0,1,1,1,1,1,1,1,1,1,1], // turn into cramped passage
+    /* 10 */ [1,0,0,0,0,0,1,1,1,1,1,1], // cramped passage (w→e)
+    /* 11 */ [1,1,1,1,0,1,1,1,1,1,1,1],
+    /* 12 */ [1,1,1,1,0,0,0,0,0,1,1,1], // switch room
+    /* 13 */ [1,1,1,1,0,0,0,0,0,1,1,1],
+    /* 14 */ [1,1,1,1,0,1,1,1,1,1,1,1], // service tunnel emerges into switch room
+    /* 15 */ [1,1,1,1,0,0,1,1,1,1,1,1]  // service tunnel entry (start)
+  ];
+  // Waypoints threading through the maze. Camera eases between consecutive waypoints using
+  // the sub position. Each entry is {sub, x, z, yaw}. yaw is radians; 0 = look toward -z.
+  // Yaw convention (matches raycaster): rz=cos(yaw), rx=sin(yaw) at screen center.
+  //   yaw = 0      → look toward +z (south on the grid)
+  //   yaw = π      → look toward -z (north on the grid — where the WP screen is)
+  //   yaw = +π/2   → look toward +x (east)
+  //   yaw = -π/2   → look toward -x (west)
+  // The start is at z=15 (bottom of grid) looking north (toward z=1, WP screen), so yaw=π.
+  // Open path through the grid (cell coords = (col+0.5, row+0.5) in (x, z)):
+  //   start (4.5, 15.5) → (4.5, 13.5) → east through switch room to (7.5, 12.5)
+  //   → back west along row 12 to (4.5, 12.5) → north (4.5, 11.5) → (4.5, 10.5)
+  //   → west along row 10 to (1.5, 10.5) → north (1.5, 8.5) through columned room
+  //   → east along row 8 briefly, then north at col 3 (open column) via row 6..row 2
+  //   → arrive at (3.5, 2.5), WP screen on row 1 ahead.
+  const WAYPOINTS_1_0 = [
+    {sub:0.00, x:4.5,  z:15.4, yaw: Math.PI          }, // service tunnel entry, face north
+    {sub:0.12, x:4.5,  z:14.3, yaw: Math.PI          }, // tunnel
+    {sub:0.18, x:4.5,  z:13.3, yaw: Math.PI/2        }, // RIGHT TURN (1) — now facing east into switch room
+    {sub:0.26, x:6.5,  z:12.7, yaw: Math.PI/2        }, // switch room, east wall ahead
+    {sub:0.32, x:7.5,  z:12.5, yaw: -Math.PI/2       }, // LEFT TURN (2) — face west to traverse back
+    {sub:0.40, x:4.7,  z:12.5, yaw: Math.PI          }, // LEFT TURN (3) — face north, exit switch room
+    {sub:0.48, x:4.5,  z:10.7, yaw: -Math.PI/2       }, // LEFT TURN (4) — face west into cramped passage
+    {sub:0.56, x:1.7,  z:10.5, yaw: Math.PI          }, // RIGHT TURN (5) — face north, enter columned room
+    {sub:0.64, x:1.5,  z: 8.0, yaw: Math.PI/2        }, // RIGHT TURN (6) — face east along row 8
+    {sub:0.68, x:4.5,  z: 8.2, yaw: Math.PI          }, // LEFT TURN (7) — face north up col-4 gap in the column row
+    {sub:0.74, x:4.5,  z: 6.5, yaw: -Math.PI/2       }, // LEFT TURN (8) — face west along row 6
+    {sub:0.78, x:3.5,  z: 6.3, yaw: Math.PI          }, // RIGHT TURN (9) — face north into the col-3 antechamber doorway
+    {sub:0.82, x:3.5,  z: 4.5, yaw: Math.PI          }, // through doorway (row 4/5 open col 3)
+    {sub:0.88, x:3.5,  z: 3.0, yaw: Math.PI          }, // artifact chamber — WP screen fills view
+    {sub:0.95, x:3.5,  z: 2.4, yaw: Math.PI          },
+    {sub:1.00, x:3.5,  z: 2.2, yaw: Math.PI          }
+  ];
+  LVL["1.0"] = {
+    map: MAZE_1_0,
     shape:"bunker",
-    tex:"brick", texAlcove:"accent", alcoveEvery:5,
+    tex:"brick", texAlcove:"accent", texWpScreen:"wpScreen10", alcoveEvery:5,
     ceil:["#15080a","#2a1408"], floor:["#1a0a04","#3a1808"],
     ambient:[90,30,10], rim:[255,120,60], light:"torch",
-    // macro mode pushes camera toward the plaque/torch with a slow dolly during sustained
-    camera:{mode:"macroPush", fov:1.05, bob:3.5},
-    billboards:[
-      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
-      {kind:"mock", z:13, side:"R", yOff:-0.2, w:3.0, h:2.1, frame:"crt"},
-      {kind:"sprite", spr:"hook",  z:16, side:"L", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
-      {kind:"sprite", spr:"hook2", z:18, side:"R", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
-      {kind:"plaque", z:15, side:"C", yOff:-0.2, w:3.2, h:1.8},
-      {kind:"floor", spr:"slug", z:13, w:2.0, h:0.4},
-      {kind:"floor", spr:"slug", z:17, w:2.0, h:0.4},
-      {kind:"floor", spr:"slug", z:21, w:2.0, h:0.4}
-    ],
+    // "maze" mode = per-waypoint follow; see cameraFor.
+    camera:{mode:"maze", fov:1.05, bob:0, waypoints: WAYPOINTS_1_0},
+    starfield:false, godray:0, sunShaft:0,
+    // no billboards in the maze — the WP screen is drawn as a wall texture instead
+    billboards:[],
+    scanlines:0,
     overlays:["torchflicker"]
-  });
+  };
+  // v12 polish: build the WP-screen wall texture for tile=3 in the 1.0 maze.
+  // Riveted bunker frame around the b2/cafelog admin shot so it feels like a mounted panel.
+  (function buildWpScreen10(){
+    const src = SHOT["b2cafelog"];
+    if(!src) return; // should exist: buildAdminMocks runs before buildLevels
+    const c = document.createElement("canvas");
+    c.width = 256; c.height = 256;
+    const g = c.getContext("2d");
+    // concrete background tint
+    g.fillStyle = "#1a0f08"; g.fillRect(0, 0, 256, 256);
+    // riveted metal outer frame
+    const frameT = 22;
+    g.fillStyle = "#3a2418";
+    g.fillRect(0, 0, 256, frameT);
+    g.fillRect(0, 256-frameT, 256, frameT);
+    g.fillRect(0, 0, frameT, 256);
+    g.fillRect(256-frameT, 0, frameT, 256);
+    // bevel highlight
+    g.fillStyle = "#5a3828"; g.fillRect(0, 0, 256, 2); g.fillRect(0, 0, 2, 256);
+    g.fillStyle = "#150a04"; g.fillRect(0, 254, 256, 2); g.fillRect(254, 0, 2, 256);
+    // rivets
+    g.fillStyle = "#1a0f08";
+    for(const [rx, ry] of [[8,8],[240,8],[8,240],[240,240],[124,8],[124,240],[8,124],[240,124]]){
+      g.beginPath(); g.arc(rx, ry, 3.5, 0, Math.PI*2); g.fill();
+      g.fillStyle = "#0a0503"; g.fillRect(rx-1, ry-1, 2, 2); g.fillStyle = "#1a0f08";
+    }
+    // inset dark glass bed for the CRT
+    g.fillStyle = "#050202"; g.fillRect(frameT, frameT, 256-2*frameT, 256-2*frameT);
+    // admin mock scaled into the inner rect
+    g.drawImage(src, frameT+4, frameT+4, 256-2*frameT-8, 256-2*frameT-8);
+    // phosphor scanlines
+    g.globalAlpha = 0.22; g.fillStyle = "#000";
+    for(let y=frameT; y<256-frameT; y+=3) g.fillRect(frameT, y, 256-2*frameT, 1);
+    g.globalAlpha = 1;
+    // amber rim glow (inner edge)
+    g.strokeStyle = "rgba(255,170,90,0.35)"; g.lineWidth = 2;
+    g.strokeRect(frameT+1, frameT+1, 256-2*frameT-2, 256-2*frameT-2);
+    LVL["1.0"].wpScreen = c;
+  })();
   // 2.0 Duke — Crypt Library (colonnade pillars)
   make("2.0", {
     shape:"library",
@@ -2075,6 +2178,33 @@ function cameraFor(level, m, sub, beat, time, movementIdx){
   const cam = level.camera;
   const mapW = level.map[0].length;
   const centerX = mapW/2;
+
+  // v12 polish: maze mode — interpolate camera pose between waypoints with smoothstep
+  // eases at each corner so turns glide instead of snapping.
+  if(cam.mode === "maze" && cam.waypoints && cam.waypoints.length >= 2){
+    const wps = cam.waypoints;
+    const s = clamp(sub, 0, 1);
+    let i = 0;
+    for(; i < wps.length - 1; i++){ if(s <= wps[i+1].sub) break; }
+    if(i >= wps.length - 1) i = wps.length - 2;
+    const a = wps[i], b = wps[i+1];
+    const t = clamp((s - a.sub) / Math.max(1e-6, (b.sub - a.sub)), 0, 1);
+    const et = smooth(t); // smoothstep so turns ease at both ends
+    const camX = lerp(a.x, b.x, et);
+    const camZ = lerp(a.z, b.z, et);
+    // Shortest-arc yaw interpolation
+    let dyaw = b.yaw - a.yaw;
+    while(dyaw >  Math.PI) dyaw -= 2*Math.PI;
+    while(dyaw < -Math.PI) dyaw += 2*Math.PI;
+    const camAng = a.yaw + dyaw * et;
+    let fov = cam.fov;
+    // small FOV breath per beat for flavour
+    if(beat.name==="approach")      fov *= 1.0 - (1-beat.frac)*0.08;
+    else if(beat.name==="arrival")  fov *= 1.0 - smooth(beat.frac)*0.05;
+    else if(beat.name==="departure")fov *= 1.0 + beat.frac*0.06;
+    return {camX, camZ, camAng, fov, roll:0, yShift:0};
+  }
+
   // Pure scroll-driven camera. No idle motion. No time-based sin/cos.
   // Scripted set-piece overrides on specific sub ranges add theatrical gestures.
   let camZ;
@@ -2386,11 +2516,29 @@ function raycastWalls(g, level, cam, beat, time, zBuf){
     // texture sample position
     let wallHit = (side===0) ? (cam.camZ + dist*rz) : (cam.camX + dist*rx);
     wallHit -= Math.floor(wallHit);
-    const texKey = (tile===2) ? level.texAlcove : level.tex;
-    const tex = TEX[texKey] || TEX[level.tex];
-    const texX = Math.floor(wallHit * 64) % 64;
-    // draw textured strip (slice of 1 source px, 2 dest px)
-    g.drawImage(tex, texX, 0, 1, 64, screenX, y0, 2, y1-y0);
+    let tex, texX;
+    if(tile === 3 && level.wpScreen){
+      // v12: WP-screen wall tile. Sample the admin-mock canvas across the tile span.
+      // wallHit is 0..1 along the tile's face. When a wall's world-x increases L→R on
+      // screen (i.e. ray's horizontal component is negative for a N-facing wall hit),
+      // we need to flip so the admin mock isn't shown mirrored. Use side/step parity:
+      // side=1 (z-step wall) with stepZ<0 (moving -z) → flip u; side=0 with stepX>0 → flip.
+      tex = level.wpScreen;
+      let u = wallHit;
+      // Flip u so the admin mock reads left-to-right for the viewer regardless of which
+      // face of the tile was hit. Derived empirically: N-facing wall (stepZ<0) mirrors.
+      if(side === 1 && stepZ < 0) u = 1 - u;       // ray moving -z → hits south face of tile (mirror)
+      else if(side === 0 && stepX > 0) u = 1 - u;  // ray moving +x → hits west face (mirror)
+      texX = Math.floor(u * tex.width) % tex.width;
+      if(texX < 0) texX += tex.width;
+      g.drawImage(tex, texX, 0, 1, tex.height, screenX, y0, 2, y1-y0);
+    } else {
+      const texKey = (tile===2) ? level.texAlcove : level.tex;
+      tex = TEX[texKey] || TEX[level.tex];
+      texX = Math.floor(wallHit * 64) % 64;
+      // draw textured strip (slice of 1 source px, 2 dest px)
+      g.drawImage(tex, texX, 0, 1, 64, screenX, y0, 2, y1-y0);
+    }
     // distance shading (dark overlay) + side shading
     const shade = Math.min(0.9, dist * 0.035);
     const sideDark = side===1 ? 0.22 : 0;
@@ -2706,6 +2854,10 @@ function drawDoorwayApproach(g, level, m, beat, time){
    Draws the artifact-room focal object as a procedural glowing sprite. Its on-screen rect is
    stored on window.__focalRect so the highlight DOM card can animate (morph) out of it. */
 function drawFocalObject(g, m, level, sub, time){
+  // v12 polish pass: movement 0 (1.0 Miles) does not use a focal object — the in-world
+  // WordPress wall screen in the final maze chamber IS the highlight. Other releases
+  // keep their golden focal object for now.
+  if(m.v === "1.0") return;
   // Begin appearing in "chamber" zone (far down the corridor), grow through "artifact" zone.
   if(sub < 0.22) return;
   const t = clamp((sub - 0.22) / (0.92 - 0.22), 0, 1);
@@ -2947,6 +3099,12 @@ function rayRenderLevel(g, sub, beat, time, m, movementIdx){
 }
 
 function drawSetpieceOverlay(g, sp, cam, level, pal, time){
+  // v12 polish pass: set-piece overlay SPRITES disabled so they don't flash on/off on top
+  // of the corridor. The set-piece registry (SETPIECES, INTRA_SETPIECES) and the subtle
+  // camera deltas inside `cameraFor` stay live — only the giant overlay sprites are muted.
+  // The rest of this function is retained intact below for future re-enable.
+  return;
+  // eslint-disable-next-line no-unreachable
   const t = clamp(sp.t, 0, 1);
   g.save();
   if(sp.kind === "stoneDoor"){
@@ -3727,6 +3885,18 @@ function dismissHighlight(){
   console.log(`[motif] highlight OFF · movement ${m}`);
 }
 document.getElementById("hl-continue").addEventListener("click", ()=>{ if(dwellOk()) dismissHighlight(); });
+// v12 polish: WP wall-screen CTA (movement 0) — opens the Playground iframe for 1.0.
+(function(){
+  const cta = document.getElementById("wpc-cta");
+  if(!cta) return;
+  cta.addEventListener("click", ()=>{
+    const v = cta.dataset.v || "1.0";
+    const frame = document.getElementById("pg-frame");
+    frame.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+    document.getElementById("pg-title").textContent = `PLAYGROUND · WordPress ${v}`;
+    document.getElementById("playground").classList.add("open");
+  });
+})();
 document.getElementById("hl-playground").addEventListener("click", (e)=>{
   const v = e.currentTarget.dataset.v; if(!v) return;
   const frame = document.getElementById("pg-frame");
@@ -3755,6 +3925,13 @@ window.addEventListener("keydown", (e)=>{
 });
 
 function updateHighlight(curM, sub, beat, y){
+  // v12 polish pass: movement 0 (1.0 Miles) has no pinned highlight card. The WP wall
+  // screen in the final maze chamber is the diegetic highlight; the journey flows past it.
+  if(curM === 0){
+    // ensure any stale pin is cleared
+    if(highlightState.active){ dismissHighlight(); }
+    return;
+  }
   // v12: give the viewer the full zone walkthrough BEFORE pinning. The focal object has
   // been growing since sub 0.22; we only pin the highlight card once the camera has
   // reached the artifact zone (sub 0.80), which at MLEN=6000 means >= ~4800 px of
@@ -3773,8 +3950,23 @@ function updateHighlight(curM, sub, beat, y){
 
 /* ---------- Plaque ---------- */
 let plaqueState = { curM:-1 };
+function updateWpCaption(curM, sub){
+  const el = document.getElementById("wp-caption");
+  if(!el) return;
+  // Visible while the camera is in the final chambers of movement 0 (WP screen in view).
+  const show = (curM === 0 && sub >= 0.74 && sub <= 0.995);
+  el.classList.toggle("show", show);
+}
 function updatePlaque(curM, sub, beat){
+  updateWpCaption(curM, sub);
   const plaque = document.getElementById("plaque");
+  // v12 polish: on movement 0 the bottom DOM plaque is suppressed — the WP wall screen +
+  // dedicated caption are the only diegetic labels.
+  if(curM === 0){
+    plaque.classList.remove("show");
+    plaqueState.curM = -1;
+    return;
+  }
   // hide the old plaque while the full-screen highlight owns the frame
   const shouldShow = !highlightState.active && curM>=0 && curM<M.length && (beat.name==="arrival" || beat.name==="sustained" || (beat.name==="departure" && beat.frac<0.4));
   if(shouldShow){
