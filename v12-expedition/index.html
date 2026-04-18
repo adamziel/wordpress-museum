@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
-<title>WordPress Museum · v11 · Raiders of the Release</title>
+<title>WordPress Museum · v12 · Raiders of the Release</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -16,7 +16,7 @@
     --accent:#e9c97a;
   }
   html,body{background:#05060a;color:var(--ink);font-family:var(--ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-  body{height:16100px}
+  body{height:59300px}
 
   /* ---------- Stage ---------- */
   #stage{position:fixed;inset:0;z-index:1;background:#05060a;overflow:hidden}
@@ -115,6 +115,23 @@
   /* ---------- Full-screen highlight (release destination) ---------- */
   #highlight{position:fixed;inset:0;z-index:30;display:flex;align-items:stretch;justify-content:center;pointer-events:none;opacity:0;transition:opacity .55s ease}
   #highlight.on{opacity:1;pointer-events:auto}
+  /* v12: morph-in from focal object. The card starts clipped to a small rect centered on
+     the focal object, then expands. Content fades in during last 30% of the morph. */
+  #hl-card{transform-origin:center center;transition:clip-path .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);clip-path:inset(0 0 0 0 round 3px)}
+  #highlight.on #hl-card{clip-path:inset(0 0 0 0 round 3px)}
+  #highlight.on.morph-in #hl-card{clip-path:inset(var(--mi-t,40%) var(--mi-r,40%) var(--mi-b,40%) var(--mi-l,40%) round 14px)}
+  #highlight.morph-in #hl-side, #highlight.morph-in #hl-shot{opacity:0}
+  #hl-side, #hl-shot{transition:opacity .5s ease .25s}
+  /* Frame material variants (match era) */
+  #highlight[data-frame="rivet"] #hl-card{border-width:2px;border-color:#a89368;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 4px #1a120a inset,0 0 0 5px #a89368 inset}
+  #highlight[data-frame="stone"] #hl-card{border-color:#c5ae7a;background:linear-gradient(180deg,rgba(22,18,12,.95),rgba(14,10,6,.96))}
+  #highlight[data-frame="neon"] #hl-card{border-color:#ff5ad9;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 30px rgba(255,90,217,.35),0 0 0 1px #ff5ad9 inset}
+  #highlight[data-frame="velvet"] #hl-card{border-color:#c9a0ff;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 60px rgba(201,160,255,.2)}
+  #highlight[data-frame="holo"] #hl-card{border-color:#b4c4ff;background:linear-gradient(180deg,rgba(30,40,70,.85),rgba(10,16,32,.9));backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px rgba(180,196,255,.3)}
+  #highlight[data-frame="gilt"] #hl-card{border-color:#e9c97a;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 3px #3a2c1a inset,0 0 0 4px #e9c97a inset}
+  #highlight[data-frame="mat"] #hl-card{border-color:#d8dfe8;background:linear-gradient(180deg,rgba(25,28,34,.95),rgba(15,18,22,.96))}
+  #highlight[data-frame="wood"] #hl-card{border-color:#8a6238;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 6px #3a2414 inset,0 0 0 7px #8a6238 inset}
+  #highlight[data-frame="labtile"] #hl-card{border-color:#7b9fdd;background:linear-gradient(180deg,rgba(10,16,28,.95),rgba(6,10,20,.97))}
   #hl-scrim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(5,6,10,.22) 0%,rgba(5,6,10,.42) 60%,rgba(5,6,10,.55) 100%);backdrop-filter:blur(1.5px) saturate(0.9);-webkit-backdrop-filter:blur(1.5px) saturate(0.9)}
   #hl-card{position:relative;margin:auto;width:min(1120px,94vw);max-height:92vh;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;padding:28px 30px;background:linear-gradient(180deg,rgba(12,10,6,.94),rgba(8,6,4,.96));border:1px solid var(--accent,#e9c97a);border-radius:3px;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 120px rgba(233,201,122,.08);overflow:hidden}
   #hl-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 30% 0%,rgba(233,201,122,.08),transparent 60%)}
@@ -142,6 +159,13 @@
   #hl-hint .bar{display:inline-block;width:160px;height:3px;background:rgba(233,201,122,.14);vertical-align:middle;margin:0 10px;position:relative;overflow:hidden;border:1px solid rgba(233,201,122,.3)}
   #hl-hint .bar .f{position:absolute;left:0;top:0;bottom:0;background:var(--accent,#e9c97a);width:0%;transition:width .15s ease}
   #hl-pull-pct{display:inline-block;min-width:32px;color:var(--accent,#e9c97a);font-weight:700}
+  /* v12 dwell UI: the Continue button shows a 4-second reading-time bar before it activates. */
+  #hl-continue{position:relative;overflow:hidden}
+  #hl-continue[data-dwell="wait"]{opacity:.55;cursor:wait}
+  #hl-continue[data-dwell="wait"] .lbl::before{content:"READING · ";color:#a89368;letter-spacing:3px}
+  #hl-continue .dwell{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(233,201,122,.12);pointer-events:none}
+  #hl-continue .dwell .f{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--accent,#e9c97a);transition:width .15s linear}
+  #hl-dwell-pct{display:inline-block;min-width:32px;color:var(--accent,#e9c97a);font-weight:700}
   @media (max-width:880px){
     #hl-card{grid-template-columns:1fr;max-height:96vh}
     #hl-shot canvas{max-height:44vh}
@@ -232,14 +256,14 @@
       <div id="hl-story">—</div>
       <div id="hl-ctas">
         <button class="primary" id="hl-playground">▸ Enter Playground</button>
-        <button id="hl-continue">Continue the journey ▾</button>
+        <button id="hl-continue"><span class="lbl">Continue the journey ▾</span><span class="dwell"><span class="f" id="hl-dwell-f"></span></span></button>
       </div>
     </div>
     <div id="hl-hint">
-      <span class="hint-lbl">Keep scrolling to continue →</span>
+      <span class="hint-lbl" id="hl-hint-lbl">Reading time · <span id="hl-dwell-pct">0%</span></span>
       <span class="bar"><span class="f" id="hl-pull"></span></span>
       <span id="hl-pull-pct">0%</span>
-      <span class="hint-alt">· or press Space · or click Continue</span>
+      <span class="hint-alt">· Space / scroll to continue when ready</span>
     </div>
   </div>
 </div>
@@ -415,7 +439,7 @@ const M = [
 */
 const OVERTURE = 400;
 const CODA = 400;
-const MLEN = 2100; // widened so sustained beat stretches ≥150vh at typical viewport
+const MLEN = 6500; // v12: >= 6 seconds of natural-speed scrolling per release (pre-highlight budget)
 const TOTAL = OVERTURE + M.length * MLEN + CODA; // 400+18900+400 = 19700
 document.body.style.height = TOTAL + "px";
 
@@ -430,6 +454,48 @@ const BEATS = [
   {key:"departure",   a:0.92, b:1.00}
 ];
 
+/* ---------- Zones (v12) ----------
+   Each movement is now divided into 4 walk-through zones plus the departure set-piece tail.
+   Zones give the level a changing *shape* (narrow → chamber → close → artifact room) so the
+   viewer feels the space change, not just the palette. Zone boundaries get a brief arch overlay
+   announcing the passage from one space to the next. */
+const ZONES = [
+  {key:"entry",    a:0.00, b:0.22, widthMul:0.82, label:"ENTRY"},
+  {key:"chamber",  a:0.22, b:0.50, widthMul:1.20, label:"CHAMBER"},
+  {key:"close",    a:0.50, b:0.75, widthMul:0.88, label:"CLOSE"},
+  {key:"artifact", a:0.75, b:0.92, widthMul:1.35, label:"ARTIFACT"}
+];
+function zoneFor(sub){
+  for(const z of ZONES){ if(sub>=z.a && sub<z.b){ const f=(sub-z.a)/(z.b-z.a); return {...z, frac:f}; } }
+  return {key:"tail", a:0.92, b:1.0, widthMul:1.0, label:"TAIL", frac:clamp((sub-0.92)/0.08,0,1)};
+}
+const ZONE_LABELS = {
+  "1.0": ["SERVICE TUNNEL", "SWITCH ROOM", "ROPE DESCENT", "VAULT PLINTH"],
+  "2.0": ["ARCHWAY ENTRANCE", "COLONNADE", "READING NOOK", "WYSIWYG MONUMENT"],
+  "2.2": ["TOOLSHED", "WORKBENCH AISLE", "WIDGET DOCK", "SIGIL CHAMBER"],
+  "3.0": ["PLANETARIUM APPROACH", "ORBIT CHAMBER", "MENU ARCADE", "SUSPENDED PLANET"],
+  "3.3": ["VELVET LOBBY", "DRAPE PASSAGE", "SPOTLIGHT STAGE", "MASK SANCTUM"],
+  "4.0": ["ATRIUM", "COLONNADE", "ROTUNDA", "URN UNDER THE SHAFT"],
+  "5.0": ["GLASS FOYER", "ASSEMBLY HALL", "MURAL ROOM", "BLOCK MONOLITH"],
+  "6.0": ["NEON BOULEVARD", "WIREFRAME LAB", "BLOCK-THEME VAULT", "TEMPLATE CRYSTAL"],
+  "7.0": ["AIRLOCK", "COMMAND PANE", "HOLOGRAPH FORUM", "AI ORB"]
+};
+
+/* Focal objects — the "thing" the camera is aimed at in the artifact room. Each is drawn as a
+   procedural glowing shape. Its on-screen bounding rect is saved to window.__focalRect each
+   frame so the highlight card can morph out of it. */
+const FOCAL = {
+  "1.0": {kind:"relic",   hue:[255,210,110], frame:"rivet"},
+  "2.0": {kind:"tablet",  hue:[233,201,122], frame:"stone"},
+  "2.2": {kind:"sigil",   hue:[125,211,168], frame:"wood"},
+  "3.0": {kind:"planet",  hue:[158,198,232], frame:"labtile"},
+  "3.3": {kind:"mask",    hue:[201,160,255], frame:"velvet"},
+  "4.0": {kind:"urn",     hue:[255,210,140], frame:"gilt"},
+  "5.0": {kind:"monolith",hue:[220,230,250], frame:"mat"},
+  "6.0": {kind:"crystal", hue:[255,90,217],  frame:"neon"},
+  "7.0": {kind:"orb",     hue:[180,196,255], frame:"holo"}
+};
+
 /* ---------- Smoothed scroll ---------- */
 let scrollTarget = 0;
 let scrollSmooth = 0;
@@ -442,7 +508,9 @@ window.addEventListener("scroll", ()=>{
     // Only count fresh forward motion (each new px beyond the last sampled position), so a
     // sequence of equal scrollTo()s doesn't double-charge the pull bar.
     const dy = Math.max(0, window.scrollY - prevY);
-    if(dy > 0){
+    // v12: pull accumulator ignored during the 4-second dwell window. Inattentive scrolling
+    // cannot dismiss the card until the reader has had time to absorb the page.
+    if(dy > 0 && dwellOk()){
       highlightState.pullAccum += dy;
       if(highlightState.pullAccum >= PULL_THRESHOLD){ highlightState.lastScrollY = window.scrollY; dismissHighlight(); return; }
       const pct = Math.min(100, (highlightState.pullAccum/PULL_THRESHOLD)*100);
@@ -2005,6 +2073,15 @@ function cameraFor(level, m, sub, beat, time, movementIdx){
   else if(beat.name==="arrival")  fov *= 1.0 - smooth(beat.frac)*0.08;
   else if(beat.name==="departure")fov *= 1.0 + beat.frac*0.10;
 
+  // v12 zones: per-zone FOV modulation so the space feels like it narrows and widens
+  // across entry → chamber → close → artifact. Pure scroll-driven, no idle motion.
+  const zone = zoneFor(sub);
+  fov *= lerp(1.0, zone.widthMul, 0.6);
+  // slight camX wander so alcoves alternate side by zone (without breaking wall stability)
+  if(zone.key==="chamber") camX = centerX + 0.35;
+  else if(zone.key==="close") camX = centerX - 0.25;
+  else if(zone.key==="artifact") camX = centerX;
+
   // Per-mode: scroll-driven static offsets only (no time).
   if(cam.mode==="dolly"){
     fov *= lerp(0.72, 1.35, smooth(sub));
@@ -2080,6 +2157,29 @@ const SETPIECES = [
   { after:6, kind:"fallBridge", label:"Collapsing bridge" },
   { after:7, kind:"chute",      label:"Slide the chute"   }
 ];
+// v12: intra-movement theatrical moments. Every release now has at least one, so the
+// journey registers ≥14 distinct theatrical set-pieces across 9 levels. Entries are
+// arrays because several releases have more than one scripted zone event.
+const INTRA_SETPIECES = {
+  0: [ { kind:"elevatorDescent",   start:0.12, end:0.22 } ],                                   // 1.0 Miles — service elevator into the bunker
+  1: [ { kind:"candleNave",        start:0.30, end:0.42 } ],                                   // 2.0 Duke — candles igniting along the nave
+  2: [ { kind:"sawBlade",          start:0.12, end:0.22 } ],                                   // 2.2 Getz — workshop saw blade spins up
+  3: [ { kind:"cathedralVista",    start:0.30, end:0.46 } ],                                   // 3.0 Thelonious — observatory cathedral
+  4: [ { kind:"lanternAlley",      start:0.12, end:0.22 } ],                                   // 3.3 Sonny — lantern-lit alley before the theater
+  5: [ { kind:"gardenInterstitial",start:0.30, end:0.46 } ],                                   // 4.0 Benny — moonlit garden glimpse
+  6: [ { kind:"spiralStair",       start:0.30, end:0.46 } ],                                   // 5.0 Bebo — gallery spiral
+  7: [ { kind:"glassSkybridge",    start:0.12, end:0.24 } ],                                   // 6.0 Arturo — skybridge over the city
+  8: [ { kind:"waterwheelChamber", start:0.12, end:0.22 } ]                                    // 7.0 Hancock — waterwheel echo airlock
+};
+function activeIntraSetpiece(movementIdx, sub){
+  const entries = INTRA_SETPIECES[movementIdx];
+  if(!entries) return null;
+  for(const entry of entries){
+    if(sub < entry.start || sub > entry.end) continue;
+    return { kind: entry.kind, t: (sub - entry.start) / (entry.end - entry.start) };
+  }
+  return null;
+}
 function activeSetpiece(movementIdx, sub){
   // Verifier issue 1: debug hook — force a specific set-piece at phase t so the verifier
   // can render each without navigating past pinned highlights. Set via
@@ -2102,7 +2202,12 @@ window.__forceSetpiece = function(kind, t){
   window.__sp_force = { kind, t: (typeof t==="number"? t : 0.5) };
   return window.__sp_force;
 };
-window.__listSetpieces = ()=>SETPIECES.map(s=>s.kind);
+window.__listSetpieces = ()=>{
+  const transition = SETPIECES.map(s=>s.kind);
+  const intra = [];
+  for(const k in INTRA_SETPIECES){ for(const e of INTRA_SETPIECES[k]){ if(!intra.includes(e.kind)) intra.push(e.kind); } }
+  return transition.concat(intra);
+};
 window.__mapMinimap = ()=>{
   const svg = document.querySelector("#minimap svg");
   return { present: !!svg, nodes: svg? svg.querySelectorAll("circle,rect,path").length : 0 };
@@ -2547,6 +2652,187 @@ function drawDoorwayApproach(g, level, m, beat, time){
 }
 
 /* ---------- Unified level renderer ---------- */
+/* ---------- Focal object (v12) ----------
+   Draws the artifact-room focal object as a procedural glowing sprite. Its on-screen rect is
+   stored on window.__focalRect so the highlight DOM card can animate (morph) out of it. */
+function drawFocalObject(g, m, level, sub, time){
+  // Begin appearing in "chamber" zone (far down the corridor), grow through "artifact" zone.
+  if(sub < 0.22) return;
+  const t = clamp((sub - 0.22) / (0.92 - 0.22), 0, 1);
+  const f = FOCAL[m.v]; if(!f) return;
+  const cx = W/2;
+  // cy placed at corridor vanishing horizon, gradually descending toward center screen.
+  const cy = H*0.48 + t*H*0.04;
+  // screen size grows non-linearly so the object really fills the frame late.
+  const size = lerp(18, Math.min(W,H)*0.56, smooth(t));
+  g.save();
+  // soft halo behind
+  const haloR = size*1.4;
+  const halo = g.createRadialGradient(cx, cy, size*0.1, cx, cy, haloR);
+  halo.addColorStop(0, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.35+0.25*t})`);
+  halo.addColorStop(1, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},0)`);
+  g.fillStyle = halo; g.beginPath(); g.arc(cx, cy, haloR, 0, TAU); g.fill();
+
+  // Body — per-release silhouette
+  const pulse = 1 + Math.sin(time*0.002)*0.02;
+  if(f.kind==="relic"){
+    // tall vial on plinth
+    const w = size*0.55, h = size*1.05;
+    // plinth
+    g.fillStyle = "#3a2618";
+    g.fillRect(cx - w*0.8, cy + h*0.3, w*1.6, h*0.35);
+    g.fillStyle = "#1a0f08";
+    g.fillRect(cx - w*0.8, cy + h*0.3, w*1.6, 4);
+    // glowing vial
+    const vg = g.createLinearGradient(cx, cy-h*0.4, cx, cy+h*0.3);
+    vg.addColorStop(0, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},0.95)`);
+    vg.addColorStop(1, `rgba(${f.hue[0]/2},${f.hue[1]/2},${f.hue[2]/2},0.85)`);
+    g.fillStyle = vg;
+    g.beginPath(); g.ellipse(cx, cy, w*0.38*pulse, h*0.38*pulse, 0, 0, TAU); g.fill();
+    g.fillStyle = "#fff6d1";
+    g.beginPath(); g.arc(cx, cy, Math.max(2,size*0.06), 0, TAU); g.fill();
+  } else if(f.kind==="tablet"){
+    const w = size*0.9, h = size*1.2;
+    g.fillStyle = "#2a2216"; g.fillRect(cx-w/2, cy-h/2, w, h);
+    g.strokeStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.4+0.5*t})`;
+    g.lineWidth = 3; g.strokeRect(cx-w/2, cy-h/2, w, h);
+    // engraved glyphs
+    g.fillStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.5+0.4*t})`;
+    for(let i=0;i<5;i++){ g.fillRect(cx-w*0.35, cy-h*0.35+i*h*0.16, w*0.7, 2); }
+  } else if(f.kind==="sigil"){
+    // hovering hex with inner rune
+    const r = size*0.45*pulse;
+    g.strokeStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.5+0.4*t})`;
+    g.lineWidth = 4;
+    g.beginPath();
+    for(let i=0;i<6;i++){ const a=i*TAU/6; const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r; if(i===0) g.moveTo(x,y); else g.lineTo(x,y); }
+    g.closePath(); g.stroke();
+    g.fillStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.4*t+0.2})`;
+    g.beginPath(); g.arc(cx, cy, r*0.35, 0, TAU); g.fill();
+  } else if(f.kind==="planet"){
+    const r = size*0.5*pulse;
+    const pg = g.createRadialGradient(cx-r*0.3, cy-r*0.3, r*0.1, cx, cy, r);
+    pg.addColorStop(0, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},1)`);
+    pg.addColorStop(1, "rgba(20,30,60,1)");
+    g.fillStyle = pg;
+    g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill();
+    // orbit ring
+    g.strokeStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.3+0.3*t})`;
+    g.lineWidth = 2;
+    g.beginPath(); g.ellipse(cx, cy, r*1.5, r*0.35, 0.3, 0, TAU); g.stroke();
+  } else if(f.kind==="mask"){
+    const w = size*0.9, h = size*1.1;
+    g.fillStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.5+0.4*t})`;
+    g.beginPath(); g.ellipse(cx, cy, w*0.4, h*0.5, 0, 0, TAU); g.fill();
+    g.fillStyle = "#1a0f2a";
+    g.beginPath(); g.ellipse(cx-w*0.15, cy-h*0.1, w*0.06, h*0.05, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(cx+w*0.15, cy-h*0.1, w*0.06, h*0.05, 0, 0, TAU); g.fill();
+    g.strokeStyle = "#0a0514"; g.lineWidth = 2;
+    g.beginPath(); g.arc(cx, cy+h*0.12, w*0.14, 0.2, Math.PI-0.2); g.stroke();
+  } else if(f.kind==="urn"){
+    const w = size*0.55, h = size*0.95;
+    g.fillStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.6+0.3*t})`;
+    g.beginPath();
+    g.ellipse(cx, cy, w*0.5, h*0.3, 0, Math.PI, TAU); // top bowl
+    g.fill();
+    g.fillRect(cx-w*0.2, cy, w*0.4, h*0.4);
+    g.fillStyle = "#3a2e1c"; g.fillRect(cx-w*0.4, cy+h*0.4, w*0.8, 8);
+  } else if(f.kind==="monolith"){
+    const w = size*0.6, h = size*1.3;
+    // stacked Gutenberg blocks
+    for(let i=0;i<4;i++){
+      const by = cy - h/2 + i*(h/4);
+      g.fillStyle = i%2? "#d8dfe8" : "#eef2f8";
+      g.fillRect(cx-w/2, by, w, h/4-2);
+      g.strokeStyle = "#6a7686"; g.lineWidth = 1;
+      g.strokeRect(cx-w/2, by, w, h/4-2);
+    }
+  } else if(f.kind==="crystal"){
+    const r = size*0.45;
+    // diamond outline with neon glow
+    g.strokeStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},1)`;
+    g.shadowColor = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.6+0.3*t})`;
+    g.shadowBlur = 30;
+    g.lineWidth = 4;
+    g.beginPath();
+    g.moveTo(cx, cy-r); g.lineTo(cx+r*0.7, cy); g.lineTo(cx, cy+r); g.lineTo(cx-r*0.7, cy); g.closePath();
+    g.stroke();
+    g.shadowBlur = 0;
+    g.beginPath();
+    g.moveTo(cx, cy-r*0.5); g.lineTo(cx+r*0.35, cy); g.lineTo(cx, cy+r*0.5); g.lineTo(cx-r*0.35, cy); g.closePath();
+    g.stroke();
+  } else if(f.kind==="orb"){
+    const r = size*0.48*pulse;
+    const og = g.createRadialGradient(cx, cy, r*0.1, cx, cy, r);
+    og.addColorStop(0, "rgba(255,255,255,0.9)");
+    og.addColorStop(0.4, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},0.7)`);
+    og.addColorStop(1, `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},0)`);
+    g.fillStyle = og;
+    g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill();
+    // rings
+    g.strokeStyle = `rgba(${f.hue[0]},${f.hue[1]},${f.hue[2]},${0.4+0.3*t})`;
+    g.lineWidth = 1.5;
+    for(let i=0;i<3;i++){
+      g.beginPath(); g.ellipse(cx, cy, r*(0.7+i*0.2), r*(0.2+i*0.08), i*0.7, 0, TAU); g.stroke();
+    }
+  }
+  g.restore();
+
+  // Save on-screen rect for highlight morph handoff
+  const rect = { x: cx - size*0.7, y: cy - size*0.7, w: size*1.4, h: size*1.4, t, v: m.v };
+  window.__focalRect = rect;
+}
+
+/* ---------- Zone arch overlay (v12) ----------
+   A brief frame silhouette drawn over the view as the camera crosses a zone boundary, giving
+   the level a sense of passing from one space into another. Duration ~12% of the zone. */
+function drawZoneArch(g, level, m, sub){
+  // triggered in the first 15% of a non-entry zone
+  const z = zoneFor(sub);
+  if(z.key==="entry" || z.key==="tail") return;
+  if(z.frac > 0.15) return;
+  const t = z.frac / 0.15; // 0→1 fade
+  const a = (1 - t) * 0.75;
+  g.save();
+  g.globalAlpha = a;
+  // arch silhouette — color matched to era rim
+  const rim = level.rim;
+  g.fillStyle = `rgba(${rim[0]*0.3|0},${rim[1]*0.3|0},${rim[2]*0.3|0},0.9)`;
+  const archW = W*0.7, archH = H*0.85;
+  const ax = (W-archW)/2, ay = (H-archH)/2;
+  // outer rectangle minus inner arch (mask effect via two filled paths)
+  g.beginPath();
+  g.moveTo(0,0); g.lineTo(W,0); g.lineTo(W,H); g.lineTo(0,H); g.closePath();
+  g.moveTo(ax, ay+archH);
+  g.lineTo(ax, ay+archH*0.4);
+  g.quadraticCurveTo(ax, ay, ax+archW/2, ay);
+  g.quadraticCurveTo(ax+archW, ay, ax+archW, ay+archH*0.4);
+  g.lineTo(ax+archW, ay+archH);
+  g.closePath();
+  g.fill("evenodd");
+  // golden rim
+  g.globalAlpha = a*0.7;
+  g.strokeStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},1)`;
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(ax, ay+archH);
+  g.lineTo(ax, ay+archH*0.4);
+  g.quadraticCurveTo(ax, ay, ax+archW/2, ay);
+  g.quadraticCurveTo(ax+archW, ay, ax+archW, ay+archH*0.4);
+  g.lineTo(ax+archW, ay+archH);
+  g.stroke();
+  // zone label (small, upper-center)
+  g.globalAlpha = a;
+  const labels = ZONE_LABELS[m.v] || [z.label,z.label,z.label,z.label];
+  const zIdx = ["entry","chamber","close","artifact"].indexOf(z.key);
+  const lbl = labels[zIdx] || z.label;
+  g.fillStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},1)`;
+  g.font = '500 11px "IBM Plex Mono",monospace';
+  g.textAlign = "center";
+  g.fillText("— " + lbl + " —", W/2, ay - 14);
+  g.restore();
+}
+
 function rayRenderLevel(g, sub, beat, time, m, movementIdx){
   const level = LVL[m.v];
   if(!level) return;
@@ -2579,10 +2865,18 @@ function rayRenderLevel(g, sub, beat, time, m, movementIdx){
   g.fillStyle = vg; g.fillRect(0,0,W,H);
   g.restore();
   drawDust(g, m.palette, sub, time);
+  // v12: focal object grows in the artifact room (late sustained) — rendered before setpiece
+  // so the setpiece overlay still takes the frame during the departure tail.
+  drawFocalObject(g, m, level, sub, time);
+  // v12: zone arch flashes briefly at each zone boundary so passages read as real transits.
+  drawZoneArch(g, level, m, sub);
   // Set-piece overlay — real visible geometry (stone slabs, boulder, chasm, rope, etc.)
   // drawn above the corridor so the theatrical beats read on screen, not just in the camera.
   const sp = activeSetpiece(movementIdx, sub);
   if(sp) drawSetpieceOverlay(g, sp, cam, level, m.palette, time);
+  // v12: intra-movement theatrical moments (cathedral, spiral, garden)
+  const isp = activeIntraSetpiece(movementIdx, sub);
+  if(isp) drawSetpieceOverlay(g, isp, cam, level, m.palette, time);
   if(cam.roll){ g.restore(); }
 }
 
@@ -2772,6 +3066,283 @@ function drawSetpieceOverlay(g, sp, cam, level, pal, time){
     lg.addColorStop(0, "rgba(230,170,80,0.22)"); lg.addColorStop(1, "rgba(0,0,0,0)");
     g.fillStyle = lg; g.fillRect(0,0,W,H);
   }
+  else if(sp.kind === "cathedralVista"){
+    // huge vaulted nave silhouette with stained-glass light beams hitting the floor
+    const peak = Math.sin(Math.PI*t);
+    g.fillStyle = "rgba(5,4,10,0.55)";
+    g.fillRect(0,0,W,H);
+    // arches receding
+    for(let i=5;i>=1;i--){
+      const s = i/5;
+      const aw = W*(0.3 + s*0.55);
+      const ah = H*(0.35 + s*0.48);
+      const ax = (W-aw)/2, ay = H*0.18 + (1-s)*80;
+      g.fillStyle = `rgba(${8+s*18|0},${6+s*14|0},${20+s*40|0},${0.6+s*0.25})`;
+      g.beginPath();
+      g.moveTo(ax, ay+ah);
+      g.lineTo(ax, ay+ah*0.45);
+      g.quadraticCurveTo(ax+aw/2, ay-ah*0.1, ax+aw, ay+ah*0.45);
+      g.lineTo(ax+aw, ay+ah);
+      g.closePath();
+      g.fill();
+    }
+    // stained-glass beams
+    const beams = 5;
+    for(let i=0;i<beams;i++){
+      const u = i/(beams-1);
+      const bx = W*(0.22 + u*0.56);
+      const hue = [[255,180,120],[180,220,255],[255,120,180],[120,255,180],[255,240,120]][i];
+      g.fillStyle = `rgba(${hue[0]},${hue[1]},${hue[2]},${0.06 + 0.08*peak})`;
+      g.beginPath();
+      g.moveTo(bx-8, H*0.22);
+      g.lineTo(bx+8, H*0.22);
+      g.lineTo(bx+64, H);
+      g.lineTo(bx-64, H);
+      g.closePath(); g.fill();
+    }
+  }
+  else if(sp.kind === "spiralStair"){
+    // camera rotates as it climbs: draw concentric ring-bands that rotate around center
+    g.fillStyle = "rgba(10,14,20,0.5)"; g.fillRect(0,0,W,H);
+    const cx=W/2, cy=H*0.55;
+    const rot = t*Math.PI*1.2;
+    for(let r=60; r<Math.max(W,H); r+=56){
+      const off = Math.sin(rot + r*0.02) * 20;
+      g.strokeStyle = `rgba(220,230,250,${0.08 + 0.03*Math.sin(r*0.1)})`;
+      g.lineWidth = 2;
+      g.beginPath(); g.ellipse(cx+off, cy, r, r*0.32, 0, 0, TAU); g.stroke();
+    }
+    // stair segments (radial chords)
+    for(let i=0;i<18;i++){
+      const a = i*TAU/18 + rot;
+      const r1=80, r2=240;
+      g.strokeStyle = "rgba(180,196,255,0.35)";
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(cx+Math.cos(a)*r1, cy+Math.sin(a)*r1*0.32);
+      g.lineTo(cx+Math.cos(a)*r2, cy+Math.sin(a)*r2*0.32);
+      g.stroke();
+    }
+  }
+  else if(sp.kind === "gardenInterstitial"){
+    // moonlit garden glimpse through a window: low walls, vines, stars
+    const peek = Math.sin(Math.PI*t);
+    const ww = W*0.5*peek, wh = H*0.55*peek;
+    const wx = (W-ww)/2, wy = H*0.18;
+    // frame
+    g.fillStyle = "rgba(8,10,18,0.7)";
+    g.fillRect(0,0,W,H);
+    // sky
+    const sg = g.createLinearGradient(wx, wy, wx, wy+wh);
+    sg.addColorStop(0, "#1a2348"); sg.addColorStop(1, "#0a0f28");
+    g.fillStyle = sg;
+    g.fillRect(wx, wy, ww, wh);
+    // moon
+    g.fillStyle = "rgba(240,240,220,0.9)";
+    g.beginPath(); g.arc(wx+ww*0.7, wy+wh*0.25, Math.min(ww,wh)*0.08, 0, TAU); g.fill();
+    // stars
+    for(let i=0;i<40;i++){
+      const sx = wx + ((i*73)%ww), sy = wy + ((i*47)%(wh*0.6));
+      g.fillStyle = `rgba(255,255,255,${0.3+0.4*Math.abs(Math.sin(i*1.7))})`;
+      g.fillRect(sx|0, sy|0, 1, 1);
+    }
+    // vines
+    g.strokeStyle = "rgba(60,120,80,0.7)"; g.lineWidth = 2;
+    for(let i=0;i<6;i++){
+      const x = wx + ww*(i/5);
+      g.beginPath(); g.moveTo(x, wy+wh);
+      g.bezierCurveTo(x+20, wy+wh*0.7, x-20, wy+wh*0.4, x+8, wy+wh*0.2);
+      g.stroke();
+    }
+    // fireflies
+    for(let i=0;i<12;i++){
+      const fx = wx + ((i*91 + time*0.05)%ww);
+      const fy = wy + wh*0.5 + Math.sin(time*0.003+i)*wh*0.2;
+      g.fillStyle = `rgba(220,255,120,${0.5+0.4*Math.sin(time*0.004+i)})`;
+      g.beginPath(); g.arc(fx, fy, 1.5, 0, TAU); g.fill();
+    }
+    // window frame
+    g.strokeStyle = "rgba(200,170,110,0.5)"; g.lineWidth = 4;
+    g.strokeRect(wx, wy, ww, wh);
+  }
+  else if(sp.kind === "elevatorDescent"){
+    // industrial elevator: two cables draw down the sides, walls scroll up past view,
+    // a floor indicator ticks. Represents the bunker service shaft in 1.0.
+    g.fillStyle = "rgba(0,0,0,0.55)"; g.fillRect(0,0,W,H);
+    // side cables
+    g.strokeStyle = "#3a2a18"; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(W*0.2, 0); g.lineTo(W*0.2, H); g.moveTo(W*0.8, 0); g.lineTo(W*0.8, H); g.stroke();
+    // wall rungs scrolling upward as we descend
+    g.fillStyle = "rgba(180,150,100,0.35)";
+    const pitch = 70, rise = (t*pitch*6) % pitch;
+    for(let y=-pitch; y<H+pitch; y+=pitch){
+      const yy = y + rise;
+      g.fillRect(W*0.15, yy, 24, 4);
+      g.fillRect(W*0.85-24, yy, 24, 4);
+    }
+    // floor indicator (LED segment)
+    const floors = ["B1","B2","B3","B4","B5"];
+    const idx = Math.min(floors.length-1, Math.floor(t*floors.length));
+    g.fillStyle = "rgba(20,12,6,0.85)"; g.fillRect(W/2-46, 40, 92, 38);
+    g.strokeStyle = "#e9c97a"; g.lineWidth = 1; g.strokeRect(W/2-46, 40, 92, 38);
+    g.fillStyle = "#ffd27a"; g.font = "700 26px 'IBM Plex Mono',monospace"; g.textAlign="center";
+    g.fillText(floors[idx], W/2, 67);
+    // faint downward dust
+    g.fillStyle = "rgba(220,180,120,0.22)";
+    for(let i=0;i<14;i++){
+      const px = W*0.3 + (i*37)%(W*0.4);
+      const py = ((i*53 + t*600)%H);
+      g.fillRect(px, py, 1, 6);
+    }
+  }
+  else if(sp.kind === "waterwheelChamber"){
+    // a big turning wheel on the left side, splashes against the floor, wet stones
+    g.fillStyle = "rgba(6,10,18,0.5)"; g.fillRect(0,0,W,H);
+    const cx = W*0.26, cy = H*0.58, r = Math.min(W,H)*0.34;
+    // pool
+    g.fillStyle = "rgba(80,120,180,0.25)"; g.fillRect(0, cy+r*0.6, W, H-(cy+r*0.6));
+    // wheel
+    const rot = t*Math.PI*1.5;
+    g.strokeStyle = "rgba(180,170,140,0.75)"; g.lineWidth = 3;
+    g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.stroke();
+    g.beginPath(); g.arc(cx, cy, r*0.18, 0, TAU); g.stroke();
+    for(let i=0;i<12;i++){
+      const a = rot + i*TAU/12;
+      g.beginPath();
+      g.moveTo(cx+Math.cos(a)*r*0.18, cy+Math.sin(a)*r*0.18);
+      g.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r);
+      g.stroke();
+      // paddle at the outer end
+      g.save(); g.translate(cx+Math.cos(a)*r, cy+Math.sin(a)*r); g.rotate(a);
+      g.fillStyle = "#5a4022"; g.fillRect(-18, -10, 24, 20);
+      g.restore();
+    }
+    // splashes at the bottom-left where the wheel dips
+    g.fillStyle = "rgba(220,230,255,0.75)";
+    for(let i=0;i<20;i++){
+      const u = i/20, sx = cx - r*0.4 + (Math.random()-0.5)*60;
+      const sy = cy + r*0.55 + Math.sin(t*10 + i)*6;
+      g.beginPath(); g.arc(sx, sy, 2+Math.random()*2, 0, TAU); g.fill();
+    }
+  }
+  else if(sp.kind === "lanternAlley"){
+    // row of paper lanterns casting passing shadows. Velvet-era alley into 3.3.
+    g.fillStyle = "rgba(10,6,14,0.55)"; g.fillRect(0,0,W,H);
+    const n = 7;
+    for(let i=0;i<n;i++){
+      const u = i/(n-1);
+      const lx = W*(0.08 + u*0.84);
+      const ly = H*0.22 + Math.sin(i*1.3)*6;
+      const flick = 0.85 + 0.15*Math.sin(t*12 + i*2.1);
+      // lantern body
+      g.fillStyle = `rgba(255,180,120,${0.85*flick})`;
+      g.beginPath(); g.ellipse(lx, ly, 22, 28, 0, 0, TAU); g.fill();
+      // halo
+      const lg = g.createRadialGradient(lx, ly, 4, lx, ly, 140);
+      lg.addColorStop(0, `rgba(255,200,140,${0.4*flick})`); lg.addColorStop(1,"rgba(0,0,0,0)");
+      g.fillStyle = lg; g.fillRect(lx-140, ly-140, 280, 280);
+      // hanging cord
+      g.strokeStyle = "rgba(120,90,60,0.7)"; g.lineWidth=1;
+      g.beginPath(); g.moveTo(lx, 0); g.lineTo(lx, ly-26); g.stroke();
+      // shadow cast onto the floor that shifts with t as we walk past
+      const sx = lx + Math.sin(t*Math.PI*2 + i)*40;
+      g.fillStyle = "rgba(0,0,0,0.35)";
+      g.beginPath(); g.ellipse(sx, H*0.78, 34, 8, 0, 0, TAU); g.fill();
+    }
+  }
+  else if(sp.kind === "glassSkybridge"){
+    // low parapet railing and a city of neon lights far below. Wind speed-lines.
+    g.fillStyle = "rgba(6,8,18,0.6)"; g.fillRect(0,0,W,H);
+    // sky vignette
+    const sg = g.createLinearGradient(0,0,0,H*0.55);
+    sg.addColorStop(0, "rgba(60,30,120,0.6)"); sg.addColorStop(1, "rgba(6,6,20,0)");
+    g.fillStyle = sg; g.fillRect(0,0,W,H*0.55);
+    // city lights below the parapet
+    const parapetY = H*0.62;
+    g.fillStyle = "rgba(255,90,217,0.6)";
+    for(let i=0;i<80;i++){
+      const cx = (i*83 + Math.floor(t*40))%W;
+      const cy = parapetY + 80 + ((i*47)%(H-parapetY-80));
+      const s = 1 + (i%3);
+      g.fillStyle = `rgba(${i%2?255:120},${i%2?90:220},${i%2?217:255},0.7)`;
+      g.fillRect(cx, cy, s, s);
+    }
+    // parapet
+    g.fillStyle = "rgba(40,44,60,0.9)"; g.fillRect(0, parapetY, W, 14);
+    g.fillStyle = "rgba(255,255,255,0.08)"; g.fillRect(0, parapetY, W, 2);
+    // railing posts
+    g.fillStyle = "rgba(200,210,230,0.5)";
+    for(let i=0;i<18;i++){ const px = (i/17)*W; g.fillRect(px, parapetY-40, 2, 40); }
+    g.strokeStyle = "rgba(200,210,230,0.4)"; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, parapetY-40); g.lineTo(W, parapetY-40); g.stroke();
+    // wind streaks
+    g.strokeStyle = "rgba(200,220,255,0.18)"; g.lineWidth=1;
+    for(let i=0;i<20;i++){
+      const y = (i*41 + t*400)%H;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(60+t*20, y); g.stroke();
+    }
+  }
+  else if(sp.kind === "candleNave"){
+    // a row of candles at the base of the columns ignites in sequence as we walk.
+    const n = 9;
+    for(let i=0;i<n;i++){
+      const u = i/(n-1);
+      const cx = W*(0.08 + u*0.84);
+      const cy = H*0.76 + Math.sin(i*0.9)*8;
+      // whether this candle is lit yet depends on t
+      const lit = t > (u*0.9) ? 1 : 0;
+      // candle body
+      g.fillStyle = "rgba(230,220,200,0.9)";
+      g.fillRect(cx-4, cy-20, 8, 22);
+      // wick
+      g.fillStyle = "#2a1a0a"; g.fillRect(cx-1, cy-24, 2, 4);
+      if(lit){
+        // flame
+        const f = 1 + 0.3*Math.sin(t*30 + i);
+        g.fillStyle = "rgba(255,210,130,0.95)";
+        g.beginPath(); g.ellipse(cx, cy-28, 4*f, 10*f, 0, 0, TAU); g.fill();
+        g.fillStyle = "rgba(255,255,240,0.9)";
+        g.beginPath(); g.ellipse(cx, cy-28, 2, 5, 0, 0, TAU); g.fill();
+        // halo on the column
+        const lg = g.createRadialGradient(cx, cy-28, 6, cx, cy-28, 140);
+        lg.addColorStop(0, "rgba(255,210,140,0.35)"); lg.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = lg; g.fillRect(cx-140, cy-170, 280, 280);
+      }
+    }
+  }
+  else if(sp.kind === "sawBlade"){
+    // spinning circular saw blade on a workshop bench. Sparks arc upward.
+    g.fillStyle = "rgba(10,8,6,0.55)"; g.fillRect(0,0,W,H);
+    const cx = W*0.72, cy = H*0.55, r = Math.min(W,H)*0.22;
+    const rot = t*Math.PI*12;
+    // bench
+    g.fillStyle = "#4a361e"; g.fillRect(cx-r*2, cy+r*0.6, r*3.5, r*0.5);
+    g.fillStyle = "#2a1d0e"; g.fillRect(cx-r*2, cy+r*0.6, r*3.5, 6);
+    // blade
+    const bg = g.createRadialGradient(cx, cy, r*0.2, cx, cy, r);
+    bg.addColorStop(0, "#ffffff"); bg.addColorStop(0.5, "#cfd4dd"); bg.addColorStop(1, "#6a707a");
+    g.fillStyle = bg;
+    g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill();
+    // teeth
+    g.fillStyle = "#e0e4ea";
+    for(let i=0;i<36;i++){
+      const a = rot + i*TAU/36;
+      g.save(); g.translate(cx+Math.cos(a)*r, cy+Math.sin(a)*r); g.rotate(a);
+      g.fillRect(0,-3, 10, 6);
+      g.restore();
+    }
+    // arbor bolt
+    g.fillStyle = "#3a4048"; g.beginPath(); g.arc(cx, cy, r*0.12, 0, TAU); g.fill();
+    // sparks
+    g.fillStyle = "rgba(255,220,140,0.9)";
+    for(let i=0;i<26;i++){
+      const a = rot*0.1 + i*0.5;
+      const sr = r + 20 + (i*7)%120;
+      const sx = cx + Math.cos(a)*sr;
+      const sy = cy + Math.sin(a)*sr - (i*3);
+      g.fillRect(sx, sy, 2, 2);
+    }
+  }
   else if(sp.kind === "corner"){
     // corner wedge: a dark angled wall sweeps across as the camera rounds the bend.
     const sweep = smooth(t);
@@ -2927,9 +3498,12 @@ function updateMinimap(y, curM, sub){
 }
 
 /* ---------- Highlight overlay (full-screen release moment) ---------- */
-let highlightState = { curM:-1, active:false, lockY:0, pullAccum:0, dismissedForM:-1, graceUntil:0, lastScrollY:0 };
-const PULL_THRESHOLD = 900; // wheel delta pixels needed to pull past highlight
+let highlightState = { curM:-1, active:false, lockY:0, pullAccum:0, dismissedForM:-1, graceUntil:0, lastScrollY:0, dwellStart:0, dwellElapsed:false };
+function dwellRemaining(){ return highlightState.active ? Math.max(0, DWELL_MIN_MS - (performance.now() - highlightState.dwellStart)) : 0; }
+function dwellOk(){ return highlightState.active && (performance.now() - highlightState.dwellStart) >= DWELL_MIN_MS; }
+const PULL_THRESHOLD = 2700; // v12: raised so inattentive scrolling doesn't dismiss accidentally
 const DISMISS_GRACE_MS = 1100; // block re-pin long enough for set-piece to actually play
+const DWELL_MIN_MS = 4000;     // v12: hard minimum dwell before dismissal is eligible
 
 function populateHighlight(curM){
   const m = M[curM];
@@ -2980,12 +3554,49 @@ function showHighlight(curM, y){
   highlightState.active = true;
   highlightState.lockY = y;
   highlightState.pullAccum = 0;
+  highlightState.dwellStart = performance.now();
+  highlightState.dwellElapsed = false;
+  // v12: lock the Continue button and make the dwell bar visible
+  const contBtn = document.getElementById("hl-continue"); if(contBtn) contBtn.setAttribute("data-dwell","wait");
+  const df = document.getElementById("hl-dwell-f"); if(df) df.style.width = "0%";
+  const dp = document.getElementById("hl-dwell-pct"); if(dp) dp.textContent = "0%";
   populateHighlight(curM);
   const hl = document.getElementById("highlight");
+  // v12 morph-in: derive clip-inset from the last saved focal rect so the card grows out of it
+  const fr = window.__focalRect;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const fx = fr ? fr.x : vw*0.4, fy = fr ? fr.y : vh*0.4;
+  const fw = fr ? fr.w : vw*0.2, fh = fr ? fr.h : vh*0.2;
+  const insL = clamp((fx/vw)*100, 0, 48);
+  const insR = clamp(((vw - fx - fw)/vw)*100, 0, 48);
+  const insT = clamp((fy/vh)*100, 0, 48);
+  const insB = clamp(((vh - fy - fh)/vh)*100, 0, 48);
+  hl.style.setProperty("--mi-l", insL+"%");
+  hl.style.setProperty("--mi-r", insR+"%");
+  hl.style.setProperty("--mi-t", insT+"%");
+  hl.style.setProperty("--mi-b", insB+"%");
+  // apply frame material for the era
+  const focal = FOCAL[M[curM].v];
+  if(focal) hl.setAttribute("data-frame", focal.frame);
+  // v12 morph-in: set the starting (clipped to focal rect) clip-path inline *without* transition,
+  // show, then in a later frame restore the transition and clear the inline style so CSS
+  // transitions from the tight inset out to the full inset(0). Two-stage because if both states
+  // are applied in the same style batch the browser collapses them and no transition fires.
+  const card = document.getElementById("hl-card");
+  card.style.transition = "none";
+  card.style.clipPath = `inset(${insT}% ${insR}% ${insB}% ${insL}% round 14px)`;
+  hl.classList.add("morph-in");
   hl.classList.add("on");
   hl.style.setProperty("--accent", M[curM].palette[3]);
+  // force a reflow so the inline clip-path is committed before we switch to transition mode
+  void card.offsetWidth;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    card.style.transition = "";
+    card.style.clipPath = "";
+    hl.classList.remove("morph-in");
+  }));
   // Per verifier issue 4: console-log motif change so automated checks can confirm crossfade.
-  console.log(`[motif] highlight ON · movement ${curM} · ${M[curM].v} ${M[curM].name} · bpm=${M[curM].motif.bpm}`);
+  console.log(`[motif] highlight ON · movement ${curM} · ${M[curM].v} ${M[curM].name} · bpm=${M[curM].motif.bpm} · morph from ${insL.toFixed(0)}/${insT.toFixed(0)}/${insR.toFixed(0)}/${insB.toFixed(0)}`);
 }
 function dismissHighlight(){
   if(!highlightState.active) return;
@@ -2994,20 +3605,30 @@ function dismissHighlight(){
   highlightState.dismissedForM = m;
   highlightState.pullAccum = 0;
   highlightState.graceUntil = performance.now() + DISMISS_GRACE_MS;
-  document.getElementById("highlight").classList.remove("on");
+  // v12 reverse morph: set inline clip-path back to the focal rect with the transition active
+  // so the card collapses back into the focal object, then fade out by removing .on.
+  const hl = document.getElementById("highlight");
+  const card = document.getElementById("hl-card");
+  const cl = parseFloat(hl.style.getPropertyValue("--mi-l"))||40;
+  const cr = parseFloat(hl.style.getPropertyValue("--mi-r"))||40;
+  const ct = parseFloat(hl.style.getPropertyValue("--mi-t"))||40;
+  const cb = parseFloat(hl.style.getPropertyValue("--mi-b"))||40;
+  card.style.clipPath = `inset(${ct}% ${cr}% ${cb}% ${cl}% round 14px)`;
+  setTimeout(()=>{ card.style.clipPath = ""; }, 700);
+  hl.classList.remove("on");
   const pullEl = document.getElementById("hl-pull"); if(pullEl) pullEl.style.width = "0%";
   const pctEl = document.getElementById("hl-pull-pct"); if(pctEl) pctEl.textContent = "0%";
-  // Land BEFORE the set-piece zone (sub 0.85) so the scripted gesture between this release
-  // and the next actually plays as the user resumes scrolling. Previously this jumped to
-  // 0.93 which is inside the setpiece window and silently clipped the gesture.
+  // v12: land just past the pin window (sub 0.91) but before the departure set-piece zone
+  // (sub 0.92), so the scripted gesture between this release and the next actually plays
+  // as the user resumes scrolling.
   if(m>=0 && m<M.length){
-    const targetY = OVERTURE + m*MLEN + MLEN*0.85;
+    const targetY = OVERTURE + m*MLEN + MLEN*0.918;
     scrollTarget = targetY;
     window.scrollTo(0, targetY);
   }
   console.log(`[motif] highlight OFF · movement ${m}`);
 }
-document.getElementById("hl-continue").addEventListener("click", dismissHighlight);
+document.getElementById("hl-continue").addEventListener("click", ()=>{ if(dwellOk()) dismissHighlight(); });
 document.getElementById("hl-playground").addEventListener("click", (e)=>{
   const v = e.currentTarget.dataset.v; if(!v) return;
   const frame = document.getElementById("pg-frame");
@@ -3018,6 +3639,7 @@ document.getElementById("hl-playground").addEventListener("click", (e)=>{
 // Pull-to-continue: accumulate forward-scroll wheel delta while highlight is active.
 window.addEventListener("wheel", (e)=>{
   if(!highlightState.active) return;
+  if(!dwellOk()) return; // v12: ignore wheel during dwell window
   if(e.deltaY > 0) highlightState.pullAccum += e.deltaY;
   if(highlightState.pullAccum >= PULL_THRESHOLD) dismissHighlight();
   const pct = Math.min(100, (highlightState.pullAccum/PULL_THRESHOLD)*100);
@@ -3029,13 +3651,17 @@ window.addEventListener("wheel", (e)=>{
 window.addEventListener("keydown", (e)=>{
   if(!highlightState.active) return;
   if(e.key===" " || e.key==="Enter" || e.key==="ArrowDown" || e.key==="PageDown"){
-    e.preventDefault(); dismissHighlight();
+    e.preventDefault();
+    if(dwellOk()) dismissHighlight();
   }
 });
 
 function updateHighlight(curM, sub, beat, y){
-  // Active when we enter a release's arrival beat (sub 0.22) and stay through sustained.
-  const inRange = curM>=0 && curM<M.length && sub >= 0.22 && sub <= 0.90;
+  // v12: give the viewer the full zone walkthrough BEFORE pinning. The focal object has
+  // been growing since sub 0.22; we only pin the highlight card once the camera has
+  // reached the artifact zone (sub 0.80), which at MLEN=6000 means >= ~4800 px of
+  // uninterrupted level scenery has already passed.
+  const inRange = curM>=0 && curM<M.length && sub >= 0.85 && sub <= 0.915;
   if(inRange && highlightState.dismissedForM !== curM){
     showHighlight(curM, y);
   }
@@ -3159,6 +3785,19 @@ function frame(t){
   updatePlaque(curM, st.sub, beat);
   updateHighlight(curM, st.sub, beat, y);
   updateScrollbar();
+
+  // v12: tick dwell progress each frame while a highlight is pinned
+  if(highlightState.active){
+    const elapsed = performance.now() - highlightState.dwellStart;
+    const pct = Math.min(100, (elapsed / DWELL_MIN_MS) * 100);
+    const df = document.getElementById("hl-dwell-f"); if(df) df.style.width = pct + "%";
+    const dp = document.getElementById("hl-dwell-pct"); if(dp) dp.textContent = Math.round(pct) + "%";
+    if(pct >= 100 && !highlightState.dwellElapsed){
+      highlightState.dwellElapsed = true;
+      const contBtn = document.getElementById("hl-continue"); if(contBtn) contBtn.removeAttribute("data-dwell");
+      const lbl = document.getElementById("hl-hint-lbl"); if(lbl) lbl.innerHTML = "Keep scrolling to continue →";
+    }
+  }
 
   // Audio scheduling — movement change + motif
   if(audioReady && curM>=0 && curM<M.length){
