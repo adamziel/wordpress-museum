@@ -1965,11 +1965,11 @@ function buildLevels(){
   // waypoints, so each turn spans a ~10% sub window and glides smoothly.
   const WAYPOINTS_1_0 = [
     {sub:0.00, x:5.5, z:15.4, yaw: Math.PI   }, // entry — face north down long tunnel
-    {sub:0.45, x:5.5, z: 7.2, yaw: Math.PI   }, // end of south tunnel, still facing north
-    {sub:0.55, x:6.2, z: 6.5, yaw: Math.PI/2 }, // TURN 1: now facing east along the corridor
-    {sub:0.80, x:8.5, z: 6.5, yaw: Math.PI/2 }, // end of east corridor
-    {sub:0.88, x:8.5, z: 5.2, yaw: Math.PI   }, // TURN 2: now facing north into the neck
-    {sub:1.00, x:8.5, z: 3.8, yaw: Math.PI   }  // artifact chamber, held back so WP screen reads at readable distance
+    {sub:0.38, x:5.5, z: 7.4, yaw: Math.PI   }, // tunnel almost done — yaw begins to rotate from here
+    {sub:0.52, x:6.2, z: 6.5, yaw: Math.PI/2 }, // TURN 1 complete: facing east along the corridor
+    {sub:0.74, x:8.5, z: 6.5, yaw: Math.PI/2 }, // east corridor approaching the next turn
+    {sub:0.86, x:8.5, z: 5.2, yaw: Math.PI   }, // TURN 2 complete: facing north into the neck
+    {sub:1.00, x:8.5, z: 3.8, yaw: Math.PI   }  // artifact chamber, WP screen at readable distance
   ];
   LVL["1.0"] = {
     map: MAZE_1_0,
@@ -2770,7 +2770,8 @@ function drawLabel(g, level, m, beat){
 }
 
 function drawDoorway(g, level, m, beat, time){
-  // Departure: a bright archway opens at the corridor end, tinted by the next movement.
+  // Disabled per user: the arched departure portal was still reading as a "portal."
+  return;
   if(beat.name!=="departure") return;
   const k = ease(beat.frac);
   const next = findNextM(m);
@@ -2812,7 +2813,8 @@ function findNextM(m){
 }
 
 function drawDoorwayApproach(g, level, m, beat, time){
-  // Approach: a visible arched doorway frames the scene and dilates open as we emerge.
+  // Disabled per user: same arched-portal family as drawDoorway.
+  return;
   if(beat.name!=="approach") return;
   const k = 1 - ease(beat.frac);   // k=1 at start (doorway tight), k=0 at end (open)
   if(k<=0) return;
@@ -4056,7 +4058,7 @@ function frame(t){
     const k = 1 - Math.exp(-6 * secs); // spring coeff matched to the old feel at 60fps
     const gap = scrollTarget - scrollSmooth;
     const springStep = gap * k;
-    const MAX_CAM_V = 700; // px/s — slower glide per user feedback; fast wheel input still queues progress.
+    const MAX_CAM_V = 1000; // px/s — bumped back up slightly so the walk feels less sluggish.
     const maxStep = MAX_CAM_V * secs;
     scrollSmooth += Math.sign(gap) * Math.min(Math.abs(springStep), maxStep);
   }
