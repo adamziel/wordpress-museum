@@ -1926,23 +1926,25 @@ function buildLevels(){
   // 1.0 Miles — Bunker (v12 polish: hand-authored 12×16 maze, camera follows waypoints)
   // Legend: 0 open, 1 concrete/brick wall, 2 accent alcove, 3 WP-screen wall tile
   //                        col: 0 1 2 3 4 5 6 7 8 9 10 11
+  // Simplified layout per user feedback: two 90° turns total, no 180° reversals.
+  // Long southbound tunnel → turn east → corridor → turn north → artifact chamber.
   const MAZE_1_0 = [
     /* 0  */ [1,1,1,1,1,1,1,1,1,1,1,1],
-    /* 1  */ [1,1,1,3,1,1,1,1,1,1,1,1], // WP screen tile on north wall (col 3 = centered over camera path)
-    /* 2  */ [1,0,0,0,0,0,1,1,1,1,1,1], // artifact chamber
-    /* 3  */ [1,0,0,0,0,0,1,1,1,1,1,1],
-    /* 4  */ [1,1,1,0,1,1,1,1,1,1,1,1], // doorway south
-    /* 5  */ [1,1,1,0,1,1,1,1,1,1,1,1], // antechamber neck
-    /* 6  */ [1,0,0,0,0,0,0,0,0,0,0,1], // columned room — wide
-    /* 7  */ [1,0,1,1,0,1,1,0,1,1,0,1], // columns
-    /* 8  */ [1,0,0,0,0,0,0,0,0,0,0,1],
-    /* 9  */ [1,0,1,1,1,1,1,1,1,1,1,1], // turn into cramped passage
-    /* 10 */ [1,0,0,0,0,0,1,1,1,1,1,1], // cramped passage (w→e)
-    /* 11 */ [1,1,1,1,0,1,1,1,1,1,1,1],
-    /* 12 */ [1,1,1,1,0,0,0,0,0,1,1,1], // switch room
-    /* 13 */ [1,1,1,1,0,0,0,0,0,1,1,1],
-    /* 14 */ [1,1,1,1,0,1,1,1,1,1,1,1], // service tunnel emerges into switch room
-    /* 15 */ [1,1,1,1,0,0,1,1,1,1,1,1]  // service tunnel entry (start)
+    /* 1  */ [1,1,1,1,1,1,1,1,3,1,1,1], // WP screen tile on north wall at col 8
+    /* 2  */ [1,1,1,1,1,1,1,0,0,0,1,1], // artifact chamber (cols 7-9)
+    /* 3  */ [1,1,1,1,1,1,1,0,0,0,1,1],
+    /* 4  */ [1,1,1,1,1,1,1,0,0,1,1,1], // neck (cols 7-8)
+    /* 5  */ [1,1,1,1,1,1,1,0,0,1,1,1],
+    /* 6  */ [1,1,1,1,1,0,0,0,0,1,1,1], // east corridor (cols 5-8)
+    /* 7  */ [1,1,1,1,1,0,0,0,0,1,1,1],
+    /* 8  */ [1,1,1,1,1,0,1,1,1,1,1,1], // south tunnel (col 5)
+    /* 9  */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 10 */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 11 */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 12 */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 13 */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 14 */ [1,1,1,1,1,0,1,1,1,1,1,1],
+    /* 15 */ [1,1,1,1,1,0,1,1,1,1,1,1]  // entry at col 5
   ];
   // Waypoints threading through the maze. Camera eases between consecutive waypoints using
   // the sub position. Each entry is {sub, x, z, yaw}. yaw is radians; 0 = look toward -z.
@@ -1958,23 +1960,16 @@ function buildLevels(){
   //   → west along row 10 to (1.5, 10.5) → north (1.5, 8.5) through columned room
   //   → east along row 8 briefly, then north at col 3 (open column) via row 6..row 2
   //   → arrive at (3.5, 2.5), WP screen on row 1 ahead.
+  // Six waypoints, two right-angle turns, no 180° reversals.
+  // π = facing north (-z). π/2 = facing east (+x). Shortest-arc interpolation between
+  // waypoints, so each turn spans a ~10% sub window and glides smoothly.
   const WAYPOINTS_1_0 = [
-    {sub:0.00, x:4.5,  z:15.4, yaw: Math.PI          }, // service tunnel entry, face north
-    {sub:0.12, x:4.5,  z:14.3, yaw: Math.PI          }, // tunnel
-    {sub:0.18, x:4.5,  z:13.3, yaw: Math.PI/2        }, // RIGHT TURN (1) — now facing east into switch room
-    {sub:0.26, x:6.5,  z:12.7, yaw: Math.PI/2        }, // switch room, east wall ahead
-    {sub:0.32, x:7.5,  z:12.5, yaw: -Math.PI/2       }, // LEFT TURN (2) — face west to traverse back
-    {sub:0.40, x:4.7,  z:12.5, yaw: Math.PI          }, // LEFT TURN (3) — face north, exit switch room
-    {sub:0.48, x:4.5,  z:10.7, yaw: -Math.PI/2       }, // LEFT TURN (4) — face west into cramped passage
-    {sub:0.56, x:1.7,  z:10.5, yaw: Math.PI          }, // RIGHT TURN (5) — face north, enter columned room
-    {sub:0.64, x:1.5,  z: 8.0, yaw: Math.PI/2        }, // RIGHT TURN (6) — face east along row 8
-    {sub:0.68, x:4.5,  z: 8.2, yaw: Math.PI          }, // LEFT TURN (7) — face north up col-4 gap in the column row
-    {sub:0.74, x:4.5,  z: 6.5, yaw: -Math.PI/2       }, // LEFT TURN (8) — face west along row 6
-    {sub:0.78, x:3.5,  z: 6.3, yaw: Math.PI          }, // RIGHT TURN (9) — face north into the col-3 antechamber doorway
-    {sub:0.82, x:3.5,  z: 4.5, yaw: Math.PI          }, // through doorway (row 4/5 open col 3)
-    {sub:0.88, x:3.5,  z: 3.0, yaw: Math.PI          }, // artifact chamber — WP screen fills view
-    {sub:0.95, x:3.5,  z: 2.4, yaw: Math.PI          },
-    {sub:1.00, x:3.5,  z: 2.2, yaw: Math.PI          }
+    {sub:0.00, x:5.5, z:15.4, yaw: Math.PI   }, // entry — face north down long tunnel
+    {sub:0.45, x:5.5, z: 7.2, yaw: Math.PI   }, // end of south tunnel, still facing north
+    {sub:0.55, x:6.2, z: 6.5, yaw: Math.PI/2 }, // TURN 1: now facing east along the corridor
+    {sub:0.80, x:8.5, z: 6.5, yaw: Math.PI/2 }, // end of east corridor
+    {sub:0.88, x:8.5, z: 5.2, yaw: Math.PI   }, // TURN 2: now facing north into the neck
+    {sub:1.00, x:8.5, z: 3.8, yaw: Math.PI   }  // artifact chamber, held back so WP screen reads at readable distance
   ];
   LVL["1.0"] = {
     map: MAZE_1_0,
@@ -2989,7 +2984,10 @@ function drawFocalObject(g, m, level, sub, time){
    A brief frame silhouette drawn over the view as the camera crosses a zone boundary, giving
    the level a sense of passing from one space into another. Duration ~12% of the zone. */
 function drawZoneArch(g, level, m, sub){
-  // triggered in the first 15% of a non-entry zone
+  // Disabled per user request — the gold-rimmed arch silhouette read as a
+  // flashing portal overlay and was the last visible "fucking portal."
+  return;
+  // unreachable below; kept so reinstating is one line if we ever want it
   const z = zoneFor(sub);
   if(z.key==="entry" || z.key==="tail") return;
   if(z.frac > 0.15) return;
@@ -3954,7 +3952,7 @@ function updateWpCaption(curM, sub){
   const el = document.getElementById("wp-caption");
   if(!el) return;
   // Visible while the camera is in the final chambers of movement 0 (WP screen in view).
-  const show = (curM === 0 && sub >= 0.74 && sub <= 0.995);
+  const show = (curM === 0 && sub >= 0.86 && sub <= 0.995);
   el.classList.toggle("show", show);
 }
 function updatePlaque(curM, sub, beat){
@@ -4058,7 +4056,7 @@ function frame(t){
     const k = 1 - Math.exp(-6 * secs); // spring coeff matched to the old feel at 60fps
     const gap = scrollTarget - scrollSmooth;
     const springStep = gap * k;
-    const MAX_CAM_V = 1400; // px/s — the user's complaint was "5x my speed", so cap the camera.
+    const MAX_CAM_V = 700; // px/s — slower glide per user feedback; fast wheel input still queues progress.
     const maxStep = MAX_CAM_V * secs;
     scrollSmooth += Math.sign(gap) * Math.min(Math.abs(springStep), maxStep);
   }
