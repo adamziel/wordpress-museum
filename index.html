@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Nine Exhibits</title>
+<title>WordPress Museum — Ten Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -54,6 +54,10 @@
   .v9 .art::before{content:"";position:absolute;inset:12% 8%;background:repeating-linear-gradient(0deg,#0b3b2e 0 8px,transparent 8px 22px),repeating-linear-gradient(90deg,#0b3b2e 0 8px,transparent 8px 22px);opacity:.55;mix-blend-mode:multiply}
   .v9 .art::after{content:"Open World · wander · get lost";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:ui-monospace,Menlo,monospace;color:#e6ffe0;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 0 8px #3e8f6a}
 
+  .v10 .art{background:radial-gradient(420px 260px at 30% 30%,#ffe7a8 0%,transparent 55%),radial-gradient(500px 300px at 75% 75%,#ff7a59 0%,transparent 55%),linear-gradient(160deg,#1a0f28 0%,#0a0510 70%);position:relative;overflow:hidden}
+  .v10 .art::before{content:"";position:absolute;inset:14% 10%;border:1px solid rgba(255,231,168,.35);border-radius:4px;box-shadow:inset 0 0 40px rgba(255,122,89,.25),0 0 28px rgba(255,122,89,.25)}
+  .v10 .art::after{content:"The Masterpiece · each release, a moment";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#ffe7a8;font-size:.95rem;letter-spacing:.04em}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -62,7 +66,7 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Nine ways to see a history</h1>
+    <h1>Ten ways to see a history</h1>
     <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
@@ -119,6 +123,12 @@
       <span class="pill">Exhibit IX · Open World</span>
       <h2>The Lost Cartography</h2>
       <p>No more straight line. A sprawling maze of wings, gardens, vaults, and rooftops linked by unexpected shortcuts. Camera angles change with the terrain — overhead for the courtyard, cinematic tilt for the descent, first-person for the archives. Wander and you will find releases you didn't expect to meet here.</p>
+    </a>
+    <a class="card v10" href="v10-masterpiece/">
+      <div class="art"></div>
+      <span class="pill">Exhibit X · The Masterpiece</span>
+      <h2>Nine Movements</h2>
+      <p>Each release stops being a room you pass and becomes a movement in a suite. Approach, anticipation, arrival, a sustained moment with its own camera language, then departure. The scroll keeps doing something the whole time — parallax, orbit, focus-pull — so even standing still feels alive. Built as a presentation, not a demo.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
