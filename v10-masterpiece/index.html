@@ -51,9 +51,15 @@
   /* ---------- HUD ---------- */
   #hud{position:fixed;top:0;left:0;right:0;z-index:15;pointer-events:none;padding:18px 24px;display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--ui)}
   #hud .left{display:flex;flex-direction:column;gap:10px}
-  #hud .release{font:400 13px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;text-transform:uppercase}
-  #hud .movement{font:400 28px/1 var(--display);letter-spacing:1.5px;color:var(--accent,#e9c97a);text-shadow:0 0 18px rgba(233,201,122,.25);transition:color .8s,text-shadow .8s}
-  #hud .era{font:400 10px/1 var(--mono);letter-spacing:3px;color:#8d7b54;text-transform:uppercase}
+  #hud .release{font:400 13px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8),0 0 10px rgba(0,0,0,.6)}
+  #hud .movement{font:400 28px/1 var(--display);letter-spacing:1.5px;color:var(--accent,#e9c97a);text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 18px rgba(233,201,122,.25);transition:color .8s,text-shadow .8s}
+  #hud .era{font:400 10px/1 var(--mono);letter-spacing:3px;color:#8d7b54;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+  html.light-era #hud .release{color:#2a2218;text-shadow:0 1px 2px rgba(255,255,255,.8),0 0 8px rgba(255,255,255,.6)}
+  html.light-era #hud .movement{color:#1a1510;text-shadow:0 2px 6px rgba(255,255,255,.85),0 0 16px rgba(255,255,255,.5)}
+  html.light-era #hud .era{color:#4a4030;text-shadow:0 1px 2px rgba(255,255,255,.8)}
+  html.light-era #beats .b{color:#7a6a52}
+  html.light-era #beats .b.on{color:#1a1510}
+  html.light-era #beats .b.on .dot{background:#1a1510;box-shadow:0 0 10px rgba(0,0,0,.6)}
   #beats{display:flex;gap:14px;margin-top:6px;font:500 9px/1 var(--mono);letter-spacing:3px;color:#6a5b3e;text-transform:uppercase}
   #beats .b{display:flex;align-items:center;gap:6px;transition:color .4s}
   #beats .b .dot{width:6px;height:6px;border-radius:50%;background:#3a321e;transition:all .4s}
@@ -68,28 +74,24 @@
   #minimap svg{width:100%;height:96px;display:block}
   #minimap .ml{font:500 9px/1.2 var(--mono);letter-spacing:2px;color:#8d7b54;margin-top:6px;text-transform:uppercase;display:flex;justify-content:space-between}
 
-  /* ---------- Plaque ---------- */
-  #plaque{position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(16px);z-index:18;width:min(820px,94vw);opacity:0;pointer-events:none;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.25,1)}
+  /* ---------- Plaque (compact diegetic HUD strip) ----------
+     The big plaque lives inside the 3D world now (floating in-world panel).
+     The DOM strip is just a thin bottom rail with the CTA + meta + paragraph ticker. */
+  #plaque{position:fixed;left:50%;bottom:14px;transform:translateX(-50%) translateY(8px);z-index:18;width:min(760px,92vw);opacity:0;pointer-events:none;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.25,1)}
   #plaque.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-  #plaque .card{display:grid;grid-template-columns:220px 1fr;gap:22px;padding:20px 24px 22px;background:linear-gradient(180deg,rgba(15,12,8,.96),rgba(8,6,4,.96));border:1px solid var(--accent,#e9c97a);box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset}
-  #plaque .bin{display:flex;flex-direction:column;gap:10px}
-  #plaque .port{width:100%;height:192px;background:#06080c;display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,201,122,.18)}
-  #plaque .port canvas{image-rendering:pixelated;width:144px;height:192px}
-  #plaque .shot{width:100%;height:126px;background:#06080c;overflow:hidden;border:1px solid rgba(233,201,122,.22)}
-  #plaque .shot canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-  #plaque .tag{font:500 9px/1 var(--mono);letter-spacing:4px;color:#8d7b54;text-transform:uppercase}
-  #plaque .meta{font:500 10px/1 var(--mono);letter-spacing:2.5px;color:#a4946a;margin-bottom:4px;text-transform:uppercase}
-  #plaque h2{font:400 34px/1 var(--display);letter-spacing:1.2px;color:var(--accent,#e9c97a);margin-bottom:2px}
-  #plaque .headline{font:400 italic 14px/1.45 var(--prose);color:#e1d9bf;margin:10px 0 14px;padding-left:10px;border-left:2px solid var(--accent,#e9c97a);max-width:440px}
-  #plaque .prose{display:flex;flex-direction:column;gap:8px;min-height:160px}
-  #plaque .prose p{font:400 13.5px/1.58 var(--prose);color:#cdc2a4;opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.25,1)}
-  #plaque .prose p.on{opacity:1;transform:translateY(0)}
-  #plaque .prose p:nth-child(even).on{transform:translateX(0)}
-  #plaque .prose p:nth-child(even){transform:translateX(14px)}
-  #plaque .cta{margin-top:16px;display:flex;align-items:center;gap:14px}
-  #plaque button{pointer-events:auto;font:500 10px/1 var(--mono);letter-spacing:3px;padding:11px 18px;border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;text-transform:uppercase;transition:all .2s}
-  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706;letter-spacing:4px}
-  #plaque .pg-hint{font:500 9px/1 var(--mono);letter-spacing:3px;color:#6a5b3e;text-transform:uppercase}
+  #plaque .card{display:flex;align-items:center;gap:16px;padding:10px 16px;background:linear-gradient(180deg,rgba(15,12,8,.78),rgba(8,6,4,.82));border:1px solid var(--accent,#e9c97a);border-radius:2px;backdrop-filter:blur(4px);box-shadow:0 10px 28px rgba(0,0,0,.5)}
+  #plaque .bin{display:none}  /* portrait & shot now rendered in-world */
+  #plaque .port canvas,#plaque .shot canvas{display:none}
+  #plaque .tag,#plaque h2,#plaque .headline{display:none}
+  #plaque .meta{font:500 10px/1 var(--mono);letter-spacing:2.5px;color:var(--accent,#e9c97a);text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+  #plaque .prose{display:flex;flex-direction:row;gap:14px;overflow:hidden;flex:1;min-height:18px;max-height:24px}
+  #plaque .prose p{font:400 italic 12.5px/1.4 var(--prose);color:#cdc2a4;opacity:0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;transition:opacity .5s ease;max-width:100%}
+  #plaque .prose p:not(:first-child){display:none}
+  #plaque .prose p.on{opacity:0.92}
+  #plaque .cta{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  #plaque button{pointer-events:auto;font:500 9px/1 var(--mono);letter-spacing:3px;padding:8px 14px;border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706}
+  #plaque .pg-hint{display:none}
 
   /* ---------- Playground ---------- */
   #playground{position:fixed;inset:0;z-index:100;background:rgba(5,6,10,.96);display:none;flex-direction:column}
@@ -346,17 +348,19 @@ const M = [
 */
 const OVERTURE = 400;
 const CODA = 400;
-const MLEN = 1700;
-const TOTAL = OVERTURE + M.length * MLEN + CODA; // 400+15300+400 = 16100
+const MLEN = 2100; // widened so sustained beat stretches ≥150vh at typical viewport
+const TOTAL = OVERTURE + M.length * MLEN + CODA; // 400+18900+400 = 19700
 document.body.style.height = TOTAL + "px";
 
-/* beat ranges within a movement (fraction): approach, anticipation, arrival, sustained, departure */
+/* beat ranges within a movement (fraction): approach, anticipation, arrival, sustained, departure
+   Sustained widened to 0.30→0.92 (62% of MLEN → ~1302px → ≥150vh at 800px viewport)
+   so the camera has time to do real theatrical work during the sustained beat. */
 const BEATS = [
-  {key:"approach",    a:0.00, b:0.22},
-  {key:"anticipation",a:0.22, b:0.38},
-  {key:"arrival",     a:0.38, b:0.50},
-  {key:"sustained",   a:0.50, b:0.86},
-  {key:"departure",   a:0.86, b:1.00}
+  {key:"approach",    a:0.00, b:0.12},
+  {key:"anticipation",a:0.12, b:0.22},
+  {key:"arrival",     a:0.22, b:0.30},
+  {key:"sustained",   a:0.30, b:0.92},
+  {key:"departure",   a:0.92, b:1.00}
 ];
 
 /* ---------- Smoothed scroll ---------- */
@@ -1217,729 +1221,1239 @@ function godrays(g, palette, strength){
   g.restore();
 }
 
-/* ---------- Per-movement renderers ----------
-   Each takes (g, sub, beat, time, m).
-   sub ∈ [0,1] is position within movement.
-   beat = {name, frac} indicates which of 5 beats + local frac [0,1].
+/* ---------- Unified retro-3D raycaster ----------
+   Every movement is rendered as a first-person walk through a textured 3D corridor.
+   Per-movement config (LVL[v]) supplies: wall-texture key, alcove texture key, ceiling/floor
+   gradient, ambient light color, rim-light color, lighting behaviour (torch/neon/fluorescent/sun),
+   billboards (portrait / admin mock / fact-tokens), camera mode (walk/orbit/dolly/dutch/macro/zoomout/overhead),
+   optional overlays (scanlines, flicker, sun-shaft, starfield, godrays).
+   The RENDER[v] entries are thin wrappers that call rayRenderLevel with the movement's LVL config.
 */
-const RENDER = {};
 
-/* 1.0 Miles — The Bunker: first-person corridor. Doorway narrows; candle flare on arrival; diorama on sustained. */
-RENDER["1.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  fillBackdrop(g, p, beat);
-  // fog + floor
-  const floorY = H*0.68;
-  // ceiling
-  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,floorY);
-  // floor
-  const fgrd = g.createLinearGradient(0,floorY,0,H);
-  fgrd.addColorStop(0, rgb(hex(p[0]),1));
-  fgrd.addColorStop(1, rgb(hex(p[1]),1));
-  g.fillStyle = fgrd; g.fillRect(0,floorY,W,H-floorY);
-  // receding corridor frames (one-point perspective)
-  const depth = 14;
-  for(let i=depth;i>=0;i--){
-    const s = 1 - i/depth; // 0 far, 1 near
-    const w = lerp(W*0.12, W*1.4, s);
-    const h = lerp(H*0.22, H*1.2, s);
-    const x = W/2 - w/2;
-    const y = H*0.48 - h*0.4;
-    const intensity = s;
-    g.strokeStyle = rgb(mix(hex(p[0]),hex(p[2]), intensity*0.7), 0.6 - i*0.04);
-    g.lineWidth = 1.5 + s*2;
-    g.strokeRect(x, y, w, h);
-    if(i===Math.floor(depth*0.5)){
-      g.fillStyle = rgb(hex(p[2]), 0.1); g.fillRect(x,y,w,h);
-    }
-  }
-  // distant door (the "approach" beat shows a small candle; it grows during anticipation)
-  const reveal = beat.name==="approach" ? beat.frac*0.3 : (beat.name==="anticipation" ? 0.3 + beat.frac*0.5 : (beat.name==="arrival" ? 0.8 + beat.frac*0.2 : 1.0));
-  // candle flame at far point
-  const cx = W/2, cy = H*0.4;
-  const flick = 0.9 + Math.sin(time*0.012)*0.1 + Math.sin(time*0.03)*0.04;
-  const flameR = 8 + reveal*30;
-  const fgrd2 = g.createRadialGradient(cx,cy,1,cx,cy,flameR*4);
-  fgrd2.addColorStop(0, rgb([255,230,180], 0.95*flick*reveal));
-  fgrd2.addColorStop(0.3, rgb(hex(p[2]), 0.6*flick*reveal));
-  fgrd2.addColorStop(1, rgb(hex(p[0]), 0));
-  g.fillStyle = fgrd2; g.fillRect(0,0,W,H);
-  // fact token 1 — permalink slugs drifting in
-  g.save();
-  const fts = [" /?p=123 ", " /archive.php?cat=5 ", " /2004/01/hello-world/ ", " /%postname%/ "];
-  for(let i=0;i<fts.length;i++){
-    const phase = (time*0.00006 + i*0.25) % 1;
-    const x = W*0.1 + phase*W*0.8;
-    const y = H*0.75 + Math.sin(phase*TAU+i)*20;
-    const op = Math.sin(phase*Math.PI) * (beat.name==="sustained" ? 0.5 : 0.2);
-    g.font = "500 12px IBM Plex Mono,Menlo,monospace";
-    g.fillStyle = rgb(hex(p[3]), op);
-    g.fillText(fts[i], x, y);
-  }
-  g.restore();
-  // fact token 2 — hook bubbles puffing out during sustained
-  if(beat.name==="sustained" || beat.name==="arrival"){
-    g.save();
-    const hooks = ["add_filter()","add_action()","do_action()","apply_filters()"];
-    for(let i=0;i<hooks.length;i++){
-      const phase = ((time*0.0002 + i*0.25) % 1);
-      const a = 1-phase;
-      const x = W*0.15 + i*W*0.18 + Math.sin(time*0.002+i)*20;
-      const y = H*0.58 - phase*80;
-      g.font = "600 11px IBM Plex Mono,Menlo,monospace";
-      g.fillStyle = rgb(hex(p[4]), 0.6*a);
-      g.fillText(hooks[i], x, y);
-    }
-    g.restore();
-  }
-  // wall carving "1.0 · MILES" during anticipation
-  if(beat.name!=="approach"){
-    const carveOp = beat.name==="anticipation"? beat.frac : 1;
-    g.save();
-    g.font = "600 44px Didot, Georgia, serif";
-    g.fillStyle = rgb(hex(p[2]), 0.15*carveOp);
-    const tx = W/2, ty = H*0.3;
-    g.textAlign="center"; g.shadowColor = rgb(hex(p[0])); g.shadowBlur=4; g.shadowOffsetY = 2;
-    g.fillText("1.0 · MILES", tx, ty);
-    g.restore();
-  }
-  rimLight(g, p, sub, beat);
-  godrays(g, p, beat.name==="arrival"?1:0.3);
-  drawDust(g, p, sub, time);
-  vignette(g, 0.35);
-};
-
-/* 2.0 Duke — Crypt Library: cinematic side-scroll alcoves */
-RENDER["2.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  fillBackdrop(g, p, beat);
-  // side-scroll pan driven by sub
-  const pan = sub * W * 2.5;
-  // Backwall texture
-  g.fillStyle = rgb(hex(p[1])); g.fillRect(0,0,W,H);
-  // columns receding
-  for(let i=0;i<12;i++){
-    const x = i*W*0.25 - pan*0.5;
-    const xm = ((x % (W*1.2))+W*1.2)%(W*1.2) - W*0.1;
-    g.fillStyle = rgb(hex(p[1]), 0.8);
-    g.fillRect(xm, H*0.1, 4, H*0.8);
-    g.fillStyle = rgb(hex(p[2]), 0.5);
-    g.fillRect(xm-10, H*0.08, 24, 10);
-    g.fillRect(xm-10, H*0.9, 24, 10);
-  }
-  // alcoves holding scrolls / busts
-  const alcoveCount = 7;
-  for(let i=0;i<alcoveCount;i++){
-    const ax = (i*W*0.38 - pan*1.0);
-    const axm = ((ax%(W*3))+W*3)%(W*3) - W;
-    if(axm<-200||axm>W+200) continue;
-    const ay = H*0.3;
-    const aw = 140, ah = H*0.42;
-    g.fillStyle = rgb(hex(p[0]));
-    g.fillRect(axm, ay, aw, ah);
-    // arch
-    g.fillStyle = rgb(hex(p[1]));
-    g.beginPath(); g.arc(axm+aw/2, ay, aw/2, 0, Math.PI, true); g.fill();
-    // scroll contents: TinyMCE toolbar icons float in alcove
-    const icons = ["B","I","U","¶","“”","⌖","🔗","—"];
-    for(let k=0;k<icons.length;k++){
-      const ix = axm+10+k*16, iy = ay+30+Math.sin(time*0.003+k+i)*4;
-      g.fillStyle = rgb(hex(p[4]), 0.7);
-      g.font="700 12px IBM Plex Mono,Menlo,monospace";
-      g.fillText(icons[k], ix, iy);
-    }
-    // user-role crowns below
-    const roles = ["A","E","Au","C","S"];
-    for(let k=0;k<roles.length;k++){
-      const rx = axm+12+k*22, ry = ay+ah-20;
-      const lit = (i*roles.length + k) % 5 === Math.floor(time*0.002)%5;
-      g.fillStyle = rgb(hex(p[lit?4:2]), lit?0.9:0.5);
-      g.font="700 10px IBM Plex Mono,Menlo,monospace";
-      g.fillText("♔"+roles[k], rx, ry);
-    }
-  }
-  // candle flames on columns
-  for(let i=0;i<24;i++){
-    const x = (i*100 - pan*0.8) % (W+200) - 40;
-    const fy = H*0.5 + Math.sin(time*0.004+i)*2;
-    const grd = g.createRadialGradient(x,fy,1,x,fy,40);
-    grd.addColorStop(0, rgb([255,220,140], 0.6));
-    grd.addColorStop(1, rgb(hex(p[0]), 0));
-    g.fillStyle = grd; g.fillRect(x-40,fy-40,80,80);
-  }
-  // Arrival: curtain pull — giant "2.0 · DUKE" descends
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save();
-    g.fillStyle = rgb(hex(p[4]), 0.92*k);
-    g.font = "700 64px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillText("2.0 · DUKE", W/2, H*0.25 + (1-k)*40);
-    g.restore();
-  }
-  rimLight(g,p,sub,beat);
-  drawDust(g,p,sub,time);
-  vignette(g, 0.42);
-};
-
-/* 2.2 Getz — Widget Workshop: overhead workbench. */
-RENDER["2.2"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // wood-grain top-down workbench
-  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,H);
-  for(let i=0;i<20;i++){
-    g.fillStyle = rgb(mix(hex(p[0]), hex(p[1]), 0.4 + 0.2*Math.sin(i*1.3)));
-    g.fillRect(0, (i*H/20)|0, W, Math.ceil(H/20)+1);
-  }
-  // sidebar (right)
-  const sbX = W*0.62, sbY = H*0.15, sbW = W*0.28, sbH = H*0.7;
-  g.fillStyle = rgb(hex(p[4]), 0.1);
-  g.fillRect(sbX, sbY, sbW, sbH);
-  g.strokeStyle = rgb(hex(p[3]), 0.4); g.lineWidth = 2;
-  g.strokeRect(sbX, sbY, sbW, sbH);
-  g.font="500 10px IBM Plex Mono,Menlo,monospace";
-  g.fillStyle = rgb(hex(p[3]));
-  g.fillText("SIDEBAR", sbX+6, sbY-6);
-  // docked widgets based on sub
-  const widgets = ["Search","Recent Posts","Archives","Categories","Tag Cloud","RSS"];
-  for(let i=0;i<widgets.length;i++){
-    const dockT = clamp((sub*1.3 - i*0.08), 0, 1);
-    const srcX = W*0.08 + i*W*0.08;
-    const srcY = H*0.55 + Math.sin(time*0.002+i)*6;
-    const dstX = sbX+8, dstY = sbY+8+i*22;
-    const x = lerp(srcX, dstX, ease(dockT));
-    const y = lerp(srcY, dstY, ease(dockT));
-    g.fillStyle = rgb(hex(p[2]), 0.85);
-    g.fillRect(x, y, 110, 18);
-    g.strokeStyle = rgb(hex(p[4]), 0.8);
-    g.strokeRect(x, y, 110, 18);
-    g.fillStyle = rgb(hex(p[4]));
-    g.font="600 10px Inter,sans-serif";
-    g.fillText(widgets[i], x+6, y+12);
-    g.fillStyle = rgb(hex(p[4]), 0.5);
-    g.fillText("⋮⋮", x+96, y+12);
-  }
-  // Atom RSS icon pulsing — fact token #1
-  const rx = W*0.22, ry = H*0.2, pulse = 0.9 + Math.sin(time*0.005)*0.15;
-  const rR = 30*pulse;
-  g.fillStyle = rgb(hex(p[3]), 0.22); g.beginPath(); g.arc(rx,ry,rR*1.4,0,TAU); g.fill();
-  g.fillStyle = rgb(hex(p[4]));
-  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR/6, 0, TAU); g.fill();
-  g.lineWidth=3; g.strokeStyle=rgb(hex(p[4]));
-  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR*0.5, -Math.PI/2, 0); g.stroke();
-  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR*0.85, -Math.PI/2, 0); g.stroke();
-  g.font="500 10px IBM Plex Mono,monospace"; g.fillStyle = rgb(hex(p[4]), 0.6);
-  g.fillText("ATOM 1.0", rx-26, ry+rR+14);
-  // Arrival: label tumbles in
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha = k;
-    g.font = "700 54px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.translate(W/2, H*0.12); g.rotate(-0.03 + k*0.03);
-    g.fillText("2.2 · GETZ", 0, 0);
-    g.restore();
-  }
-  rimLight(g,p,sub,beat);
-  drawDust(g,p,sub,time);
-  vignette(g, 0.25);
-};
-
-/* 3.0 Thelonious — Laboratory: orbit around a planet, moon merging */
-RENDER["3.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // deep cool gradient
-  const grd = g.createRadialGradient(W*0.5, H*0.55, 20, W*0.5, H*0.55, Math.max(W,H)*0.9);
-  grd.addColorStop(0, rgb(hex(p[1])));
-  grd.addColorStop(1, rgb(hex(p[0])));
-  g.fillStyle = grd; g.fillRect(0,0,W,H);
-  // starfield
-  for(let i=0;i<120;i++){
-    const sx = (i*137 + Math.floor(time*0.05))%W;
-    const sy = (i*91)%H;
-    const a = 0.3 + 0.5*Math.sin(time*0.003+i);
-    g.fillStyle = rgb(hex(p[4]), a*0.4);
-    g.fillRect(sx|0, sy|0, 1, 1);
-  }
-  // orbit angle driven by sub
-  const orbit = time*0.0004 + sub*TAU*0.5;
-  const cx = W*0.5, cy = H*0.55;
-  const planetR = Math.min(W,H)*0.18;
-  // rings
-  g.save(); g.translate(cx,cy); g.rotate(orbit*0.3);
-  for(let i=0;i<3;i++){
-    const rr = planetR*1.4 + i*10;
-    g.strokeStyle = rgb(hex(p[3]), 0.15);
-    g.beginPath(); g.ellipse(0,0, rr, rr*0.28, 0, 0, TAU); g.stroke();
-  }
-  g.restore();
-  // planet
-  const pgrd = g.createRadialGradient(cx-planetR*0.3, cy-planetR*0.3, planetR*0.1, cx, cy, planetR);
-  pgrd.addColorStop(0, rgb(hex(p[3])));
-  pgrd.addColorStop(0.7, rgb(hex(p[2])));
-  pgrd.addColorStop(1, rgb(hex(p[1])));
-  g.fillStyle = pgrd; g.beginPath(); g.arc(cx,cy,planetR,0,TAU); g.fill();
-  // continents (custom post types glyphs)
-  g.save(); g.beginPath(); g.arc(cx,cy,planetR,0,TAU); g.clip();
-  g.fillStyle = rgb(hex(p[1]), 0.55);
-  for(let i=0;i<5;i++){
-    g.beginPath();
-    const a = orbit + i*1.2;
-    const rx = cx + Math.cos(a)*planetR*0.5;
-    const ry = cy + Math.sin(a)*planetR*0.4;
-    g.arc(rx, ry, planetR*0.22, 0, TAU); g.fill();
-  }
-  g.restore();
-  // moon — fact token #1: WP-MU merging in
-  const mergeT = beat.name==="approach"? beat.frac*0.3 : (beat.name==="anticipation"? 0.3 + beat.frac*0.5 : (beat.name==="arrival"? 0.8 + beat.frac*0.2 : 1.0));
-  const moonR = planetR*0.35;
-  const angleIn = -Math.PI*0.7;
-  const startDist = planetR*3.5, endDist = planetR + moonR*0.2;
-  const dist = lerp(startDist, endDist, ease(mergeT));
-  const mx = cx + Math.cos(angleIn)*dist;
-  const my = cy + Math.sin(angleIn)*dist;
-  const mgrd = g.createRadialGradient(mx-moonR*0.3, my-moonR*0.3, moonR*0.1, mx, my, moonR);
-  mgrd.addColorStop(0, rgb(hex(p[4])));
-  mgrd.addColorStop(1, rgb(hex(p[2])));
-  g.fillStyle = mgrd; g.beginPath(); g.arc(mx, my, moonR, 0, TAU); g.fill();
-  g.fillStyle = rgb(hex(p[0]));
-  g.font = "700 10px IBM Plex Mono,monospace"; g.textAlign="center";
-  g.fillText("MU", mx, my+4);
-  g.textAlign="left";
-  // merge glow on arrival
-  if(beat.name==="arrival"){
-    const k = smooth(beat.frac);
-    const ggrd = g.createRadialGradient(cx,cy,planetR*0.5, cx,cy, planetR*3);
-    ggrd.addColorStop(0, rgb(hex(p[4]), 0.4*k));
-    ggrd.addColorStop(1, rgb(hex(p[4]), 0));
-    g.fillStyle = ggrd; g.fillRect(0,0,W,H);
-  }
-  // fact token #2: Twenty Ten theme thumbnail floats in on sustained
-  if(beat.name==="sustained" || beat.name==="arrival"){
-    const ox = W*0.8, oy = H*0.65;
-    const thumb = 120;
-    g.save(); g.translate(ox, oy); g.rotate(Math.sin(time*0.001)*0.04);
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillRect(-thumb/2, -thumb/2, thumb, thumb);
-    g.fillStyle = rgb(hex(p[1]));
-    g.fillRect(-thumb/2+8, -thumb/2+8, thumb-16, 16);
-    for(let i=0;i<4;i++){ g.fillStyle = rgb(hex(p[2]), 0.7); g.fillRect(-thumb/2+8, -thumb/2+30+i*12, thumb-16, 8); }
-    g.fillStyle = rgb(hex(p[0])); g.font = "700 10px IBM Plex Mono,monospace"; g.textAlign="center";
-    g.fillText("Twenty Ten", 0, -thumb/2+20);
-    g.restore();
-    g.textAlign="left";
-  }
-  // release label
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha = k;
-    g.font = "400 56px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("3.0 · THELONIOUS", W/2, H*0.2);
-    g.restore();
-  }
-  rimLight(g,p,sub,beat);
-  drawDust(g,p,sub,time);
-  vignette(g, 0.4);
-};
-
-/* 3.3 Sonny — Velvet Pointer: Dutch tilt, drag-drop rain, pointer bubbles */
-RENDER["3.3"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  g.save();
-  // slight Dutch tilt
-  const tilt = 0.05 * Math.sin(time*0.0008);
-  g.translate(W/2, H/2); g.rotate(tilt); g.translate(-W/2, -H/2);
-  // velvet backdrop
-  const grd = g.createRadialGradient(W*0.5, H*0.5, 40, W*0.5, H*0.5, Math.max(W,H));
-  grd.addColorStop(0, rgb(hex(p[2])));
-  grd.addColorStop(1, rgb(hex(p[0])));
-  g.fillStyle = grd; g.fillRect(-W*0.2, -H*0.2, W*1.4, H*1.4);
-  // velvet texture (vertical drapes)
-  for(let i=0;i<36;i++){
-    const x = (i/36)*W*1.4 - W*0.2;
-    g.fillStyle = rgb(hex(p[1]), 0.06 + 0.05*Math.sin(i*0.7));
-    g.fillRect(x, -H*0.2, 6, H*1.4);
-  }
-  // portal ring
-  const cx = W*0.5, cy = H*0.5;
-  const ringR = Math.min(W,H)*0.3 * (0.9 + Math.sin(time*0.002)*0.04);
-  for(let i=6;i>=0;i--){
-    g.strokeStyle = rgb(hex(p[3]), 0.3 - i*0.04);
-    g.lineWidth = 1+i*1.2;
-    g.beginPath(); g.arc(cx,cy, ringR+i*6, 0, TAU); g.stroke();
-  }
-  // drag-drop rain — pixel files falling UP (upload)
-  for(let i=0;i<40;i++){
-    const phase = ((time*0.0003 + i*0.27) % 1);
-    const x = W*0.15 + ((i*57)%80)*(W*0.7/80);
-    const y = lerp(H*1.1, -40, phase);
-    const op = Math.sin(phase*Math.PI);
-    g.fillStyle = rgb(hex(p[4]), op*0.7);
-    g.fillRect(x, y, 10, 12);
-    g.fillStyle = rgb(hex(p[2]), op*0.9);
-    g.fillRect(x+6, y, 4, 4);
-    g.fillStyle = rgb(hex(p[0]), op);
-    g.font = "500 6px IBM Plex Mono,monospace"; g.fillText(".jpg", x+1, y+20);
-  }
-  g.restore();
-  // pointer bubbles (outside tilt so they read)
-  if(beat.name!=="approach"){
-    const bubbles = [
-      {x:W*0.2, y:H*0.3, txt:"Try the new admin bar!"},
-      {x:W*0.72, y:H*0.68, txt:"Drag files here."},
-      {x:W*0.16, y:H*0.72, txt:"Flyout menus, anywhere."}
-    ];
-    for(let i=0;i<bubbles.length;i++){
-      const show = clamp(sub*1.5 - i*0.18, 0, 1);
-      if(show<=0) continue;
-      const b = bubbles[i];
-      g.save(); g.globalAlpha = smooth(show);
-      g.fillStyle = rgb(hex(p[3]));
-      g.beginPath();
-      const bw=180, bh=34;
-      g.moveTo(b.x,b.y); g.lineTo(b.x+bw,b.y); g.lineTo(b.x+bw,b.y+bh); g.lineTo(b.x+20,b.y+bh);
-      g.lineTo(b.x+12,b.y+bh+8); g.lineTo(b.x+8,b.y+bh); g.lineTo(b.x,b.y+bh); g.closePath();
-      g.fill();
-      g.fillStyle = rgb(hex(p[0]));
-      g.font="600 12px Inter,sans-serif";
-      g.fillText(b.txt, b.x+12, b.y+22);
-      g.restore();
-    }
-  }
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha=k;
-    g.font = "400 52px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("3.3 · SONNY", W/2, H*0.15);
-    g.restore();
-  }
-  drawDust(g,p,sub,time);
-  vignette(g, 0.45);
-};
-
-/* 4.0 Benny — Marble Atrium: dolly-zoom media grid wall */
-RENDER["4.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // marble floor + sky
-  const sky = g.createLinearGradient(0,0,0,H*0.55);
-  sky.addColorStop(0, rgb(hex(p[1])));
-  sky.addColorStop(1, rgb(hex(p[0])));
-  g.fillStyle = sky; g.fillRect(0,0,W,H*0.55);
-  const floor = g.createLinearGradient(0,H*0.55,0,H);
-  floor.addColorStop(0, rgb(hex(p[2])));
-  floor.addColorStop(1, rgb(hex(p[3])));
-  g.fillStyle = floor; g.fillRect(0,H*0.55,W,H*0.45);
-  // marble veins on floor
-  for(let i=0;i<30;i++){
-    g.strokeStyle = rgb(hex(p[3]), 0.12);
-    g.lineWidth = 1;
-    g.beginPath();
-    const y0 = H*0.55 + (i*12)%(H*0.45);
-    g.moveTo(0, y0);
-    for(let x=0;x<=W;x+=20){ g.lineTo(x, y0 + Math.sin(x*0.02+i)*4); }
-    g.stroke();
-  }
-  // dolly-zoom: grid recedes as sub increases (pull-back)
-  const zoom = lerp(1.8, 0.6, ease(sub));
-  const gridCols = 7, gridRows = 4;
-  const cellW = (W*0.65/gridCols)*zoom, cellH = (H*0.4/gridRows)*zoom;
-  const ox = W*0.5 - (gridCols*cellW)/2;
-  const oy = H*0.18;
-  for(let r=0;r<gridRows;r++){
-    for(let c=0;c<gridCols;c++){
-      const reflow = (sub*2 + c*0.07 + r*0.12)%1;
-      const x = ox + c*cellW + Math.sin(time*0.001+c+r)*reflow*6;
-      const y = oy + r*cellH;
-      const hue = (c*17 + r*41)%360;
-      g.fillStyle = `hsl(${hue},${30+((c+r)%3)*10}%,${55-r*4}%)`;
-      g.fillRect(x,y,cellW-4,cellH-4);
-      g.fillStyle = "rgba(255,255,255,0.12)"; g.fillRect(x,y,cellW-4,4);
-    }
-  }
-  // globe of language packs (fact token #2)
-  const gx = W*0.85, gy = H*0.75, gR = 40;
-  g.save(); g.translate(gx, gy);
-  g.strokeStyle = rgb(hex(p[4]), 0.6); g.lineWidth=1;
-  g.beginPath(); g.arc(0,0,gR,0,TAU); g.stroke();
-  for(let i=0;i<6;i++){
-    g.beginPath();
-    g.ellipse(0,0, gR, gR*Math.abs(Math.cos(i/6*Math.PI+time*0.0005)), 0, 0, TAU); g.stroke();
-  }
-  const flags = ["en","es","fr","de","ja","zh","pt","ru"];
-  for(let i=0;i<flags.length;i++){
-    const a = time*0.001 + i/flags.length*TAU;
-    const x = Math.cos(a)*gR*1.2, y = Math.sin(a)*gR*0.4;
-    g.fillStyle = rgb(hex(p[4]));
-    g.font="700 9px IBM Plex Mono,monospace"; g.fillText(flags[i], x-6, y+3);
-  }
-  g.restore();
-  // inline oEmbed card drifting
-  if(beat.name==="sustained" || beat.name==="arrival"){
-    const ocx = W*0.14, ocy = H*0.7 + Math.sin(time*0.0015)*10;
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillRect(ocx, ocy, 160, 80);
-    g.strokeStyle = rgb(hex(p[3])); g.strokeRect(ocx, ocy, 160, 80);
-    g.fillStyle = rgb(hex(p[2])); g.fillRect(ocx+8, ocy+8, 60, 44);
-    g.fillStyle = rgb(hex(p[4]));
-    g.beginPath(); g.moveTo(ocx+26, ocy+22); g.lineTo(ocx+50, ocy+30); g.lineTo(ocx+26, ocy+38); g.closePath(); g.fill();
-    g.fillStyle = rgb(hex(p[4])); g.font="600 9px Inter,sans-serif";
-    g.fillText("inline embed preview", ocx+72, ocy+22);
-  }
-  // arrival label
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha=k;
-    g.font = "400 62px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("4.0 · BENNY", W/2, H*0.14);
-    g.restore();
-  }
-  rimLight(g,p,sub,beat);
-  drawDust(g,p,sub,time);
-  vignette(g, 0.22);
-};
-
-/* 5.0 Bebo — Gallery: macro pull from a single block to a post */
-RENDER["5.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // gallery white
-  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,H);
-  g.fillStyle = rgb(hex(p[1])); g.fillRect(0,H*0.82,W,H*0.18);
-  // scale — start 6x (inside paragraph), end 1x (whole post)
-  const zoom = lerp(6.0, 0.85, smooth(sub));
-  const cx = W/2, cy = H/2;
-  g.save(); g.translate(cx,cy); g.scale(zoom, zoom); g.translate(-cx,-cy);
-  // "post" diagram — several blocks stacked
-  const postW = W*0.5, postH = H*0.75;
-  const px = (W-postW)/2, py = H*0.12;
-  g.fillStyle = rgb(hex(p[0])); g.fillRect(px, py, postW, postH);
-  g.strokeStyle = rgb(hex(p[2]), 0.5); g.lineWidth = 1.5/zoom;
-  g.strokeRect(px, py, postW, postH);
-  // title block
-  g.fillStyle = rgb(hex(p[4])); g.font = `400 ${28/Math.max(zoom,1)}px Didot,Georgia,serif`;
-  g.fillText("Gutenberg", px+20/zoom, py+40/zoom);
-  // paragraph block (highlighted with selection frame)
-  const parBlock = {x:px+20, y:py+60, w:postW-40, h:50};
-  // blocks appearing based on sub reveal
-  const revealCount = Math.floor(sub*10) - 1;
-  const blocks = [
-    {type:"P", text:"A post is a composition of blocks."},
-    {type:"IMG"},
-    {type:"H2", text:"Everything composes."},
-    {type:"QUOTE", text:"“inevitable in hindsight.”"},
-    {type:"COLS"},
-    {type:"P", text:"Twenty Nineteen was the first block-ready default."}
-  ];
-  let by = py+60;
-  for(let i=0;i<blocks.length;i++){
-    const show = clamp(sub*1.8 - i*0.15, 0, 1);
-    if(show<=0) continue;
-    const b = blocks[i];
-    const bh = b.type==="IMG"?70 : b.type==="COLS"?50 : 36;
-    g.save();
-    g.globalAlpha = show;
-    g.strokeStyle = rgb(hex(p[3]), 0.8); g.lineWidth = 1/zoom;
-    g.strokeRect(px+20, by, postW-40, bh);
-    if(b.type==="P"){
-      g.fillStyle = rgb(hex(p[4]));
-      g.font = `400 ${14/Math.max(zoom,1)}px "Iowan Old Style",Georgia,serif`;
-      g.fillText(b.text, px+28, by+22);
-    } else if(b.type==="IMG"){
-      g.fillStyle = rgb(hex(p[2]), 0.6);
-      g.fillRect(px+28, by+8, postW-56, bh-16);
-      g.fillStyle = rgb(hex(p[4]), 0.7);
-      g.font = `400 ${10/Math.max(zoom,1)}px Inter,sans-serif`; g.fillText("🖼 image block", px+36, by+bh/2);
-    } else if(b.type==="H2"){
-      g.fillStyle = rgb(hex(p[4])); g.font = `700 ${18/Math.max(zoom,1)}px Didot,serif`;
-      g.fillText(b.text, px+28, by+24);
-    } else if(b.type==="QUOTE"){
-      g.fillStyle = rgb(hex(p[3])); g.fillRect(px+28, by+6, 2, bh-12);
-      g.fillStyle = rgb(hex(p[4])); g.font = `italic 400 ${13/Math.max(zoom,1)}px "Iowan Old Style",Georgia,serif`;
-      g.fillText(b.text, px+36, by+22);
-    } else if(b.type==="COLS"){
-      for(let k=0;k<3;k++){
-        g.fillStyle = rgb(hex(p[2]), 0.4);
-        g.fillRect(px+28 + k*((postW-64)/3 + 4), by+8, (postW-64)/3, bh-16);
+/* ---------- Procedural 64×64 wall textures ---------- */
+const TEX = {};
+function makeTex(name, painter){
+  const c = document.createElement("canvas"); c.width=64; c.height=64;
+  const g = c.getContext("2d");
+  painter(g,64,64);
+  TEX[name] = c;
+}
+function buildWallTextures(){
+  // brick — 1.0 Bunker
+  makeTex("brick", (g)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,64,64);
+    for(let row=0; row<8; row++){
+      const off = (row%2)*8;
+      for(let col=0; col<9; col++){
+        const x = col*8 - off;
+        const y = row*8;
+        const variance = ((row*3 + col*7)%24);
+        const r = 110 + variance, gr = 60 + variance/2, b = 34 + variance/4;
+        g.fillStyle = `rgb(${r},${gr},${b})`;
+        g.fillRect(x+1, y+1, 7, 6);
+        // highlight
+        g.fillStyle = `rgba(233,181,115,0.15)`;
+        g.fillRect(x+1, y+1, 7, 1);
       }
     }
-    g.restore();
-    by += bh + 6;
-  }
-  g.restore();
-  // arrival label
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha=k;
-    g.font = "400 60px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("5.0 · BEBO", W/2, H*0.14);
-    g.restore();
-  }
-  drawDust(g,p,sub,time);
-  vignette(g, 0.15);
-};
-
-/* 6.0 Arturo — Neon Site-Editor */
-RENDER["6.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // gradient night
-  const grd = g.createLinearGradient(0,0,0,H);
-  grd.addColorStop(0, rgb(hex(p[0])));
-  grd.addColorStop(1, rgb(hex(p[1])));
-  g.fillStyle = grd; g.fillRect(0,0,W,H);
-  // neon sun
-  const sx = W*0.5, sy = H*0.7;
-  const sR = Math.min(W,H)*0.28;
-  for(let i=0;i<12;i++){
-    g.fillStyle = rgb(hex(p[3]), 0.04);
-    g.beginPath(); g.arc(sx,sy,sR+i*14,0,TAU); g.fill();
-  }
-  const sun = g.createLinearGradient(sx, sy-sR, sx, sy);
-  sun.addColorStop(0, rgb(hex(p[3])));
-  sun.addColorStop(1, rgb(hex(p[2])));
-  g.fillStyle = sun; g.beginPath(); g.arc(sx,sy,sR,0,TAU); g.fill();
-  // scanlines across sun
-  g.fillStyle = rgb(hex(p[0]), 0.8);
-  for(let i=0;i<6;i++){ const y = sy - sR*0.3 + i*8; g.fillRect(sx-sR, y, sR*2, 2); }
-  // Dutch tilt for the site-editor overlay
-  g.save();
-  const tilt = 0.06;
-  g.translate(W/2, H/2); g.rotate(tilt); g.translate(-W/2, -H/2);
-  // template canvas
-  const tx = W*0.2, ty = H*0.1, tw = W*0.6, th = H*0.55;
-  g.fillStyle = rgb(hex(p[4]), 0.1);
-  g.fillRect(tx, ty, tw, th);
-  g.strokeStyle = rgb(hex(p[3])); g.lineWidth = 1.5; g.strokeRect(tx,ty,tw,th);
-  // regions light up sequentially
-  const regions = [
-    {y0:0, y1:0.12, label:"HEADER"},
-    {y0:0.14, y1:0.42, label:"HERO PATTERN"},
-    {y0:0.44, y1:0.72, label:"POSTS GRID"},
-    {y0:0.74, y1:1.0, label:"FOOTER"}
-  ];
-  for(let i=0;i<regions.length;i++){
-    const rOn = clamp(sub*2 - i*0.3, 0, 1);
-    const r = regions[i];
-    const rx = tx+8, ry = ty + r.y0*th + 6;
-    const rw = tw-16, rh = (r.y1-r.y0)*th - 8;
-    if(rOn>0){
-      g.save();
-      g.shadowColor = rgb(hex(p[3]), 0.8*rOn); g.shadowBlur = 18*rOn;
-      g.strokeStyle = rgb(hex(p[3]), 0.7+0.3*rOn); g.lineWidth = 1.2;
-      g.strokeRect(rx, ry, rw, rh);
-      g.restore();
-      g.fillStyle = rgb(hex(p[3]), 0.3*rOn);
-      g.fillRect(rx, ry, rw*smooth(rOn), rh);
-    } else {
-      g.strokeStyle = rgb(hex(p[2]), 0.2); g.strokeRect(rx, ry, rw, rh);
+    g.strokeStyle="#150a04"; g.lineWidth=1;
+    for(let y=0;y<=64;y+=8){ g.beginPath(); g.moveTo(0,y+0.5); g.lineTo(64,y+0.5); g.stroke(); }
+    // soot
+    for(let i=0;i<80;i++){ g.fillStyle=`rgba(0,0,0,${Math.random()*0.4})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // stone-column — 2.0 Duke
+  makeTex("stone", (g)=>{
+    g.fillStyle="#3a2f1f"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=8){
+      const grd = g.createLinearGradient(x,0,x+8,0);
+      grd.addColorStop(0,"#1f1810"); grd.addColorStop(0.5,"#78623f"); grd.addColorStop(1,"#1f1810");
+      g.fillStyle=grd; g.fillRect(x,0,8,64);
     }
-    g.fillStyle = rgb(hex(p[4]), 0.8);
-    g.font="600 10px IBM Plex Mono,monospace"; g.fillText(r.label, rx+8, ry+14);
-  }
-  g.restore();
-  // style-variation swatches rotating
-  const swCount = 6;
-  const swY = H*0.82;
-  for(let i=0;i<swCount;i++){
-    const x = W*0.2 + i*(W*0.1) + Math.sin(time*0.001+i)*3;
-    const rot = time*0.0005 + i*0.5;
-    g.save(); g.translate(x, swY); g.rotate(rot);
-    const c = i%3===0 ? p[3] : (i%3===1 ? p[2] : p[4]);
-    g.fillStyle = rgb(hex(c));
-    g.fillRect(-14,-14,28,28);
-    g.strokeStyle = rgb(hex(p[4]), 0.8); g.strokeRect(-14,-14,28,28);
-    g.restore();
-  }
-  g.fillStyle = rgb(hex(p[4]), 0.6);
-  g.font = "500 10px IBM Plex Mono,monospace";
-  g.fillText("STYLE VARIATIONS", W*0.2, swY-22);
-  // scanline glitch overlay during sustained/arrival
-  if(beat.name==="arrival" || beat.name==="sustained"){
-    g.fillStyle = rgb(hex(p[0]), 0.08);
-    for(let y=0;y<H;y+=3) g.fillRect(0,y,W,1);
-  }
-  // arrival label
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha=k;
-    g.font = "400 58px Didot, Georgia, serif"; g.textAlign="center";
-    g.shadowColor = rgb(hex(p[3])); g.shadowBlur = 24;
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("6.0 · ARTURO", W/2, H*0.12);
-    g.restore();
-  }
-  drawDust(g,p,sub,time);
-  vignette(g, 0.5);
-};
+    // horizontal seams
+    g.fillStyle="#15100a"; g.fillRect(0,31,64,1); g.fillRect(0,47,64,1);
+    // specks
+    for(let i=0;i<120;i++){ g.fillStyle=`rgba(244,223,176,${Math.random()*0.15})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // wood-grain — 2.2 Getz
+  makeTex("wood", (g)=>{
+    g.fillStyle="#0f2a26"; g.fillRect(0,0,64,64);
+    for(let y=0;y<64;y++){
+      const shade = 0.4 + 0.25*Math.sin(y*0.4) + 0.15*Math.sin(y*1.1 + 3);
+      const r=(31*shade)|0, gr=(77*shade+20)|0, b=(68*shade+10)|0;
+      g.fillStyle=`rgb(${r},${gr},${b})`;
+      g.fillRect(0,y,64,1);
+    }
+    // vertical plank seams
+    for(let x=0;x<=64;x+=32){ g.fillStyle="rgba(0,0,0,0.5)"; g.fillRect(x,0,1,64); }
+    // knots
+    for(let i=0;i<3;i++){
+      const x=((i*37+11)%64), y=((i*23+7)%56)+4;
+      const rg = g.createRadialGradient(x,y,0,x,y,4);
+      rg.addColorStop(0,"rgba(0,0,0,0.7)"); rg.addColorStop(1,"rgba(0,0,0,0)");
+      g.fillStyle=rg; g.fillRect(x-5,y-5,10,10);
+    }
+  });
+  // lab-panel — 3.0 Thelonious
+  makeTex("lab", (g)=>{
+    g.fillStyle="#1d3a58"; g.fillRect(0,0,64,64);
+    // panel divisions
+    g.fillStyle="#0a1422"; g.fillRect(0,31,64,2); g.fillRect(31,0,2,64);
+    // rivets
+    for(const [x,y] of [[4,4],[60,4],[4,28],[60,28],[4,36],[60,36],[4,60],[60,60]]){
+      g.fillStyle="#9ec6e8"; g.beginPath(); g.arc(x,y,1.4,0,TAU); g.fill();
+      g.fillStyle="#f1f8ff"; g.fillRect(x-0.5,y-0.5,1,1);
+    }
+    // vent slits
+    for(let i=0;i<5;i++){ g.fillStyle="#0a1422"; g.fillRect(40,38+i*4,18,2); g.fillStyle="#4a7faa"; g.fillRect(40,38+i*4+2,18,1); }
+    // LED
+    g.fillStyle="#9ec6e8"; g.beginPath(); g.arc(10,42,1.6,0,TAU); g.fill();
+    g.fillStyle="rgba(158,198,232,0.3)"; g.beginPath(); g.arc(10,42,4,0,TAU); g.fill();
+    // stencil
+    g.fillStyle="rgba(158,198,232,0.55)"; g.font="700 6px monospace"; g.fillText("MU-01", 38,12);
+  });
+  // velvet-drape — 3.3 Sonny
+  makeTex("velvet", (g)=>{
+    g.fillStyle="#1a0f2a"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=4){
+      const grd = g.createLinearGradient(x,0,x+4,0);
+      grd.addColorStop(0,"rgba(20,10,40,0.85)");
+      grd.addColorStop(0.5,`rgba(${122+((x*7)%40)},${74+((x*3)%30)},${192},0.45)`);
+      grd.addColorStop(1,"rgba(20,10,40,0.85)");
+      g.fillStyle=grd; g.fillRect(x,0,4,64);
+    }
+    for(let i=0;i<80;i++){ g.fillStyle=`rgba(201,160,255,${Math.random()*0.3})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // marble — 4.0 Benny
+  makeTex("marble", (g)=>{
+    g.fillStyle="#f0e7cb"; g.fillRect(0,0,64,64);
+    // grain
+    for(let i=0;i<40;i++){
+      g.fillStyle=`rgba(185,155,106,${Math.random()*0.07})`;
+      g.beginPath(); g.arc(Math.random()*64,Math.random()*64,3+Math.random()*5,0,TAU); g.fill();
+    }
+    // veins
+    for(let i=0;i<5;i++){
+      g.strokeStyle=`rgba(117,96,69,${0.15+Math.random()*0.25})`;
+      g.lineWidth=0.8; g.beginPath();
+      let x=Math.random()*64, y=Math.random()*64;
+      g.moveTo(x,y);
+      for(let j=0;j<10;j++){ x+=(Math.random()-0.5)*18; y+=(Math.random()-0.5)*18; g.lineTo(x,y); }
+      g.stroke();
+    }
+    // gold inlay strip at mid
+    g.fillStyle="#b99b6a"; g.fillRect(0,31,64,1);
+    g.fillStyle="rgba(233,201,122,0.5)"; g.fillRect(0,30,64,1);
+  });
+  // white-gallery — 5.0 Bebo
+  makeTex("gallery", (g)=>{
+    g.fillStyle="#f5f7fa"; g.fillRect(0,0,64,64);
+    for(let i=0;i<120;i++){ g.fillStyle=`rgba(168,180,194,${Math.random()*0.06})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+    g.strokeStyle="rgba(74,91,114,0.18)"; g.beginPath(); g.moveTo(0,58); g.lineTo(64,58); g.stroke();
+    g.strokeStyle="rgba(168,180,194,0.3)"; g.beginPath(); g.moveTo(0,6); g.lineTo(64,6); g.stroke();
+    // subtle frame hints
+    g.strokeStyle="rgba(221,227,235,0.6)"; g.lineWidth=0.5; g.strokeRect(12,18,40,28);
+  });
+  // neon-grid — 6.0 Arturo
+  makeTex("neon", (g)=>{
+    g.fillStyle="#0b021a"; g.fillRect(0,0,64,64);
+    // vertical pink glow
+    for(let i=0;i<=64;i+=8){
+      const grd=g.createLinearGradient(i-2,0,i+2,0);
+      grd.addColorStop(0,"rgba(255,90,217,0)"); grd.addColorStop(0.5,"rgba(255,90,217,0.9)"); grd.addColorStop(1,"rgba(255,90,217,0)");
+      g.fillStyle=grd; g.fillRect(i-2,0,4,64);
+    }
+    for(let i=0;i<=64;i+=8){
+      const grd=g.createLinearGradient(0,i-2,0,i+2);
+      grd.addColorStop(0,"rgba(139,47,206,0)"); grd.addColorStop(0.5,"rgba(139,47,206,0.7)"); grd.addColorStop(1,"rgba(139,47,206,0)");
+      g.fillStyle=grd; g.fillRect(0,i-2,64,4);
+    }
+    // sparkles
+    for(let i=0;i<10;i++){
+      const x=Math.random()*64, y=Math.random()*64;
+      const rg=g.createRadialGradient(x,y,0,x,y,3);
+      rg.addColorStop(0,"rgba(255,231,251,1)"); rg.addColorStop(1,"rgba(255,231,251,0)");
+      g.fillStyle=rg; g.fillRect(x-3,y-3,6,6);
+    }
+  });
+  // void-pillar — 7.0 Monk
+  makeTex("void", (g)=>{
+    g.fillStyle="#fafbff"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=2){
+      g.fillStyle=`rgba(122,130,153,${0.05+Math.sin(x*0.35)*0.035})`;
+      g.fillRect(x,0,1,64);
+    }
+    g.strokeStyle="rgba(200,204,216,0.3)"; g.beginPath(); g.moveTo(0,32); g.lineTo(64,32); g.stroke();
+    for(let i=0;i<50;i++){ g.fillStyle=`rgba(200,204,216,${Math.random()*0.2})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // alcove accent (darker variant used inside alcoves across movements)
+  makeTex("accent", (g)=>{
+    g.fillStyle="#000"; g.fillRect(0,0,64,64);
+    for(let y=0;y<64;y++) for(let x=0;x<64;x++){
+      const a = 0.3 + Math.sin((x+y)*0.2)*0.1;
+      g.fillStyle=`rgba(40,30,20,${a})`; g.fillRect(x,y,1,1);
+    }
+  });
+}
 
-/* 7.0 Monk — Void: slow zoom-out, cursors, AI halo */
-RENDER["7.0"] = function(g, sub, beat, time, m){
-  const p = m.palette;
-  // white void gradient
-  const grd = g.createRadialGradient(W*0.5, H*0.5, 20, W*0.5, H*0.5, Math.max(W,H));
-  grd.addColorStop(0, rgb(hex(p[0])));
-  grd.addColorStop(1, rgb(hex(p[1])));
-  g.fillStyle = grd; g.fillRect(0,0,W,H);
-  // soft grid whisper
-  g.strokeStyle = rgb(hex(p[2]), 0.08); g.lineWidth = 1;
-  for(let i=0;i<30;i++){ g.beginPath(); g.moveTo(i*W/30,0); g.lineTo(i*W/30,H); g.stroke(); }
-  // zoom-out card: editor doc
-  const zoom = lerp(2.2, 0.7, smooth(sub));
-  const cx = W/2, cy = H/2;
-  g.save(); g.translate(cx,cy); g.scale(zoom, zoom); g.translate(-cx, -cy);
-  const dx = W*0.25, dy = H*0.2, dw = W*0.5, dh = H*0.6;
-  g.fillStyle = rgb(hex(p[0]));
-  g.fillRect(dx, dy, dw, dh);
-  g.strokeStyle = rgb(hex(p[2]), 0.4); g.lineWidth=0.6/zoom; g.strokeRect(dx,dy,dw,dh);
-  // title
-  g.fillStyle = rgb(hex(p[4])); g.font = "400 22px Didot,Georgia,serif";
-  g.fillText("The Museum", dx+20, dy+36);
-  // body lines
-  g.fillStyle = rgb(hex(p[3]));
-  g.font = "400 12px 'Iowan Old Style',Georgia,serif";
-  const bodyLines = [
-    "Nine movements.",
-    "Twenty-two years of a platform written with many hands.",
-    "A room that does not end — it exhales."
-  ];
-  for(let i=0;i<bodyLines.length;i++){
-    const a = clamp(sub*2 - i*0.12, 0, 1);
-    g.globalAlpha = a;
-    g.fillText(bodyLines[i], dx+20, dy+62+i*22);
+/* ---------- Billboard sprite factory ----------
+   Each billboard is a canvas drawn inside the 3D scene at (worldX, worldZ, yOffset) with width,height
+   (in world units). Common sprites generated once: pedestal plaque, door glow, cube.
+*/
+const BB = {};
+function makeBB(name, w, h, painter){
+  const c = document.createElement("canvas"); c.width=w; c.height=h;
+  const g = c.getContext("2d"); painter(g,w,h); BB[name]=c;
+}
+function buildBillboards(){
+  // Framed portrait frame (content filled with per-movement portrait canvas at render time)
+  makeBB("frame", 120, 160, (g,w,h)=>{
+    g.fillStyle="#1a0f04"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#7a5a2c"; g.lineWidth=4; g.strokeRect(4,4,w-8,h-8);
+    g.fillStyle="#3a2814"; g.fillRect(10,10,w-20,h-20);
+    // gold inner bevel
+    g.strokeStyle="#c9a05a"; g.lineWidth=1; g.strokeRect(10.5,10.5,w-21,h-21);
+  });
+  // Hologram pane frame (7.0 AI look)
+  makeBB("holo", 140, 100, (g,w,h)=>{
+    g.fillStyle="rgba(90,130,240,0.12)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="rgba(169,184,255,0.9)"; g.lineWidth=1; g.strokeRect(1,1,w-2,h-2);
+    g.strokeStyle="rgba(169,184,255,0.4)"; g.strokeRect(5,5,w-10,h-10);
+    for(let i=0;i<h;i+=3){ g.fillStyle="rgba(169,184,255,0.06)"; g.fillRect(0,i,w,1); }
+  });
+  // CRT monitor frame
+  makeBB("crt", 140, 110, (g,w,h)=>{
+    g.fillStyle="#1a1a1a"; g.fillRect(0,0,w,h);
+    g.fillStyle="#0a0a0a"; g.fillRect(6,6,w-12,h-22);
+    g.fillStyle="#2a2a2a"; g.fillRect(6,h-16,w-12,10);
+    g.fillStyle="#e9c97a"; g.fillRect(w-14,h-12,6,2);
+    // bevel
+    g.strokeStyle="#444"; g.strokeRect(2,2,w-4,h-4);
+  });
+  // Gilded screen frame (4.0 / 2.0)
+  makeBB("gilt", 160, 110, (g,w,h)=>{
+    g.fillStyle="#b99b6a"; g.fillRect(0,0,w,h);
+    g.fillStyle="#f0e7cb"; g.fillRect(4,4,w-8,h-8);
+    g.strokeStyle="#7a5a2c"; g.lineWidth=2; g.strokeRect(4,4,w-8,h-8);
+  });
+  // Neon screen frame (6.0)
+  makeBB("neonscr", 160, 110, (g,w,h)=>{
+    g.fillStyle="#120526"; g.fillRect(0,0,w,h);
+    g.shadowColor="#ff5ad9"; g.shadowBlur=12;
+    g.strokeStyle="#ff5ad9"; g.lineWidth=2; g.strokeRect(3,3,w-6,h-6);
+    g.shadowBlur=0;
+  });
+  // Gallery mat (5.0)
+  makeBB("mat", 160, 110, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#1e1e1e"; g.lineWidth=1; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#f5f7fa"; g.fillRect(8,8,w-16,h-16);
+  });
+  // Doorway glow — used as transition portal
+  makeBB("door", 128, 180, (g,w,h)=>{
+    const rg = g.createRadialGradient(w/2,h*0.55,4,w/2,h*0.55,w*0.7);
+    rg.addColorStop(0,"rgba(255,230,180,1)");
+    rg.addColorStop(0.4,"rgba(233,201,122,0.6)");
+    rg.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=rg; g.fillRect(0,0,w,h);
+    g.fillStyle="#000"; g.globalCompositeOperation="destination-in";
+    // arched doorway shape
+    g.beginPath();
+    g.moveTo(w*0.2, h);
+    g.lineTo(w*0.2, h*0.35);
+    g.arc(w/2, h*0.35, w*0.3, Math.PI, 0);
+    g.lineTo(w*0.8, h);
+    g.closePath();
+    g.fill();
+  });
+  // Gutenberg cube faces
+  makeBB("cubeP", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#1e1e1e"; g.font="700 16px Georgia,serif"; g.fillText("¶", 8, 22);
+    g.font="11px Georgia,serif"; g.fillStyle="#555";
+    g.fillText("A post is a", 8, 48); g.fillText("composition", 8, 62); g.fillText("of blocks.", 8, 76);
+  });
+  makeBB("cubeH", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#1e1e1e"; g.font="700 12px Georgia,serif"; g.fillText("H2", 8, 20);
+    g.font="700 20px Georgia,serif"; g.fillText("Gutenberg", 8, 60);
+  });
+  makeBB("cubeIMG", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#dde3eb"; g.fillRect(8,8,w-16,h-16);
+    g.fillStyle="#4a5b72"; g.font="700 30px sans-serif"; g.fillText("🖼", 30, 68);
+  });
+  makeBB("cubeQ", 100, 100, (g,w,h)=>{
+    g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,h);
+    g.fillStyle="#fff"; g.font="italic 700 12px Georgia,serif"; g.fillText('"inevitable', 8, 40);
+    g.fillText('in hindsight."', 8, 58);
+  });
+  // Permalink slug sprite (floor marker)
+  makeBB("slug", 180, 34, (g,w,h)=>{
+    g.fillStyle="rgba(233,177,115,0.9)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#2a1408"; g.font="700 14px IBM Plex Mono,monospace";
+    g.fillText("/%postname%/", 10, 22);
+  });
+  // Hook tablet (for 1.0 sustained)
+  makeBB("hook", 140, 60, (g,w,h)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.lineWidth=1; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#fff1d4"; g.font="600 14px IBM Plex Mono,monospace"; g.fillText("add_filter()", 10, 28);
+    g.font="10px IBM Plex Mono,monospace"; g.fillStyle="#e9b173"; g.fillText("hook · 1.2", 10, 46);
+  });
+  makeBB("hook2", 140, 60, (g,w,h)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.lineWidth=1; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#fff1d4"; g.font="600 14px IBM Plex Mono,monospace"; g.fillText("add_action()", 10, 28);
+    g.font="10px IBM Plex Mono,monospace"; g.fillStyle="#e9b173"; g.fillText("hook · 1.2", 10, 46);
+  });
+  // Crown badge (2.0 roles)
+  function crown(n,label){
+    makeBB(n, 90, 60, (g,w,h)=>{
+      g.fillStyle="#15110b"; g.fillRect(0,0,w,h);
+      g.fillStyle="#c29a58"; g.font="700 30px serif"; g.fillText("♔", 6, 38);
+      g.fillStyle="#f4dfb0"; g.font="700 14px IBM Plex Mono,monospace"; g.fillText(label, 38, 30);
+      g.fillStyle="#78623f"; g.font="500 9px IBM Plex Mono,monospace"; g.fillText("role", 38, 44);
+    });
   }
-  g.globalAlpha = 1;
-  // cursors
-  const cursorPos = [{x:dx+90, y:dy+56, col:p[4], name:"matt"},{x:dx+160, y:dy+82, col:p[3], name:"rosa"}];
-  const blink = (time*0.003)%2<1;
-  for(const cu of cursorPos){
-    if(blink){ g.fillStyle = cu.col; g.fillRect(cu.x, cu.y, 1.5, 14); }
-    g.fillStyle = cu.col; g.font = "500 9px IBM Plex Mono,monospace";
-    g.fillText(cu.name, cu.x+3, cu.y+26);
+  crown("roleA","ADMIN"); crown("roleE","EDITOR"); crown("roleAu","AUTHOR");
+  // Widget crate (2.2)
+  function widget(n, label, color){
+    makeBB(n, 120, 50, (g,w,h)=>{
+      g.fillStyle=color; g.fillRect(0,0,w,h);
+      g.strokeStyle="#dff5e4"; g.lineWidth=1; g.strokeRect(1,1,w-2,h-2);
+      g.fillStyle="#dff5e4"; g.font="600 12px Inter,sans-serif"; g.fillText(label, 10, 20);
+      g.fillStyle="rgba(223,245,228,0.5)"; g.font="9px IBM Plex Mono,monospace"; g.fillText("⋮⋮ widget", 10, 36);
+    });
   }
-  // AI halo around title
-  if(beat.name!=="approach"){
-    const haloAlpha = beat.name==="sustained"? 0.55 : (beat.name==="arrival"? smooth(beat.frac)*0.5 : 0.3);
-    g.save();
-    g.shadowColor = rgb(hex(p[3]), 0.9);
-    g.shadowBlur = 24;
-    g.strokeStyle = rgb(hex(p[3]), haloAlpha); g.lineWidth = 1.5;
-    g.strokeRect(dx+16, dy+16, dw-32, 34);
-    g.restore();
+  widget("wSearch","Search","#1f4d44");
+  widget("wRecent","Recent Posts","#1f4d44");
+  widget("wTag","Tag Cloud","#1f4d44");
+  widget("wRSS","RSS","#1f4d44");
+  // Planet sphere (3.0)
+  makeBB("planet", 200, 200, (g,w,h)=>{
+    const rg = g.createRadialGradient(w*0.38,h*0.38,4,w/2,h/2,w/2);
+    rg.addColorStop(0,"#9ec6e8"); rg.addColorStop(0.7,"#4a7faa"); rg.addColorStop(1,"#0a1422");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    // continents
+    g.fillStyle="rgba(10,20,34,0.55)";
+    for(let i=0;i<8;i++){ g.beginPath(); const a=i*0.8; g.arc(w/2+Math.cos(a)*w*0.2, h/2+Math.sin(a)*h*0.18, 14, 0, TAU); g.fill(); }
+    // label
+    g.fillStyle="#f1f8ff"; g.font="700 14px Didot,serif"; g.textAlign="center"; g.fillText("WP", w/2, h/2+5); g.textAlign="left";
+  });
+  // MU Moon (3.0)
+  makeBB("moon", 90, 90, (g,w,h)=>{
+    const rg=g.createRadialGradient(w*0.38,h*0.38,2,w/2,h/2,w/2);
+    rg.addColorStop(0,"#f1f8ff"); rg.addColorStop(1,"#4a7faa");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    g.fillStyle="#0a1422"; g.font="700 18px IBM Plex Mono,monospace"; g.textAlign="center"; g.fillText("MU", w/2, h/2+6); g.textAlign="left";
+  });
+  // Pointer bubble (3.3)
+  function bub(n, label){
+    makeBB(n, 180, 50, (g,w,h)=>{
+      g.fillStyle="#2e93c9"; g.fillRect(0,0,w,h-8);
+      g.beginPath(); g.moveTo(20,h-8); g.lineTo(28,h); g.lineTo(36,h-8); g.closePath(); g.fill();
+      g.fillStyle="#fff"; g.font="700 12px Inter,sans-serif"; g.fillText("New feature!", 12, 22);
+      g.font="500 11px Inter,sans-serif"; g.fillText(label, 12, 36);
+    });
+  }
+  bub("ptr1","Try the new admin bar.");
+  bub("ptr2","Drag files here.");
+  bub("ptr3","Flyout menus, anywhere.");
+  // Upload file sprite
+  makeBB("upfile", 32, 40, (g,w,h)=>{
+    g.fillStyle="#c9a0ff"; g.fillRect(0,0,w,h);
+    g.fillStyle="#f2e8ff"; g.fillRect(w-10,0,10,10);
+    g.fillStyle="#1a0f2a"; g.font="700 7px IBM Plex Mono,monospace"; g.fillText(".jpg", 3, h-4);
+  });
+  // Language globe (4.0)
+  makeBB("globe", 120, 120, (g,w,h)=>{
+    g.fillStyle="rgba(240,231,203,0.8)"; g.beginPath(); g.arc(w/2,h/2,w/2-4,0,TAU); g.fill();
+    g.strokeStyle="#756045"; g.lineWidth=1;
+    for(let i=0;i<5;i++){ g.beginPath(); g.ellipse(w/2,h/2,w/2-4,(w/2-4)*Math.abs(Math.cos(i/5*Math.PI)),0,0,TAU); g.stroke(); }
+    g.fillStyle="#2a1f12"; g.font="700 10px IBM Plex Mono,monospace"; g.textAlign="center";
+    const langs = ["en","ja","es","de","zh","fr","pt"]; langs.forEach((l,i)=>{ const a=i/langs.length*TAU; g.fillText(l, w/2+Math.cos(a)*w*0.28, h/2+Math.sin(a)*h*0.28+3); });
+    g.textAlign="left";
+  });
+  // oEmbed card (4.0)
+  makeBB("oembed", 180, 100, (g,w,h)=>{
+    g.fillStyle="#f0e7cb"; g.fillRect(0,0,w,h); g.strokeStyle="#b99b6a"; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#a8b4c2"; g.fillRect(8,8,70,60);
+    g.fillStyle="#fff"; g.beginPath(); g.moveTo(32,28); g.lineTo(58,38); g.lineTo(32,50); g.closePath(); g.fill();
+    g.fillStyle="#2a1f12"; g.font="700 11px Inter,sans-serif"; g.fillText("Inline oEmbed", 86, 26);
+    g.font="10px Inter,sans-serif"; g.fillStyle="#756045"; g.fillText("preview, in-editor", 86, 42);
+  });
+  // Swatch (6.0)
+  function sw(n, color){ makeBB(n, 48, 48, (g,w,h)=>{ g.fillStyle=color; g.fillRect(0,0,w,h); g.strokeStyle="#ffe7fb"; g.strokeRect(1,1,w-2,h-2); }); }
+  sw("sw1","#ff5ad9"); sw("sw2","#8b2fce"); sw("sw3","#3a0b6e"); sw("sw4","#ffe7fb");
+  // Cursors + AI suggestion card (7.0)
+  makeBB("cursor1", 40, 60, (g,w,h)=>{ g.fillStyle="#2a6ae0"; g.fillRect(w/2-1,0,2,h-14); g.fillStyle="#2a6ae0"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("matt", w/2-8, h-2); });
+  makeBB("cursor2", 40, 60, (g,w,h)=>{ g.fillStyle="#d43fa8"; g.fillRect(w/2-1,0,2,h-14); g.fillStyle="#d43fa8"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("rosa", w/2-8, h-2); });
+  makeBB("aiSug", 160, 80, (g,w,h)=>{
+    g.fillStyle="#f4f6ff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#a9b8ff"; g.lineWidth=1.5; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#3a4254"; g.font="700 11px Inter,sans-serif"; g.fillText("✦ AI Suggestion", 10, 22);
+    g.fillStyle="#555"; g.font="10px Inter,sans-serif"; g.fillText("Try a larger serif.", 10, 40);
+    g.fillStyle="#a9b8ff"; g.fillRect(10, 52, 60, 18);
+    g.fillStyle="#fff"; g.font="700 9px Inter,sans-serif"; g.fillText("Accept", 24, 64);
+  });
+  // Holographic AI panes — translucent UI surfaces hovering in the void
+  makeBB("aiPane", 180, 110, (g,w,h)=>{
+    g.fillStyle="rgba(212,224,255,0.86)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#5a78ff"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#1f2a44"; g.font="700 12px Inter,sans-serif"; g.fillText("✦ Generate post", 10, 22);
+    g.fillStyle="#3a4254"; g.font="10px Inter,sans-serif";
+    g.fillText("WordPress 7.0 — let the model", 10, 40);
+    g.fillText("draft a paragraph from the title.", 10, 54);
+    g.fillStyle="#5a78ff"; g.fillRect(10, 70, 60, 22); g.fillStyle="#fff"; g.font="700 10px Inter,sans-serif"; g.fillText("Generate", 18, 85);
+    g.fillStyle="rgba(0,0,0,0.4)"; g.fillRect(80, 70, 60, 22); g.fillStyle="#fff"; g.fillText("Cancel", 95, 85);
+  });
+  makeBB("aiPane2", 170, 100, (g,w,h)=>{
+    g.fillStyle="rgba(255,228,236,0.88)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#d43fa8"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#42203a"; g.font="700 12px Inter,sans-serif"; g.fillText("◈ Co-edit (rosa)", 10, 22);
+    g.fillStyle="#5a3a4c"; g.font="10px Inter,sans-serif";
+    g.fillText("rosa is editing this block.", 10, 40);
+    g.fillStyle="#d43fa8"; g.fillRect(10, 56, 80, 14);
+    g.fillStyle="#fff"; g.font="700 9px Inter,sans-serif"; g.fillText("Following…", 18, 67);
+    g.fillStyle="rgba(212,63,168,0.18)"; g.fillRect(10, 76, w-20, 14);
+  });
+  makeBB("aiPane3", 170, 100, (g,w,h)=>{
+    g.fillStyle="rgba(220,242,235,0.88)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#2a8d76"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#10322a"; g.font="700 12px Inter,sans-serif"; g.fillText("⌘ Command", 10, 22);
+    g.fillStyle="#2a8d76"; g.fillRect(10, 30, w-20, 18);
+    g.fillStyle="#fff"; g.font="600 11px IBM Plex Mono,monospace"; g.fillText("/insert image grid", 14, 43);
+    g.fillStyle="#3a4254"; g.font="10px Inter,sans-serif"; g.fillText("3 results — press ↵", 10, 64);
+    g.fillStyle="rgba(42,141,118,0.22)"; g.fillRect(10, 72, w-20, 18);
+  });
+  // Atom RSS glyph (2.2)
+  makeBB("atom", 110, 110, (g,w,h)=>{
+    g.fillStyle="rgba(125,211,168,0.12)"; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    g.strokeStyle="#dff5e4"; g.lineWidth=3;
+    g.beginPath(); g.arc(30,80, 40, -Math.PI/2, 0); g.stroke();
+    g.beginPath(); g.arc(30,80, 60, -Math.PI/2, 0); g.stroke();
+    g.fillStyle="#dff5e4"; g.beginPath(); g.arc(30,80,8,0,TAU); g.fill();
+    g.fillStyle="#7dd3a8"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("ATOM 1.0", 36, 20);
+  });
+  // Portal ring (3.3)
+  makeBB("portal", 220, 220, (g,w,h)=>{
+    for(let i=8;i>=0;i--){ g.strokeStyle=`rgba(201,160,255,${0.15 + (8-i)*0.08})`; g.lineWidth=1+i; g.beginPath(); g.arc(w/2,h/2,w/2-4-i*6,0,TAU); g.stroke(); }
+    const rg=g.createRadialGradient(w/2,h/2,4,w/2,h/2,w/2-10);
+    rg.addColorStop(0,"rgba(242,232,255,0.6)"); rg.addColorStop(1,"rgba(58,31,92,0)");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-10,0,TAU); g.fill();
+  });
+  // End door (corridor exit)
+  makeBB("exit", 120, 180, (g,w,h)=>{
+    g.fillStyle="rgba(0,0,0,0.85)"; g.fillRect(0,0,w,h);
+    const rg=g.createRadialGradient(w/2,h*0.55,3,w/2,h*0.55,w*0.6);
+    rg.addColorStop(0,"rgba(255,230,180,0.95)"); rg.addColorStop(0.5,"rgba(233,201,122,0.4)"); rg.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=rg; g.fillRect(0,0,w,h);
+  });
+}
+
+/* ---------- Level configs ---------- */
+// Per-movement map shapes vary width, alcove pattern, and interior pillars so each
+// movement reads as its own level, not a texture-swap of the same corridor.
+// Values: 0 empty, 1 wall, 2 alcove accent, 3 bright panel.
+const LVL = {};
+function buildLevels(){
+  const Lc=40;
+  // shape: "bunker" narrow+alcoves, "library" colonnade pillars, "workshop" broad wood,
+  // "lab" wide with cross-vents, "tunnel" narrow arched, "atrium" very wide w/ 4 center columns,
+  // "gallery" wide with side-room alcoves, "neon" cyber corridor w/ grid pillars, "void" extra-wide sparse.
+  function shapeMap(shape){
+    const Wc = (shape==="atrium"||shape==="void"||shape==="gallery") ? 11
+             : (shape==="lab"||shape==="neon") ? 9
+             : (shape==="library"||shape==="workshop") ? 8
+             : 7;
+    const m=[];
+    for(let z=0; z<Lc; z++){
+      const row = new Array(Wc).fill(0);
+      row[0]=1; row[Wc-1]=1; // outer walls
+      // per-shape features
+      if(shape==="bunker"){
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="library"){
+        // colonnade: pillar pair every 3 rows
+        if(z>3 && z<Lc-3 && z%3===0){ row[2]=1; row[Wc-3]=1; }
+        if(z>2 && z<Lc-3 && z%6===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="workshop"){
+        // wood panel: slight alcoves
+        if(z>3 && z<Lc-3 && z%4===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="lab"){
+        // cross-vent pillars mid
+        if(z>4 && z<Lc-3 && z%7===0){ row[1]=1; row[Wc-2]=1; }
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="tunnel"){
+        // narrow velvet, arched alcoves every 2
+        if(z>2 && z<Lc-3 && z%2===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="atrium"){
+        // four great columns near center at fixed z
+        if(z===10 || z===14){ row[3]=1; row[Wc-4]=1; }
+        if(z===18 || z===22){ row[3]=1; row[Wc-4]=1; }
+        // shallow alcoves
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="gallery"){
+        // side rooms: carve breaks every 5 rows (alcove recessed)
+        if(z>3 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="neon"){
+        // short grid pillars on floor
+        if(z>4 && z<Lc-3 && z%4===0){ row[0]=2; row[Wc-1]=2; }
+        if(z>4 && z<Lc-4 && z%8===0){ row[2]=1; row[Wc-3]=1; }
+      } else if(shape==="void"){
+        // very sparse: only a couple of distant pillars
+        if(z===10 || z===22){ row[4]=1; row[Wc-5]=1; }
+      }
+      m.push(row);
+    }
+    for(let x=0;x<Wc;x++) m[Lc-1][x]=1;
+    return m;
+  }
+  const make = (v, cfg)=>{
+    const shape = cfg.shape || "bunker";
+    LVL[v] = Object.assign({
+      map: shapeMap(shape),
+      shape,
+      tex: "brick", texAlcove: "accent",
+      ceil: ["#2a1408","#6e3c22"],
+      floor: ["#1a0a04","#6e3c22"],
+      ambient: [20,12,4],
+      rim: [255,180,110],
+      light: "torch",
+      scanlines: 0,
+      camera: {mode:"walk", fov: 1.0, bob: 3},
+      starfield: false, godray: 0, sunShaft: 0,
+      billboards: [],
+      overlays: []
+    }, cfg);
+  };
+
+  // 1.0 Miles — Bunker
+  make("1.0", {
+    shape:"bunker",
+    tex:"brick", texAlcove:"accent", alcoveEvery:5,
+    ceil:["#15080a","#2a1408"], floor:["#1a0a04","#3a1808"],
+    ambient:[90,30,10], rim:[255,120,60], light:"torch",
+    // macro mode pushes camera toward the plaque/torch with a slow dolly during sustained
+    camera:{mode:"macroPush", fov:1.05, bob:3.5},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:-0.2, w:3.0, h:2.1, frame:"crt"},
+      {kind:"sprite", spr:"hook",  z:16, side:"L", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
+      {kind:"sprite", spr:"hook2", z:18, side:"R", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
+      {kind:"plaque", z:15, side:"C", yOff:-0.2, w:3.2, h:1.8},
+      {kind:"floor", spr:"slug", z:13, w:2.0, h:0.4},
+      {kind:"floor", spr:"slug", z:17, w:2.0, h:0.4},
+      {kind:"floor", spr:"slug", z:21, w:2.0, h:0.4}
+    ],
+    overlays:["torchflicker"]
+  });
+  // 2.0 Duke — Crypt Library (colonnade pillars)
+  make("2.0", {
+    shape:"library",
+    tex:"stone", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#0a0604","#3a2f1f"], floor:["#15110b","#78623f"],
+    ambient:[60,44,18], rim:[233,201,122], light:"candle",
+    camera:{mode:"walk", fov:1.0, bob:2.5},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.2, h:2.2, frame:"gilt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.2, w:3.2, h:1.8},
+      {kind:"sprite", spr:"roleA",  z:16, side:"L", yOff:0.4, w:1.8, h:1.1, bob:0.3},
+      {kind:"sprite", spr:"roleE",  z:18, side:"R", yOff:0.4, w:1.8, h:1.1, bob:0.3},
+      {kind:"sprite", spr:"roleAu", z:20, side:"L", yOff:0.4, w:1.8, h:1.1, bob:0.3}
+    ]
+  });
+  // 2.2 Getz — Widget Workshop (broad wood-panelled room)
+  make("2.2", {
+    shape:"workshop",
+    tex:"wood", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#0a1a18","#1f4d44"], floor:["#0f2a26","#3a8a74"],
+    ambient:[40,80,68], rim:[125,211,168], light:"fluorescent",
+    camera:{mode:"overhead", fov:1.1, bob:1, tilt:0.08},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.0, h:2.8},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.0, h:2.1, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"sprite", spr:"atom", z:17, side:"L", yOff:0.5, w:1.8, h:1.8, rot:0.002, bob:0.2},
+      {kind:"widget", z:16, side:"C", yOff:0.2, spr:"wSearch", w:2.0, h:0.8, slide:0.8},
+      {kind:"widget", z:18, side:"C", yOff:0.2, spr:"wRecent", w:2.0, h:0.8, slide:1.1},
+      {kind:"widget", z:20, side:"C", yOff:0.2, spr:"wTag", w:2.0, h:0.8, slide:1.4},
+      {kind:"widget", z:22, side:"C", yOff:0.2, spr:"wRSS", w:2.0, h:0.8, slide:1.7}
+    ]
+  });
+  // 3.0 Thelonious — Laboratory (wide hall with vent pillars)
+  make("3.0", {
+    shape:"lab",
+    tex:"lab", texAlcove:"accent", alcoveEvery:5,
+    ceil:["#05080f","#0a1422"], floor:["#0a1422","#1d3a58"],
+    ambient:[20,40,70], rim:[158,198,232], light:"fluorescent",
+    camera:{mode:"orbit", fov:1.05, bob:1.5},
+    starfield:true,
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.4, h:2.4, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"planet", z:20, w:5.5, h:5.5, bob:0.25, rot:0.0008},
+      {kind:"moon",   z:20, w:2.4, h:2.4, orbitR:3.0, orbitSpeed:0.0012}
+    ]
+  });
+  // 3.3 Sonny — Velvet Tunnel
+  make("3.3", {
+    shape:"tunnel",
+    tex:"velvet", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#0a0514","#1a0f2a"], floor:["#1a0f2a","#3a1f5c"],
+    ambient:[60,30,100], rim:[201,160,255], light:"pulse",
+    camera:{mode:"dutch", fov:1.0, bob:2},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.2, h:2.2, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"sprite", spr:"portal", z:20, side:"C", yOff:-0.2, w:5.0, h:5.0, rot:0.002},
+      {kind:"sprite", spr:"ptr1", z:14, side:"L", yOff:0.4, w:2.4, h:0.8, bob:0.3},
+      {kind:"sprite", spr:"ptr2", z:16, side:"R", yOff:0.3, w:2.4, h:0.8, bob:0.3},
+      {kind:"sprite", spr:"ptr3", z:18, side:"L", yOff:0.2, w:2.4, h:0.8, bob:0.3}
+    ],
+    overlays:["uploadRain"]
+  });
+  // 4.0 Benny — Marble Atrium (wide open w/ four great columns)
+  make("4.0", {
+    shape:"atrium",
+    tex:"marble", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#3a2e1c","#6a4f2d"], floor:["#4a341a","#8a6a3a"],
+    ambient:[130,96,50], rim:[255,210,140], light:"sun",
+    camera:{mode:"dolly", fov:0.9, bob:1.2},
+    sunShaft:0.7,
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.6, h:2.4, frame:"gilt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      {kind:"sprite", spr:"globe",  z:17, side:"L", yOff:0.5, w:2.6, h:2.6, rot:0.0015, bob:0.3},
+      {kind:"sprite", spr:"oembed", z:18, side:"R", yOff:0.3, w:3.0, h:1.7, bob:0.3},
+      {kind:"sprite", spr:"oembed", z:22, side:"L", yOff:0.5, w:2.4, h:1.4, bob:0.35}
+    ]
+  });
+  // 5.0 Bebo — Gallery (wide with side rooms)
+  make("5.0", {
+    shape:"gallery",
+    tex:"gallery", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#b8c2d0","#8a96a8"], floor:["#6a7686","#384250"],
+    ambient:[160,176,198], rim:[220,230,250], light:"gallery",
+    camera:{mode:"macro", fov:0.8, bob:1},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.8, h:2.6, frame:"mat"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      // Gutenberg blocks: bigger and assembling — they slide in & snap toward center during sustained
+      {kind:"cube", spr:"cubeH",   z:16, side:"C", yOff:0.9, w:2.6, h:2.6, bob:0.7, rot:0.003,  assemble:0.6},
+      {kind:"cube", spr:"cubeP",   z:17, side:"L", yOff:0.6, w:2.4, h:2.4, bob:0.6, rot:-0.0024, assemble:0.9},
+      {kind:"cube", spr:"cubeIMG", z:18, side:"R", yOff:0.7, w:2.4, h:2.4, bob:0.7, rot:0.0026,  assemble:1.2},
+      {kind:"cube", spr:"cubeQ",   z:19, side:"C", yOff:1.0, w:2.4, h:2.4, bob:0.75, rot:-0.0028, assemble:1.5},
+      {kind:"cube", spr:"cubeP",   z:21, side:"L", yOff:0.7, w:2.4, h:2.4, bob:0.7, rot:0.0022,  assemble:1.8}
+    ]
+  });
+  // 6.0 Arturo — Neon Site-Editor (cyber grid corridor)
+  make("6.0", {
+    shape:"neon",
+    tex:"neon", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#0b021a","#3a0b6e"], floor:["#0b021a","#3a0b6e"],
+    ambient:[40,10,60], rim:[255,90,217], light:"neon",
+    scanlines:1,
+    camera:{mode:"dutch", fov:1.05, bob:1.8, tilt:0.05},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.8, h:2.6, frame:"neonscr"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      {kind:"sprite", spr:"sw1", z:16, side:"L", yOff:0.6, w:1.3, h:1.3, rot:0.004, bob:0.3},
+      {kind:"sprite", spr:"sw2", z:18, side:"R", yOff:0.6, w:1.3, h:1.3, rot:-0.005, bob:0.3},
+      {kind:"sprite", spr:"sw3", z:20, side:"L", yOff:0.5, w:1.3, h:1.3, rot:0.003, bob:0.35},
+      {kind:"sprite", spr:"sw4", z:22, side:"R", yOff:0.7, w:1.3, h:1.3, rot:-0.004, bob:0.35}
+    ]
+  });
+  // 7.0 Monk — Void (extra-wide asymmetric room)
+  make("7.0", {
+    shape:"void",
+    tex:"void", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#8590a8","#5a6478"], floor:["#48536a","#1e2438"],
+    ambient:[120,140,180], rim:[180,196,255], light:"soft",
+    camera:{mode:"zoomout", fov:0.85, bob:0.8},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.6, h:2.4, frame:"holo"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      // holographic AI panes hovering in the void — multiple translucent UI surfaces
+      {kind:"sprite", spr:"aiSug",   z:16, side:"C", yOff:0.7, w:3.0, h:1.5, bob:0.4},
+      {kind:"sprite", spr:"aiPane",  z:17, side:"L", yOff:0.5, w:2.6, h:1.6, bob:0.35},
+      {kind:"sprite", spr:"aiPane2", z:18, side:"R", yOff:0.4, w:2.6, h:1.6, bob:0.4},
+      {kind:"sprite", spr:"aiPane3", z:20, side:"C", yOff:0.9, w:2.4, h:1.4, bob:0.45},
+      {kind:"sprite", spr:"cursor1", z:19, side:"L", yOff:0.3, w:0.7, h:1.4, bob:0.2},
+      {kind:"sprite", spr:"cursor2", z:21, side:"R", yOff:0.3, w:0.7, h:1.4, bob:0.25}
+    ]
+  });
+}
+
+/* ---------- Camera path ---------- */
+function cameraFor(level, m, sub, beat, time){
+  const cam = level.camera;
+  const mapW = level.map[0].length;
+  const centerX = mapW/2;
+  // Scripted walk — but the camera LINGERS during the sustained beat (62% of the
+  // movement) so in-world billboards (portrait, plaque, mock, fact-tokens) remain
+  // on screen while the camera does theatrical orbit/dolly/dutch work.
+  // Phase map: approach 0→0.12 (z 2→8), anticipation+arrival 0.12→0.30 (z 8→10),
+  // sustained 0.30→0.92 (z 10→14, slow), departure 0.92→1.00 (z 14→22 rush).
+  let camZ;
+  if(sub < 0.30)       camZ = 2 + (sub/0.30) * 8;              // 2 → 10
+  else if(sub < 0.92)  camZ = 10 + ((sub-0.30)/0.62) * 4;      // 10 → 14 slow crawl
+  else                 camZ = 14 + ((sub-0.92)/0.08) * 8;      // 14 → 22 exit push
+  let camX = centerX;
+  let camAng = 0; // looking +Z
+  let fov = cam.fov;
+  let roll = 0, yShift = 0;
+  // subtle bob
+  yShift = Math.sin(time*0.004)* (cam.bob||2) * 0.01;
+  // beat FX — approach doorway zoom, arrival punch, departure widen
+  if(beat.name==="approach"){
+    fov *= 1.0 - (1-beat.frac)*0.18; // emerging from a narrow doorway
+  }
+  if(beat.name==="arrival"){
+    fov *= 1.0 - smooth(beat.frac)*0.10;
+  }
+  if(beat.name==="departure"){
+    fov *= 1.0 + beat.frac*0.14;
+  }
+  // per-mode camera variation — amplitudes cranked so motion reads at a glance
+  if(cam.mode==="orbit"){
+    // visible oscillation around the corridor centerline
+    camX = centerX + Math.sin(time*0.0012)*2.6;
+    camAng = Math.sin(time*0.0012+1)*0.46;
+  } else if(cam.mode==="dutch"){
+    roll = 0.14 + Math.sin(time*0.0013)*0.11;
+    camX = centerX + Math.sin(time*0.0009)*0.5;
+  } else if(cam.mode==="dolly"){
+    // aggressive dolly-zoom: FOV widens while camera pushes forward
+    const t = smooth(sub);
+    fov *= lerp(0.62, 1.45, t);
+    camAng = Math.sin(time*0.0008)*0.05;
+  } else if(cam.mode==="macro"){
+    // macro pull: embedded inside a block, pulls all the way back
+    fov *= lerp(0.50, 1.30, smooth(sub));
+    camZ = lerp(2.0, 26, smooth(sub));
+    camX = centerX + Math.sin(time*0.0008)*0.7;
+  } else if(cam.mode==="zoomout"){
+    // void: breathing zoom with drift
+    fov *= lerp(0.65, 1.45, smooth(sub));
+    camX = centerX + Math.sin(time*0.0007)*1.6;
+    camAng = Math.sin(time*0.0005)*0.08;
+    yShift += Math.sin(time*0.0006)*0.03;
+  } else if(cam.mode==="macroPush"){
+    // 1.0 bunker: camera pushes slowly toward the plaque/portrait while FOV tightens,
+    // with a small arc-sway so the room walls scrape past visibly during sustained.
+    const t = smooth(sub);
+    fov *= lerp(1.05, 0.78, t);
+    camX = centerX + Math.sin(time*0.0011)*1.4;
+    camAng = Math.sin(time*0.0009)*0.16;
+    yShift += Math.sin(time*0.0014)*0.04;
+    if(beat.name==="sustained"){
+      // additional macro pull-in: amp the push so sustained reads as cinematic dolly
+      camZ += beat.frac * 1.2;
+    }
+  } else if(cam.mode==="overhead"){
+    // overhead tilt: horizon pushed higher in frame
+    yShift += -0.14 + Math.sin(time*0.0011)*0.03;
+    camX = centerX + Math.sin(time*0.0009)*1.0;
+    roll = Math.sin(time*0.0007)*0.04;
+  } else {
+    // plain walk: keep continuous sway + micro-ang so every sustained frame has motion
+    const sw = (beat.name==="sustained") ? 1.0 : 0.45;
+    camX = centerX + Math.sin(time*0.0008)*0.9*sw;
+    camAng = Math.sin(time*0.0007)*0.09*sw;
+    yShift += Math.sin(time*0.0011)*0.015*sw;
+  }
+  return {camX, camZ, camAng, fov, roll, yShift};
+}
+
+/* ---------- Renderer core ---------- */
+function drawCeilingFloor(g, level, cam, beat, time){
+  // horizon adjusted by yShift
+  const horizon = H*0.5 + cam.yShift*H + Math.sin(cam.roll)*0 /* handled globally */;
+  // ceiling
+  const cg = g.createLinearGradient(0,0,0,horizon);
+  cg.addColorStop(0, level.ceil[0]); cg.addColorStop(1, level.ceil[1]);
+  g.fillStyle = cg; g.fillRect(0,0,W,horizon);
+  // floor
+  const fg = g.createLinearGradient(0,horizon,0,H);
+  fg.addColorStop(0, level.floor[1]); fg.addColorStop(1, level.floor[0]);
+  g.fillStyle = fg; g.fillRect(0,horizon,W,H-horizon);
+  // floor perspective grid (receding lines)
+  g.save();
+  g.strokeStyle = `rgba(${level.rim[0]},${level.rim[1]},${level.rim[2]},0.08)`;
+  g.lineWidth = 1;
+  for(let i=1;i<18;i++){
+    const t = i/18;
+    const y = horizon + (H-horizon) * (t*t);
+    g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
+  }
+  // vanishing-point verticals
+  const vpx = W*0.5, vpy = horizon;
+  for(let i=-6;i<=6;i++){
+    g.beginPath(); g.moveTo(vpx + i*60, H); g.lineTo(vpx, vpy); g.stroke();
   }
   g.restore();
-  // arrival label
-  if(beat.name==="arrival"){
-    const k = ease(beat.frac);
-    g.save(); g.globalAlpha=k;
-    g.font = "400 56px Didot, Georgia, serif"; g.textAlign="center";
-    g.fillStyle = rgb(hex(p[4]));
-    g.fillText("7.0 · MONK", W/2, H*0.12);
+  // sky tint if starfield
+  if(level.starfield){
+    g.save();
+    for(let i=0;i<140;i++){
+      const sx = (i*137)%W;
+      const sy = (i*91)%horizon;
+      const a = 0.2 + 0.6*Math.abs(Math.sin(time*0.002+i));
+      g.fillStyle = `rgba(255,255,255,${a*0.6})`;
+      g.fillRect(sx|0, sy|0, 1, 1);
+    }
     g.restore();
   }
-  drawDust(g,p,sub,time);
-  vignette(g, 0.08);
-};
+  // sun shaft (4.0)
+  if(level.sunShaft>0){
+    g.save(); g.globalCompositeOperation="screen";
+    const cx = W*0.5, cy = H*0.1;
+    for(let i=0;i<12;i++){
+      const ang = -Math.PI/2 + (i-6)*0.1;
+      g.beginPath(); g.moveTo(cx,cy);
+      g.lineTo(cx+Math.cos(ang)*W, cy+Math.sin(ang)*H*2);
+      g.lineTo(cx+Math.cos(ang)*W+40, cy+Math.sin(ang)*H*2);
+      g.closePath();
+      g.fillStyle = `rgba(255,230,180,${0.04*level.sunShaft})`;
+      g.fill();
+    }
+    g.restore();
+  }
+}
+
+function sampleLightIntensity(level, time){
+  // returns 0..1 attenuation multiplier on rim lighting
+  switch(level.light){
+    case "torch":       return 0.85 + 0.15*Math.sin(time*0.017) + 0.1*Math.sin(time*0.041);
+    case "candle":      return 0.9 + 0.1*Math.sin(time*0.007);
+    case "fluorescent": return 0.97 + 0.03*Math.sin(time*0.08);
+    case "pulse":       return 0.7 + 0.3*Math.sin(time*0.003);
+    case "neon":        return 0.8 + 0.2*Math.sin(time*0.002 + Math.sin(time*0.01));
+    case "sun":         return 1.0;
+    case "gallery":     return 1.0;
+    case "soft":        return 0.95;
+    default: return 1.0;
+  }
+}
+
+function raycastWalls(g, level, cam, beat, time, zBuf){
+  const cols = Math.floor(W/2);
+  const halfFovTan = Math.tan(cam.fov/2);
+  const mapH = level.map.length;
+  const mapW = level.map[0].length;
+  const ambient = level.ambient;
+  const rim = level.rim;
+  const lightFx = sampleLightIntensity(level, time);
+  const horizon = H*0.5 + cam.yShift*H;
+  const wallScale = H; // wall height scalar
+  const fovFactor = 1 / (2*halfFovTan);
+  // cos camAng, sin camAng for DDA ray transform
+  const cosA = Math.cos(cam.camAng), sinA = Math.sin(cam.camAng);
+  for(let col=0; col<cols; col++){
+    const screenX = col*2;
+    // ray direction in camera space
+    const camSpaceX = (2*col/cols - 1) * halfFovTan; // right
+    const camSpaceZ = 1; // forward
+    // rotate to world
+    const rx = camSpaceX*cosA + camSpaceZ*sinA;
+    const rz = -camSpaceX*sinA + camSpaceZ*cosA;
+    // DDA
+    const invRx = rx!==0 ? 1/Math.abs(rx) : 1e9;
+    const invRz = rz!==0 ? 1/Math.abs(rz) : 1e9;
+    let mx = Math.floor(cam.camX), mz = Math.floor(cam.camZ);
+    let sideDistX = (rx<0? (cam.camX - mx) : (mx+1 - cam.camX)) * invRx;
+    let sideDistZ = (rz<0? (cam.camZ - mz) : (mz+1 - cam.camZ)) * invRz;
+    const stepX = rx<0?-1:1, stepZ = rz<0?-1:1;
+    let hit=0, side=0, tile=0;
+    for(let step=0; step<64 && !hit; step++){
+      if(sideDistX < sideDistZ){ sideDistX += invRx; mx += stepX; side=0; }
+      else { sideDistZ += invRz; mz += stepZ; side=1; }
+      if(mz<0||mz>=mapH||mx<0||mx>=mapW){ hit=1; tile=1; side = (mz<0||mz>=mapH)?1:0; break; }
+      tile = level.map[mz][mx];
+      if(tile>0) hit=1;
+    }
+    // perpendicular distance
+    let dist;
+    if(side===0) dist = (mx - cam.camX + (1-stepX)/2) / rx;
+    else         dist = (mz - cam.camZ + (1-stepZ)/2) / rz;
+    dist = Math.max(0.05, Math.abs(dist));
+    zBuf[col] = dist;
+    // wall strip height
+    const lineH = (wallScale / dist);
+    let y0 = horizon - lineH/2;
+    let y1 = horizon + lineH/2;
+    // texture sample position
+    let wallHit = (side===0) ? (cam.camZ + dist*rz) : (cam.camX + dist*rx);
+    wallHit -= Math.floor(wallHit);
+    const texKey = (tile===2) ? level.texAlcove : level.tex;
+    const tex = TEX[texKey] || TEX[level.tex];
+    const texX = Math.floor(wallHit * 64) % 64;
+    // draw textured strip (slice of 1 source px, 2 dest px)
+    g.drawImage(tex, texX, 0, 1, 64, screenX, y0, 2, y1-y0);
+    // distance shading (dark overlay) + side shading
+    const shade = Math.min(0.9, dist * 0.035);
+    const sideDark = side===1 ? 0.22 : 0;
+    g.fillStyle = `rgba(${ambient[0]*0.3|0},${ambient[1]*0.3|0},${ambient[2]*0.3|0},${shade + sideDark})`;
+    g.fillRect(screenX, y0, 2, y1-y0);
+    // ambient wash: each era's ambient tint bleeds into walls at a moderate strength
+    // so the entire 3D room reads as lit by that era's colour.
+    g.fillStyle = `rgba(${ambient[0]},${ambient[1]},${ambient[2]},0.16)`;
+    g.fillRect(screenX, y0, 2, y1-y0);
+    // rim light injection near camera — stronger so per-era colour reads clearly
+    if(dist < 14){
+      const rimA = (1 - dist/14) * 0.38 * lightFx;
+      g.fillStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},${rimA})`;
+      g.fillRect(screenX, y0, 2, y1-y0);
+    }
+  }
+}
+
+function drawBillboards(g, level, cam, beat, time, zBuf, m){
+  const cosA = Math.cos(cam.camAng), sinA = Math.sin(cam.camAng);
+  const halfFovTan = Math.tan(cam.fov/2);
+  const horizon = H*0.5 + cam.yShift*H;
+  // collect with transformed coords
+  const items = [];
+  const mapW = level.map[0].length;
+  const centerX = mapW/2;
+  for(const b of level.billboards){
+    // compute worldX based on side — cap the lateral offset so the sprite stays
+    // within the camera cone in wide rooms (atrium/gallery/void mapW=11). Without
+    // this, side:"L" at wx=1.1 with centerX=5.5 leaves the sprite ~4.4u off-center
+    // and it slides out of frame during sustained.
+    let wx;
+    const sideOff = 1.9; // max lateral distance from centerline in world units
+    if(b.side==="L") wx = Math.max(1.2, centerX - sideOff);
+    else if(b.side==="R") wx = Math.min(mapW - 1.2, centerX + sideOff);
+    else wx = centerX + (b.offset||0);
+    // Shift all billboard world-z forward by +10 so that while the camera lingers at
+    // camZ≈10..14 during sustained, billboards originally authored at z:8..24 land at
+    // z:18..34 — comfortably ahead of the camera (4–8u min) so they don't crash the
+    // foreground when camZ reaches 14.
+    let wz = b.z + 10;
+    // dynamic motion: bob (vertical), slide (lateral dock-in), orbit (circular)
+    let dynYOff = 0;
+    if(b.bob) dynYOff += Math.sin(time*0.002 + b.z*0.7) * b.bob;
+    if(b.slide){
+      // widgets sliding/docking from farther z toward target as sustained progresses
+      const t = clamp((beat.name==="sustained"?beat.frac:beat.name==="departure"?1:0), 0, 1);
+      wz += (b.slide) * (1 - t) * 3; // starts further, docks closer
+    }
+    if(b.orbitR){
+      const ang = time * (b.orbitSpeed||0.001);
+      wx += Math.cos(ang) * b.orbitR;
+      wz += Math.sin(ang) * b.orbitR * 0.6;
+    }
+    if(b.assemble){
+      // 5.0 Gutenberg blocks: start scattered to the sides + above, assemble toward center & home Y
+      const t = clamp(beat.name==="approach"?0 : beat.name==="anticipation"?beat.frac*0.4 : beat.name==="arrival"?0.4+beat.frac*0.4 : beat.name==="sustained"?Math.min(1, 0.8+beat.frac*0.5) : 1, 0, 1);
+      const tt = 1 - t; // 1 = scattered, 0 = assembled
+      const phase = b.assemble || 0;
+      wx += Math.sin(phase) * 3.5 * tt;
+      dynYOff += (Math.cos(phase) * 1.6 + 1.2) * tt;
+      wz += Math.cos(phase*1.3) * 2.2 * tt;
+      // snap pulse near assembly
+      if(t>0.7){ dynYOff += Math.sin(time*0.005 + phase)*0.08; }
+    }
+    const dx = wx - cam.camX, dz = wz - cam.camZ;
+    // rotate into camera space
+    const tz = dx*sinA + dz*cosA; // forward
+    const tx = dx*cosA - dz*sinA; // right
+    if(tz<=0.1) continue;
+    const scale = H / tz;
+    const spriteCanvas = resolveSprite(b, m, beat, time);
+    if(!spriteCanvas) continue;
+    const wW = (b.w||1.6) * scale;
+    const hH = (b.h||2.0) * scale;
+    const screenX = W/2 + (tx / tz) * (W/2 / halfFovTan);
+    // y offset from wall center
+    const yCenter = horizon - hH/2 + ((b.yOff||0) + dynYOff) * scale;
+    items.push({spriteCanvas, screenX, yCenter, wW, hH, dist:tz, b});
+  }
+  items.sort((a,b)=> b.dist - a.dist);
+  for(const it of items){
+    const x0 = Math.floor(it.screenX - it.wW/2);
+    const x1 = Math.ceil(it.screenX + it.wW/2);
+    // per-column z-test
+    for(let sx=x0; sx<x1; sx+=2){
+      const col = Math.floor(sx/2);
+      if(col<0||col>=zBuf.length) continue;
+      if(it.dist > zBuf[col]) continue;
+      const u = (sx - (it.screenX - it.wW/2)) / it.wW;
+      if(u<0||u>1) continue;
+      const srcX = Math.floor(u * it.spriteCanvas.width);
+      g.drawImage(it.spriteCanvas, srcX, 0, 1, it.spriteCanvas.height, sx, it.yCenter, 2, it.hH);
+    }
+  }
+}
+
+/* Per-movement plaque canvases (floating in-world panel that the camera focuses on
+   during the sustained beat — replaces the bottom DOM card as the "diegetic plaque"). */
+const PLAQ = {};
+function buildPlaques(){
+  for(const m of M){
+    const c = document.createElement("canvas"); c.width=360; c.height=200;
+    const g = c.getContext("2d");
+    const p = m.palette;
+    // parchment / plate background tinted to era
+    const bg = mix(hex(p[0]), [0,0,0], 0.2);
+    g.fillStyle = rgb(bg); g.fillRect(0,0,360,200);
+    // frame
+    g.strokeStyle = rgb(hex(p[3])); g.lineWidth=3; g.strokeRect(3,3,354,194);
+    g.strokeStyle = rgb(hex(p[2])); g.lineWidth=1; g.strokeRect(8,8,344,184);
+    // header bar
+    g.fillStyle = rgb(hex(p[3]),0.28); g.fillRect(8,8,344,28);
+    g.fillStyle = rgb(hex(p[4])); g.font="700 12px 'IBM Plex Mono',monospace";
+    g.fillText(`WORDPRESS ${m.v}  ·  ${m.date}`, 16, 26);
+    // title
+    g.fillStyle = rgb(hex(p[4])); g.font = "400 26px 'Didot',Georgia,serif";
+    g.fillText(`${m.era}`, 16, 66);
+    g.fillStyle = rgb(hex(p[3])); g.font = "400 italic 13px 'Iowan Old Style',Georgia,serif";
+    g.fillText(`"${m.name}" — ${m.musician}`, 16, 86);
+    // headline (wrap naive)
+    g.fillStyle = rgb(mix(hex(p[3]),hex(p[4]),0.5)); g.font="400 13px 'Iowan Old Style',Georgia,serif";
+    const words = m.headline.split(" ");
+    let line="", ly=116;
+    for(const w of words){
+      const test = line + w + " ";
+      if(g.measureText(test).width > 330 && line.length>0){ g.fillText(line, 16, ly); line = w + " "; ly += 18; }
+      else line = test;
+    }
+    g.fillText(line, 16, ly);
+    // register tag
+    g.fillStyle = rgb(hex(p[3])); g.font="500 10px 'IBM Plex Mono',monospace";
+    g.fillText(m.register.toUpperCase(), 16, 188);
+    PLAQ[m.v] = c;
+  }
+}
+
+function resolveSprite(b, m, beat, time){
+  if(b.kind==="plaque"){
+    return PLAQ[m.v] || null;
+  }
+  if(b.kind==="portrait"){
+    // composite: frame + portrait
+    const frame = BB.frame;
+    const c = document.createElement("canvas"); c.width=frame.width; c.height=frame.height;
+    const g = c.getContext("2d");
+    g.drawImage(frame,0,0);
+    if(PORT[m.portraitKey]) g.drawImage(PORT[m.portraitKey], 15, 25, c.width-30, c.height-50);
+    // era nameplate
+    g.fillStyle="#e9c97a"; g.font="700 9px IBM Plex Mono,monospace"; g.textAlign="center";
+    g.fillText(m.musician.split(" (")[0].toUpperCase(), c.width/2, c.height-6);
+    g.textAlign="left";
+    return c;
+  } else if(b.kind==="mock"){
+    // framed admin mock
+    const frame = BB[b.frame || "crt"];
+    const shot = SHOT[m.adminKey];
+    if(!frame||!shot) return null;
+    const c = document.createElement("canvas"); c.width=frame.width; c.height=frame.height;
+    const g = c.getContext("2d");
+    g.drawImage(frame,0,0);
+    g.drawImage(shot, 8, 8, c.width-16, c.height-28);
+    // scanline overlay
+    g.globalAlpha=0.2;
+    for(let y=8;y<c.height-20;y+=3){ g.fillStyle="#000"; g.fillRect(8,y,c.width-16,1); }
+    g.globalAlpha=1;
+    // label
+    g.fillStyle="#e9c97a"; g.font="700 8px IBM Plex Mono,monospace"; g.fillText(b.frame==="gilt"?"DISPLAY":b.frame==="holo"?"HOLO":"MONITOR", 10, c.height-5);
+    return c;
+  } else if(b.kind==="sprite"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="widget"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="floor"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="cube"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="planet"){
+    return BB.planet;
+  } else if(b.kind==="moon"){
+    return BB.moon;
+  }
+  return null;
+}
+
+/* ---------- Overlays ---------- */
+function drawTorchFlicker(g, level, time, beat){
+  const s = sampleLightIntensity(level, time);
+  const a = (1-s) * 0.35;
+  g.fillStyle = `rgba(${level.ambient[0]},${level.ambient[1]},${level.ambient[2]},${a})`;
+  g.fillRect(0,0,W,H);
+}
+function drawScanlines(g, strength){
+  g.save(); g.globalAlpha = strength * 0.2;
+  g.fillStyle="#000";
+  for(let y=0;y<H;y+=3) g.fillRect(0,y,W,1);
+  g.restore();
+}
+function drawUploadRain(g, level, time, sub){
+  // 3.3 — files rising from floor to ceiling
+  const upfile = BB.upfile;
+  g.save();
+  for(let i=0;i<32;i++){
+    const phase = ((time*0.0003 + i*0.21) % 1);
+    const x = ((i*83)%W);
+    const y = lerp(H*1.05, -40, phase);
+    const s = 0.7 + (i%3)*0.2;
+    g.globalAlpha = Math.sin(phase*Math.PI) * 0.85;
+    g.drawImage(upfile, x, y, upfile.width*s, upfile.height*s);
+  }
+  g.restore();
+}
+
+function drawRoll(g, roll){
+  // implemented by saving and rotating context prior to the scene: handled by wrapper
+}
+
+function drawLabel(g, level, m, beat){
+  if(beat.name!=="arrival") return;
+  const k = ease(beat.frac);
+  g.save();
+  g.globalAlpha = k;
+  g.fillStyle = `rgb(${level.rim[0]},${level.rim[1]},${level.rim[2]})`;
+  g.font = "400 58px Didot, Georgia, serif"; g.textAlign="center";
+  if(level.light==="neon"){
+    g.shadowColor = `rgb(${level.rim[0]},${level.rim[1]},${level.rim[2]})`;
+    g.shadowBlur = 24;
+  }
+  g.fillText(`${m.v} · ${m.name.toUpperCase()}`, W/2, H*0.17 + (1-k)*20);
+  g.restore();
+  g.textAlign="left";
+}
+
+function drawDoorway(g, level, m, beat, time){
+  // Departure: a bright archway opens at the corridor end, tinted by the next movement.
+  if(beat.name!=="departure") return;
+  const k = ease(beat.frac);
+  const next = findNextM(m);
+  const tint = next ? hex(next.palette[2]) : [255,230,180];
+  g.save();
+  // dark outer frame squeezes in as the camera accelerates toward the doorway
+  g.fillStyle = `rgba(0,0,0,${0.25 + 0.5*k})`; g.fillRect(0,0,W,H);
+  // then punch a bright arched portal in the middle
+  g.globalCompositeOperation = "destination-out";
+  const aw = W * (0.20 + 0.45*k);
+  const ah = H * (0.45 + 0.4*k);
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.3);
+  g.arc(W/2, H/2 - ah*0.3, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.closePath();
+  g.fill();
+  // paint a next-movement glow through the portal
+  g.globalCompositeOperation = "source-over";
+  const rg = g.createRadialGradient(W/2, H/2, 10, W/2, H/2, Math.max(aw,ah));
+  rg.addColorStop(0, `rgba(${tint[0]},${tint[1]},${tint[2]},${0.35+0.5*k})`);
+  rg.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = rg; g.fillRect(0,0,W,H);
+  // rim outline
+  g.strokeStyle = `rgba(${tint[0]},${tint[1]},${tint[2]},${0.6+0.3*k})`;
+  g.lineWidth = 2 + 4*k;
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.3);
+  g.arc(W/2, H/2 - ah*0.3, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.stroke();
+  g.restore();
+}
+function findNextM(m){
+  const idx = M.findIndex(x=>x.v===m.v);
+  return idx>=0 && idx+1<M.length ? M[idx+1] : null;
+}
+
+function drawDoorwayApproach(g, level, m, beat, time){
+  // Approach: a visible arched doorway frames the scene and dilates open as we emerge.
+  if(beat.name!=="approach") return;
+  const k = 1 - ease(beat.frac);   // k=1 at start (doorway tight), k=0 at end (open)
+  if(k<=0) return;
+  g.save();
+  // outside-the-doorway black mask shaped like an arched portal — starts nearly
+  // closed (tight arch) and dilates open as we step through
+  const ah = H * (0.28 + 0.65*(1-k));  // arch height
+  const aw = W * (0.22 + 0.72*(1-k));  // arch half-width
+  g.fillStyle = `rgba(0,0,0,${0.75 + 0.2*k})`;
+  g.beginPath();
+  g.moveTo(0,0); g.lineTo(W,0); g.lineTo(W,H); g.lineTo(0,H); g.closePath();
+  // subtract the archway
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.4);
+  g.arc(W/2, H/2 - ah*0.4, aw, Math.PI, 0, true);
+  g.lineTo(W/2 + aw, H);
+  g.closePath();
+  g.fill("evenodd");
+  // warm rim glow on the archway edge
+  const rim = level.rim;
+  g.strokeStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},${0.7+0.3*k})`;
+  g.lineWidth = 3 + 8*k;
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.4);
+  g.arc(W/2, H/2 - ah*0.4, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.stroke();
+  g.restore();
+}
+
+/* ---------- Unified level renderer ---------- */
+function rayRenderLevel(g, sub, beat, time, m){
+  const level = LVL[m.v];
+  if(!level) return;
+  const cam = cameraFor(level, m, sub, beat, time);
+  // roll wrap
+  if(cam.roll){
+    g.save();
+    g.translate(W/2, H/2);
+    g.rotate(cam.roll);
+    g.translate(-W/2, -H/2);
+  }
+  drawCeilingFloor(g, level, cam, beat, time);
+  const zBuf = new Float32Array(Math.floor(W/2));
+  raycastWalls(g, level, cam, beat, time, zBuf);
+  drawBillboards(g, level, cam, beat, time, zBuf, m);
+  // overlays
+  if((level.overlays||[]).includes("torchflicker")) drawTorchFlicker(g, level, time, beat);
+  if((level.overlays||[]).includes("uploadRain")) drawUploadRain(g, level, time, sub);
+  if(level.scanlines) drawScanlines(g, level.scanlines);
+  // transitions
+  drawDoorwayApproach(g, level, m, beat, time);
+  drawDoorway(g, level, m, beat, time);
+  // label on arrival
+  drawLabel(g, level, m, beat);
+  // rim/vignette
+  g.save();
+  const vg = g.createRadialGradient(W/2, H*0.5, Math.min(W,H)*0.3, W/2, H*0.5, Math.max(W,H)*0.75);
+  vg.addColorStop(0,"rgba(0,0,0,0)");
+  vg.addColorStop(1, level.light==="gallery"||level.light==="soft" ? "rgba(20,30,50,0.25)" : "rgba(0,0,0,0.5)");
+  g.fillStyle = vg; g.fillRect(0,0,W,H);
+  g.restore();
+  drawDust(g, m.palette, sub, time);
+  if(cam.roll){ g.restore(); }
+}
+
+/* ---------- RENDER dispatch (all point to unified renderer) ---------- */
+const RENDER = {};
+["1.0","2.0","2.2","3.0","3.3","4.0","5.0","6.0","7.0"].forEach(v=>{
+  RENDER[v] = function(g, sub, beat, time, m){ rayRenderLevel(g, sub, beat, time, m); };
+});
+// legacy no-op stubs to preserve reachability should old code reference them
+const _RENDER_LEGACY_UNUSED_ = null;
+
 
 /* Overture */
 function renderOverture(g, t, time){
@@ -2023,6 +2537,8 @@ function updateHUD(curM, sub, beat){
     mvt.textContent = m.era;
     eraE.textContent = `${m.date} · ${m.register}`;
     setAccent(m.palette[3]);
+    const lightEra = (m.v==="4.0" || m.v==="5.0" || m.v==="7.0");
+    document.documentElement.classList.toggle("light-era", lightEra);
   }
   const bnodes = document.querySelectorAll("#beats .b");
   bnodes.forEach((el,i)=>{
@@ -2094,12 +2610,13 @@ function updatePlaque(curM, sub, beat){
     }
     plaque.classList.add("show");
     plaque.style.setProperty("--accent", M[curM].palette[3]);
-    // Layered reveal: reveal paragraphs based on beat+sub
-    const reveal = beat.name==="arrival" ? beat.frac : (beat.name==="sustained" ? 0.2 + beat.frac*0.95 : 1);
+    // Cycle paragraphs one-at-a-time through the sustained beat
     const paras = document.querySelectorAll("#p-prose p");
+    const reveal = beat.name==="arrival" ? 0 : (beat.name==="sustained" ? beat.frac : 1);
+    const idx = Math.min(paras.length-1, Math.floor(reveal * paras.length));
     paras.forEach((el,i)=>{
-      const threshold = i * (1/paras.length) * 0.95 + 0.02;
-      el.classList.toggle("on", reveal > threshold);
+      el.style.display = (i===idx) ? "block" : "none";
+      el.classList.toggle("on", i===idx);
     });
   } else {
     plaque.classList.remove("show");
@@ -2190,9 +2707,9 @@ function boot(){
   let p = 0;
   bootProgress(0.05);
   // stage 1: portraits
-  setTimeout(()=>{ buildPortraits(); bootProgress(0.4);
-    // stage 2: admin mocks
-    setTimeout(()=>{ buildAdminMocks(); bootProgress(0.7);
+  setTimeout(()=>{ buildPortraits(); buildWallTextures(); bootProgress(0.4);
+    // stage 2: admin mocks + billboards + levels
+    setTimeout(()=>{ buildAdminMocks(); buildBillboards(); buildLevels(); buildPlaques(); bootProgress(0.7);
       // stage 3: minimap
       setTimeout(()=>{ buildMinimap(); bootProgress(0.95);
         setTimeout(()=>{ bootProgress(1.0);
