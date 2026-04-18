@@ -1,0 +1,2754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordPress Museum · v10 · Nine Movements</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --display:"Didot","Bodoni 72",Georgia,"Times New Roman",serif;
+    --prose:"Iowan Old Style","Palatino Linotype","Palatino","Book Antiqua",Georgia,serif;
+    --mono:"IBM Plex Mono","JetBrains Mono","Menlo",ui-monospace,monospace;
+    --ui:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --ink:#f2eee4;
+    --accent:#e9c97a;
+  }
+  html,body{background:#05060a;color:var(--ink);font-family:var(--ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body{height:16100px}
+
+  /* ---------- Stage ---------- */
+  #stage{position:fixed;inset:0;z-index:1;background:#05060a;overflow:hidden}
+  #stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #breath{position:fixed;inset:-2% -2% -2% -2%;z-index:1;pointer-events:none;will-change:transform}
+
+  /* ---------- Loading splash ---------- */
+  #boot{position:fixed;inset:0;z-index:80;background:#05060a;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:opacity .7s}
+  #boot.gone{opacity:0;pointer-events:none}
+  #boot .ring{position:absolute;width:280px;height:280px;border-radius:50%;border:1px solid rgba(233,201,122,.3);animation:spin 8s linear infinite}
+  #boot .ring:nth-child(2){width:220px;height:220px;border-color:rgba(233,201,122,.18);animation-duration:14s;animation-direction:reverse}
+  #boot .ring:nth-child(3){width:160px;height:160px;border-color:rgba(233,201,122,.1);animation-duration:20s}
+  #boot .core{position:relative;text-align:center;z-index:1}
+  #boot .core .mark{font:400 10px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;opacity:.7;margin-bottom:18px}
+  #boot .core .title{font:400 34px/1 var(--display);letter-spacing:2px;color:#f4ecd6}
+  #boot .core .sub{font:400 10px/1.8 var(--mono);letter-spacing:3px;margin-top:18px;color:#8d7b54;text-transform:uppercase}
+  #boot .bar{position:absolute;bottom:30%;left:50%;transform:translateX(-50%);width:240px;height:1px;background:rgba(233,201,122,.18)}
+  #boot .bar .f{position:absolute;left:0;top:0;bottom:0;width:0%;background:#e9c97a;transition:width .25s ease}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Start splash ---------- */
+  #splash{position:fixed;inset:0;z-index:70;background:radial-gradient(ellipse at 50% 40%,#1b120a,#05060a 65%);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .7s}
+  #splash.gone{opacity:0;pointer-events:none}
+  #splash .slab{text-align:center;max-width:640px;padding:44px 40px;border-top:1px solid rgba(233,201,122,.4);border-bottom:1px solid rgba(233,201,122,.4)}
+  #splash .k{font:400 10px/1 var(--mono);letter-spacing:5px;color:#c5ae7a;text-transform:uppercase;display:block;margin-bottom:20px}
+  #splash h1{font:400 52px/1.05 var(--display);letter-spacing:3px;color:#f4ecd6;margin-bottom:8px}
+  #splash .subtitle{font:400 italic 16px/1.4 var(--prose);color:#c8bfa6;margin-bottom:28px}
+  #splash p{font:400 13px/1.7 var(--prose);color:#b9af95;margin:0 auto;max-width:480px}
+  #splash .cta{font:500 10px/1 var(--mono);letter-spacing:6px;color:#e9c97a;margin-top:26px;text-transform:uppercase}
+  #splash .cta .pulse{display:inline-block;width:8px;height:8px;background:#e9c97a;border-radius:50%;margin-right:10px;vertical-align:middle;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;top:0;left:0;right:0;z-index:15;pointer-events:none;padding:18px 24px;display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--ui)}
+  #hud .left{display:flex;flex-direction:column;gap:10px}
+  #hud .release{font:400 13px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8),0 0 10px rgba(0,0,0,.6)}
+  #hud .movement{font:400 28px/1 var(--display);letter-spacing:1.5px;color:var(--accent,#e9c97a);text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 18px rgba(233,201,122,.25);transition:color .8s,text-shadow .8s}
+  #hud .era{font:400 10px/1 var(--mono);letter-spacing:3px;color:#8d7b54;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+  html.light-era #hud .release{color:#2a2218;text-shadow:0 1px 2px rgba(255,255,255,.8),0 0 8px rgba(255,255,255,.6)}
+  html.light-era #hud .movement{color:#1a1510;text-shadow:0 2px 6px rgba(255,255,255,.85),0 0 16px rgba(255,255,255,.5)}
+  html.light-era #hud .era{color:#4a4030;text-shadow:0 1px 2px rgba(255,255,255,.8)}
+  html.light-era #beats .b{color:#7a6a52}
+  html.light-era #beats .b.on{color:#1a1510}
+  html.light-era #beats .b.on .dot{background:#1a1510;box-shadow:0 0 10px rgba(0,0,0,.6)}
+  #beats{display:flex;gap:14px;margin-top:6px;font:500 9px/1 var(--mono);letter-spacing:3px;color:#6a5b3e;text-transform:uppercase}
+  #beats .b{display:flex;align-items:center;gap:6px;transition:color .4s}
+  #beats .b .dot{width:6px;height:6px;border-radius:50%;background:#3a321e;transition:all .4s}
+  #beats .b.on{color:var(--accent,#e9c97a)}
+  #beats .b.on .dot{background:var(--accent,#e9c97a);box-shadow:0 0 10px var(--accent,#e9c97a);transform:scale(1.3)}
+  #beats .b.past .dot{background:#6a5b3e}
+
+  /* ---------- Minimap (graph SVG) ---------- */
+  #minimap{position:fixed;top:18px;right:24px;z-index:15;width:330px;padding:12px 14px;background:linear-gradient(180deg,rgba(10,8,6,.82),rgba(10,8,6,.92));border:1px solid rgba(233,201,122,.35);border-radius:2px}
+  #minimap .mh{font:500 9px/1 var(--mono);letter-spacing:3px;color:#c5ae7a;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+  #minimap .mh .prog{color:#8d7b54}
+  #minimap svg{width:100%;height:96px;display:block}
+  #minimap .ml{font:500 9px/1.2 var(--mono);letter-spacing:2px;color:#8d7b54;margin-top:6px;text-transform:uppercase;display:flex;justify-content:space-between}
+
+  /* ---------- Plaque (compact diegetic HUD strip) ----------
+     The big plaque lives inside the 3D world now (floating in-world panel).
+     The DOM strip is just a thin bottom rail with the CTA + meta + paragraph ticker. */
+  #plaque{position:fixed;left:50%;bottom:14px;transform:translateX(-50%) translateY(8px);z-index:18;width:min(760px,92vw);opacity:0;pointer-events:none;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.25,1)}
+  #plaque.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  #plaque .card{display:flex;align-items:center;gap:16px;padding:10px 16px;background:linear-gradient(180deg,rgba(15,12,8,.78),rgba(8,6,4,.82));border:1px solid var(--accent,#e9c97a);border-radius:2px;backdrop-filter:blur(4px);box-shadow:0 10px 28px rgba(0,0,0,.5)}
+  #plaque .bin{display:none}  /* portrait & shot now rendered in-world */
+  #plaque .port canvas,#plaque .shot canvas{display:none}
+  #plaque .tag,#plaque h2,#plaque .headline{display:none}
+  #plaque .meta{font:500 10px/1 var(--mono);letter-spacing:2.5px;color:var(--accent,#e9c97a);text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+  #plaque .prose{display:flex;flex-direction:row;gap:14px;overflow:hidden;flex:1;min-height:18px;max-height:24px}
+  #plaque .prose p{font:400 italic 12.5px/1.4 var(--prose);color:#cdc2a4;opacity:0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;transition:opacity .5s ease;max-width:100%}
+  #plaque .prose p:not(:first-child){display:none}
+  #plaque .prose p.on{opacity:0.92}
+  #plaque .cta{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  #plaque button{pointer-events:auto;font:500 9px/1 var(--mono);letter-spacing:3px;padding:8px 14px;border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706}
+  #plaque .pg-hint{display:none}
+
+  /* ---------- Playground ---------- */
+  #playground{position:fixed;inset:0;z-index:100;background:rgba(5,6,10,.96);display:none;flex-direction:column}
+  #playground.open{display:flex;animation:pgin .4s ease}
+  @keyframes pgin{from{opacity:0}to{opacity:1}}
+  #playground .pgh{height:46px;background:#0a0806;border-bottom:1px solid var(--accent,#e9c97a);display:flex;align-items:center;padding:0 18px;color:var(--accent,#e9c97a);font:500 11px/1 var(--mono);letter-spacing:3px;text-transform:uppercase}
+  #playground .pgh button{margin-left:auto;background:transparent;border:1px solid var(--accent,#e9c97a);color:var(--accent,#e9c97a);padding:8px 16px;font:inherit;cursor:pointer;letter-spacing:3px}
+  #playground .pgh button:hover{background:var(--accent,#e9c97a);color:#0a0706}
+  #playground iframe{flex:1;border:0;background:#fff;width:100%}
+
+  /* ---------- Coda fade & vignette ---------- */
+  #vignette{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%)}
+  #grain{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:radial-gradient(#fff 1px,transparent 1.5px);background-size:3px 3px}
+  #whitefade{position:fixed;inset:0;z-index:7;pointer-events:none;background:#fff;opacity:0;transition:opacity .6s}
+
+  /* ---------- Scroll hair ---------- */
+  #scrollbar{position:fixed;top:0;left:0;right:0;height:2px;z-index:19;pointer-events:none}
+  #scrollbar .f{height:100%;background:linear-gradient(90deg,var(--accent,#e9c97a),transparent);width:0%;transition:width .08s linear}
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important;transition-duration:.15s !important}
+  }
+</style>
+</head>
+<body>
+<div id="boot">
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="core">
+    <div class="mark">PRESENTATION BUILD · V10</div>
+    <div class="title">Nine Movements</div>
+    <div class="sub">composing the suite…</div>
+  </div>
+  <div class="bar"><div class="f" id="bootf"></div></div>
+</div>
+
+<div id="stage">
+  <canvas id="view"></canvas>
+</div>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="whitefade"></div>
+<div id="scrollbar"><div class="f" id="sf"></div></div>
+
+<div id="hud">
+  <div class="left">
+    <div class="release" id="h-release">OVERTURE</div>
+    <div class="movement" id="h-movement">Nine Movements</div>
+    <div class="era" id="h-era">WORDPRESS · 2003 → 2026</div>
+    <div id="beats">
+      <div class="b" data-b="0"><span class="dot"></span>Approach</div>
+      <div class="b" data-b="1"><span class="dot"></span>Anticipation</div>
+      <div class="b" data-b="2"><span class="dot"></span>Arrival</div>
+      <div class="b" data-b="3"><span class="dot"></span>Sustained</div>
+      <div class="b" data-b="4"><span class="dot"></span>Departure</div>
+    </div>
+  </div>
+</div>
+
+<div id="minimap">
+  <div class="mh"><span>SUITE · NINE MOVEMENTS</span><span class="prog" id="m-prog">00%</span></div>
+  <svg id="m-svg" viewBox="0 0 320 96" preserveAspectRatio="none"></svg>
+  <div class="ml"><span id="m-from">—</span><span id="m-to">—</span></div>
+</div>
+
+<div id="plaque">
+  <div class="card">
+    <div class="bin">
+      <div class="port"><canvas id="p-port" width="72" height="96"></canvas></div>
+      <div class="tag" id="p-tag">ERA MOCK</div>
+      <div class="shot"><canvas id="p-shot" width="280" height="140"></canvas></div>
+    </div>
+    <div>
+      <div class="meta" id="p-meta">VERSION · DATE</div>
+      <h2 id="p-name">—</h2>
+      <div class="headline" id="p-headline">—</div>
+      <div class="prose" id="p-prose"></div>
+      <div class="cta">
+        <button id="p-btn">▸ Activate in Playground</button>
+        <span class="pg-hint">loads playground.wordpress.net</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="playground">
+  <div class="pgh"><span id="pg-title">—</span><button id="pg-close">✕ Close</button></div>
+  <iframe id="pg-frame" title="WordPress Playground" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   WordPress Museum v10 · Nine Movements
+   Single-file presentation build. Vanilla JS + canvas + WebAudio.
+   ========================================================= */
+
+/* ---------- helpers ---------- */
+const TAU = Math.PI * 2;
+const clamp = (v,a,b)=> v<a?a : v>b?b : v;
+const lerp  = (a,b,t)=> a + (b-a)*t;
+const smooth= (t)=> t<=0?0 : t>=1?1 : t*t*(3-2*t);
+const ease  = (t)=> t<=0?0 : t>=1?1 : 1 - Math.pow(1-t,3);
+function hex(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function rgb(c,a){ return a==null?`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`:`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+function mix(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; }
+
+/* ---------- MOVEMENTS ---------- */
+/* Each movement: palette (5 hex), headline, paragraphs (split for layered reveal),
+   motif (chord progression as semitone arrays + bass line), camera tag. */
+const M = [
+  {
+    v:"1.0", name:"Miles", musician:"Miles Davis (tpt)", date:"2004 · 01 · 03", era:"The Bunker",
+    camera:"first-person corridor", trick:"CANDLE-OUT", register:"somber · pioneer",
+    palette:["#2a1408","#6e3c22","#b06238","#e9b173","#fff1d4"],
+    headline:"A fork became a platform: permalinks, preview, and the plugin-API spine.",
+    paras:[
+      "Released January 3, 2004 as WordPress's first numbered major, forked from Michel Valdrighi's b2/cafelog by Matt Mullenweg and Mike Little.",
+      "The codename honoured Miles Davis and began the jazz-name tradition that carried every major release after it.",
+      "1.0 shipped search-engine-friendly permalinks, a post preview pane, a simple installer, and the bones of a plugin architecture.",
+      "Within months, add_filter and add_action in 1.2 turned that spine into the most generous hook system on the web.",
+      "The room where WordPress stopped being someone else's fork and started being itself."
+    ],
+    motif:{ bpm:70, chords:[[62,65,69,72,76],[55,59,62,65,70],[60,64,67,71,74]], bass:[38,43,48], mel:[72,74,72,69,65] },
+    portraitKey:"trumpet", adminKey:"b2cafelog"
+  },
+  {
+    v:"2.0", name:"Duke", musician:"Duke Ellington (p)", date:"2005 · 12 · 31", era:"The Crypt Library",
+    camera:"cinematic side-scroll", trick:"FALL", register:"formal · midnight gala",
+    palette:["#15110b","#3a2f1f","#78623f","#c29a58","#f4dfb0"],
+    headline:"A New Year's Eve gift: TinyMCE, Akismet, and proper user roles.",
+    paras:[
+      "Announced by Matt Mullenweg on December 31, 2005 — literally a New Year's Eve gift, named for Duke Ellington.",
+      "Duke shipped the TinyMCE rich-text editor. Writing in WordPress finally felt like writing, not tagging HTML.",
+      "Akismet arrived built-in; rich image uploads landed; the database layer moved to WPDB.",
+      "Roles & Capabilities — Admin, Editor, Author, Contributor, Subscriber — defined a permission model WordPress still uses two decades later.",
+      "A formal release on a formal night: black tie, small group, quiet ballad."
+    ],
+    motif:{ bpm:82, chords:[[58,62,65,68,72],[56,60,63,66,70],[53,57,60,64,67],[55,59,62,65,70]], bass:[34,30,29,31], mel:[72,74,75,72,70,67] },
+    portraitKey:"piano", adminKey:"tinymce"
+  },
+  {
+    v:"2.2", name:"Getz", musician:"Stan Getz (sax)", date:"2007 · 05 · 16", era:"The Widget Workshop",
+    camera:"overhead workbench", trick:"WALL-WALK", register:"playful · workshop-warm",
+    palette:["#0f2a26","#1f4d44","#3a8a74","#7dd3a8","#dff5e4"],
+    headline:"Widgets entered core — sidebars became draggable lego.",
+    paras:[
+      "May 16, 2007. Named for cool-jazz saxophonist Stan Getz.",
+      "Before 2.2, a sidebar was hand-edited PHP. After 2.2, it was a lego box of draggable widgets: Recent Posts, Categories, Tag Cloud, RSS.",
+      "Atom 1.0 feed support landed. PHP 4.2 and MySQL 4.0 became the new floor.",
+      "A small-number release that changed what a non-developer could do with a WordPress theme: everything.",
+      "A workshop, not a theatre — the loud thing today is the quiet thing tomorrow."
+    ],
+    motif:{ bpm:92, chords:[[60,64,67,71,74],[58,62,65,69,72],[55,59,62,66,69],[57,61,64,67,70]], bass:[36,34,31,33], mel:[72,74,76,79,76,72] },
+    portraitKey:"sax", adminKey:"widgets"
+  },
+  {
+    v:"3.0", name:"Thelonious", musician:"Thelonious Monk (p)", date:"2010 · 06 · 17", era:"The Laboratory",
+    camera:"orbit (planet / moon)", trick:"SHRINK", register:"civic · laboratorial",
+    palette:["#0a1422","#1d3a58","#4a7faa","#9ec6e8","#f1f8ff"],
+    headline:"WordPress MU folded into core; custom post types and menus arrived.",
+    paras:[
+      "June 17, 2010. Named for Thelonious Monk.",
+      "3.0 merged WordPress MU into core — every install became potentially a multisite network.",
+      "Custom post types redefined what 'a post' could mean: portfolios, products, events, anything.",
+      "Custom menus, introduced here, replaced a fiddly decade of pages-with-parent PHP.",
+      "The Kubrick default theme stepped aside for Twenty Ten, founding a tradition: a new default every year."
+    ],
+    motif:{ bpm:96, chords:[[64,68,71,75,78],[62,66,69,73,76],[59,63,66,70,73],[66,70,73,77,80]], bass:[40,38,36,42], mel:[76,78,80,83,80,78,76] },
+    portraitKey:"monkpiano", adminKey:"admin27"
+  },
+  {
+    v:"3.3", name:"Sonny", musician:"Sonny Stitt (sax)", date:"2011 · 12 · 12", era:"Velvet Pointers",
+    camera:"Dutch tilt · portal", trick:"PORTAL", register:"dream · velvet",
+    palette:["#1a0f2a","#3a1f5c","#7a4ac0","#c9a0ff","#f2e8ff"],
+    headline:"Drag-drop upload, flyout menus, blue pointer speech bubbles.",
+    paras:[
+      "December 12, 2011. Named for bebop saxophonist Sonny Stitt.",
+      "3.3 retired the multi-step Flash uploader in favour of drag-and-drop. A small technical change that felt miraculous.",
+      "Flyout admin menus replaced the double-click sidebar navigation.",
+      "Blue 'feature pointer' bubbles softly introduced new UI — WordPress admin learned to teach itself.",
+      "The admin bar got its modern shape. A polish release that quietly became the friendly one."
+    ],
+    motif:{ bpm:102, chords:[[60,64,67,70,74],[58,62,65,68,72],[55,58,62,65,69],[63,66,70,73,77]], bass:[36,34,31,39], mel:[77,79,80,82,79,77] },
+    portraitKey:"sax2", adminKey:"sonnyadmin"
+  },
+  {
+    v:"4.0", name:"Benny", musician:"Benny Goodman (cl)", date:"2014 · 09 · 04", era:"The Marble Atrium",
+    camera:"dolly-zoom grid", trick:"FLIP", register:"proud · marble atrium",
+    palette:["#d8ccaf","#f0e7cb","#b99b6a","#756045","#2a1f12"],
+    headline:"A grid-style media library; inline oEmbeds; language packs.",
+    paras:[
+      "September 4, 2014. Named for swing clarinetist Benny Goodman.",
+      "A symbolic version bump — no rewrite, but a felt maturity.",
+      "The media library reflowed into a grid; embeds previewed right inside the editor; plugin-install shifted content-first.",
+      "Language packs streamlined internationalisation — WordPress became genuinely multilingual from core.",
+      "The moment WordPress felt, for the first time, deliberately designed — not just accreted."
+    ],
+    motif:{ bpm:78, chords:[[55,59,62,66,69],[57,60,64,67,71],[52,55,59,62,66],[57,60,64,68,71]], bass:[31,33,28,33], mel:[72,74,76,74,72,71,69] },
+    portraitKey:"clarinet", adminKey:"mp6grid"
+  },
+  {
+    v:"5.0", name:"Bebo", musician:"Bebo Valdés (p)", date:"2018 · 12 · 06", era:"The Gallery",
+    camera:"macro pull (block → post)", trick:"FLY", register:"gallery · white",
+    palette:["#f5f7fa","#dde3eb","#a8b4c2","#4a5b72","#111826"],
+    headline:"Gutenberg. A post became a composition of blocks.",
+    paras:[
+      "December 6, 2018. Named for Cuban pianist Bebo Valdés.",
+      "5.0 shipped Gutenberg: the block editor. The biggest editing change since 2.0's WYSIWYG.",
+      "A paragraph became a paragraph block; an image, a block; a quote, a block; a column layout, blocks inside a block.",
+      "Twenty Nineteen arrived as the first block-ready default theme.",
+      "The release was contentious at launch — Classic Editor installs exceeded a million in weeks — and inevitable in hindsight."
+    ],
+    motif:{ bpm:88, chords:[[65,68,72,75,79],[61,64,68,71,75],[63,66,69,72,76],[67,70,74,77,81]], bass:[41,37,39,43], mel:[77,79,81,79,77,76,74] },
+    portraitKey:"bebopiano", adminKey:"gutenberg"
+  },
+  {
+    v:"6.0", name:"Arturo", musician:"Arturo O'Farrill (p)", date:"2022 · 05 · 24", era:"Neon Site-Editor",
+    camera:"Dutch tilt + scanline", trick:"NEGATIVE", register:"neon · electric",
+    palette:["#0b021a","#3a0b6e","#8b2fce","#ff5ad9","#ffe7fb"],
+    headline:"Full-site editing matured: styles, patterns, template locking.",
+    paras:[
+      "May 24, 2022. Named for Afro-Cuban jazz pianist Arturo O'Farrill.",
+      "6.0 advanced Full-Site Editing with style variations, distraction-free Write mode, and locking controls for block patterns.",
+      "A new Webfonts API landed. Template browsing in the site editor matured.",
+      "Designers could shape a whole site — header, footer, templates, styles — without opening a PHP file.",
+      "The neon release: theme.json let colour, type, and spacing be spoken as a single language."
+    ],
+    motif:{ bpm:104, chords:[[63,67,70,74,77],[68,72,75,79,82],[61,65,68,72,75],[66,70,73,77,80]], bass:[39,44,37,42], mel:[79,82,84,82,79,77] },
+    portraitKey:"keytar", adminKey:"siteeditor"
+  },
+  {
+    v:"7.0", name:"Monk", musician:"Thelonious Monk (reprise)", date:"2026 · 02 · 10", era:"The Void",
+    camera:"slow zoom-out void", trick:"WHITEN", register:"elegiac · futurist",
+    palette:["#fafbff","#e8eaf0","#c8ccd8","#7a8299","#3a4254"],
+    headline:"Collaborative editing in core; an AI styling helper quietly listens.",
+    paras:[
+      "February 10, 2026. A landmark reprise closing the codename circle back to Thelonious Monk.",
+      "7.0 lands collaborative editing in core after years of Phase-3 labs: multiple cursors, presence, threaded comments on the block canvas.",
+      "Twenty Twenty-Six ships with an AI-assisted styling helper that proposes theme-consistent variations.",
+      "Speculative, of course — presented here as the quiet, open-ended room where the platform begins writing with you.",
+      "A coda in whites and soft greys. The museum does not end; it exhales."
+    ],
+    motif:{ bpm:60, chords:[[65,69,72,76,79,83],[62,66,69,72,76,79],[63,67,70,74,77,81],[60,64,67,71,74,78]], bass:[41,38,39,36], mel:[79,81,83,79,77,76,74,72] },
+    portraitKey:"headphones", adminKey:"ai"
+  }
+];
+
+/* ---------- Scroll layout ----------
+   overture: 0..400
+   movements: each 1700px
+   coda: last 400
+*/
+const OVERTURE = 400;
+const CODA = 400;
+const MLEN = 2100; // widened so sustained beat stretches ≥150vh at typical viewport
+const TOTAL = OVERTURE + M.length * MLEN + CODA; // 400+18900+400 = 19700
+document.body.style.height = TOTAL + "px";
+
+/* beat ranges within a movement (fraction): approach, anticipation, arrival, sustained, departure
+   Sustained widened to 0.30→0.92 (62% of MLEN → ~1302px → ≥150vh at 800px viewport)
+   so the camera has time to do real theatrical work during the sustained beat. */
+const BEATS = [
+  {key:"approach",    a:0.00, b:0.12},
+  {key:"anticipation",a:0.12, b:0.22},
+  {key:"arrival",     a:0.22, b:0.30},
+  {key:"sustained",   a:0.30, b:0.92},
+  {key:"departure",   a:0.92, b:1.00}
+];
+
+/* ---------- Smoothed scroll ---------- */
+let scrollTarget = 0;
+let scrollSmooth = 0;
+window.addEventListener("scroll", ()=>{ scrollTarget = window.scrollY; }, {passive:true});
+
+/* ---------- Canvas ---------- */
+const canvas = document.getElementById("view");
+const ctx = canvas.getContext("2d", {alpha:false});
+let DPR = Math.min(window.devicePixelRatio||1, 2);
+let W=1, H=1;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.floor(W*DPR); canvas.height = Math.floor(H*DPR);
+  canvas.style.width = W+"px"; canvas.style.height = H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize(); window.addEventListener("resize", resize);
+
+/* ---------- Noise & dust ---------- */
+const noise2 = (()=>{ const s=2048; const arr=new Float32Array(s); for(let i=0;i<s;i++) arr[i]=Math.random(); return (x,y)=>arr[((x*131+y*311)|0)&(s-1)]; })();
+const dust = [];
+for(let i=0;i<140;i++) dust.push({x:Math.random(),y:Math.random(),z:.2+Math.random()*.8,s:.2+Math.random()*1.4,o:.1+Math.random()*.5});
+
+/* ---------- Pixel portraits (hand-authored 24×32) ---------- */
+/* Use string pixel grids — 0=clear, 1=silhouette, 2=highlight, 3=accent, 4=bg-halo */
+const PORT = {};
+function paintPortrait(key, palette){
+  const c = document.createElement("canvas"); c.width=72; c.height=96;
+  const g = c.getContext("2d");
+  // halo
+  const grd = g.createRadialGradient(36,44,6,36,44,56);
+  grd.addColorStop(0, rgb(hex(palette[3]),0.4));
+  grd.addColorStop(1, rgb(hex(palette[0]),0));
+  g.fillStyle = rgb(hex(palette[0])); g.fillRect(0,0,72,96);
+  g.fillStyle = grd; g.fillRect(0,0,72,96);
+  const sil = PORT_PX[key] || PORT_PX.trumpet;
+  const pxW=24, pxH=32, cell=3;
+  const ox=(72-pxW*cell)/2, oy=(96-pxH*cell)/2;
+  for(let y=0;y<pxH;y++){
+    for(let x=0;x<pxW;x++){
+      const v = sil[y][x];
+      if(v===0) continue;
+      let col;
+      if(v===1) col = hex(palette[0]);
+      else if(v===2) col = hex(palette[3]);
+      else if(v===3) col = hex(palette[4]);
+      else if(v===4) col = mix(hex(palette[2]), hex(palette[4]), 0.5);
+      else col = hex(palette[2]);
+      g.fillStyle = rgb(col);
+      g.fillRect(ox+x*cell, oy+y*cell, cell, cell);
+    }
+  }
+  // CRT scanlines
+  g.globalAlpha = 0.18;
+  for(let y=0;y<96;y+=2){ g.fillStyle="#000"; g.fillRect(0,y,72,1); }
+  g.globalAlpha = 1;
+  return c;
+}
+/* PORT_PX: 32 rows × 24 cols. Values: 0 bg; 1 dark-silhouette; 2 mid; 3 hi; 5 deep */
+const PX = (s)=> s.split("\n").filter(r=>r.length>0).map(r=>r.split("").map(ch=>ch===" "?0:(ch==="."?0:parseInt(ch))));
+const PORT_PX = {
+  // trumpet silhouette (Miles)
+  trumpet: PX(`
+........................
+........................
+........55555...........
+.......5222225..........
+.......522222255........
+.......52222225.........
+.......52555525.........
+........55555...........
+........11111...........
+.......1222221..........
+......12222221..........
+......12222221..........
+.....1222222221.........
+.....1222222221..........
+....1222222222233333333.
+....12222222221333333333
+....1222222222133333333.
+....1222222221..........
+....12222222221.........
+....122222222221........
+....12222222222.........
+....1222222222..........
+.....122222221..........
+.....1111111............
+......11111.............
+......11111.............
+......11111.............
+.....1111111............
+....111111111...........
+...11111111111..........
+..111111111111111.......
+...1.............1......
+`),
+  piano: PX(`
+........................
+........................
+........55555...........
+.......5333335..........
+.......5322225..........
+......53322225..........
+......53322235..........
+.......555555...........
+.......11111............
+......1222221...........
+.....122222221..........
+.....123332221..........
+....122322222221........
+....122322222221........
+....122222222221........
+....122222222221........
+....12222222221.........
+....1222222222..........
+....1222222222..........
+....122222222...........
+....12222221............
+....1111111.............
+....1111111.............
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  sax: PX(`
+........................
+........................
+.......5555.............
+......522225............
+......522225............
+......522225............
+.......5555.............
+........1...............
+.......121..............
+.......121..............
+......12321.............
+......12321.............
+......12321..3..........
+......12321.333.........
+......12321.33..........
+.......131.333..........
+........1.333...........
+........1333............
+........133.............
+........133.............
+........1133............
+........12233...........
+........122233..........
+........1222233.........
+........12222233........
+........122222233.......
+........1222222223......
+........12222222223.....
+........122222222233....
+........1222222222233...
+.........11111111111....
+.........2222222222.....
+`),
+  monkpiano: PX(`
+........................
+........................
+.......555555...........
+......55333335..........
+......53322335..........
+......53322335..........
+.......533335...........
+........1111............
+.......122221...........
+......12222221..........
+.....1223333221.........
+.....1223333221.........
+....122333322221........
+....122333322221........
+....122222222221........
+....122222222221........
+....122222222221........
+....122222222221........
+....12222222222.........
+....12222222222.........
+....1222222222..........
+.....11111111...........
+.....111111.............
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  sax2: PX(`
+........................
+........................
+........5555............
+.......522225...........
+.......522225...........
+.......522225...........
+........5555............
+.........1..............
+........121.............
+........121.............
+.......12321............
+.......12321............
+.......12321.3..........
+.......12321.33.........
+.......12321.33.........
+........131.33..........
+.........1.33...........
+.........133............
+.........13.............
+.........133............
+.........1133...........
+.........12233..........
+.........122233.........
+.........1222233........
+.........12222233.......
+.........122222233......
+.........1222222233.....
+.........12222222233....
+.........122222222233...
+..........1111111111....
+..........22222222......
+........................
+`),
+  clarinet: PX(`
+........................
+........................
+.........5555...........
+........522225..........
+........522225..........
+........522225..........
+.........5555...........
+..........1.............
+.........121............
+.........121............
+.........121............
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........122221..........
+........12222221........
+........12222221........
+.........111111.........
+..........33333.........
+..........33333.........
+`),
+  bebopiano: PX(`
+........................
+........................
+.......5555555..........
+......522222225.........
+.....52222222225........
+.....52222222225........
+......522222225.........
+.......5555555..........
+........11111...........
+.......1222221..........
+......122222221.........
+.....12222222221........
+.....12233333221........
+....12223333322221......
+....122233333222211.....
+....122222222222211.....
+....12222222222221......
+....12222222222221......
+....1222222222222.......
+....122222222222........
+....12222222222.........
+....1222222221..........
+....111111111...........
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  keytar: PX(`
+........................
+........................
+.......555555...........
+......53333335..........
+......53333335..........
+......53333335..........
+.......555555...........
+........11111...........
+.......1333331..........
+......13333331..........
+.....133333331..........
+....1333333331..........
+...13333333331..........
+..133333333331..........
+.1333333333331..........
+13333333333331..........
+13333333333331..........
+.1333333333331..........
+..133333333331..........
+...13333333331..........
+....1333333331..........
+.....133333331..........
+......13333331..........
+.......1333331..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........5555555.........
+........5555555.........
+`),
+  headphones: PX(`
+........................
+.......5555555..........
+......522222225.........
+.....52222222225........
+....5222222222225.......
+....5222222222225.......
+....52222222222225......
+...522..........225.....
+...52............25.....
+...52............25.....
+...52............25.....
+...52.....11.....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52.....11.....25.....
+...52............25.....
+...52............25.....
+...52............25.....
+...555............555...
+...525............525...
+...525............525...
+...525............525...
+...525............525...
+...525............525...
+...5225..........5225...
+....555..........555....
+........................
+........................
+........................
+........................
+`)
+};
+function buildPortraits(){
+  for(const m of M){ PORT[m.portraitKey] = paintPortrait(m.portraitKey, m.palette); }
+}
+
+/* ---------- Era-accurate admin mocks (280×140) ---------- */
+const SHOT = {};
+function mockFrame(g,w,h, bg,fg){
+  g.fillStyle = bg; g.fillRect(0,0,w,h);
+}
+function drawB2cafelog(g){
+  // 2003/2004 b2/cafelog-ish: dark bg, orange title, centered form
+  const w=280,h=140;
+  g.fillStyle="#14120e"; g.fillRect(0,0,w,h);
+  g.fillStyle="#2a1408"; g.fillRect(0,0,w,22);
+  g.fillStyle="#ff6a3d"; g.font="700 11px 'IBM Plex Mono',monospace";
+  g.fillText("b2/cafelog »  WordPress 1.0 'Miles'", 8, 15);
+  g.fillStyle="#b06238"; g.font="9px 'IBM Plex Mono',monospace";
+  g.fillText("Post a new entry", 10, 36);
+  g.strokeStyle="#4a2814"; g.strokeRect(10,42,w-20,22);
+  g.fillStyle="#1b100a"; g.fillRect(11,43,w-22,20);
+  g.fillStyle="#e9b173"; g.font="9px 'IBM Plex Mono',monospace";
+  g.fillText("Title: Hello world!", 14, 57);
+  g.strokeStyle="#4a2814"; g.strokeRect(10,68,w-20,48);
+  g.fillStyle="#1b100a"; g.fillRect(11,69,w-22,46);
+  g.fillStyle="#e9b173";
+  g.fillText("Welcome to WordPress. This is your", 14, 82);
+  g.fillText("first post. Edit or delete it, then", 14, 94);
+  g.fillText("start blogging!", 14, 106);
+  g.fillStyle="#ff6a3d"; g.fillRect(10,122,50,12);
+  g.fillStyle="#14120e"; g.font="700 8px 'IBM Plex Mono',monospace";
+  g.fillText("Publish", 16, 131);
+}
+function drawTinyMCE(g){
+  // 2005 Kubrick-era: blue top bar, TinyMCE toolbar
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  // Kubrick blue bar
+  g.fillStyle="#21759b"; g.fillRect(0,0,w,24);
+  g.fillStyle="#fff"; g.font="700 11px 'Trebuchet MS',sans-serif";
+  g.fillText("WordPress › Write › Post", 8, 16);
+  // tabs
+  g.fillStyle="#dfdfdf"; g.fillRect(0,24,w,18);
+  g.fillStyle="#21759b"; g.font="9px 'Trebuchet MS',sans-serif";
+  g.fillText("Write  Manage  Comments  Blogroll  Presentation  Plugins  Users  Options", 6, 36);
+  // title input
+  g.fillStyle="#fff"; g.fillRect(8,46,w-16,16); g.strokeStyle="#ccc"; g.strokeRect(8,46,w-16,16);
+  g.fillStyle="#333"; g.font="9px 'Trebuchet MS',sans-serif";
+  g.fillText("Hello world!", 12, 58);
+  // TinyMCE toolbar
+  g.fillStyle="#e5e5e5"; g.fillRect(8,66,w-16,18); g.strokeStyle="#b5b5b5"; g.strokeRect(8,66,w-16,18);
+  const tools=["B","I","U","·","“”","⌖","▤","▥","–","≡","≣","≢","⎘","—","🔗","⇌","✂"];
+  g.fillStyle="#333"; g.font="700 10px 'Trebuchet MS',sans-serif";
+  for(let i=0;i<tools.length;i++){ g.fillText(tools[i], 12+i*14, 78); }
+  // editor area
+  g.fillStyle="#fff"; g.fillRect(8,86,w-16,40); g.strokeStyle="#b5b5b5"; g.strokeRect(8,86,w-16,40);
+  g.fillStyle="#333"; g.font="9px Georgia,serif";
+  g.fillText("Welcome to WordPress. This is your first", 12, 98);
+  g.fillText("post. Edit or delete it, then start writing!", 12, 110);
+  // publish button
+  g.fillStyle="#21759b"; g.fillRect(8,128,50,10);
+  g.fillStyle="#fff"; g.font="700 8px 'Trebuchet MS',sans-serif"; g.fillText("Publish", 16, 136);
+}
+function drawWidgets(g){
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  g.fillStyle="#21759b"; g.fillRect(0,0,w,22);
+  g.fillStyle="#fff"; g.font="700 10px 'Trebuchet MS',sans-serif";
+  g.fillText("Presentation › Widgets", 8, 15);
+  // Available widgets
+  g.fillStyle="#444"; g.font="700 9px 'Trebuchet MS',sans-serif";
+  g.fillText("AVAILABLE WIDGETS", 8, 36);
+  const avail=["Recent Posts","Tag Cloud","Archives","Categories","RSS","Search"];
+  for(let i=0;i<avail.length;i++){
+    const x=8+(i%2)*82, y=42+Math.floor(i/2)*16;
+    g.fillStyle="#e0eef6"; g.fillRect(x,y,80,14);
+    g.strokeStyle="#7ab"; g.strokeRect(x,y,80,14);
+    g.fillStyle="#21759b"; g.font="8px 'Trebuchet MS',sans-serif";
+    g.fillText(avail[i], x+4, y+10);
+    // drag handle dots
+    g.fillStyle="#7ab"; g.fillText("⋮⋮", x+70, y+11);
+  }
+  // Sidebar column
+  g.fillStyle="#444"; g.font="700 9px 'Trebuchet MS',sans-serif";
+  g.fillText("SIDEBAR 1", 180, 36);
+  g.strokeStyle="#b5b5b5"; g.strokeRect(180,40,92,96);
+  g.fillStyle="#fff"; g.fillRect(181,41,90,94);
+  const placed=["Search","Recent Posts","Categories"];
+  for(let i=0;i<placed.length;i++){
+    const y=44+i*18;
+    g.fillStyle="#f5faff"; g.fillRect(184,y,86,15);
+    g.strokeStyle="#21759b"; g.strokeRect(184,y,86,15);
+    g.fillStyle="#21759b"; g.font="8px 'Trebuchet MS',sans-serif";
+    g.fillText(placed[i], 188, y+11);
+    g.fillText("⋮⋮", 260, y+11);
+  }
+}
+function drawAdmin27(g){
+  const w=280,h=140;
+  // 2.7+ era admin, grey with blue accents; used for 3.0
+  g.fillStyle="#f9f9f9"; g.fillRect(0,0,w,h);
+  // top admin bar
+  g.fillStyle="#464646"; g.fillRect(0,0,w,18);
+  g.fillStyle="#ddd"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("WordPress  › Dashboard", 8, 12);
+  g.fillStyle="#aaa"; g.fillText("Howdy, matt", w-68, 12);
+  // sidebar
+  g.fillStyle="#ececec"; g.fillRect(0,18,62,h-18);
+  g.strokeStyle="#ccc"; g.beginPath(); g.moveTo(62,18); g.lineTo(62,h); g.stroke();
+  const items=["Dashboard","Posts","Media","Links","Pages","Comments","Appearance","Plugins","Users","Tools","Settings"];
+  g.font="8px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===6? "#21759b":"#333";
+    if(i===6){ g.fillStyle="#d8ecf6"; g.fillRect(0,26+i*10,62,10); g.fillStyle="#21759b"; }
+    g.fillText(items[i], 6, 34+i*10);
+  }
+  // content area with boxes
+  g.fillStyle="#333"; g.font="700 11px 'Helvetica Neue',sans-serif";
+  g.fillText("Dashboard", 70, 34);
+  const boxes=[{t:"Right Now",x:70,y:42,w:100,h:40},{t:"Recent Comments",x:174,y:42,w:100,h:40},{t:"QuickPress",x:70,y:86,w:100,h:46},{t:"Incoming Links",x:174,y:86,w:100,h:46}];
+  for(const b of boxes){
+    g.fillStyle="#fff"; g.fillRect(b.x,b.y,b.w,b.h); g.strokeStyle="#dfdfdf"; g.strokeRect(b.x,b.y,b.w,b.h);
+    g.fillStyle="#ececec"; g.fillRect(b.x,b.y,b.w,12);
+    g.fillStyle="#333"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText(b.t, b.x+4, b.y+9);
+    g.fillStyle="#999"; g.font="8px 'Helvetica Neue',sans-serif";
+    for(let i=0;i<2;i++) g.fillText("• item "+(i+1), b.x+5, b.y+22+i*10);
+  }
+}
+function drawSonny(g){
+  // 3.3: admin bar + flyout menu + blue pointer bubble
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  g.fillStyle="#222"; g.fillRect(0,0,w,22);
+  g.fillStyle="#eee"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("⌂  My Blog  + New", 8, 14);
+  g.fillStyle="#999"; g.fillText("Howdy, matt ▾", w-72, 14);
+  // sidebar
+  g.fillStyle="#ececec"; g.fillRect(0,22,54,h-22);
+  g.strokeStyle="#ccc"; g.beginPath(); g.moveTo(54,22); g.lineTo(54,h); g.stroke();
+  const items=["Dashboard","Posts","Media","Pages","Comments","Appearance","Plugins","Users","Tools","Settings"];
+  g.font="8px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===2? "#21759b":"#444";
+    if(i===2){ g.fillStyle="#21759b"; g.fillRect(0,28+i*10,54,10); g.fillStyle="#fff"; }
+    g.fillText(items[i], 5, 36+i*10);
+  }
+  // flyout for Media
+  g.fillStyle="#333"; g.fillRect(54,48,72,38);
+  g.fillStyle="#fff"; g.font="8px 'Helvetica Neue',sans-serif";
+  const sub=["Library","Add New"];
+  for(let i=0;i<sub.length;i++) g.fillText(sub[i], 60, 60+i*12);
+  // drag-drop uploader
+  g.fillStyle="#fff"; g.fillRect(134,40,w-142,62); g.strokeStyle="#bbb"; g.setLineDash([4,3]); g.strokeRect(134,40,w-142,62); g.setLineDash([]);
+  g.fillStyle="#777"; g.font="9px 'Helvetica Neue',sans-serif";
+  g.fillText("Drop files here", 160, 68);
+  g.fillStyle="#21759b"; g.font="8px 'Helvetica Neue',sans-serif";
+  g.fillText("or select from your computer", 150, 82);
+  // blue pointer bubble near Users
+  g.fillStyle="#2e93c9"; g.beginPath(); g.moveTo(54,100); g.lineTo(60,96); g.lineTo(60,104); g.closePath(); g.fill();
+  g.fillStyle="#2e93c9"; g.fillRect(60,88,84,28);
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif";
+  g.fillText("New feature!", 66, 100);
+  g.font="8px 'Helvetica Neue',sans-serif";
+  g.fillText("Try the new admin bar.", 66, 110);
+}
+function drawMp6Grid(g){
+  // MP6 4.0: dark sidebar, media grid
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  // dark admin bar
+  g.fillStyle="#23282d"; g.fillRect(0,0,w,18);
+  g.fillStyle="#eee"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("⌂  My Blog  + New", 8, 12);
+  g.fillStyle="#9aa"; g.fillText("Howdy, matt", w-64, 12);
+  // dark sidebar
+  g.fillStyle="#32373c"; g.fillRect(0,18,48,h-18);
+  const items=["⌂","✎","◧","⚙","⌘","✎","◈","★","♠","⚒","⚙"];
+  g.fillStyle="#b4b9be"; g.font="700 10px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===2? "#fff":"#b4b9be";
+    if(i===2){ g.fillStyle="#0073aa"; g.fillRect(0,24+i*10,48,10); g.fillStyle="#fff"; }
+    g.fillText(items[i], 8, 32+i*10);
+  }
+  // header
+  g.fillStyle="#444"; g.font="700 11px 'Helvetica Neue',sans-serif";
+  g.fillText("Media Library", 56, 32);
+  // grid
+  const cols=6, rows=3, gw=32, gh=26, gap=4, ox=56, oy=40;
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      const i=y*cols+x;
+      const hue = (i*37)%360;
+      g.fillStyle = `hsl(${hue},30%,${35+((i*17)%30)}%)`;
+      g.fillRect(ox+x*(gw+gap), oy+y*(gh+gap), gw, gh);
+      // inner highlight
+      g.fillStyle="rgba(255,255,255,0.06)";
+      g.fillRect(ox+x*(gw+gap), oy+y*(gh+gap), gw, 4);
+    }
+  }
+}
+function drawGutenberg(g){
+  const w=280,h=140;
+  g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+  // top bar
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,22);
+  g.fillStyle="#fff"; g.font="700 10px 'Helvetica Neue',sans-serif";
+  g.fillText("+ ↶ ↷    Post", 8, 15);
+  g.fillStyle="#007cba"; g.fillRect(w-46,4,40,14);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif"; g.fillText("Publish", w-42, 14);
+  // canvas
+  g.fillStyle="#f0f0f1"; g.fillRect(0,22,w,h-22);
+  g.fillStyle="#fff"; g.fillRect(22,28,w-90,h-34);
+  g.strokeStyle="#e0e0e0"; g.strokeRect(22,28,w-90,h-34);
+  // H1
+  g.fillStyle="#1e1e1e"; g.font="700 13px Georgia,serif"; g.fillText("Gutenberg", 32, 48);
+  // paragraph block (with handles)
+  g.strokeStyle="#007cba"; g.strokeRect(30,54,w-106,20);
+  g.fillStyle="#1e1e1e"; g.font="9px Georgia,serif"; g.fillText("A post is a composition of blocks.", 34, 67);
+  // toolbar above paragraph
+  g.fillStyle="#1e1e1e"; g.fillRect(30,44,80,8);
+  g.fillStyle="#fff"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("¶ B I “ ⌨", 34, 50);
+  // image block placeholder
+  g.fillStyle="#e0e0e0"; g.fillRect(30,78,90,30);
+  g.fillStyle="#888"; g.font="8px 'Helvetica Neue',sans-serif"; g.fillText("🖼 image", 54, 95);
+  // quote block
+  g.fillStyle="#1e1e1e"; g.fillRect(124,78,w-200,30);
+  g.fillStyle="#fff"; g.font="italic 8px Georgia,serif"; g.fillText("“inevitable in hindsight.”", 130, 96);
+  // + inserter
+  g.fillStyle="#007cba"; g.beginPath(); g.arc(30,116,5,0,TAU); g.fill();
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("+", 27, 119);
+  // right sidebar
+  g.fillStyle="#fff"; g.fillRect(w-62,22,62,h-22);
+  g.strokeStyle="#e0e0e0"; g.strokeRect(w-62,22,62,h-22);
+  g.fillStyle="#1e1e1e"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("Document  Block", w-58, 32);
+  g.fillStyle="#555";  g.font="7px 'Helvetica Neue',sans-serif";
+  g.fillText("Status", w-58, 46);
+  g.fillText("Categories", w-58, 58);
+  g.fillText("Tags", w-58, 70);
+  g.fillText("Featured image", w-58, 82);
+}
+function drawSiteEditor(g){
+  const w=280,h=140;
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,h);
+  // top
+  g.fillStyle="#0b0b0c"; g.fillRect(0,0,w,20);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("W  ◧  Templates › Home", 8, 13);
+  g.fillStyle="#007cba"; g.fillRect(w-42,3,34,14);
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("Save", w-36, 13);
+  // left: styles panel
+  g.fillStyle="#2a2a2a"; g.fillRect(0,20,58,h-20);
+  g.fillStyle="#bbb"; g.font="700 8px 'Helvetica Neue',sans-serif";
+  g.fillText("Styles", 6, 32);
+  g.fillText("Browse", 6, 44);
+  g.fillText("Colors", 6, 56);
+  g.fillText("Typography", 6, 68);
+  // style variation swatches
+  const sw=["#ff5ad9","#8b2fce","#3a0b6e","#ffe7fb"];
+  for(let i=0;i<sw.length;i++){
+    g.fillStyle=sw[i]; g.fillRect(6+i*12, 76, 10, 10);
+    g.strokeStyle="#555"; g.strokeRect(6+i*12, 76, 10, 10);
+  }
+  // canvas with template regions
+  const cx=62, cy=24, cw=w-70, ch=h-30;
+  g.fillStyle="#fafafa"; g.fillRect(cx,cy,cw,ch);
+  // header region
+  g.fillStyle="#111"; g.fillRect(cx+4,cy+4,cw-8,16);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif"; g.fillText("HEADER / LOGO        MENU", cx+8, cy+15);
+  // hero
+  g.fillStyle="#ffe7fb"; g.fillRect(cx+4,cy+24,cw-8,26);
+  g.fillStyle="#3a0b6e"; g.font="700 10px Georgia,serif"; g.fillText("HERO PATTERN", cx+10, cy+42);
+  // grid
+  for(let i=0;i<3;i++){ g.fillStyle="#eee"; g.fillRect(cx+4+i*((cw-12)/3+4), cy+54, (cw-12)/3, 22); g.strokeStyle="#aaa"; g.strokeRect(cx+4+i*((cw-12)/3+4), cy+54, (cw-12)/3, 22);}
+  // footer
+  g.fillStyle="#222"; g.fillRect(cx+4,cy+80,cw-8,14);
+  g.fillStyle="#bbb"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("FOOTER", cx+8, cy+90);
+}
+function drawAI(g){
+  const w=280,h=140;
+  g.fillStyle="#fcfcfe"; g.fillRect(0,0,w,h);
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,20);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("+  Post  · 3 editing now", 8, 13);
+  // collaborators
+  g.fillStyle="#e8f0fe"; g.beginPath(); g.arc(w-30,10,6,0,TAU); g.fill();
+  g.fillStyle="#fde8f1"; g.beginPath(); g.arc(w-18,10,6,0,TAU); g.fill();
+  g.fillStyle="#e8fde9"; g.beginPath(); g.arc(w-6,10,6,0,TAU); g.fill();
+  // canvas
+  g.fillStyle="#fff"; g.fillRect(18,26,w-36,h-34); g.strokeStyle="#eee"; g.strokeRect(18,26,w-36,h-34);
+  // block with glowing AI halo
+  g.save();
+  g.shadowColor="rgba(120,160,255,0.55)"; g.shadowBlur=12;
+  g.strokeStyle="#a9b8ff"; g.lineWidth=1.5; g.strokeRect(26,36,w-52,28);
+  g.restore();
+  g.fillStyle="#1e1e1e"; g.font="700 11px Georgia,serif"; g.fillText("The Museum", 30, 52);
+  g.fillStyle="#555"; g.font="9px Georgia,serif"; g.fillText("A quiet, open-ended room.", 30, 62);
+  // two cursors
+  g.fillStyle="#2a6ae0"; g.fillRect(90,50,1,10); g.fillStyle="#2a6ae0"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("matt", 92, 58);
+  g.fillStyle="#d43fa8"; g.fillRect(150,50,1,10); g.fillStyle="#d43fa8"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("rosa", 152, 58);
+  // AI suggestion card
+  g.fillStyle="#f4f6ff"; g.fillRect(26,74,w-52,24); g.strokeStyle="#a9b8ff"; g.strokeRect(26,74,w-52,24);
+  g.fillStyle="#3a4254"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("✦ Suggestion", 30, 86);
+  g.fillStyle="#555"; g.font="8px 'Helvetica Neue',sans-serif"; g.fillText("Try a larger serif for this title.", 30, 96);
+  g.fillStyle="#a9b8ff"; g.fillRect(w-64,80,36,12); g.fillStyle="#fff"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("Accept", w-56, 89);
+  // comment
+  g.fillStyle="#fffbe8"; g.fillRect(26,104,w-52,22); g.strokeStyle="#e8dfa2"; g.strokeRect(26,104,w-52,22);
+  g.fillStyle="#6a5a1a"; g.font="italic 8px Georgia,serif"; g.fillText("rosa: love the quiet — should we add…", 30, 118);
+}
+function buildAdminMocks(){
+  const fns = { b2cafelog:drawB2cafelog, tinymce:drawTinyMCE, widgets:drawWidgets, admin27:drawAdmin27, sonnyadmin:drawSonny, mp6grid:drawMp6Grid, gutenberg:drawGutenberg, siteeditor:drawSiteEditor, ai:drawAI };
+  for(const key of Object.keys(fns)){
+    const c = document.createElement("canvas"); c.width=280; c.height=140;
+    const g = c.getContext("2d"); fns[key](g); SHOT[key]=c;
+  }
+}
+
+/* ---------- Minimap (graph SVG) ---------- */
+function buildMinimap(){
+  const svg = document.getElementById("m-svg");
+  const w=320, h=96;
+  const pad = 18;
+  const sx = (i)=> pad + (w-pad*2) * (i/(M.length-1));
+  const sy = 34; // main spine
+  let html = "";
+  // spine
+  html += `<line x1="${pad}" y1="${sy}" x2="${w-pad}" y2="${sy}" stroke="rgba(233,201,122,0.4)" stroke-width="1"/>`;
+  // wings (fork below 2.0 Kubrick archive + 3.0 lab annex)
+  html += `<path d="M ${sx(1)} ${sy} Q ${sx(1)-10} ${sy+14} ${sx(1)-22} ${sy+22}" stroke="rgba(233,201,122,0.3)" stroke-width="1" fill="none" stroke-dasharray="2 3"/>`;
+  html += `<circle cx="${sx(1)-22}" cy="${sy+22}" r="3" fill="none" stroke="rgba(233,201,122,0.35)"/>`;
+  html += `<text x="${sx(1)-34}" y="${sy+34}" fill="#8d7b54" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">KUBRICK·ARCHIVE</text>`;
+  html += `<path d="M ${sx(3)} ${sy} Q ${sx(3)+6} ${sy+18} ${sx(3)+18} ${sy+28}" stroke="rgba(233,201,122,0.3)" stroke-width="1" fill="none" stroke-dasharray="2 3"/>`;
+  html += `<circle cx="${sx(3)+18}" cy="${sy+28}" r="3" fill="none" stroke="rgba(233,201,122,0.35)"/>`;
+  html += `<text x="${sx(3)+22}" y="${sy+30}" fill="#8d7b54" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">WP-MU ANNEX</text>`;
+  // shortcut 3.3 → 6.0
+  html += `<path d="M ${sx(4)} ${sy-4} C ${sx(4)+30} ${sy-28} ${sx(7)-30} ${sy-28} ${sx(7)} ${sy-4}" stroke="rgba(198,139,255,0.55)" stroke-width="1" fill="none" stroke-dasharray="3 2"/>`;
+  html += `<text x="${(sx(4)+sx(7))/2 - 32}" y="${sy-30}" fill="#9c7adf" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">VELVET → NEON SHORTCUT</text>`;
+  // nodes
+  for(let i=0;i<M.length;i++){
+    const x=sx(i), y=sy;
+    const color = M[i].palette[3];
+    html += `<circle id="mnode${i}" cx="${x}" cy="${y}" r="4" fill="#0a0806" stroke="${color}" stroke-width="1.2"/>`;
+    html += `<text x="${x}" y="${y+14}" fill="#c5ae7a" font-family="IBM Plex Mono,Menlo,monospace" font-size="7" text-anchor="middle" letter-spacing="0.5">${M[i].v}</text>`;
+    html += `<text x="${x}" y="${y-10}" fill="#8d7b54" font-family="Didot,Georgia,serif" font-size="7" text-anchor="middle" font-style="italic">${M[i].name}</text>`;
+  }
+  // current pulse
+  html += `<circle id="mpulse" cx="${sx(0)}" cy="${sy}" r="8" fill="none" stroke="#e9c97a" stroke-width="1" opacity="0.5"/>`;
+  svg.innerHTML = html;
+}
+
+/* ---------- Audio engine ---------- */
+let AC = null, master = null, reverb=null, convGain=null, dryGain=null;
+let audioReady = false;
+let activeOsc = [];
+let schedulerTimer = null;
+let curMovement = -1;
+let motifNextTime = 0;
+function makeImpulse(len, decay){
+  const rate = AC.sampleRate;
+  const length = rate * len;
+  const imp = AC.createBuffer(2, length, rate);
+  for(let ch=0;ch<2;ch++){
+    const d = imp.getChannelData(ch);
+    for(let i=0;i<length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/length, decay);
+  }
+  return imp;
+}
+function initAudio(){
+  if(AC) return;
+  AC = new (window.AudioContext||window.webkitAudioContext)();
+  master = AC.createGain(); master.gain.value = 0.0; master.connect(AC.destination);
+  const comp = AC.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=4; comp.attack.value=.01; comp.release.value=.25;
+  comp.connect(master);
+  reverb = AC.createConvolver(); reverb.buffer = makeImpulse(2.8, 2.0);
+  convGain = AC.createGain(); convGain.gain.value = 0.45;
+  dryGain = AC.createGain(); dryGain.gain.value = 0.9;
+  reverb.connect(convGain); convGain.connect(comp); dryGain.connect(comp);
+  audioReady = true;
+}
+function mtof(m){ return 440 * Math.pow(2,(m-69)/12); }
+function fadeIn(){
+  if(!AC) return;
+  master.gain.cancelScheduledValues(AC.currentTime);
+  master.gain.setValueAtTime(master.gain.value, AC.currentTime);
+  master.gain.linearRampToValueAtTime(0.32, AC.currentTime + 1.8);
+}
+function playVoice(freq, start, dur, type, gain){
+  const o = AC.createOscillator(); o.type = type || "triangle"; o.frequency.value = freq;
+  const g = AC.createGain();
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(gain||0.08, start + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g); g.connect(dryGain); g.connect(reverb);
+  o.start(start); o.stop(start + dur + 0.05);
+  activeOsc.push(o);
+  if(activeOsc.length>120){ const old = activeOsc.shift(); try{old.stop();}catch{} }
+}
+function playHat(start, dur, gain){
+  const noiseBuf = AC.createBuffer(1, AC.sampleRate*0.1, AC.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 3);
+  const src = AC.createBufferSource(); src.buffer = noiseBuf;
+  const hp = AC.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=6000;
+  const g = AC.createGain(); g.gain.value = gain||0.04;
+  src.connect(hp); hp.connect(g); g.connect(dryGain);
+  src.start(start); src.stop(start + dur);
+}
+
+/* Schedule motif for current movement — voice lead across boundaries */
+let motifState = { idx:-1, beat:0, lastChord:null };
+function scheduleMotif(now, mIdx, intensity){
+  if(!AC) return;
+  const m = M[mIdx]; if(!m) return;
+  const spb = 60 / m.motif.bpm;
+  while(motifNextTime < now + 0.6){
+    if(motifNextTime < now) motifNextTime = now + 0.05;
+    const t = motifNextTime;
+    const chordIdx = motifState.beat % m.motif.chords.length;
+    const chord = m.motif.chords[chordIdx];
+    const bass = m.motif.bass[chordIdx % m.motif.bass.length];
+    const mel = m.motif.mel[motifState.beat % m.motif.mel.length];
+    const vol = intensity;
+    // bass on the 1
+    playVoice(mtof(bass), t, spb*1.6, "sine", 0.10*vol);
+    // chord pad voices (triangle)
+    for(let i=0;i<chord.length;i++) playVoice(mtof(chord[i]), t+0.02, spb*1.8, "triangle", 0.035*vol);
+    // melody on off-beats (sine)
+    playVoice(mtof(mel+12), t + spb*0.5, spb*0.9, "sine", 0.08*vol);
+    // soft hat on the &
+    playHat(t + spb*0.5, 0.1, 0.022*vol);
+    if(motifState.beat%2===1) playHat(t + spb*0.75, 0.08, 0.015*vol);
+    motifNextTime += spb;
+    motifState.beat++;
+    motifState.lastChord = chord;
+  }
+}
+
+/* ---------- Scene paint helpers ---------- */
+function fillBackdrop(g, palette, beat){
+  // gradient stops derived from palette + beat
+  const top = hex(palette[0]);
+  const mid = hex(palette[1]);
+  const bot = hex(palette[0]);
+  const grd = g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, rgb(top));
+  grd.addColorStop(0.5, rgb(mid));
+  grd.addColorStop(1, rgb(bot));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function drawDust(g, palette, sub, time){
+  g.save();
+  for(const p of dust){
+    const y = (p.y + time*0.00004*p.z + sub*0.2) % 1;
+    const x = (p.x + Math.sin(time*0.0003+p.z*7)*0.02) % 1;
+    const sz = p.s * (0.5 + 0.5*p.z);
+    g.fillStyle = rgb(hex(palette[3]), p.o*0.35);
+    g.beginPath(); g.arc(x*W, y*H, sz, 0, TAU); g.fill();
+  }
+  g.restore();
+}
+function vignette(g, strength){
+  const grd = g.createRadialGradient(W/2, H*0.5, Math.min(W,H)*0.2, W/2, H*0.5, Math.max(W,H)*0.7);
+  grd.addColorStop(0, "rgba(0,0,0,0)");
+  grd.addColorStop(1, `rgba(0,0,0,${strength})`);
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function rimLight(g, palette, sub, beat){
+  const c = hex(palette[3]);
+  const a = beat.name==="arrival" ? (0.22 + smooth(beat.frac)*0.35) : (beat.name==="sustained" ? 0.25 : 0.12);
+  const grd = g.createRadialGradient(W/2, H*0.45, 40, W/2, H*0.45, Math.max(W,H)*0.9);
+  grd.addColorStop(0, rgb(c, a));
+  grd.addColorStop(1, rgb(c, 0));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function godrays(g, palette, strength){
+  if(strength<=0.01) return;
+  g.save(); g.globalCompositeOperation = "screen";
+  const cx = W*0.5, cy = H*0.15;
+  const c = hex(palette[4]);
+  for(let i=0;i<16;i++){
+    const ang = -Math.PI/2 + (i-8)*0.08;
+    g.beginPath(); g.moveTo(cx,cy);
+    const dx = Math.cos(ang)*W, dy = Math.sin(ang)*H*2;
+    g.lineTo(cx+dx+30, cy+dy); g.lineTo(cx+dx-30, cy+dy); g.closePath();
+    g.fillStyle = rgb(c, 0.02*strength);
+    g.fill();
+  }
+  g.restore();
+}
+
+/* ---------- Unified retro-3D raycaster ----------
+   Every movement is rendered as a first-person walk through a textured 3D corridor.
+   Per-movement config (LVL[v]) supplies: wall-texture key, alcove texture key, ceiling/floor
+   gradient, ambient light color, rim-light color, lighting behaviour (torch/neon/fluorescent/sun),
+   billboards (portrait / admin mock / fact-tokens), camera mode (walk/orbit/dolly/dutch/macro/zoomout/overhead),
+   optional overlays (scanlines, flicker, sun-shaft, starfield, godrays).
+   The RENDER[v] entries are thin wrappers that call rayRenderLevel with the movement's LVL config.
+*/
+
+/* ---------- Procedural 64×64 wall textures ---------- */
+const TEX = {};
+function makeTex(name, painter){
+  const c = document.createElement("canvas"); c.width=64; c.height=64;
+  const g = c.getContext("2d");
+  painter(g,64,64);
+  TEX[name] = c;
+}
+function buildWallTextures(){
+  // brick — 1.0 Bunker
+  makeTex("brick", (g)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,64,64);
+    for(let row=0; row<8; row++){
+      const off = (row%2)*8;
+      for(let col=0; col<9; col++){
+        const x = col*8 - off;
+        const y = row*8;
+        const variance = ((row*3 + col*7)%24);
+        const r = 110 + variance, gr = 60 + variance/2, b = 34 + variance/4;
+        g.fillStyle = `rgb(${r},${gr},${b})`;
+        g.fillRect(x+1, y+1, 7, 6);
+        // highlight
+        g.fillStyle = `rgba(233,181,115,0.15)`;
+        g.fillRect(x+1, y+1, 7, 1);
+      }
+    }
+    g.strokeStyle="#150a04"; g.lineWidth=1;
+    for(let y=0;y<=64;y+=8){ g.beginPath(); g.moveTo(0,y+0.5); g.lineTo(64,y+0.5); g.stroke(); }
+    // soot
+    for(let i=0;i<80;i++){ g.fillStyle=`rgba(0,0,0,${Math.random()*0.4})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // stone-column — 2.0 Duke
+  makeTex("stone", (g)=>{
+    g.fillStyle="#3a2f1f"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=8){
+      const grd = g.createLinearGradient(x,0,x+8,0);
+      grd.addColorStop(0,"#1f1810"); grd.addColorStop(0.5,"#78623f"); grd.addColorStop(1,"#1f1810");
+      g.fillStyle=grd; g.fillRect(x,0,8,64);
+    }
+    // horizontal seams
+    g.fillStyle="#15100a"; g.fillRect(0,31,64,1); g.fillRect(0,47,64,1);
+    // specks
+    for(let i=0;i<120;i++){ g.fillStyle=`rgba(244,223,176,${Math.random()*0.15})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // wood-grain — 2.2 Getz
+  makeTex("wood", (g)=>{
+    g.fillStyle="#0f2a26"; g.fillRect(0,0,64,64);
+    for(let y=0;y<64;y++){
+      const shade = 0.4 + 0.25*Math.sin(y*0.4) + 0.15*Math.sin(y*1.1 + 3);
+      const r=(31*shade)|0, gr=(77*shade+20)|0, b=(68*shade+10)|0;
+      g.fillStyle=`rgb(${r},${gr},${b})`;
+      g.fillRect(0,y,64,1);
+    }
+    // vertical plank seams
+    for(let x=0;x<=64;x+=32){ g.fillStyle="rgba(0,0,0,0.5)"; g.fillRect(x,0,1,64); }
+    // knots
+    for(let i=0;i<3;i++){
+      const x=((i*37+11)%64), y=((i*23+7)%56)+4;
+      const rg = g.createRadialGradient(x,y,0,x,y,4);
+      rg.addColorStop(0,"rgba(0,0,0,0.7)"); rg.addColorStop(1,"rgba(0,0,0,0)");
+      g.fillStyle=rg; g.fillRect(x-5,y-5,10,10);
+    }
+  });
+  // lab-panel — 3.0 Thelonious
+  makeTex("lab", (g)=>{
+    g.fillStyle="#1d3a58"; g.fillRect(0,0,64,64);
+    // panel divisions
+    g.fillStyle="#0a1422"; g.fillRect(0,31,64,2); g.fillRect(31,0,2,64);
+    // rivets
+    for(const [x,y] of [[4,4],[60,4],[4,28],[60,28],[4,36],[60,36],[4,60],[60,60]]){
+      g.fillStyle="#9ec6e8"; g.beginPath(); g.arc(x,y,1.4,0,TAU); g.fill();
+      g.fillStyle="#f1f8ff"; g.fillRect(x-0.5,y-0.5,1,1);
+    }
+    // vent slits
+    for(let i=0;i<5;i++){ g.fillStyle="#0a1422"; g.fillRect(40,38+i*4,18,2); g.fillStyle="#4a7faa"; g.fillRect(40,38+i*4+2,18,1); }
+    // LED
+    g.fillStyle="#9ec6e8"; g.beginPath(); g.arc(10,42,1.6,0,TAU); g.fill();
+    g.fillStyle="rgba(158,198,232,0.3)"; g.beginPath(); g.arc(10,42,4,0,TAU); g.fill();
+    // stencil
+    g.fillStyle="rgba(158,198,232,0.55)"; g.font="700 6px monospace"; g.fillText("MU-01", 38,12);
+  });
+  // velvet-drape — 3.3 Sonny
+  makeTex("velvet", (g)=>{
+    g.fillStyle="#1a0f2a"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=4){
+      const grd = g.createLinearGradient(x,0,x+4,0);
+      grd.addColorStop(0,"rgba(20,10,40,0.85)");
+      grd.addColorStop(0.5,`rgba(${122+((x*7)%40)},${74+((x*3)%30)},${192},0.45)`);
+      grd.addColorStop(1,"rgba(20,10,40,0.85)");
+      g.fillStyle=grd; g.fillRect(x,0,4,64);
+    }
+    for(let i=0;i<80;i++){ g.fillStyle=`rgba(201,160,255,${Math.random()*0.3})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // marble — 4.0 Benny
+  makeTex("marble", (g)=>{
+    g.fillStyle="#f0e7cb"; g.fillRect(0,0,64,64);
+    // grain
+    for(let i=0;i<40;i++){
+      g.fillStyle=`rgba(185,155,106,${Math.random()*0.07})`;
+      g.beginPath(); g.arc(Math.random()*64,Math.random()*64,3+Math.random()*5,0,TAU); g.fill();
+    }
+    // veins
+    for(let i=0;i<5;i++){
+      g.strokeStyle=`rgba(117,96,69,${0.15+Math.random()*0.25})`;
+      g.lineWidth=0.8; g.beginPath();
+      let x=Math.random()*64, y=Math.random()*64;
+      g.moveTo(x,y);
+      for(let j=0;j<10;j++){ x+=(Math.random()-0.5)*18; y+=(Math.random()-0.5)*18; g.lineTo(x,y); }
+      g.stroke();
+    }
+    // gold inlay strip at mid
+    g.fillStyle="#b99b6a"; g.fillRect(0,31,64,1);
+    g.fillStyle="rgba(233,201,122,0.5)"; g.fillRect(0,30,64,1);
+  });
+  // white-gallery — 5.0 Bebo
+  makeTex("gallery", (g)=>{
+    g.fillStyle="#f5f7fa"; g.fillRect(0,0,64,64);
+    for(let i=0;i<120;i++){ g.fillStyle=`rgba(168,180,194,${Math.random()*0.06})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+    g.strokeStyle="rgba(74,91,114,0.18)"; g.beginPath(); g.moveTo(0,58); g.lineTo(64,58); g.stroke();
+    g.strokeStyle="rgba(168,180,194,0.3)"; g.beginPath(); g.moveTo(0,6); g.lineTo(64,6); g.stroke();
+    // subtle frame hints
+    g.strokeStyle="rgba(221,227,235,0.6)"; g.lineWidth=0.5; g.strokeRect(12,18,40,28);
+  });
+  // neon-grid — 6.0 Arturo
+  makeTex("neon", (g)=>{
+    g.fillStyle="#0b021a"; g.fillRect(0,0,64,64);
+    // vertical pink glow
+    for(let i=0;i<=64;i+=8){
+      const grd=g.createLinearGradient(i-2,0,i+2,0);
+      grd.addColorStop(0,"rgba(255,90,217,0)"); grd.addColorStop(0.5,"rgba(255,90,217,0.9)"); grd.addColorStop(1,"rgba(255,90,217,0)");
+      g.fillStyle=grd; g.fillRect(i-2,0,4,64);
+    }
+    for(let i=0;i<=64;i+=8){
+      const grd=g.createLinearGradient(0,i-2,0,i+2);
+      grd.addColorStop(0,"rgba(139,47,206,0)"); grd.addColorStop(0.5,"rgba(139,47,206,0.7)"); grd.addColorStop(1,"rgba(139,47,206,0)");
+      g.fillStyle=grd; g.fillRect(0,i-2,64,4);
+    }
+    // sparkles
+    for(let i=0;i<10;i++){
+      const x=Math.random()*64, y=Math.random()*64;
+      const rg=g.createRadialGradient(x,y,0,x,y,3);
+      rg.addColorStop(0,"rgba(255,231,251,1)"); rg.addColorStop(1,"rgba(255,231,251,0)");
+      g.fillStyle=rg; g.fillRect(x-3,y-3,6,6);
+    }
+  });
+  // void-pillar — 7.0 Monk
+  makeTex("void", (g)=>{
+    g.fillStyle="#fafbff"; g.fillRect(0,0,64,64);
+    for(let x=0;x<64;x+=2){
+      g.fillStyle=`rgba(122,130,153,${0.05+Math.sin(x*0.35)*0.035})`;
+      g.fillRect(x,0,1,64);
+    }
+    g.strokeStyle="rgba(200,204,216,0.3)"; g.beginPath(); g.moveTo(0,32); g.lineTo(64,32); g.stroke();
+    for(let i=0;i<50;i++){ g.fillStyle=`rgba(200,204,216,${Math.random()*0.2})`; g.fillRect((Math.random()*64)|0,(Math.random()*64)|0,1,1); }
+  });
+  // alcove accent (darker variant used inside alcoves across movements)
+  makeTex("accent", (g)=>{
+    g.fillStyle="#000"; g.fillRect(0,0,64,64);
+    for(let y=0;y<64;y++) for(let x=0;x<64;x++){
+      const a = 0.3 + Math.sin((x+y)*0.2)*0.1;
+      g.fillStyle=`rgba(40,30,20,${a})`; g.fillRect(x,y,1,1);
+    }
+  });
+}
+
+/* ---------- Billboard sprite factory ----------
+   Each billboard is a canvas drawn inside the 3D scene at (worldX, worldZ, yOffset) with width,height
+   (in world units). Common sprites generated once: pedestal plaque, door glow, cube.
+*/
+const BB = {};
+function makeBB(name, w, h, painter){
+  const c = document.createElement("canvas"); c.width=w; c.height=h;
+  const g = c.getContext("2d"); painter(g,w,h); BB[name]=c;
+}
+function buildBillboards(){
+  // Framed portrait frame (content filled with per-movement portrait canvas at render time)
+  makeBB("frame", 120, 160, (g,w,h)=>{
+    g.fillStyle="#1a0f04"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#7a5a2c"; g.lineWidth=4; g.strokeRect(4,4,w-8,h-8);
+    g.fillStyle="#3a2814"; g.fillRect(10,10,w-20,h-20);
+    // gold inner bevel
+    g.strokeStyle="#c9a05a"; g.lineWidth=1; g.strokeRect(10.5,10.5,w-21,h-21);
+  });
+  // Hologram pane frame (7.0 AI look)
+  makeBB("holo", 140, 100, (g,w,h)=>{
+    g.fillStyle="rgba(90,130,240,0.12)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="rgba(169,184,255,0.9)"; g.lineWidth=1; g.strokeRect(1,1,w-2,h-2);
+    g.strokeStyle="rgba(169,184,255,0.4)"; g.strokeRect(5,5,w-10,h-10);
+    for(let i=0;i<h;i+=3){ g.fillStyle="rgba(169,184,255,0.06)"; g.fillRect(0,i,w,1); }
+  });
+  // CRT monitor frame
+  makeBB("crt", 140, 110, (g,w,h)=>{
+    g.fillStyle="#1a1a1a"; g.fillRect(0,0,w,h);
+    g.fillStyle="#0a0a0a"; g.fillRect(6,6,w-12,h-22);
+    g.fillStyle="#2a2a2a"; g.fillRect(6,h-16,w-12,10);
+    g.fillStyle="#e9c97a"; g.fillRect(w-14,h-12,6,2);
+    // bevel
+    g.strokeStyle="#444"; g.strokeRect(2,2,w-4,h-4);
+  });
+  // Gilded screen frame (4.0 / 2.0)
+  makeBB("gilt", 160, 110, (g,w,h)=>{
+    g.fillStyle="#b99b6a"; g.fillRect(0,0,w,h);
+    g.fillStyle="#f0e7cb"; g.fillRect(4,4,w-8,h-8);
+    g.strokeStyle="#7a5a2c"; g.lineWidth=2; g.strokeRect(4,4,w-8,h-8);
+  });
+  // Neon screen frame (6.0)
+  makeBB("neonscr", 160, 110, (g,w,h)=>{
+    g.fillStyle="#120526"; g.fillRect(0,0,w,h);
+    g.shadowColor="#ff5ad9"; g.shadowBlur=12;
+    g.strokeStyle="#ff5ad9"; g.lineWidth=2; g.strokeRect(3,3,w-6,h-6);
+    g.shadowBlur=0;
+  });
+  // Gallery mat (5.0)
+  makeBB("mat", 160, 110, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#1e1e1e"; g.lineWidth=1; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#f5f7fa"; g.fillRect(8,8,w-16,h-16);
+  });
+  // Doorway glow — used as transition portal
+  makeBB("door", 128, 180, (g,w,h)=>{
+    const rg = g.createRadialGradient(w/2,h*0.55,4,w/2,h*0.55,w*0.7);
+    rg.addColorStop(0,"rgba(255,230,180,1)");
+    rg.addColorStop(0.4,"rgba(233,201,122,0.6)");
+    rg.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=rg; g.fillRect(0,0,w,h);
+    g.fillStyle="#000"; g.globalCompositeOperation="destination-in";
+    // arched doorway shape
+    g.beginPath();
+    g.moveTo(w*0.2, h);
+    g.lineTo(w*0.2, h*0.35);
+    g.arc(w/2, h*0.35, w*0.3, Math.PI, 0);
+    g.lineTo(w*0.8, h);
+    g.closePath();
+    g.fill();
+  });
+  // Gutenberg cube faces
+  makeBB("cubeP", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#1e1e1e"; g.font="700 16px Georgia,serif"; g.fillText("¶", 8, 22);
+    g.font="11px Georgia,serif"; g.fillStyle="#555";
+    g.fillText("A post is a", 8, 48); g.fillText("composition", 8, 62); g.fillText("of blocks.", 8, 76);
+  });
+  makeBB("cubeH", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#1e1e1e"; g.font="700 12px Georgia,serif"; g.fillText("H2", 8, 20);
+    g.font="700 20px Georgia,serif"; g.fillText("Gutenberg", 8, 60);
+  });
+  makeBB("cubeIMG", 100, 100, (g,w,h)=>{
+    g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#007cba"; g.lineWidth=2; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#dde3eb"; g.fillRect(8,8,w-16,h-16);
+    g.fillStyle="#4a5b72"; g.font="700 30px sans-serif"; g.fillText("🖼", 30, 68);
+  });
+  makeBB("cubeQ", 100, 100, (g,w,h)=>{
+    g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,h);
+    g.fillStyle="#fff"; g.font="italic 700 12px Georgia,serif"; g.fillText('"inevitable', 8, 40);
+    g.fillText('in hindsight."', 8, 58);
+  });
+  // Permalink slug sprite (floor marker)
+  makeBB("slug", 180, 34, (g,w,h)=>{
+    g.fillStyle="rgba(233,177,115,0.9)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#2a1408"; g.font="700 14px IBM Plex Mono,monospace";
+    g.fillText("/%postname%/", 10, 22);
+  });
+  // Hook tablet (for 1.0 sustained)
+  makeBB("hook", 140, 60, (g,w,h)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.lineWidth=1; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#fff1d4"; g.font="600 14px IBM Plex Mono,monospace"; g.fillText("add_filter()", 10, 28);
+    g.font="10px IBM Plex Mono,monospace"; g.fillStyle="#e9b173"; g.fillText("hook · 1.2", 10, 46);
+  });
+  makeBB("hook2", 140, 60, (g,w,h)=>{
+    g.fillStyle="#2a1408"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#e9b173"; g.lineWidth=1; g.strokeRect(2,2,w-4,h-4);
+    g.fillStyle="#fff1d4"; g.font="600 14px IBM Plex Mono,monospace"; g.fillText("add_action()", 10, 28);
+    g.font="10px IBM Plex Mono,monospace"; g.fillStyle="#e9b173"; g.fillText("hook · 1.2", 10, 46);
+  });
+  // Crown badge (2.0 roles)
+  function crown(n,label){
+    makeBB(n, 90, 60, (g,w,h)=>{
+      g.fillStyle="#15110b"; g.fillRect(0,0,w,h);
+      g.fillStyle="#c29a58"; g.font="700 30px serif"; g.fillText("♔", 6, 38);
+      g.fillStyle="#f4dfb0"; g.font="700 14px IBM Plex Mono,monospace"; g.fillText(label, 38, 30);
+      g.fillStyle="#78623f"; g.font="500 9px IBM Plex Mono,monospace"; g.fillText("role", 38, 44);
+    });
+  }
+  crown("roleA","ADMIN"); crown("roleE","EDITOR"); crown("roleAu","AUTHOR");
+  // Widget crate (2.2)
+  function widget(n, label, color){
+    makeBB(n, 120, 50, (g,w,h)=>{
+      g.fillStyle=color; g.fillRect(0,0,w,h);
+      g.strokeStyle="#dff5e4"; g.lineWidth=1; g.strokeRect(1,1,w-2,h-2);
+      g.fillStyle="#dff5e4"; g.font="600 12px Inter,sans-serif"; g.fillText(label, 10, 20);
+      g.fillStyle="rgba(223,245,228,0.5)"; g.font="9px IBM Plex Mono,monospace"; g.fillText("⋮⋮ widget", 10, 36);
+    });
+  }
+  widget("wSearch","Search","#1f4d44");
+  widget("wRecent","Recent Posts","#1f4d44");
+  widget("wTag","Tag Cloud","#1f4d44");
+  widget("wRSS","RSS","#1f4d44");
+  // Planet sphere (3.0)
+  makeBB("planet", 200, 200, (g,w,h)=>{
+    const rg = g.createRadialGradient(w*0.38,h*0.38,4,w/2,h/2,w/2);
+    rg.addColorStop(0,"#9ec6e8"); rg.addColorStop(0.7,"#4a7faa"); rg.addColorStop(1,"#0a1422");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    // continents
+    g.fillStyle="rgba(10,20,34,0.55)";
+    for(let i=0;i<8;i++){ g.beginPath(); const a=i*0.8; g.arc(w/2+Math.cos(a)*w*0.2, h/2+Math.sin(a)*h*0.18, 14, 0, TAU); g.fill(); }
+    // label
+    g.fillStyle="#f1f8ff"; g.font="700 14px Didot,serif"; g.textAlign="center"; g.fillText("WP", w/2, h/2+5); g.textAlign="left";
+  });
+  // MU Moon (3.0)
+  makeBB("moon", 90, 90, (g,w,h)=>{
+    const rg=g.createRadialGradient(w*0.38,h*0.38,2,w/2,h/2,w/2);
+    rg.addColorStop(0,"#f1f8ff"); rg.addColorStop(1,"#4a7faa");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    g.fillStyle="#0a1422"; g.font="700 18px IBM Plex Mono,monospace"; g.textAlign="center"; g.fillText("MU", w/2, h/2+6); g.textAlign="left";
+  });
+  // Pointer bubble (3.3)
+  function bub(n, label){
+    makeBB(n, 180, 50, (g,w,h)=>{
+      g.fillStyle="#2e93c9"; g.fillRect(0,0,w,h-8);
+      g.beginPath(); g.moveTo(20,h-8); g.lineTo(28,h); g.lineTo(36,h-8); g.closePath(); g.fill();
+      g.fillStyle="#fff"; g.font="700 12px Inter,sans-serif"; g.fillText("New feature!", 12, 22);
+      g.font="500 11px Inter,sans-serif"; g.fillText(label, 12, 36);
+    });
+  }
+  bub("ptr1","Try the new admin bar.");
+  bub("ptr2","Drag files here.");
+  bub("ptr3","Flyout menus, anywhere.");
+  // Upload file sprite
+  makeBB("upfile", 32, 40, (g,w,h)=>{
+    g.fillStyle="#c9a0ff"; g.fillRect(0,0,w,h);
+    g.fillStyle="#f2e8ff"; g.fillRect(w-10,0,10,10);
+    g.fillStyle="#1a0f2a"; g.font="700 7px IBM Plex Mono,monospace"; g.fillText(".jpg", 3, h-4);
+  });
+  // Language globe (4.0)
+  makeBB("globe", 120, 120, (g,w,h)=>{
+    g.fillStyle="rgba(240,231,203,0.8)"; g.beginPath(); g.arc(w/2,h/2,w/2-4,0,TAU); g.fill();
+    g.strokeStyle="#756045"; g.lineWidth=1;
+    for(let i=0;i<5;i++){ g.beginPath(); g.ellipse(w/2,h/2,w/2-4,(w/2-4)*Math.abs(Math.cos(i/5*Math.PI)),0,0,TAU); g.stroke(); }
+    g.fillStyle="#2a1f12"; g.font="700 10px IBM Plex Mono,monospace"; g.textAlign="center";
+    const langs = ["en","ja","es","de","zh","fr","pt"]; langs.forEach((l,i)=>{ const a=i/langs.length*TAU; g.fillText(l, w/2+Math.cos(a)*w*0.28, h/2+Math.sin(a)*h*0.28+3); });
+    g.textAlign="left";
+  });
+  // oEmbed card (4.0)
+  makeBB("oembed", 180, 100, (g,w,h)=>{
+    g.fillStyle="#f0e7cb"; g.fillRect(0,0,w,h); g.strokeStyle="#b99b6a"; g.strokeRect(0.5,0.5,w-1,h-1);
+    g.fillStyle="#a8b4c2"; g.fillRect(8,8,70,60);
+    g.fillStyle="#fff"; g.beginPath(); g.moveTo(32,28); g.lineTo(58,38); g.lineTo(32,50); g.closePath(); g.fill();
+    g.fillStyle="#2a1f12"; g.font="700 11px Inter,sans-serif"; g.fillText("Inline oEmbed", 86, 26);
+    g.font="10px Inter,sans-serif"; g.fillStyle="#756045"; g.fillText("preview, in-editor", 86, 42);
+  });
+  // Swatch (6.0)
+  function sw(n, color){ makeBB(n, 48, 48, (g,w,h)=>{ g.fillStyle=color; g.fillRect(0,0,w,h); g.strokeStyle="#ffe7fb"; g.strokeRect(1,1,w-2,h-2); }); }
+  sw("sw1","#ff5ad9"); sw("sw2","#8b2fce"); sw("sw3","#3a0b6e"); sw("sw4","#ffe7fb");
+  // Cursors + AI suggestion card (7.0)
+  makeBB("cursor1", 40, 60, (g,w,h)=>{ g.fillStyle="#2a6ae0"; g.fillRect(w/2-1,0,2,h-14); g.fillStyle="#2a6ae0"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("matt", w/2-8, h-2); });
+  makeBB("cursor2", 40, 60, (g,w,h)=>{ g.fillStyle="#d43fa8"; g.fillRect(w/2-1,0,2,h-14); g.fillStyle="#d43fa8"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("rosa", w/2-8, h-2); });
+  makeBB("aiSug", 160, 80, (g,w,h)=>{
+    g.fillStyle="#f4f6ff"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#a9b8ff"; g.lineWidth=1.5; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#3a4254"; g.font="700 11px Inter,sans-serif"; g.fillText("✦ AI Suggestion", 10, 22);
+    g.fillStyle="#555"; g.font="10px Inter,sans-serif"; g.fillText("Try a larger serif.", 10, 40);
+    g.fillStyle="#a9b8ff"; g.fillRect(10, 52, 60, 18);
+    g.fillStyle="#fff"; g.font="700 9px Inter,sans-serif"; g.fillText("Accept", 24, 64);
+  });
+  // Holographic AI panes — translucent UI surfaces hovering in the void
+  makeBB("aiPane", 180, 110, (g,w,h)=>{
+    g.fillStyle="rgba(212,224,255,0.86)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#5a78ff"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#1f2a44"; g.font="700 12px Inter,sans-serif"; g.fillText("✦ Generate post", 10, 22);
+    g.fillStyle="#3a4254"; g.font="10px Inter,sans-serif";
+    g.fillText("WordPress 7.0 — let the model", 10, 40);
+    g.fillText("draft a paragraph from the title.", 10, 54);
+    g.fillStyle="#5a78ff"; g.fillRect(10, 70, 60, 22); g.fillStyle="#fff"; g.font="700 10px Inter,sans-serif"; g.fillText("Generate", 18, 85);
+    g.fillStyle="rgba(0,0,0,0.4)"; g.fillRect(80, 70, 60, 22); g.fillStyle="#fff"; g.fillText("Cancel", 95, 85);
+  });
+  makeBB("aiPane2", 170, 100, (g,w,h)=>{
+    g.fillStyle="rgba(255,228,236,0.88)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#d43fa8"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#42203a"; g.font="700 12px Inter,sans-serif"; g.fillText("◈ Co-edit (rosa)", 10, 22);
+    g.fillStyle="#5a3a4c"; g.font="10px Inter,sans-serif";
+    g.fillText("rosa is editing this block.", 10, 40);
+    g.fillStyle="#d43fa8"; g.fillRect(10, 56, 80, 14);
+    g.fillStyle="#fff"; g.font="700 9px Inter,sans-serif"; g.fillText("Following…", 18, 67);
+    g.fillStyle="rgba(212,63,168,0.18)"; g.fillRect(10, 76, w-20, 14);
+  });
+  makeBB("aiPane3", 170, 100, (g,w,h)=>{
+    g.fillStyle="rgba(220,242,235,0.88)"; g.fillRect(0,0,w,h);
+    g.strokeStyle="#2a8d76"; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+    g.fillStyle="#10322a"; g.font="700 12px Inter,sans-serif"; g.fillText("⌘ Command", 10, 22);
+    g.fillStyle="#2a8d76"; g.fillRect(10, 30, w-20, 18);
+    g.fillStyle="#fff"; g.font="600 11px IBM Plex Mono,monospace"; g.fillText("/insert image grid", 14, 43);
+    g.fillStyle="#3a4254"; g.font="10px Inter,sans-serif"; g.fillText("3 results — press ↵", 10, 64);
+    g.fillStyle="rgba(42,141,118,0.22)"; g.fillRect(10, 72, w-20, 18);
+  });
+  // Atom RSS glyph (2.2)
+  makeBB("atom", 110, 110, (g,w,h)=>{
+    g.fillStyle="rgba(125,211,168,0.12)"; g.beginPath(); g.arc(w/2,h/2,w/2-2,0,TAU); g.fill();
+    g.strokeStyle="#dff5e4"; g.lineWidth=3;
+    g.beginPath(); g.arc(30,80, 40, -Math.PI/2, 0); g.stroke();
+    g.beginPath(); g.arc(30,80, 60, -Math.PI/2, 0); g.stroke();
+    g.fillStyle="#dff5e4"; g.beginPath(); g.arc(30,80,8,0,TAU); g.fill();
+    g.fillStyle="#7dd3a8"; g.font="700 10px IBM Plex Mono,monospace"; g.fillText("ATOM 1.0", 36, 20);
+  });
+  // Portal ring (3.3)
+  makeBB("portal", 220, 220, (g,w,h)=>{
+    for(let i=8;i>=0;i--){ g.strokeStyle=`rgba(201,160,255,${0.15 + (8-i)*0.08})`; g.lineWidth=1+i; g.beginPath(); g.arc(w/2,h/2,w/2-4-i*6,0,TAU); g.stroke(); }
+    const rg=g.createRadialGradient(w/2,h/2,4,w/2,h/2,w/2-10);
+    rg.addColorStop(0,"rgba(242,232,255,0.6)"); rg.addColorStop(1,"rgba(58,31,92,0)");
+    g.fillStyle=rg; g.beginPath(); g.arc(w/2,h/2,w/2-10,0,TAU); g.fill();
+  });
+  // End door (corridor exit)
+  makeBB("exit", 120, 180, (g,w,h)=>{
+    g.fillStyle="rgba(0,0,0,0.85)"; g.fillRect(0,0,w,h);
+    const rg=g.createRadialGradient(w/2,h*0.55,3,w/2,h*0.55,w*0.6);
+    rg.addColorStop(0,"rgba(255,230,180,0.95)"); rg.addColorStop(0.5,"rgba(233,201,122,0.4)"); rg.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=rg; g.fillRect(0,0,w,h);
+  });
+}
+
+/* ---------- Level configs ---------- */
+// Per-movement map shapes vary width, alcove pattern, and interior pillars so each
+// movement reads as its own level, not a texture-swap of the same corridor.
+// Values: 0 empty, 1 wall, 2 alcove accent, 3 bright panel.
+const LVL = {};
+function buildLevels(){
+  const Lc=40;
+  // shape: "bunker" narrow+alcoves, "library" colonnade pillars, "workshop" broad wood,
+  // "lab" wide with cross-vents, "tunnel" narrow arched, "atrium" very wide w/ 4 center columns,
+  // "gallery" wide with side-room alcoves, "neon" cyber corridor w/ grid pillars, "void" extra-wide sparse.
+  function shapeMap(shape){
+    const Wc = (shape==="atrium"||shape==="void"||shape==="gallery") ? 11
+             : (shape==="lab"||shape==="neon") ? 9
+             : (shape==="library"||shape==="workshop") ? 8
+             : 7;
+    const m=[];
+    for(let z=0; z<Lc; z++){
+      const row = new Array(Wc).fill(0);
+      row[0]=1; row[Wc-1]=1; // outer walls
+      // per-shape features
+      if(shape==="bunker"){
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="library"){
+        // colonnade: pillar pair every 3 rows
+        if(z>3 && z<Lc-3 && z%3===0){ row[2]=1; row[Wc-3]=1; }
+        if(z>2 && z<Lc-3 && z%6===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="workshop"){
+        // wood panel: slight alcoves
+        if(z>3 && z<Lc-3 && z%4===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="lab"){
+        // cross-vent pillars mid
+        if(z>4 && z<Lc-3 && z%7===0){ row[1]=1; row[Wc-2]=1; }
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="tunnel"){
+        // narrow velvet, arched alcoves every 2
+        if(z>2 && z<Lc-3 && z%2===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="atrium"){
+        // four great columns near center at fixed z
+        if(z===10 || z===14){ row[3]=1; row[Wc-4]=1; }
+        if(z===18 || z===22){ row[3]=1; row[Wc-4]=1; }
+        // shallow alcoves
+        if(z>2 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="gallery"){
+        // side rooms: carve breaks every 5 rows (alcove recessed)
+        if(z>3 && z<Lc-3 && z%5===0){ row[0]=2; row[Wc-1]=2; }
+      } else if(shape==="neon"){
+        // short grid pillars on floor
+        if(z>4 && z<Lc-3 && z%4===0){ row[0]=2; row[Wc-1]=2; }
+        if(z>4 && z<Lc-4 && z%8===0){ row[2]=1; row[Wc-3]=1; }
+      } else if(shape==="void"){
+        // very sparse: only a couple of distant pillars
+        if(z===10 || z===22){ row[4]=1; row[Wc-5]=1; }
+      }
+      m.push(row);
+    }
+    for(let x=0;x<Wc;x++) m[Lc-1][x]=1;
+    return m;
+  }
+  const make = (v, cfg)=>{
+    const shape = cfg.shape || "bunker";
+    LVL[v] = Object.assign({
+      map: shapeMap(shape),
+      shape,
+      tex: "brick", texAlcove: "accent",
+      ceil: ["#2a1408","#6e3c22"],
+      floor: ["#1a0a04","#6e3c22"],
+      ambient: [20,12,4],
+      rim: [255,180,110],
+      light: "torch",
+      scanlines: 0,
+      camera: {mode:"walk", fov: 1.0, bob: 3},
+      starfield: false, godray: 0, sunShaft: 0,
+      billboards: [],
+      overlays: []
+    }, cfg);
+  };
+
+  // 1.0 Miles — Bunker
+  make("1.0", {
+    shape:"bunker",
+    tex:"brick", texAlcove:"accent", alcoveEvery:5,
+    ceil:["#15080a","#2a1408"], floor:["#1a0a04","#3a1808"],
+    ambient:[90,30,10], rim:[255,120,60], light:"torch",
+    // macro mode pushes camera toward the plaque/torch with a slow dolly during sustained
+    camera:{mode:"macroPush", fov:1.05, bob:3.5},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:-0.2, w:3.0, h:2.1, frame:"crt"},
+      {kind:"sprite", spr:"hook",  z:16, side:"L", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
+      {kind:"sprite", spr:"hook2", z:18, side:"R", yOff:-0.3, w:2.2, h:1.0, bob:0.25},
+      {kind:"plaque", z:15, side:"C", yOff:-0.2, w:3.2, h:1.8},
+      {kind:"floor", spr:"slug", z:13, w:2.0, h:0.4},
+      {kind:"floor", spr:"slug", z:17, w:2.0, h:0.4},
+      {kind:"floor", spr:"slug", z:21, w:2.0, h:0.4}
+    ],
+    overlays:["torchflicker"]
+  });
+  // 2.0 Duke — Crypt Library (colonnade pillars)
+  make("2.0", {
+    shape:"library",
+    tex:"stone", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#0a0604","#3a2f1f"], floor:["#15110b","#78623f"],
+    ambient:[60,44,18], rim:[233,201,122], light:"candle",
+    camera:{mode:"walk", fov:1.0, bob:2.5},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.2, h:2.2, frame:"gilt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.2, w:3.2, h:1.8},
+      {kind:"sprite", spr:"roleA",  z:16, side:"L", yOff:0.4, w:1.8, h:1.1, bob:0.3},
+      {kind:"sprite", spr:"roleE",  z:18, side:"R", yOff:0.4, w:1.8, h:1.1, bob:0.3},
+      {kind:"sprite", spr:"roleAu", z:20, side:"L", yOff:0.4, w:1.8, h:1.1, bob:0.3}
+    ]
+  });
+  // 2.2 Getz — Widget Workshop (broad wood-panelled room)
+  make("2.2", {
+    shape:"workshop",
+    tex:"wood", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#0a1a18","#1f4d44"], floor:["#0f2a26","#3a8a74"],
+    ambient:[40,80,68], rim:[125,211,168], light:"fluorescent",
+    camera:{mode:"overhead", fov:1.1, bob:1, tilt:0.08},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.0, h:2.8},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.0, h:2.1, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"sprite", spr:"atom", z:17, side:"L", yOff:0.5, w:1.8, h:1.8, rot:0.002, bob:0.2},
+      {kind:"widget", z:16, side:"C", yOff:0.2, spr:"wSearch", w:2.0, h:0.8, slide:0.8},
+      {kind:"widget", z:18, side:"C", yOff:0.2, spr:"wRecent", w:2.0, h:0.8, slide:1.1},
+      {kind:"widget", z:20, side:"C", yOff:0.2, spr:"wTag", w:2.0, h:0.8, slide:1.4},
+      {kind:"widget", z:22, side:"C", yOff:0.2, spr:"wRSS", w:2.0, h:0.8, slide:1.7}
+    ]
+  });
+  // 3.0 Thelonious — Laboratory (wide hall with vent pillars)
+  make("3.0", {
+    shape:"lab",
+    tex:"lab", texAlcove:"accent", alcoveEvery:5,
+    ceil:["#05080f","#0a1422"], floor:["#0a1422","#1d3a58"],
+    ambient:[20,40,70], rim:[158,198,232], light:"fluorescent",
+    camera:{mode:"orbit", fov:1.05, bob:1.5},
+    starfield:true,
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.4, h:2.4, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"planet", z:20, w:5.5, h:5.5, bob:0.25, rot:0.0008},
+      {kind:"moon",   z:20, w:2.4, h:2.4, orbitR:3.0, orbitSpeed:0.0012}
+    ]
+  });
+  // 3.3 Sonny — Velvet Tunnel
+  make("3.3", {
+    shape:"tunnel",
+    tex:"velvet", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#0a0514","#1a0f2a"], floor:["#1a0f2a","#3a1f5c"],
+    ambient:[60,30,100], rim:[201,160,255], light:"pulse",
+    camera:{mode:"dutch", fov:1.0, bob:2},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.2, h:2.2, frame:"crt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.4, w:3.2, h:1.8},
+      {kind:"sprite", spr:"portal", z:20, side:"C", yOff:-0.2, w:5.0, h:5.0, rot:0.002},
+      {kind:"sprite", spr:"ptr1", z:14, side:"L", yOff:0.4, w:2.4, h:0.8, bob:0.3},
+      {kind:"sprite", spr:"ptr2", z:16, side:"R", yOff:0.3, w:2.4, h:0.8, bob:0.3},
+      {kind:"sprite", spr:"ptr3", z:18, side:"L", yOff:0.2, w:2.4, h:0.8, bob:0.3}
+    ],
+    overlays:["uploadRain"]
+  });
+  // 4.0 Benny — Marble Atrium (wide open w/ four great columns)
+  make("4.0", {
+    shape:"atrium",
+    tex:"marble", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#3a2e1c","#6a4f2d"], floor:["#4a341a","#8a6a3a"],
+    ambient:[130,96,50], rim:[255,210,140], light:"sun",
+    camera:{mode:"dolly", fov:0.9, bob:1.2},
+    sunShaft:0.7,
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.6, h:2.4, frame:"gilt"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      {kind:"sprite", spr:"globe",  z:17, side:"L", yOff:0.5, w:2.6, h:2.6, rot:0.0015, bob:0.3},
+      {kind:"sprite", spr:"oembed", z:18, side:"R", yOff:0.3, w:3.0, h:1.7, bob:0.3},
+      {kind:"sprite", spr:"oembed", z:22, side:"L", yOff:0.5, w:2.4, h:1.4, bob:0.35}
+    ]
+  });
+  // 5.0 Bebo — Gallery (wide with side rooms)
+  make("5.0", {
+    shape:"gallery",
+    tex:"gallery", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#b8c2d0","#8a96a8"], floor:["#6a7686","#384250"],
+    ambient:[160,176,198], rim:[220,230,250], light:"gallery",
+    camera:{mode:"macro", fov:0.8, bob:1},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.8, h:2.6, frame:"mat"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      // Gutenberg blocks: bigger and assembling — they slide in & snap toward center during sustained
+      {kind:"cube", spr:"cubeH",   z:16, side:"C", yOff:0.9, w:2.6, h:2.6, bob:0.7, rot:0.003,  assemble:0.6},
+      {kind:"cube", spr:"cubeP",   z:17, side:"L", yOff:0.6, w:2.4, h:2.4, bob:0.6, rot:-0.0024, assemble:0.9},
+      {kind:"cube", spr:"cubeIMG", z:18, side:"R", yOff:0.7, w:2.4, h:2.4, bob:0.7, rot:0.0026,  assemble:1.2},
+      {kind:"cube", spr:"cubeQ",   z:19, side:"C", yOff:1.0, w:2.4, h:2.4, bob:0.75, rot:-0.0028, assemble:1.5},
+      {kind:"cube", spr:"cubeP",   z:21, side:"L", yOff:0.7, w:2.4, h:2.4, bob:0.7, rot:0.0022,  assemble:1.8}
+    ]
+  });
+  // 6.0 Arturo — Neon Site-Editor (cyber grid corridor)
+  make("6.0", {
+    shape:"neon",
+    tex:"neon", texAlcove:"accent", alcoveEvery:4,
+    ceil:["#0b021a","#3a0b6e"], floor:["#0b021a","#3a0b6e"],
+    ambient:[40,10,60], rim:[255,90,217], light:"neon",
+    scanlines:1,
+    camera:{mode:"dutch", fov:1.05, bob:1.8, tilt:0.05},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.8, h:2.6, frame:"neonscr"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      {kind:"sprite", spr:"sw1", z:16, side:"L", yOff:0.6, w:1.3, h:1.3, rot:0.004, bob:0.3},
+      {kind:"sprite", spr:"sw2", z:18, side:"R", yOff:0.6, w:1.3, h:1.3, rot:-0.005, bob:0.3},
+      {kind:"sprite", spr:"sw3", z:20, side:"L", yOff:0.5, w:1.3, h:1.3, rot:0.003, bob:0.35},
+      {kind:"sprite", spr:"sw4", z:22, side:"R", yOff:0.7, w:1.3, h:1.3, rot:-0.004, bob:0.35}
+    ]
+  });
+  // 7.0 Monk — Void (extra-wide asymmetric room)
+  make("7.0", {
+    shape:"void",
+    tex:"void", texAlcove:"accent", alcoveEvery:0,
+    ceil:["#8590a8","#5a6478"], floor:["#48536a","#1e2438"],
+    ambient:[120,140,180], rim:[180,196,255], light:"soft",
+    camera:{mode:"zoomout", fov:0.85, bob:0.8},
+    billboards:[
+      {kind:"portrait", z:13, side:"L", yOff:-0.2, w:2.4, h:3.2},
+      {kind:"mock", z:13, side:"R", yOff:0, w:3.6, h:2.4, frame:"holo"},
+      {kind:"plaque", z:15, side:"C", yOff:-0.3, w:3.4, h:1.8},
+      // holographic AI panes hovering in the void — multiple translucent UI surfaces
+      {kind:"sprite", spr:"aiSug",   z:16, side:"C", yOff:0.7, w:3.0, h:1.5, bob:0.4},
+      {kind:"sprite", spr:"aiPane",  z:17, side:"L", yOff:0.5, w:2.6, h:1.6, bob:0.35},
+      {kind:"sprite", spr:"aiPane2", z:18, side:"R", yOff:0.4, w:2.6, h:1.6, bob:0.4},
+      {kind:"sprite", spr:"aiPane3", z:20, side:"C", yOff:0.9, w:2.4, h:1.4, bob:0.45},
+      {kind:"sprite", spr:"cursor1", z:19, side:"L", yOff:0.3, w:0.7, h:1.4, bob:0.2},
+      {kind:"sprite", spr:"cursor2", z:21, side:"R", yOff:0.3, w:0.7, h:1.4, bob:0.25}
+    ]
+  });
+}
+
+/* ---------- Camera path ---------- */
+function cameraFor(level, m, sub, beat, time){
+  const cam = level.camera;
+  const mapW = level.map[0].length;
+  const centerX = mapW/2;
+  // Scripted walk — but the camera LINGERS during the sustained beat (62% of the
+  // movement) so in-world billboards (portrait, plaque, mock, fact-tokens) remain
+  // on screen while the camera does theatrical orbit/dolly/dutch work.
+  // Phase map: approach 0→0.12 (z 2→8), anticipation+arrival 0.12→0.30 (z 8→10),
+  // sustained 0.30→0.92 (z 10→14, slow), departure 0.92→1.00 (z 14→22 rush).
+  let camZ;
+  if(sub < 0.30)       camZ = 2 + (sub/0.30) * 8;              // 2 → 10
+  else if(sub < 0.92)  camZ = 10 + ((sub-0.30)/0.62) * 4;      // 10 → 14 slow crawl
+  else                 camZ = 14 + ((sub-0.92)/0.08) * 8;      // 14 → 22 exit push
+  let camX = centerX;
+  let camAng = 0; // looking +Z
+  let fov = cam.fov;
+  let roll = 0, yShift = 0;
+  // subtle bob
+  yShift = Math.sin(time*0.004)* (cam.bob||2) * 0.01;
+  // beat FX — approach doorway zoom, arrival punch, departure widen
+  if(beat.name==="approach"){
+    fov *= 1.0 - (1-beat.frac)*0.18; // emerging from a narrow doorway
+  }
+  if(beat.name==="arrival"){
+    fov *= 1.0 - smooth(beat.frac)*0.10;
+  }
+  if(beat.name==="departure"){
+    fov *= 1.0 + beat.frac*0.14;
+  }
+  // per-mode camera variation — amplitudes cranked so motion reads at a glance
+  if(cam.mode==="orbit"){
+    // visible oscillation around the corridor centerline
+    camX = centerX + Math.sin(time*0.0012)*2.6;
+    camAng = Math.sin(time*0.0012+1)*0.46;
+  } else if(cam.mode==="dutch"){
+    roll = 0.14 + Math.sin(time*0.0013)*0.11;
+    camX = centerX + Math.sin(time*0.0009)*0.5;
+  } else if(cam.mode==="dolly"){
+    // aggressive dolly-zoom: FOV widens while camera pushes forward
+    const t = smooth(sub);
+    fov *= lerp(0.62, 1.45, t);
+    camAng = Math.sin(time*0.0008)*0.05;
+  } else if(cam.mode==="macro"){
+    // macro pull: embedded inside a block, pulls all the way back
+    fov *= lerp(0.50, 1.30, smooth(sub));
+    camZ = lerp(2.0, 26, smooth(sub));
+    camX = centerX + Math.sin(time*0.0008)*0.7;
+  } else if(cam.mode==="zoomout"){
+    // void: breathing zoom with drift
+    fov *= lerp(0.65, 1.45, smooth(sub));
+    camX = centerX + Math.sin(time*0.0007)*1.6;
+    camAng = Math.sin(time*0.0005)*0.08;
+    yShift += Math.sin(time*0.0006)*0.03;
+  } else if(cam.mode==="macroPush"){
+    // 1.0 bunker: camera pushes slowly toward the plaque/portrait while FOV tightens,
+    // with a small arc-sway so the room walls scrape past visibly during sustained.
+    const t = smooth(sub);
+    fov *= lerp(1.05, 0.78, t);
+    camX = centerX + Math.sin(time*0.0011)*1.4;
+    camAng = Math.sin(time*0.0009)*0.16;
+    yShift += Math.sin(time*0.0014)*0.04;
+    if(beat.name==="sustained"){
+      // additional macro pull-in: amp the push so sustained reads as cinematic dolly
+      camZ += beat.frac * 1.2;
+    }
+  } else if(cam.mode==="overhead"){
+    // overhead tilt: horizon pushed higher in frame
+    yShift += -0.14 + Math.sin(time*0.0011)*0.03;
+    camX = centerX + Math.sin(time*0.0009)*1.0;
+    roll = Math.sin(time*0.0007)*0.04;
+  } else {
+    // plain walk: keep continuous sway + micro-ang so every sustained frame has motion
+    const sw = (beat.name==="sustained") ? 1.0 : 0.45;
+    camX = centerX + Math.sin(time*0.0008)*0.9*sw;
+    camAng = Math.sin(time*0.0007)*0.09*sw;
+    yShift += Math.sin(time*0.0011)*0.015*sw;
+  }
+  return {camX, camZ, camAng, fov, roll, yShift};
+}
+
+/* ---------- Renderer core ---------- */
+function drawCeilingFloor(g, level, cam, beat, time){
+  // horizon adjusted by yShift
+  const horizon = H*0.5 + cam.yShift*H + Math.sin(cam.roll)*0 /* handled globally */;
+  // ceiling
+  const cg = g.createLinearGradient(0,0,0,horizon);
+  cg.addColorStop(0, level.ceil[0]); cg.addColorStop(1, level.ceil[1]);
+  g.fillStyle = cg; g.fillRect(0,0,W,horizon);
+  // floor
+  const fg = g.createLinearGradient(0,horizon,0,H);
+  fg.addColorStop(0, level.floor[1]); fg.addColorStop(1, level.floor[0]);
+  g.fillStyle = fg; g.fillRect(0,horizon,W,H-horizon);
+  // floor perspective grid (receding lines)
+  g.save();
+  g.strokeStyle = `rgba(${level.rim[0]},${level.rim[1]},${level.rim[2]},0.08)`;
+  g.lineWidth = 1;
+  for(let i=1;i<18;i++){
+    const t = i/18;
+    const y = horizon + (H-horizon) * (t*t);
+    g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
+  }
+  // vanishing-point verticals
+  const vpx = W*0.5, vpy = horizon;
+  for(let i=-6;i<=6;i++){
+    g.beginPath(); g.moveTo(vpx + i*60, H); g.lineTo(vpx, vpy); g.stroke();
+  }
+  g.restore();
+  // sky tint if starfield
+  if(level.starfield){
+    g.save();
+    for(let i=0;i<140;i++){
+      const sx = (i*137)%W;
+      const sy = (i*91)%horizon;
+      const a = 0.2 + 0.6*Math.abs(Math.sin(time*0.002+i));
+      g.fillStyle = `rgba(255,255,255,${a*0.6})`;
+      g.fillRect(sx|0, sy|0, 1, 1);
+    }
+    g.restore();
+  }
+  // sun shaft (4.0)
+  if(level.sunShaft>0){
+    g.save(); g.globalCompositeOperation="screen";
+    const cx = W*0.5, cy = H*0.1;
+    for(let i=0;i<12;i++){
+      const ang = -Math.PI/2 + (i-6)*0.1;
+      g.beginPath(); g.moveTo(cx,cy);
+      g.lineTo(cx+Math.cos(ang)*W, cy+Math.sin(ang)*H*2);
+      g.lineTo(cx+Math.cos(ang)*W+40, cy+Math.sin(ang)*H*2);
+      g.closePath();
+      g.fillStyle = `rgba(255,230,180,${0.04*level.sunShaft})`;
+      g.fill();
+    }
+    g.restore();
+  }
+}
+
+function sampleLightIntensity(level, time){
+  // returns 0..1 attenuation multiplier on rim lighting
+  switch(level.light){
+    case "torch":       return 0.85 + 0.15*Math.sin(time*0.017) + 0.1*Math.sin(time*0.041);
+    case "candle":      return 0.9 + 0.1*Math.sin(time*0.007);
+    case "fluorescent": return 0.97 + 0.03*Math.sin(time*0.08);
+    case "pulse":       return 0.7 + 0.3*Math.sin(time*0.003);
+    case "neon":        return 0.8 + 0.2*Math.sin(time*0.002 + Math.sin(time*0.01));
+    case "sun":         return 1.0;
+    case "gallery":     return 1.0;
+    case "soft":        return 0.95;
+    default: return 1.0;
+  }
+}
+
+function raycastWalls(g, level, cam, beat, time, zBuf){
+  const cols = Math.floor(W/2);
+  const halfFovTan = Math.tan(cam.fov/2);
+  const mapH = level.map.length;
+  const mapW = level.map[0].length;
+  const ambient = level.ambient;
+  const rim = level.rim;
+  const lightFx = sampleLightIntensity(level, time);
+  const horizon = H*0.5 + cam.yShift*H;
+  const wallScale = H; // wall height scalar
+  const fovFactor = 1 / (2*halfFovTan);
+  // cos camAng, sin camAng for DDA ray transform
+  const cosA = Math.cos(cam.camAng), sinA = Math.sin(cam.camAng);
+  for(let col=0; col<cols; col++){
+    const screenX = col*2;
+    // ray direction in camera space
+    const camSpaceX = (2*col/cols - 1) * halfFovTan; // right
+    const camSpaceZ = 1; // forward
+    // rotate to world
+    const rx = camSpaceX*cosA + camSpaceZ*sinA;
+    const rz = -camSpaceX*sinA + camSpaceZ*cosA;
+    // DDA
+    const invRx = rx!==0 ? 1/Math.abs(rx) : 1e9;
+    const invRz = rz!==0 ? 1/Math.abs(rz) : 1e9;
+    let mx = Math.floor(cam.camX), mz = Math.floor(cam.camZ);
+    let sideDistX = (rx<0? (cam.camX - mx) : (mx+1 - cam.camX)) * invRx;
+    let sideDistZ = (rz<0? (cam.camZ - mz) : (mz+1 - cam.camZ)) * invRz;
+    const stepX = rx<0?-1:1, stepZ = rz<0?-1:1;
+    let hit=0, side=0, tile=0;
+    for(let step=0; step<64 && !hit; step++){
+      if(sideDistX < sideDistZ){ sideDistX += invRx; mx += stepX; side=0; }
+      else { sideDistZ += invRz; mz += stepZ; side=1; }
+      if(mz<0||mz>=mapH||mx<0||mx>=mapW){ hit=1; tile=1; side = (mz<0||mz>=mapH)?1:0; break; }
+      tile = level.map[mz][mx];
+      if(tile>0) hit=1;
+    }
+    // perpendicular distance
+    let dist;
+    if(side===0) dist = (mx - cam.camX + (1-stepX)/2) / rx;
+    else         dist = (mz - cam.camZ + (1-stepZ)/2) / rz;
+    dist = Math.max(0.05, Math.abs(dist));
+    zBuf[col] = dist;
+    // wall strip height
+    const lineH = (wallScale / dist);
+    let y0 = horizon - lineH/2;
+    let y1 = horizon + lineH/2;
+    // texture sample position
+    let wallHit = (side===0) ? (cam.camZ + dist*rz) : (cam.camX + dist*rx);
+    wallHit -= Math.floor(wallHit);
+    const texKey = (tile===2) ? level.texAlcove : level.tex;
+    const tex = TEX[texKey] || TEX[level.tex];
+    const texX = Math.floor(wallHit * 64) % 64;
+    // draw textured strip (slice of 1 source px, 2 dest px)
+    g.drawImage(tex, texX, 0, 1, 64, screenX, y0, 2, y1-y0);
+    // distance shading (dark overlay) + side shading
+    const shade = Math.min(0.9, dist * 0.035);
+    const sideDark = side===1 ? 0.22 : 0;
+    g.fillStyle = `rgba(${ambient[0]*0.3|0},${ambient[1]*0.3|0},${ambient[2]*0.3|0},${shade + sideDark})`;
+    g.fillRect(screenX, y0, 2, y1-y0);
+    // ambient wash: each era's ambient tint bleeds into walls at a moderate strength
+    // so the entire 3D room reads as lit by that era's colour.
+    g.fillStyle = `rgba(${ambient[0]},${ambient[1]},${ambient[2]},0.16)`;
+    g.fillRect(screenX, y0, 2, y1-y0);
+    // rim light injection near camera — stronger so per-era colour reads clearly
+    if(dist < 14){
+      const rimA = (1 - dist/14) * 0.38 * lightFx;
+      g.fillStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},${rimA})`;
+      g.fillRect(screenX, y0, 2, y1-y0);
+    }
+  }
+}
+
+function drawBillboards(g, level, cam, beat, time, zBuf, m){
+  const cosA = Math.cos(cam.camAng), sinA = Math.sin(cam.camAng);
+  const halfFovTan = Math.tan(cam.fov/2);
+  const horizon = H*0.5 + cam.yShift*H;
+  // collect with transformed coords
+  const items = [];
+  const mapW = level.map[0].length;
+  const centerX = mapW/2;
+  for(const b of level.billboards){
+    // compute worldX based on side — cap the lateral offset so the sprite stays
+    // within the camera cone in wide rooms (atrium/gallery/void mapW=11). Without
+    // this, side:"L" at wx=1.1 with centerX=5.5 leaves the sprite ~4.4u off-center
+    // and it slides out of frame during sustained.
+    let wx;
+    const sideOff = 1.9; // max lateral distance from centerline in world units
+    if(b.side==="L") wx = Math.max(1.2, centerX - sideOff);
+    else if(b.side==="R") wx = Math.min(mapW - 1.2, centerX + sideOff);
+    else wx = centerX + (b.offset||0);
+    // Shift all billboard world-z forward by +10 so that while the camera lingers at
+    // camZ≈10..14 during sustained, billboards originally authored at z:8..24 land at
+    // z:18..34 — comfortably ahead of the camera (4–8u min) so they don't crash the
+    // foreground when camZ reaches 14.
+    let wz = b.z + 10;
+    // dynamic motion: bob (vertical), slide (lateral dock-in), orbit (circular)
+    let dynYOff = 0;
+    if(b.bob) dynYOff += Math.sin(time*0.002 + b.z*0.7) * b.bob;
+    if(b.slide){
+      // widgets sliding/docking from farther z toward target as sustained progresses
+      const t = clamp((beat.name==="sustained"?beat.frac:beat.name==="departure"?1:0), 0, 1);
+      wz += (b.slide) * (1 - t) * 3; // starts further, docks closer
+    }
+    if(b.orbitR){
+      const ang = time * (b.orbitSpeed||0.001);
+      wx += Math.cos(ang) * b.orbitR;
+      wz += Math.sin(ang) * b.orbitR * 0.6;
+    }
+    if(b.assemble){
+      // 5.0 Gutenberg blocks: start scattered to the sides + above, assemble toward center & home Y
+      const t = clamp(beat.name==="approach"?0 : beat.name==="anticipation"?beat.frac*0.4 : beat.name==="arrival"?0.4+beat.frac*0.4 : beat.name==="sustained"?Math.min(1, 0.8+beat.frac*0.5) : 1, 0, 1);
+      const tt = 1 - t; // 1 = scattered, 0 = assembled
+      const phase = b.assemble || 0;
+      wx += Math.sin(phase) * 3.5 * tt;
+      dynYOff += (Math.cos(phase) * 1.6 + 1.2) * tt;
+      wz += Math.cos(phase*1.3) * 2.2 * tt;
+      // snap pulse near assembly
+      if(t>0.7){ dynYOff += Math.sin(time*0.005 + phase)*0.08; }
+    }
+    const dx = wx - cam.camX, dz = wz - cam.camZ;
+    // rotate into camera space
+    const tz = dx*sinA + dz*cosA; // forward
+    const tx = dx*cosA - dz*sinA; // right
+    if(tz<=0.1) continue;
+    const scale = H / tz;
+    const spriteCanvas = resolveSprite(b, m, beat, time);
+    if(!spriteCanvas) continue;
+    const wW = (b.w||1.6) * scale;
+    const hH = (b.h||2.0) * scale;
+    const screenX = W/2 + (tx / tz) * (W/2 / halfFovTan);
+    // y offset from wall center
+    const yCenter = horizon - hH/2 + ((b.yOff||0) + dynYOff) * scale;
+    items.push({spriteCanvas, screenX, yCenter, wW, hH, dist:tz, b});
+  }
+  items.sort((a,b)=> b.dist - a.dist);
+  for(const it of items){
+    const x0 = Math.floor(it.screenX - it.wW/2);
+    const x1 = Math.ceil(it.screenX + it.wW/2);
+    // per-column z-test
+    for(let sx=x0; sx<x1; sx+=2){
+      const col = Math.floor(sx/2);
+      if(col<0||col>=zBuf.length) continue;
+      if(it.dist > zBuf[col]) continue;
+      const u = (sx - (it.screenX - it.wW/2)) / it.wW;
+      if(u<0||u>1) continue;
+      const srcX = Math.floor(u * it.spriteCanvas.width);
+      g.drawImage(it.spriteCanvas, srcX, 0, 1, it.spriteCanvas.height, sx, it.yCenter, 2, it.hH);
+    }
+  }
+}
+
+/* Per-movement plaque canvases (floating in-world panel that the camera focuses on
+   during the sustained beat — replaces the bottom DOM card as the "diegetic plaque"). */
+const PLAQ = {};
+function buildPlaques(){
+  for(const m of M){
+    const c = document.createElement("canvas"); c.width=360; c.height=200;
+    const g = c.getContext("2d");
+    const p = m.palette;
+    // parchment / plate background tinted to era
+    const bg = mix(hex(p[0]), [0,0,0], 0.2);
+    g.fillStyle = rgb(bg); g.fillRect(0,0,360,200);
+    // frame
+    g.strokeStyle = rgb(hex(p[3])); g.lineWidth=3; g.strokeRect(3,3,354,194);
+    g.strokeStyle = rgb(hex(p[2])); g.lineWidth=1; g.strokeRect(8,8,344,184);
+    // header bar
+    g.fillStyle = rgb(hex(p[3]),0.28); g.fillRect(8,8,344,28);
+    g.fillStyle = rgb(hex(p[4])); g.font="700 12px 'IBM Plex Mono',monospace";
+    g.fillText(`WORDPRESS ${m.v}  ·  ${m.date}`, 16, 26);
+    // title
+    g.fillStyle = rgb(hex(p[4])); g.font = "400 26px 'Didot',Georgia,serif";
+    g.fillText(`${m.era}`, 16, 66);
+    g.fillStyle = rgb(hex(p[3])); g.font = "400 italic 13px 'Iowan Old Style',Georgia,serif";
+    g.fillText(`"${m.name}" — ${m.musician}`, 16, 86);
+    // headline (wrap naive)
+    g.fillStyle = rgb(mix(hex(p[3]),hex(p[4]),0.5)); g.font="400 13px 'Iowan Old Style',Georgia,serif";
+    const words = m.headline.split(" ");
+    let line="", ly=116;
+    for(const w of words){
+      const test = line + w + " ";
+      if(g.measureText(test).width > 330 && line.length>0){ g.fillText(line, 16, ly); line = w + " "; ly += 18; }
+      else line = test;
+    }
+    g.fillText(line, 16, ly);
+    // register tag
+    g.fillStyle = rgb(hex(p[3])); g.font="500 10px 'IBM Plex Mono',monospace";
+    g.fillText(m.register.toUpperCase(), 16, 188);
+    PLAQ[m.v] = c;
+  }
+}
+
+function resolveSprite(b, m, beat, time){
+  if(b.kind==="plaque"){
+    return PLAQ[m.v] || null;
+  }
+  if(b.kind==="portrait"){
+    // composite: frame + portrait
+    const frame = BB.frame;
+    const c = document.createElement("canvas"); c.width=frame.width; c.height=frame.height;
+    const g = c.getContext("2d");
+    g.drawImage(frame,0,0);
+    if(PORT[m.portraitKey]) g.drawImage(PORT[m.portraitKey], 15, 25, c.width-30, c.height-50);
+    // era nameplate
+    g.fillStyle="#e9c97a"; g.font="700 9px IBM Plex Mono,monospace"; g.textAlign="center";
+    g.fillText(m.musician.split(" (")[0].toUpperCase(), c.width/2, c.height-6);
+    g.textAlign="left";
+    return c;
+  } else if(b.kind==="mock"){
+    // framed admin mock
+    const frame = BB[b.frame || "crt"];
+    const shot = SHOT[m.adminKey];
+    if(!frame||!shot) return null;
+    const c = document.createElement("canvas"); c.width=frame.width; c.height=frame.height;
+    const g = c.getContext("2d");
+    g.drawImage(frame,0,0);
+    g.drawImage(shot, 8, 8, c.width-16, c.height-28);
+    // scanline overlay
+    g.globalAlpha=0.2;
+    for(let y=8;y<c.height-20;y+=3){ g.fillStyle="#000"; g.fillRect(8,y,c.width-16,1); }
+    g.globalAlpha=1;
+    // label
+    g.fillStyle="#e9c97a"; g.font="700 8px IBM Plex Mono,monospace"; g.fillText(b.frame==="gilt"?"DISPLAY":b.frame==="holo"?"HOLO":"MONITOR", 10, c.height-5);
+    return c;
+  } else if(b.kind==="sprite"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="widget"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="floor"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="cube"){
+    return BB[b.spr] || null;
+  } else if(b.kind==="planet"){
+    return BB.planet;
+  } else if(b.kind==="moon"){
+    return BB.moon;
+  }
+  return null;
+}
+
+/* ---------- Overlays ---------- */
+function drawTorchFlicker(g, level, time, beat){
+  const s = sampleLightIntensity(level, time);
+  const a = (1-s) * 0.35;
+  g.fillStyle = `rgba(${level.ambient[0]},${level.ambient[1]},${level.ambient[2]},${a})`;
+  g.fillRect(0,0,W,H);
+}
+function drawScanlines(g, strength){
+  g.save(); g.globalAlpha = strength * 0.2;
+  g.fillStyle="#000";
+  for(let y=0;y<H;y+=3) g.fillRect(0,y,W,1);
+  g.restore();
+}
+function drawUploadRain(g, level, time, sub){
+  // 3.3 — files rising from floor to ceiling
+  const upfile = BB.upfile;
+  g.save();
+  for(let i=0;i<32;i++){
+    const phase = ((time*0.0003 + i*0.21) % 1);
+    const x = ((i*83)%W);
+    const y = lerp(H*1.05, -40, phase);
+    const s = 0.7 + (i%3)*0.2;
+    g.globalAlpha = Math.sin(phase*Math.PI) * 0.85;
+    g.drawImage(upfile, x, y, upfile.width*s, upfile.height*s);
+  }
+  g.restore();
+}
+
+function drawRoll(g, roll){
+  // implemented by saving and rotating context prior to the scene: handled by wrapper
+}
+
+function drawLabel(g, level, m, beat){
+  if(beat.name!=="arrival") return;
+  const k = ease(beat.frac);
+  g.save();
+  g.globalAlpha = k;
+  g.fillStyle = `rgb(${level.rim[0]},${level.rim[1]},${level.rim[2]})`;
+  g.font = "400 58px Didot, Georgia, serif"; g.textAlign="center";
+  if(level.light==="neon"){
+    g.shadowColor = `rgb(${level.rim[0]},${level.rim[1]},${level.rim[2]})`;
+    g.shadowBlur = 24;
+  }
+  g.fillText(`${m.v} · ${m.name.toUpperCase()}`, W/2, H*0.17 + (1-k)*20);
+  g.restore();
+  g.textAlign="left";
+}
+
+function drawDoorway(g, level, m, beat, time){
+  // Departure: a bright archway opens at the corridor end, tinted by the next movement.
+  if(beat.name!=="departure") return;
+  const k = ease(beat.frac);
+  const next = findNextM(m);
+  const tint = next ? hex(next.palette[2]) : [255,230,180];
+  g.save();
+  // dark outer frame squeezes in as the camera accelerates toward the doorway
+  g.fillStyle = `rgba(0,0,0,${0.25 + 0.5*k})`; g.fillRect(0,0,W,H);
+  // then punch a bright arched portal in the middle
+  g.globalCompositeOperation = "destination-out";
+  const aw = W * (0.20 + 0.45*k);
+  const ah = H * (0.45 + 0.4*k);
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.3);
+  g.arc(W/2, H/2 - ah*0.3, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.closePath();
+  g.fill();
+  // paint a next-movement glow through the portal
+  g.globalCompositeOperation = "source-over";
+  const rg = g.createRadialGradient(W/2, H/2, 10, W/2, H/2, Math.max(aw,ah));
+  rg.addColorStop(0, `rgba(${tint[0]},${tint[1]},${tint[2]},${0.35+0.5*k})`);
+  rg.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = rg; g.fillRect(0,0,W,H);
+  // rim outline
+  g.strokeStyle = `rgba(${tint[0]},${tint[1]},${tint[2]},${0.6+0.3*k})`;
+  g.lineWidth = 2 + 4*k;
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.3);
+  g.arc(W/2, H/2 - ah*0.3, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.stroke();
+  g.restore();
+}
+function findNextM(m){
+  const idx = M.findIndex(x=>x.v===m.v);
+  return idx>=0 && idx+1<M.length ? M[idx+1] : null;
+}
+
+function drawDoorwayApproach(g, level, m, beat, time){
+  // Approach: a visible arched doorway frames the scene and dilates open as we emerge.
+  if(beat.name!=="approach") return;
+  const k = 1 - ease(beat.frac);   // k=1 at start (doorway tight), k=0 at end (open)
+  if(k<=0) return;
+  g.save();
+  // outside-the-doorway black mask shaped like an arched portal — starts nearly
+  // closed (tight arch) and dilates open as we step through
+  const ah = H * (0.28 + 0.65*(1-k));  // arch height
+  const aw = W * (0.22 + 0.72*(1-k));  // arch half-width
+  g.fillStyle = `rgba(0,0,0,${0.75 + 0.2*k})`;
+  g.beginPath();
+  g.moveTo(0,0); g.lineTo(W,0); g.lineTo(W,H); g.lineTo(0,H); g.closePath();
+  // subtract the archway
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.4);
+  g.arc(W/2, H/2 - ah*0.4, aw, Math.PI, 0, true);
+  g.lineTo(W/2 + aw, H);
+  g.closePath();
+  g.fill("evenodd");
+  // warm rim glow on the archway edge
+  const rim = level.rim;
+  g.strokeStyle = `rgba(${rim[0]},${rim[1]},${rim[2]},${0.7+0.3*k})`;
+  g.lineWidth = 3 + 8*k;
+  g.beginPath();
+  g.moveTo(W/2 - aw, H);
+  g.lineTo(W/2 - aw, H/2 - ah*0.4);
+  g.arc(W/2, H/2 - ah*0.4, aw, Math.PI, 0, false);
+  g.lineTo(W/2 + aw, H);
+  g.stroke();
+  g.restore();
+}
+
+/* ---------- Unified level renderer ---------- */
+function rayRenderLevel(g, sub, beat, time, m){
+  const level = LVL[m.v];
+  if(!level) return;
+  const cam = cameraFor(level, m, sub, beat, time);
+  // roll wrap
+  if(cam.roll){
+    g.save();
+    g.translate(W/2, H/2);
+    g.rotate(cam.roll);
+    g.translate(-W/2, -H/2);
+  }
+  drawCeilingFloor(g, level, cam, beat, time);
+  const zBuf = new Float32Array(Math.floor(W/2));
+  raycastWalls(g, level, cam, beat, time, zBuf);
+  drawBillboards(g, level, cam, beat, time, zBuf, m);
+  // overlays
+  if((level.overlays||[]).includes("torchflicker")) drawTorchFlicker(g, level, time, beat);
+  if((level.overlays||[]).includes("uploadRain")) drawUploadRain(g, level, time, sub);
+  if(level.scanlines) drawScanlines(g, level.scanlines);
+  // transitions
+  drawDoorwayApproach(g, level, m, beat, time);
+  drawDoorway(g, level, m, beat, time);
+  // label on arrival
+  drawLabel(g, level, m, beat);
+  // rim/vignette
+  g.save();
+  const vg = g.createRadialGradient(W/2, H*0.5, Math.min(W,H)*0.3, W/2, H*0.5, Math.max(W,H)*0.75);
+  vg.addColorStop(0,"rgba(0,0,0,0)");
+  vg.addColorStop(1, level.light==="gallery"||level.light==="soft" ? "rgba(20,30,50,0.25)" : "rgba(0,0,0,0.5)");
+  g.fillStyle = vg; g.fillRect(0,0,W,H);
+  g.restore();
+  drawDust(g, m.palette, sub, time);
+  if(cam.roll){ g.restore(); }
+}
+
+/* ---------- RENDER dispatch (all point to unified renderer) ---------- */
+const RENDER = {};
+["1.0","2.0","2.2","3.0","3.3","4.0","5.0","6.0","7.0"].forEach(v=>{
+  RENDER[v] = function(g, sub, beat, time, m){ rayRenderLevel(g, sub, beat, time, m); };
+});
+// legacy no-op stubs to preserve reachability should old code reference them
+const _RENDER_LEGACY_UNUSED_ = null;
+
+
+/* Overture */
+function renderOverture(g, t, time){
+  // fade from pure black through palette 1.0
+  const p = M[0].palette;
+  const grd = g.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[1]), t));
+  grd.addColorStop(1, rgb([5,6,10]));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  // title
+  g.save();
+  g.globalAlpha = 1 - t*0.7;
+  g.fillStyle = "#f4ecd6";
+  g.font = "400 62px Didot,Georgia,serif"; g.textAlign="center";
+  g.fillText("Nine Movements", W/2, H*0.42);
+  g.font = "400 italic 15px 'Iowan Old Style',Georgia,serif";
+  g.fillStyle = "#c5ae7a";
+  g.fillText("a suite in nine parts for the WordPress Museum", W/2, H*0.48);
+  g.font = "500 10px IBM Plex Mono,monospace";
+  g.fillStyle = "#8d7b54";
+  g.fillText("1.0  ·  2.0  ·  2.2  ·  3.0  ·  3.3  ·  4.0  ·  5.0  ·  6.0  ·  7.0", W/2, H*0.55);
+  g.restore();
+  drawDust(g, p, t, time);
+}
+
+/* Coda */
+function renderCoda(g, t, time){
+  const p = M[M.length-1].palette;
+  const grd = g.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[0])));
+  grd.addColorStop(1, rgb(mix(hex(p[0]), [255,255,255], t)));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  g.save();
+  g.globalAlpha = 1-t*0.4;
+  g.fillStyle = "#3a4254";
+  g.textAlign="center";
+  g.font = "400 italic 17px 'Iowan Old Style',Georgia,serif";
+  g.fillText("the suite continues, elsewhere.", W/2, H*0.46);
+  g.font = "500 10px IBM Plex Mono,monospace";
+  g.fillStyle = "#7a8299";
+  g.fillText("— end —", W/2, H*0.52);
+  g.restore();
+  // fade to pure white
+  document.getElementById("whitefade").style.opacity = String(t*0.5);
+}
+
+/* ---------- Scene dispatch ---------- */
+function getBeat(sub){
+  for(let i=0;i<BEATS.length;i++){
+    const b = BEATS[i];
+    if(sub >= b.a && sub <= b.b){
+      const frac = (sub - b.a) / (b.b - b.a);
+      return {name:b.key, frac, i};
+    }
+  }
+  return {name:"departure", frac:1, i:4};
+}
+function scrollToMovement(y){
+  if(y < OVERTURE) return {m:-1, sub:y/OVERTURE};
+  if(y > OVERTURE + M.length*MLEN) return {m:M.length, sub:(y-OVERTURE-M.length*MLEN)/CODA};
+  const idx = Math.floor((y - OVERTURE)/MLEN);
+  const sub = ((y - OVERTURE) - idx*MLEN)/MLEN;
+  return {m:idx, sub};
+}
+
+/* ---------- UI updates ---------- */
+function setAccent(color){
+  document.documentElement.style.setProperty("--accent", color);
+}
+function updateHUD(curM, sub, beat){
+  const rel = document.getElementById("h-release");
+  const mvt = document.getElementById("h-movement");
+  const eraE = document.getElementById("h-era");
+  if(curM<0){
+    rel.textContent = "OVERTURE"; mvt.textContent = "Nine Movements"; eraE.textContent = "WORDPRESS · 2003 → 2026";
+  } else if(curM>=M.length){
+    rel.textContent = "CODA"; mvt.textContent = "— end —"; eraE.textContent = "after the ninth movement";
+  } else {
+    const m = M[curM];
+    rel.textContent = `WORDPRESS ${m.v} · ${m.musician}`;
+    mvt.textContent = m.era;
+    eraE.textContent = `${m.date} · ${m.register}`;
+    setAccent(m.palette[3]);
+    const lightEra = (m.v==="4.0" || m.v==="5.0" || m.v==="7.0");
+    document.documentElement.classList.toggle("light-era", lightEra);
+  }
+  const bnodes = document.querySelectorAll("#beats .b");
+  bnodes.forEach((el,i)=>{
+    el.classList.remove("on","past");
+    if(curM<0||curM>=M.length) return;
+    if(i===beat.i) el.classList.add("on");
+    else if(i<beat.i) el.classList.add("past");
+  });
+}
+function updateMinimap(y, curM, sub){
+  const pct = clamp(y/TOTAL, 0, 1);
+  document.getElementById("m-prog").textContent = String(Math.floor(pct*100)).padStart(2,"0")+"%";
+  const svg = document.getElementById("m-svg");
+  const sx = (i)=> 18 + (320-36)*(i/(M.length-1));
+  const pulse = document.getElementById("mpulse");
+  if(pulse){
+    let x;
+    if(curM<0) x = sx(0);
+    else if(curM>=M.length) x = sx(M.length-1);
+    else x = lerp(sx(curM), sx(Math.min(M.length-1, curM+1)), sub);
+    pulse.setAttribute("cx", x);
+    const r = 6 + 2*Math.sin(Date.now()*0.005);
+    pulse.setAttribute("r", r);
+  }
+  // highlight current node
+  for(let i=0;i<M.length;i++){
+    const n = document.getElementById("mnode"+i);
+    if(!n) continue;
+    if(i===curM){ n.setAttribute("fill", M[i].palette[3]); n.setAttribute("r","5"); }
+    else if(i<curM){ n.setAttribute("fill", M[i].palette[3]+"aa" /*not valid but browsers ignore*/); n.setAttribute("fill-opacity","0.8"); n.setAttribute("r","4"); }
+    else { n.setAttribute("fill", "#0a0806"); n.setAttribute("r","4"); n.setAttribute("fill-opacity","1");}
+  }
+  const fromE = document.getElementById("m-from"); const toE = document.getElementById("m-to");
+  if(curM<0){ fromE.textContent="overture"; toE.textContent=M[0].era; }
+  else if(curM>=M.length){ fromE.textContent=M[M.length-1].era; toE.textContent="coda"; }
+  else {
+    fromE.textContent = M[curM].era;
+    toE.textContent = curM+1<M.length ? M[curM+1].era : "coda";
+  }
+}
+
+/* ---------- Plaque ---------- */
+let plaqueState = { curM:-1 };
+function updatePlaque(curM, sub, beat){
+  const plaque = document.getElementById("plaque");
+  const shouldShow = curM>=0 && curM<M.length && (beat.name==="arrival" || beat.name==="sustained" || (beat.name==="departure" && beat.frac<0.4));
+  if(shouldShow){
+    if(plaqueState.curM !== curM){
+      plaqueState.curM = curM;
+      const m = M[curM];
+      document.getElementById("p-meta").textContent = `WORDPRESS ${m.v} · ${m.date} · ${m.musician}`;
+      document.getElementById("p-name").textContent = `${m.era} — "${m.name}"`;
+      document.getElementById("p-headline").textContent = m.headline;
+      document.getElementById("p-tag").textContent = `${m.adminKey.toUpperCase()} · ERA MOCK`;
+      // portrait
+      const portCanvas = document.getElementById("p-port");
+      const pg = portCanvas.getContext("2d"); pg.clearRect(0,0,72,96);
+      if(PORT[m.portraitKey]) pg.drawImage(PORT[m.portraitKey], 0, 0);
+      // shot
+      const shotCanvas = document.getElementById("p-shot");
+      const sg = shotCanvas.getContext("2d"); sg.clearRect(0,0,280,140);
+      if(SHOT[m.adminKey]) sg.drawImage(SHOT[m.adminKey], 0, 0);
+      // prose
+      const proseEl = document.getElementById("p-prose");
+      proseEl.innerHTML = m.paras.map((t,i)=>`<p data-i="${i}">${t}</p>`).join("");
+      // CTA
+      const btn = document.getElementById("p-btn");
+      btn.dataset.v = m.v;
+    }
+    plaque.classList.add("show");
+    plaque.style.setProperty("--accent", M[curM].palette[3]);
+    // Cycle paragraphs one-at-a-time through the sustained beat
+    const paras = document.querySelectorAll("#p-prose p");
+    const reveal = beat.name==="arrival" ? 0 : (beat.name==="sustained" ? beat.frac : 1);
+    const idx = Math.min(paras.length-1, Math.floor(reveal * paras.length));
+    paras.forEach((el,i)=>{
+      el.style.display = (i===idx) ? "block" : "none";
+      el.classList.toggle("on", i===idx);
+    });
+  } else {
+    plaque.classList.remove("show");
+    if(!shouldShow) plaqueState.curM = -1;
+  }
+}
+
+/* ---------- Playground ---------- */
+document.getElementById("p-btn").addEventListener("click", (e)=>{
+  const v = e.currentTarget.dataset.v;
+  if(!v) return;
+  const frame = document.getElementById("pg-frame");
+  frame.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+  document.getElementById("pg-title").textContent = `PLAYGROUND · WordPress ${v}`;
+  document.getElementById("playground").classList.add("open");
+});
+document.getElementById("pg-close").addEventListener("click", ()=>{
+  document.getElementById("playground").classList.remove("open");
+  document.getElementById("pg-frame").src = "about:blank";
+});
+
+/* ---------- Scrollbar hairline ---------- */
+function updateScrollbar(){
+  const pct = clamp(scrollSmooth/TOTAL, 0, 1);
+  document.getElementById("sf").style.width = (pct*100)+"%";
+}
+
+/* ---------- Main loop ---------- */
+let rafId = 0;
+let lastT = 0;
+let started = false;
+let fpsAcc = 0, fpsN = 0, fps = 60;
+function frame(t){
+  const dt = Math.min(50, t-lastT); lastT = t;
+  fpsAcc += 1000/(Math.max(1,dt)); fpsN++;
+  if(fpsN>30){ fps = fpsAcc/fpsN; fpsAcc=0; fpsN=0; }
+
+  scrollSmooth += (scrollTarget - scrollSmooth) * 0.12;
+  const y = scrollSmooth;
+  const st = scrollToMovement(y);
+
+  ctx.save();
+  // camera breathing
+  const breath = Math.sin(t*0.0008)*2;
+  ctx.translate(0, breath);
+
+  ctx.fillStyle = "#05060a"; ctx.fillRect(0,0,W,H);
+
+  let beat = {name:"approach",frac:0,i:0};
+  let curM = -1;
+  if(st.m < 0){
+    renderOverture(ctx, smooth(st.sub), t);
+    curM = -1;
+  } else if(st.m >= M.length){
+    renderCoda(ctx, smooth(st.sub), t);
+    curM = M.length;
+  } else {
+    curM = st.m;
+    beat = getBeat(st.sub);
+    const fn = RENDER[M[curM].v] || RENDER["1.0"];
+    fn(ctx, st.sub, beat, t, M[curM]);
+  }
+
+  ctx.restore();
+
+  // UI overlays
+  updateHUD(curM, st.sub, beat);
+  updateMinimap(y, curM, st.sub);
+  updatePlaque(curM, st.sub, beat);
+  updateScrollbar();
+
+  // Audio scheduling — movement change + motif
+  if(audioReady && curM>=0 && curM<M.length){
+    if(curM !== curMovement){
+      curMovement = curM;
+      motifState.beat = 0; motifNextTime = AC.currentTime + 0.2;
+    }
+    const intensity = beat.name==="approach"? 0.25 : beat.name==="anticipation"? 0.55 : beat.name==="arrival"? 1.0 : beat.name==="sustained"? 0.85 : 0.45;
+    scheduleMotif(AC.currentTime, curM, intensity);
+  }
+
+  rafId = requestAnimationFrame(frame);
+}
+
+/* ---------- Boot sequence ---------- */
+function bootProgress(p){ document.getElementById("bootf").style.width = (p*100)+"%"; }
+function boot(){
+  let p = 0;
+  bootProgress(0.05);
+  // stage 1: portraits
+  setTimeout(()=>{ buildPortraits(); buildWallTextures(); bootProgress(0.4);
+    // stage 2: admin mocks + billboards + levels
+    setTimeout(()=>{ buildAdminMocks(); buildBillboards(); buildLevels(); buildPlaques(); bootProgress(0.7);
+      // stage 3: minimap
+      setTimeout(()=>{ buildMinimap(); bootProgress(0.95);
+        setTimeout(()=>{ bootProgress(1.0);
+          setTimeout(()=>{ document.getElementById("boot").classList.add("gone"); }, 500);
+        }, 160);
+      }, 120);
+    }, 120);
+  }, 180);
+}
+boot();
+rafId = requestAnimationFrame(frame);
+
+/* ---------- Start / audio unlock on first gesture ---------- */
+function startOnce(){
+  if(started) return; started = true;
+  try { initAudio(); fadeIn(); } catch(e){ console.warn("audio init failed", e); }
+  const sp = document.getElementById("splash");
+  if(sp) sp.classList.add("gone");
+}
+window.addEventListener("click", startOnce, {once:false});
+window.addEventListener("keydown", (e)=>{ if(e.key===" "||e.key==="Enter") startOnce(); });
+window.addEventListener("wheel", startOnce, {once:true, passive:true});
+window.addEventListener("touchstart", startOnce, {once:true, passive:true});
+
+/* ---------- Splash ---------- */
+(function makeSplash(){
+  const div = document.createElement("div");
+  div.id = "splash";
+  div.innerHTML = `
+    <div class="slab">
+      <span class="k">WordPress Museum · Presentation · V10</span>
+      <h1>Nine Movements</h1>
+      <div class="subtitle">a suite of nine, in the key of a platform</div>
+      <p>Each major WordPress release — <em>1.0, 2.0, 2.2, 3.0, 3.3, 4.0, 5.0, 6.0, 7.0</em> — is a movement in five beats: approach, anticipation, arrival, the sustained moment, departure. Scroll is the baton. Click to begin.</p>
+      <div class="cta"><span class="pulse"></span>click · scroll · listen</div>
+    </div>
+  `;
+  document.body.appendChild(div);
+})();
+</script>
+</body>
+</html>
