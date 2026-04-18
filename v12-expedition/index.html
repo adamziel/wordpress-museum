@@ -1965,10 +1965,10 @@ function buildLevels(){
   // waypoints, so each turn spans a ~10% sub window and glides smoothly.
   const WAYPOINTS_1_0 = [
     {sub:0.00, x:5.5, z:15.4, yaw: Math.PI   }, // entry — face north down long tunnel
-    {sub:0.38, x:5.5, z: 7.4, yaw: Math.PI   }, // tunnel almost done — yaw begins to rotate from here
-    {sub:0.52, x:6.2, z: 6.5, yaw: Math.PI/2 }, // TURN 1 complete: facing east along the corridor
-    {sub:0.74, x:8.5, z: 6.5, yaw: Math.PI/2 }, // east corridor approaching the next turn
-    {sub:0.86, x:8.5, z: 5.2, yaw: Math.PI   }, // TURN 2 complete: facing north into the neck
+    {sub:0.42, x:5.5, z: 7.4, yaw: Math.PI   }, // tunnel done — yaw rotation starts now
+    {sub:0.49, x:6.2, z: 6.5, yaw: Math.PI/2 }, // TURN 1 complete: facing east (7% window ≈ 2x sharper)
+    {sub:0.77, x:8.5, z: 6.5, yaw: Math.PI/2 }, // east corridor approaching second turn
+    {sub:0.83, x:8.5, z: 5.2, yaw: Math.PI   }, // TURN 2 complete: facing north (6% window ≈ 2x sharper)
     {sub:1.00, x:8.5, z: 3.8, yaw: Math.PI   }  // artifact chamber, WP screen at readable distance
   ];
   LVL["1.0"] = {
@@ -2400,15 +2400,24 @@ function drawCeilingFloor(g, level, cam, beat, time){
   const fg = g.createLinearGradient(0,horizon,0,H);
   fg.addColorStop(0, level.floor[1]); fg.addColorStop(1, level.floor[0]);
   g.fillStyle = fg; g.fillRect(0,horizon,W,H-horizon);
-  // floor perspective grid (receding lines)
+  // floor perspective grid — the receding horizontal lines now slide toward the viewer
+  // as the camera walks forward, so the floor reads as moving under you instead of
+  // a static pattern. Phase = distance walked along the camera's facing direction.
   g.save();
-  g.strokeStyle = `rgba(${level.rim[0]},${level.rim[1]},${level.rim[2]},0.08)`;
+  g.strokeStyle = `rgba(${level.rim[0]},${level.rim[1]},${level.rim[2]},0.14)`;
   g.lineWidth = 1;
-  for(let i=1;i<18;i++){
-    const t = i/18;
+  const fwdDist = (cam.camX||0) * Math.sin(cam.yaw||0) + (cam.camZ||0) * Math.cos(cam.yaw||0);
+  const frac = fwdDist - Math.floor(fwdDist); // 0..1 wraps every world unit
+  for(let i=0;i<18;i++){
+    const t = (i + frac) / 18;
+    if(t <= 0 || t >= 1) continue;
     const y = horizon + (H-horizon) * (t*t);
+    // Fade the near-bottom lines back in smoothly as they emerge, so they don't pop.
+    const edgeFade = (t < 0.08) ? (t/0.08) : ((t > 0.92) ? ((1-t)/0.08) : 1);
+    g.globalAlpha = 0.9 * edgeFade;
     g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
   }
+  g.globalAlpha = 1;
   // vanishing-point verticals
   const vpx = W*0.5, vpy = horizon;
   for(let i=-6;i<=6;i++){
@@ -4058,7 +4067,7 @@ function frame(t){
     const k = 1 - Math.exp(-6 * secs); // spring coeff matched to the old feel at 60fps
     const gap = scrollTarget - scrollSmooth;
     const springStep = gap * k;
-    const MAX_CAM_V = 1000; // px/s — bumped back up slightly so the walk feels less sluggish.
+    const MAX_CAM_V = 1500; // px/s — bumped again for a brisker walk.
     const maxStep = MAX_CAM_V * secs;
     scrollSmooth += Math.sign(gap) * Math.min(Math.abs(springStep), maxStep);
   }
