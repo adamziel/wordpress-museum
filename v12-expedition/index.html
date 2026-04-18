@@ -113,17 +113,25 @@
   #scrollbar .f{height:100%;background:linear-gradient(90deg,var(--accent,#e9c97a),transparent);width:0%;transition:width .08s linear}
 
   /* ---------- Full-screen highlight (release destination) ---------- */
-  #highlight{position:fixed;inset:0;z-index:30;display:flex;align-items:stretch;justify-content:center;pointer-events:none;opacity:0;transition:opacity 1.1s cubic-bezier(.22,1,.36,1)}
+  /* v13: slowed the container opacity to 1.4s (was 1.1s) so the morph breathes even if the
+     scroll is fast. The rate limit on the camera prevents fast scroll from rushing past anyway,
+     but a longer ramp gives frame-to-frame a smaller delta which reads as smoother. */
+  #highlight{position:fixed;inset:0;z-index:30;display:flex;align-items:stretch;justify-content:center;pointer-events:none;opacity:0;transition:opacity 1.4s cubic-bezier(.33,.8,.25,1)}
   #highlight.on{opacity:1;pointer-events:auto}
+  /* v13 fix: card children fade in as a unit, timed BEHIND the container so content is
+     always at <= container alpha and no sub-element ever pops in after the card is visible.
+     The wider 1.1s ramp with a 0.35s delay keeps children rising during the second half of the
+     container fade, never racing ahead. */
+  #hl-card > *{opacity:0;transition:opacity 1.1s cubic-bezier(.33,.8,.25,1) .35s}
+  #highlight.on #hl-card > *{opacity:1}
   /* v12: morph-in from focal object. The card starts clipped to a small rect centered on
      the focal object, then expands. Content fades in during last 30% of the morph.
      Smoothness pass: transition extended to 1.1s cubic-out so the morph feels like a
      single continuous breath rather than a fast snap followed by content fade. */
-  #hl-card{transform-origin:center center;transition:clip-path 1.1s cubic-bezier(.22,1,.36,1),transform 1.1s cubic-bezier(.22,1,.36,1);clip-path:inset(0 0 0 0 round 3px)}
+  #hl-card{transform-origin:center center;transition:clip-path 1.4s cubic-bezier(.33,.8,.25,1),transform 1.4s cubic-bezier(.33,.8,.25,1);clip-path:inset(0 0 0 0 round 3px)}
   #highlight.on #hl-card{clip-path:inset(0 0 0 0 round 3px)}
   #highlight.on.morph-in #hl-card{clip-path:inset(var(--mi-t,40%) var(--mi-r,40%) var(--mi-b,40%) var(--mi-l,40%) round 14px)}
-  #highlight.morph-in #hl-side, #highlight.morph-in #hl-shot{opacity:0}
-  #hl-side, #hl-shot{transition:opacity .75s cubic-bezier(.22,1,.36,1) .35s}
+  /* (child fades handled by #hl-card > * rule above — kept as one system to avoid pops) */
   /* Scrim blur/dim ramps with the highlight opacity so the world dims smoothly rather
      than flipping into blur-land on the first frame. */
   #hl-scrim{opacity:0;transition:opacity 1s cubic-bezier(.22,1,.36,1)}
@@ -2196,22 +2204,48 @@ function activeIntraSetpiece(movementIdx, sub){
   }
   return null;
 }
+// v13 fix 4: set-piece windows were too narrow (sub >= 0.92 / sub <= 0.08 = 16% of MLEN).
+// At high user-scroll speeds the whole thing flashed in a split second. We widen to 0.82 / 0.18
+// (36% combined = ~2340px) AND pace by real time so once triggered a set-piece always plays for
+// at least SP_MIN_MS regardless of how fast the camera sweeps past. The pacing is stored on
+// window.__sp_time and wraps/advances across frames.
+const SP_DEP_START = 0.82;
+const SP_APP_END   = 0.18;
+const SP_MIN_MS    = 900;
+let __sp_state = { key:null, t0:0, kindKey:null };
 function activeSetpiece(movementIdx, sub){
   // Verifier issue 1: debug hook — force a specific set-piece at phase t so the verifier
   // can render each without navigating past pinned highlights. Set via
   // window.__forceSetpiece("leap", 0.5); window.__forceSetpiece(null) to clear.
   if(window.__sp_force){ return window.__sp_force; }
-  // Departure half of current movement
+  // Determine candidate set-piece at this position
+  let kind = null, rawT = 0, key = null;
   const dep = SETPIECES.find(s=>s.after===movementIdx);
-  if(dep && sub >= 0.92){
-    return { kind:dep.kind, t: (sub-0.92)/0.08 * 0.5 };
+  if(dep && sub >= SP_DEP_START){
+    kind = dep.kind;
+    key = `dep-${movementIdx}-${dep.kind}`;
+    rawT = (sub - SP_DEP_START) / (1 - SP_DEP_START) * 0.5;
+  } else {
+    const prev = SETPIECES.find(s=>s.after===movementIdx-1);
+    if(prev && sub <= SP_APP_END){
+      kind = prev.kind;
+      key = `app-${movementIdx}-${prev.kind}`;
+      rawT = 0.5 + sub / SP_APP_END * 0.5;
+    }
   }
-  // Approach half of current movement = tail of previous set-piece
-  const prev = SETPIECES.find(s=>s.after===movementIdx-1);
-  if(prev && sub <= 0.08){
-    return { kind:prev.kind, t: 0.5 + sub/0.08 * 0.5 };
+  if(!kind) { __sp_state.key = null; return null; }
+  // Time-based pacing: once a set-piece key becomes active, advance t from its own clock
+  // so it plays for at least SP_MIN_MS even if the camera blasts through the window.
+  const now = performance.now();
+  if(__sp_state.key !== key){
+    __sp_state = { key, t0: now, kindKey: key };
   }
-  return null;
+  const elapsed = now - __sp_state.t0;
+  const timeT = Math.min(1, elapsed / SP_MIN_MS);
+  // Use whichever progress is further along — scroll-driven rawT OR time-driven timeT —
+  // so fast scrollers still get the full play, slow scrollers aren't held back.
+  const t = Math.max(rawT, timeT);
+  return { kind, t };
 }
 window.__forceSetpiece = function(kind, t){
   if(kind==null){ window.__sp_force = null; return "cleared"; }
@@ -3651,9 +3685,11 @@ function dismissHighlight(){
   const cr = parseFloat(hl.style.getPropertyValue("--mi-r"))||40;
   const ct = parseFloat(hl.style.getPropertyValue("--mi-t"))||40;
   const cb = parseFloat(hl.style.getPropertyValue("--mi-b"))||40;
+  // v13 fix: keep the clip-path AT the collapsed focal rect through the whole morph-out.
+  // Previously a transitionend handler cleared the inline style mid-fade, which let the
+  // (still faintly visible) card snap back to its full size right before opacity hit 0.
+  // We leave the inline clipPath in place — the next openHighlight sets a fresh one.
   card.style.clipPath = `inset(${ct}% ${cr}% ${cb}% ${cl}% round 14px)`;
-  const clearClip = ()=>{ card.style.clipPath = ""; card.removeEventListener("transitionend", clearClip); };
-  card.addEventListener("transitionend", clearClip);
   hl.classList.remove("on");
   const pullEl = document.getElementById("hl-pull"); if(pullEl) pullEl.style.width = "0%";
   const pctEl = document.getElementById("hl-pull-pct"); if(pctEl) pctEl.textContent = "0%";
@@ -3812,13 +3848,25 @@ function frame(t){
   if(highlightState.active){
     scrollTarget = highlightState.lockY;
     window.scrollTo(0, highlightState.lockY);
+    // v13 fix 1: also snap the *camera* (scrollSmooth) to the lock directly so the rate-limited
+    // spring doesn't glide in from far above the lock. The rate limit below would otherwise
+    // take a second or more to close a large gap after a fast scroll overshoots the pin zone.
+    scrollSmooth = highlightState.lockY;
   }
-  // Smoothness pass: eased toward target with k=0.10 (was .12). The lower stiffness gives
-  // roughly a 380ms settle on a single wheel click — the camera glides under fast input
-  // rather than snapping. Frame-dt-weighted so the feel is uniform across refresh rates.
+  // v13 fix 1 (camera rate limit): decouple camera velocity from scroll velocity.
+  // The user's scroll supplies *intent* via scrollTarget; the camera (scrollSmooth) advances
+  // toward that target under a spring, but is capped at MAX_CAM_V px/s. At 5x scroll speed the
+  // camera still glides at its own pace, giving set-pieces time to play and the morph transitions
+  // time to breathe. Without this, a 5000 px/s wheel blitzes the whole journey in ~12s with
+  // each release blurring past in ~1.2s.
   {
-    const k = 1 - Math.pow(1 - 0.10, Math.max(1, dt/16.67));
-    scrollSmooth += (scrollTarget - scrollSmooth) * k;
+    const secs = Math.max(0.001, dt/1000);
+    const k = 1 - Math.exp(-6 * secs); // spring coeff matched to the old feel at 60fps
+    const gap = scrollTarget - scrollSmooth;
+    const springStep = gap * k;
+    const MAX_CAM_V = 1400; // px/s — the user's complaint was "5x my speed", so cap the camera.
+    const maxStep = MAX_CAM_V * secs;
+    scrollSmooth += Math.sign(gap) * Math.min(Math.abs(springStep), maxStep);
   }
   const y = scrollSmooth;
   const st = scrollToMovement(y);
