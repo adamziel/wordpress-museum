@@ -3,1221 +3,2235 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WP Museum v8 — The Impossible Museum</title>
+<title>WordPress Museum · v10 · Nine Movements</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:#000;color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
-  body{height: 900vh; /* 9 rooms × 100vh */}
-  #viewport{position:fixed;inset:0;overflow:hidden;background:#000;z-index:1;perspective:1200px;perspective-origin:50% 50%}
-  #stage{position:absolute;inset:0;transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform,filter;transition:none}
-  canvas#view,canvas#fx{position:absolute;inset:0;width:100%;height:100%;display:block}
-  canvas#view{image-rendering:pixelated}
-  canvas#fx{pointer-events:none}
+  :root{
+    --display:"Didot","Bodoni 72",Georgia,"Times New Roman",serif;
+    --prose:"Iowan Old Style","Palatino Linotype","Palatino","Book Antiqua",Georgia,serif;
+    --mono:"IBM Plex Mono","JetBrains Mono","Menlo",ui-monospace,monospace;
+    --ui:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --ink:#f2eee4;
+    --accent:#e9c97a;
+  }
+  html,body{background:#05060a;color:var(--ink);font-family:var(--ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body{height:16100px}
 
-  #splash{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(60% 50% at 50% 50%,#120609,#000);color:#f5e8c8;font-family:"Courier New",monospace;cursor:pointer;transition:opacity .6s}
-  #splash .box{text-align:center;padding:40px;border:2px solid #8a1818;box-shadow:0 0 0 6px #300,0 0 60px #600 inset;background:#1a0808;max-width:520px}
-  #splash h1{font-size:38px;letter-spacing:3px;color:#ffbe66;text-shadow:2px 2px 0 #600;margin-bottom:14px;line-height:1.1}
-  #splash .sub{font-size:11px;letter-spacing:4px;color:#c89858;margin-bottom:14px}
-  #splash p{font-size:13px;line-height:1.7;color:#dcc9a0}
-  #splash .k{color:#ffd27f;font-weight:bold}
+  /* ---------- Stage ---------- */
+  #stage{position:fixed;inset:0;z-index:1;background:#05060a;overflow:hidden}
+  #stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #breath{position:fixed;inset:-2% -2% -2% -2%;z-index:1;pointer-events:none;will-change:transform}
+
+  /* ---------- Loading splash ---------- */
+  #boot{position:fixed;inset:0;z-index:80;background:#05060a;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:opacity .7s}
+  #boot.gone{opacity:0;pointer-events:none}
+  #boot .ring{position:absolute;width:280px;height:280px;border-radius:50%;border:1px solid rgba(233,201,122,.3);animation:spin 8s linear infinite}
+  #boot .ring:nth-child(2){width:220px;height:220px;border-color:rgba(233,201,122,.18);animation-duration:14s;animation-direction:reverse}
+  #boot .ring:nth-child(3){width:160px;height:160px;border-color:rgba(233,201,122,.1);animation-duration:20s}
+  #boot .core{position:relative;text-align:center;z-index:1}
+  #boot .core .mark{font:400 10px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;opacity:.7;margin-bottom:18px}
+  #boot .core .title{font:400 34px/1 var(--display);letter-spacing:2px;color:#f4ecd6}
+  #boot .core .sub{font:400 10px/1.8 var(--mono);letter-spacing:3px;margin-top:18px;color:#8d7b54;text-transform:uppercase}
+  #boot .bar{position:absolute;bottom:30%;left:50%;transform:translateX(-50%);width:240px;height:1px;background:rgba(233,201,122,.18)}
+  #boot .bar .f{position:absolute;left:0;top:0;bottom:0;width:0%;background:#e9c97a;transition:width .25s ease}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Start splash ---------- */
+  #splash{position:fixed;inset:0;z-index:70;background:radial-gradient(ellipse at 50% 40%,#1b120a,#05060a 65%);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .7s}
   #splash.gone{opacity:0;pointer-events:none}
+  #splash .slab{text-align:center;max-width:640px;padding:44px 40px;border-top:1px solid rgba(233,201,122,.4);border-bottom:1px solid rgba(233,201,122,.4)}
+  #splash .k{font:400 10px/1 var(--mono);letter-spacing:5px;color:#c5ae7a;text-transform:uppercase;display:block;margin-bottom:20px}
+  #splash h1{font:400 52px/1.05 var(--display);letter-spacing:3px;color:#f4ecd6;margin-bottom:8px}
+  #splash .subtitle{font:400 italic 16px/1.4 var(--prose);color:#c8bfa6;margin-bottom:28px}
+  #splash p{font:400 13px/1.7 var(--prose);color:#b9af95;margin:0 auto;max-width:480px}
+  #splash .cta{font:500 10px/1 var(--mono);letter-spacing:6px;color:#e9c97a;margin-top:26px;text-transform:uppercase}
+  #splash .cta .pulse{display:inline-block;width:8px;height:8px;background:#e9c97a;border-radius:50%;margin-right:10px;vertical-align:middle;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 
-  #plaque{position:fixed;left:50%;bottom:14%;transform:translateX(-50%) translateY(30px);z-index:20;
-    width:min(780px,94vw);pointer-events:none;opacity:0;transition:opacity .4s ease,transform .5s ease}
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;top:0;left:0;right:0;z-index:15;pointer-events:none;padding:18px 24px;display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--ui)}
+  #hud .left{display:flex;flex-direction:column;gap:10px}
+  #hud .release{font:400 13px/1 var(--mono);letter-spacing:4px;color:#c5ae7a;text-transform:uppercase}
+  #hud .movement{font:400 28px/1 var(--display);letter-spacing:1.5px;color:var(--accent,#e9c97a);text-shadow:0 0 18px rgba(233,201,122,.25);transition:color .8s,text-shadow .8s}
+  #hud .era{font:400 10px/1 var(--mono);letter-spacing:3px;color:#8d7b54;text-transform:uppercase}
+  #beats{display:flex;gap:14px;margin-top:6px;font:500 9px/1 var(--mono);letter-spacing:3px;color:#6a5b3e;text-transform:uppercase}
+  #beats .b{display:flex;align-items:center;gap:6px;transition:color .4s}
+  #beats .b .dot{width:6px;height:6px;border-radius:50%;background:#3a321e;transition:all .4s}
+  #beats .b.on{color:var(--accent,#e9c97a)}
+  #beats .b.on .dot{background:var(--accent,#e9c97a);box-shadow:0 0 10px var(--accent,#e9c97a);transform:scale(1.3)}
+  #beats .b.past .dot{background:#6a5b3e}
+
+  /* ---------- Minimap (graph SVG) ---------- */
+  #minimap{position:fixed;top:18px;right:24px;z-index:15;width:330px;padding:12px 14px;background:linear-gradient(180deg,rgba(10,8,6,.82),rgba(10,8,6,.92));border:1px solid rgba(233,201,122,.35);border-radius:2px}
+  #minimap .mh{font:500 9px/1 var(--mono);letter-spacing:3px;color:#c5ae7a;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+  #minimap .mh .prog{color:#8d7b54}
+  #minimap svg{width:100%;height:96px;display:block}
+  #minimap .ml{font:500 9px/1.2 var(--mono);letter-spacing:2px;color:#8d7b54;margin-top:6px;text-transform:uppercase;display:flex;justify-content:space-between}
+
+  /* ---------- Plaque ---------- */
+  #plaque{position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(16px);z-index:18;width:min(820px,94vw);opacity:0;pointer-events:none;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.25,1)}
   #plaque.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-  #plaque .card{display:grid;grid-template-columns:220px 1fr;gap:18px;padding:18px 22px;
-    background:linear-gradient(180deg,rgba(18,14,10,.94),rgba(6,4,3,.94));
-    border:1px solid var(--accent,#e9c97a);box-shadow:0 0 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05) inset;
-    border-radius:6px;color:#f3ead6}
-  #plaque .portwrap{display:flex;flex-direction:column;gap:10px}
-  #plaque .port{width:100%;height:180px;background:#0a0806;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #plaque .card{display:grid;grid-template-columns:220px 1fr;gap:22px;padding:20px 24px 22px;background:linear-gradient(180deg,rgba(15,12,8,.96),rgba(8,6,4,.96));border:1px solid var(--accent,#e9c97a);box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset}
+  #plaque .bin{display:flex;flex-direction:column;gap:10px}
+  #plaque .port{width:100%;height:192px;background:#06080c;display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,201,122,.18)}
   #plaque .port canvas{image-rendering:pixelated;width:144px;height:192px}
-  #plaque .shot{width:100%;height:96px;background:#0a0806;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+  #plaque .shot{width:100%;height:126px;background:#06080c;overflow:hidden;border:1px solid rgba(233,201,122,.22)}
   #plaque .shot canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-  #plaque h2{font:700 22px/1.1 Georgia,serif;color:var(--accent,#e9c97a);margin-bottom:2px;letter-spacing:.5px}
-  #plaque .sub{font:500 11px/1.4 "Courier New",monospace;opacity:.75;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-  #plaque .body{font:400 13px/1.55 Georgia,serif;color:#e5dcc6;margin-bottom:12px}
-  #plaque button{pointer-events:auto;font:600 11px/1 "Courier New",monospace;letter-spacing:2px;padding:9px 14px;
-    border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;
-    text-transform:uppercase;transition:all .15s}
-  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706}
+  #plaque .tag{font:500 9px/1 var(--mono);letter-spacing:4px;color:#8d7b54;text-transform:uppercase}
+  #plaque .meta{font:500 10px/1 var(--mono);letter-spacing:2.5px;color:#a4946a;margin-bottom:4px;text-transform:uppercase}
+  #plaque h2{font:400 34px/1 var(--display);letter-spacing:1.2px;color:var(--accent,#e9c97a);margin-bottom:2px}
+  #plaque .headline{font:400 italic 14px/1.45 var(--prose);color:#e1d9bf;margin:10px 0 14px;padding-left:10px;border-left:2px solid var(--accent,#e9c97a);max-width:440px}
+  #plaque .prose{display:flex;flex-direction:column;gap:8px;min-height:160px}
+  #plaque .prose p{font:400 13.5px/1.58 var(--prose);color:#cdc2a4;opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.25,1)}
+  #plaque .prose p.on{opacity:1;transform:translateY(0)}
+  #plaque .prose p:nth-child(even).on{transform:translateX(0)}
+  #plaque .prose p:nth-child(even){transform:translateX(14px)}
+  #plaque .cta{margin-top:16px;display:flex;align-items:center;gap:14px}
+  #plaque button{pointer-events:auto;font:500 10px/1 var(--mono);letter-spacing:3px;padding:11px 18px;border:1px solid var(--accent,#e9c97a);background:transparent;color:var(--accent,#e9c97a);cursor:pointer;text-transform:uppercase;transition:all .2s}
+  #plaque button:hover{background:var(--accent,#e9c97a);color:#0a0706;letter-spacing:4px}
+  #plaque .pg-hint{font:500 9px/1 var(--mono);letter-spacing:3px;color:#6a5b3e;text-transform:uppercase}
 
-  #hud{position:fixed;left:0;right:0;bottom:0;height:90px;z-index:15;pointer-events:none;
-    background:linear-gradient(180deg,transparent,rgba(0,0,0,.75));display:flex;align-items:flex-end}
-  #hud .bar{width:100%;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;font-family:"Courier New",monospace;color:#d9c488}
-  #hud .era{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.85}
-  #hud .room{font-size:22px;font-weight:700;color:var(--accent,#e9c97a);text-shadow:0 0 12px var(--accent,#e9c97a)}
-  #hud .year{font-size:11px;letter-spacing:2px;opacity:.7}
-  #hud .trick{font-size:10px;letter-spacing:3px;opacity:.6;color:#fff}
-  #hud .face{width:48px;height:48px;border:2px solid #8a1818;background:#2a0a0a;display:flex;align-items:center;justify-content:center;
-    font-size:18px;color:#ffb05a;font-weight:900;box-shadow:inset 0 0 10px #500}
-  #hud .stat{display:flex;gap:10px;align-items:center}
-
-  #minimap{position:fixed;top:14px;right:14px;z-index:15;width:250px;
-    background:rgba(0,0,0,.7);border:1px solid #c69b4a;padding:8px;font-family:"Courier New",monospace;color:#e9c97a;font-size:10px}
-  #minimap .title{font-size:9px;letter-spacing:2px;opacity:.7;margin-bottom:4px}
-  #minimap .dots{display:flex;gap:3px;align-items:center;height:18px}
-  #minimap .d{flex:1;height:10px;background:#2a1a0a;border:1px solid #4a3820;transition:all .3s;position:relative}
-  #minimap .d.past{background:#4a3010;border-color:#8a5a20}
-  #minimap .d.now{background:#e9c97a;border-color:#fff;box-shadow:0 0 10px #ffc94a}
-  #minimap .label{font-size:9px;margin-top:4px;opacity:.75;letter-spacing:1px}
-
-  #xhair{position:fixed;left:50%;top:48%;width:14px;height:14px;margin-left:-7px;margin-top:-7px;z-index:10;pointer-events:none;opacity:.35}
-  #xhair::before,#xhair::after{content:"";position:absolute;background:#f5e8c8}
-  #xhair::before{left:6px;top:0;width:2px;height:14px}
-  #xhair::after{left:0;top:6px;width:14px;height:2px}
-
-  #hint{position:fixed;left:50%;top:55%;transform:translateX(-50%);z-index:12;color:#f5e8c8;
-    font-family:"Courier New",monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;
-    opacity:0;transition:opacity .6s;text-shadow:0 2px 8px #000;pointer-events:none}
-  #hint.show{opacity:.7}
-  #hint::after{content:"▼";display:block;text-align:center;margin-top:8px;animation:bob 1.8s ease-in-out infinite}
-  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
-
-  #trick-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.7);z-index:25;
-    pointer-events:none;padding:14px 28px;background:rgba(0,0,0,.7);border:2px solid #fff;
-    font-family:"Courier New",monospace;color:#fff;font-size:18px;letter-spacing:6px;text-transform:uppercase;
-    opacity:0;transition:opacity .35s,transform .35s;text-shadow:0 0 10px currentColor}
-  #trick-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-
-  #playground{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);display:none;flex-direction:column}
-  #playground.open{display:flex}
-  #playground .pg-head{height:40px;background:#0a0806;border-bottom:1px solid #c69b4a;display:flex;align-items:center;padding:0 14px;color:#e9c97a;font-family:"Courier New",monospace;font-size:12px;letter-spacing:2px}
-  #playground .pg-head button{margin-left:auto;background:transparent;border:1px solid #e9c97a;color:#e9c97a;padding:6px 14px;font:inherit;cursor:pointer;letter-spacing:2px}
-  #playground .pg-head button:hover{background:#e9c97a;color:#0a0706}
+  /* ---------- Playground ---------- */
+  #playground{position:fixed;inset:0;z-index:100;background:rgba(5,6,10,.96);display:none;flex-direction:column}
+  #playground.open{display:flex;animation:pgin .4s ease}
+  @keyframes pgin{from{opacity:0}to{opacity:1}}
+  #playground .pgh{height:46px;background:#0a0806;border-bottom:1px solid var(--accent,#e9c97a);display:flex;align-items:center;padding:0 18px;color:var(--accent,#e9c97a);font:500 11px/1 var(--mono);letter-spacing:3px;text-transform:uppercase}
+  #playground .pgh button{margin-left:auto;background:transparent;border:1px solid var(--accent,#e9c97a);color:var(--accent,#e9c97a);padding:8px 16px;font:inherit;cursor:pointer;letter-spacing:3px}
+  #playground .pgh button:hover{background:var(--accent,#e9c97a);color:#0a0706}
   #playground iframe{flex:1;border:0;background:#fff;width:100%}
 
-  #flash{position:fixed;inset:0;background:#fff;pointer-events:none;opacity:0;z-index:8;mix-blend-mode:screen;transition:opacity .8s}
+  /* ---------- Coda fade & vignette ---------- */
+  #vignette{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%)}
+  #grain{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:radial-gradient(#fff 1px,transparent 1.5px);background-size:3px 3px}
+  #whitefade{position:fixed;inset:0;z-index:7;pointer-events:none;background:#fff;opacity:0;transition:opacity .6s}
+
+  /* ---------- Scroll hair ---------- */
+  #scrollbar{position:fixed;top:0;left:0;right:0;height:2px;z-index:19;pointer-events:none}
+  #scrollbar .f{height:100%;background:linear-gradient(90deg,var(--accent,#e9c97a),transparent);width:0%;transition:width .08s linear}
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important;transition-duration:.15s !important}
+  }
 </style>
 </head>
 <body>
-<div id="viewport">
-  <div id="stage">
-    <canvas id="view"></canvas>
-    <canvas id="fx"></canvas>
+<div id="boot">
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="core">
+    <div class="mark">PRESENTATION BUILD · V10</div>
+    <div class="title">Nine Movements</div>
+    <div class="sub">composing the suite…</div>
   </div>
+  <div class="bar"><div class="f" id="bootf"></div></div>
 </div>
-<div id="flash"></div>
-<div id="xhair"></div>
-<div id="hint">Scroll to walk</div>
-<div id="trick-banner"></div>
-<div id="minimap">
-  <div class="title">IMPOSSIBLE MUSEUM MAP · 9 ROOMS</div>
-  <div class="dots" id="dots"></div>
-  <div class="label" id="mini-label">—</div>
+
+<div id="stage">
+  <canvas id="view"></canvas>
 </div>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="whitefade"></div>
+<div id="scrollbar"><div class="f" id="sf"></div></div>
+
 <div id="hud">
-  <div class="bar">
-    <div class="stat">
-      <div class="face" id="face">1.0</div>
-      <div>
-        <div class="era" id="era">WORDPRESS</div>
-        <div class="room" id="hud-room">—</div>
-      </div>
-    </div>
-    <div>
-      <div class="year" id="year">—</div>
-      <div class="trick" id="trick-label">—</div>
+  <div class="left">
+    <div class="release" id="h-release">OVERTURE</div>
+    <div class="movement" id="h-movement">Nine Movements</div>
+    <div class="era" id="h-era">WORDPRESS · 2003 → 2026</div>
+    <div id="beats">
+      <div class="b" data-b="0"><span class="dot"></span>Approach</div>
+      <div class="b" data-b="1"><span class="dot"></span>Anticipation</div>
+      <div class="b" data-b="2"><span class="dot"></span>Arrival</div>
+      <div class="b" data-b="3"><span class="dot"></span>Sustained</div>
+      <div class="b" data-b="4"><span class="dot"></span>Departure</div>
     </div>
   </div>
 </div>
+
+<div id="minimap">
+  <div class="mh"><span>SUITE · NINE MOVEMENTS</span><span class="prog" id="m-prog">00%</span></div>
+  <svg id="m-svg" viewBox="0 0 320 96" preserveAspectRatio="none"></svg>
+  <div class="ml"><span id="m-from">—</span><span id="m-to">—</span></div>
+</div>
+
 <div id="plaque">
   <div class="card">
-    <div class="portwrap">
-      <div class="port" id="portrait"></div>
-      <div class="shot" id="shot"></div>
+    <div class="bin">
+      <div class="port"><canvas id="p-port" width="72" height="96"></canvas></div>
+      <div class="tag" id="p-tag">ERA MOCK</div>
+      <div class="shot"><canvas id="p-shot" width="280" height="140"></canvas></div>
     </div>
     <div>
-      <div class="sub" id="p-sub">VERSION · DATE</div>
+      <div class="meta" id="p-meta">VERSION · DATE</div>
       <h2 id="p-name">—</h2>
-      <div class="body" id="p-body">—</div>
-      <button id="p-btn">▶ ACTIVATE IN PLAYGROUND</button>
+      <div class="headline" id="p-headline">—</div>
+      <div class="prose" id="p-prose"></div>
+      <div class="cta">
+        <button id="p-btn">▸ Activate in Playground</button>
+        <span class="pg-hint">loads playground.wordpress.net</span>
+      </div>
     </div>
   </div>
 </div>
-<div id="splash">
-  <div class="box">
-    <div class="sub">WORDPRESS MUSEUM · V8</div>
-    <h1>THE IMPOSSIBLE MUSEUM</h1>
-    <p>Nine rooms. Twenty-two years of WordPress. Between each room, the laws of the world break — you will jump, fall, walk on walls, shrink, step through a portal, flip upside down, fly, and pass through a photo negative.</p>
-    <p style="margin-top:14px"><span class="k">SCROLL</span> to travel. <span class="k">CLICK</span> to begin.</p>
-  </div>
-</div>
+
 <div id="playground">
-  <div class="pg-head"><span id="pg-label">—</span><button id="pg-close">✕ CLOSE</button></div>
-  <iframe id="pg-frame" title="Playground" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  <div class="pgh"><span id="pg-title">—</span><button id="pg-close">✕ Close</button></div>
+  <iframe id="pg-frame" title="WordPress Playground" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
 </div>
 
 <script>
 "use strict";
 
-function hexToRgb(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
-function rgb(c){ return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; }
-function mixColors(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
+/* =========================================================
+   WordPress Museum v10 · Nine Movements
+   Single-file presentation build. Vanilla JS + canvas + WebAudio.
+   ========================================================= */
 
-const ROOMS = [
-  { v:"1.0", name:"Miles", date:"2004-01-03", musician:"Miles Davis",
-    era:"BUNKER / 2004",
-    hist:"Released January 3, 2004 as WordPress's first numbered major, forked from b2/cafelog by Matt Mullenweg and Mike Little. 'Miles' honored Miles Davis, inaugurating the jazz-codename tradition. The release introduced search-engine-friendly permalinks, a post preview pane, and the plugin-API spine — add_filter and add_action arrived soon after in 1.2. The moment WordPress stopped being a fork and started being a platform.",
-    accent:"#ff6a3d",
-    bpm:70, chord:[[57,60,64,67],[55,58,62,65],[53,57,60,63]], bass:[38,36,35,34],
-    palette:{wall:[110,60,34],wall2:[70,30,18],floor:[40,22,14],ceil:[18,10,8],fog:[26,8,4],light:[255,120,50],ambient:0.18},
-    tex:"brick", shot:"b2cafelog",
-    trick:"JUMP", trickLabel:"LEAP THE GAP"
+/* ---------- helpers ---------- */
+const TAU = Math.PI * 2;
+const clamp = (v,a,b)=> v<a?a : v>b?b : v;
+const lerp  = (a,b,t)=> a + (b-a)*t;
+const smooth= (t)=> t<=0?0 : t>=1?1 : t*t*(3-2*t);
+const ease  = (t)=> t<=0?0 : t>=1?1 : 1 - Math.pow(1-t,3);
+function hex(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function rgb(c,a){ return a==null?`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`:`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+function mix(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; }
+
+/* ---------- MOVEMENTS ---------- */
+/* Each movement: palette (5 hex), headline, paragraphs (split for layered reveal),
+   motif (chord progression as semitone arrays + bass line), camera tag. */
+const M = [
+  {
+    v:"1.0", name:"Miles", musician:"Miles Davis (tpt)", date:"2004 · 01 · 03", era:"The Bunker",
+    camera:"first-person corridor", trick:"CANDLE-OUT", register:"somber · pioneer",
+    palette:["#2a1408","#6e3c22","#b06238","#e9b173","#fff1d4"],
+    headline:"A fork became a platform: permalinks, preview, and the plugin-API spine.",
+    paras:[
+      "Released January 3, 2004 as WordPress's first numbered major, forked from Michel Valdrighi's b2/cafelog by Matt Mullenweg and Mike Little.",
+      "The codename honoured Miles Davis and began the jazz-name tradition that carried every major release after it.",
+      "1.0 shipped search-engine-friendly permalinks, a post preview pane, a simple installer, and the bones of a plugin architecture.",
+      "Within months, add_filter and add_action in 1.2 turned that spine into the most generous hook system on the web.",
+      "The room where WordPress stopped being someone else's fork and started being itself."
+    ],
+    motif:{ bpm:70, chords:[[62,65,69,72,76],[55,59,62,65,70],[60,64,67,71,74]], bass:[38,43,48], mel:[72,74,72,69,65] },
+    portraitKey:"trumpet", adminKey:"b2cafelog"
   },
-  { v:"2.0", name:"Duke", date:"2005-12-31", musician:"Duke Ellington",
-    era:"CRYPT / 2005",
-    hist:"A New Year's Eve gift on December 31, 2005, named for Duke Ellington. 'Duke' shipped the TinyMCE rich-text WYSIWYG editor, rich-text image uploads, Akismet anti-spam, and the user roles & capabilities system that still structures WordPress permissions today. It was the first release where writing in WordPress felt like writing, not tagging HTML. Matt Mullenweg announced it just before midnight on New Year's Eve.",
-    accent:"#ffc36b",
-    bpm:84, chord:[[56,60,63,66],[54,57,61,64],[52,56,59,63]], bass:[32,31,30,33],
-    palette:{wall:[90,82,70],wall2:[50,44,36],floor:[30,26,20],ceil:[22,20,16],fog:[30,22,14],light:[255,180,90],ambient:0.24},
-    tex:"stone", shot:"tinymce",
-    trick:"FALL", trickLabel:"DESCEND THE SHAFT"
+  {
+    v:"2.0", name:"Duke", musician:"Duke Ellington (p)", date:"2005 · 12 · 31", era:"The Crypt Library",
+    camera:"cinematic side-scroll", trick:"FALL", register:"formal · midnight gala",
+    palette:["#15110b","#3a2f1f","#78623f","#c29a58","#f4dfb0"],
+    headline:"A New Year's Eve gift: TinyMCE, Akismet, and proper user roles.",
+    paras:[
+      "Announced by Matt Mullenweg on December 31, 2005 — literally a New Year's Eve gift, named for Duke Ellington.",
+      "Duke shipped the TinyMCE rich-text editor. Writing in WordPress finally felt like writing, not tagging HTML.",
+      "Akismet arrived built-in; rich image uploads landed; the database layer moved to WPDB.",
+      "Roles & Capabilities — Admin, Editor, Author, Contributor, Subscriber — defined a permission model WordPress still uses two decades later.",
+      "A formal release on a formal night: black tie, small group, quiet ballad."
+    ],
+    motif:{ bpm:82, chords:[[58,62,65,68,72],[56,60,63,66,70],[53,57,60,64,67],[55,59,62,65,70]], bass:[34,30,29,31], mel:[72,74,75,72,70,67] },
+    portraitKey:"piano", adminKey:"tinymce"
   },
-  { v:"2.2", name:"Getz", date:"2007-05-16", musician:"Stan Getz",
-    era:"WIDGET WORKSHOP / 2007",
-    hist:"Released May 16, 2007, named for cool-jazz saxophonist Stan Getz. 'Getz' introduced the Widgets system into core — before this, sidebars were hand-coded PHP. Atom 1.0 feed support arrived. The minimum was bumped to PHP 4.2 and MySQL 4.0. A quiet release that made WordPress's sidebar famously draggable, and handed millions of bloggers a lego-box of reusable sidebar pieces.",
-    accent:"#6adfb8",
-    bpm:90, chord:[[58,62,65,69],[55,59,62,65],[60,64,67,70]], bass:[34,33,36,38],
-    palette:{wall:[70,110,100],wall2:[38,68,62],floor:[24,48,42],ceil:[20,40,38],fog:[22,48,44],light:[180,255,210],ambient:0.32},
-    tex:"widget", shot:"widgets",
-    trick:"WALL", trickLabel:"WALK THE WALL"
+  {
+    v:"2.2", name:"Getz", musician:"Stan Getz (sax)", date:"2007 · 05 · 16", era:"The Widget Workshop",
+    camera:"overhead workbench", trick:"WALL-WALK", register:"playful · workshop-warm",
+    palette:["#0f2a26","#1f4d44","#3a8a74","#7dd3a8","#dff5e4"],
+    headline:"Widgets entered core — sidebars became draggable lego.",
+    paras:[
+      "May 16, 2007. Named for cool-jazz saxophonist Stan Getz.",
+      "Before 2.2, a sidebar was hand-edited PHP. After 2.2, it was a lego box of draggable widgets: Recent Posts, Categories, Tag Cloud, RSS.",
+      "Atom 1.0 feed support landed. PHP 4.2 and MySQL 4.0 became the new floor.",
+      "A small-number release that changed what a non-developer could do with a WordPress theme: everything.",
+      "A workshop, not a theatre — the loud thing today is the quiet thing tomorrow."
+    ],
+    motif:{ bpm:92, chords:[[60,64,67,71,74],[58,62,65,69,72],[55,59,62,66,69],[57,61,64,67,70]], bass:[36,34,31,33], mel:[72,74,76,79,76,72] },
+    portraitKey:"sax", adminKey:"widgets"
   },
-  { v:"3.0", name:"Thelonious", date:"2010-06-17", musician:"Thelonious Monk",
-    era:"LABORATORY / 2010",
-    hist:"June 17, 2010, named for Thelonious Monk. 'Thelonious' merged WordPress MU into core — multisite for everyone — and introduced custom post types and custom menus. The default theme Twenty Ten replaced the long-serving Kubrick, founding the new 'Twenty X' tradition. It shipped after a long beta and marked a civilizational shift for the platform: WordPress was no longer just a blog engine.",
-    accent:"#9be3d4",
-    bpm:96, chord:[[60,64,67,71],[62,65,69,72],[59,62,65,69]], bass:[36,38,41,43],
-    palette:{wall:[190,198,204],wall2:[120,128,138],floor:[70,80,90],ceil:[210,220,230],fog:[180,200,210],light:[230,250,255],ambient:0.55},
-    tex:"tech", shot:"admin27",
-    trick:"SHRINK", trickLabel:"SHRINK TO PASS"
+  {
+    v:"3.0", name:"Thelonious", musician:"Thelonious Monk (p)", date:"2010 · 06 · 17", era:"The Laboratory",
+    camera:"orbit (planet / moon)", trick:"SHRINK", register:"civic · laboratorial",
+    palette:["#0a1422","#1d3a58","#4a7faa","#9ec6e8","#f1f8ff"],
+    headline:"WordPress MU folded into core; custom post types and menus arrived.",
+    paras:[
+      "June 17, 2010. Named for Thelonious Monk.",
+      "3.0 merged WordPress MU into core — every install became potentially a multisite network.",
+      "Custom post types redefined what 'a post' could mean: portfolios, products, events, anything.",
+      "Custom menus, introduced here, replaced a fiddly decade of pages-with-parent PHP.",
+      "The Kubrick default theme stepped aside for Twenty Ten, founding a tradition: a new default every year."
+    ],
+    motif:{ bpm:96, chords:[[64,68,71,75,78],[62,66,69,73,76],[59,63,66,70,73],[66,70,73,77,80]], bass:[40,38,36,42], mel:[76,78,80,83,80,78,76] },
+    portraitKey:"monkpiano", adminKey:"admin27"
   },
-  { v:"3.3", name:"Sonny", date:"2011-12-12", musician:"Sonny Stitt",
-    era:"POINTERS / 2011",
-    hist:"December 12, 2011, named for bebop saxophonist Sonny Stitt. 'Sonny' shipped the drag-and-drop media uploader — goodbye, the old multi-tab Flash uploader. Flyout admin menus replaced double-click navigation. 'Feature pointers' with little blue speech bubbles taught new users about new features. The admin bar was redesigned. A polish release that quietly made the admin feel friendly for the first time.",
-    accent:"#c99bff",
-    bpm:102, chord:[[62,65,69,72],[60,64,67,71],[57,60,64,67]], bass:[36,34,38,40],
-    palette:{wall:[120,100,180],wall2:[70,55,110],floor:[40,30,60],ceil:[50,40,80],fog:[60,50,100],light:[200,180,255],ambient:0.36},
-    tex:"velvet", shot:"sonnyadmin",
-    trick:"PORTAL", trickLabel:"THROUGH THE PORTAL"
+  {
+    v:"3.3", name:"Sonny", musician:"Sonny Stitt (sax)", date:"2011 · 12 · 12", era:"Velvet Pointers",
+    camera:"Dutch tilt · portal", trick:"PORTAL", register:"dream · velvet",
+    palette:["#1a0f2a","#3a1f5c","#7a4ac0","#c9a0ff","#f2e8ff"],
+    headline:"Drag-drop upload, flyout menus, blue pointer speech bubbles.",
+    paras:[
+      "December 12, 2011. Named for bebop saxophonist Sonny Stitt.",
+      "3.3 retired the multi-step Flash uploader in favour of drag-and-drop. A small technical change that felt miraculous.",
+      "Flyout admin menus replaced the double-click sidebar navigation.",
+      "Blue 'feature pointer' bubbles softly introduced new UI — WordPress admin learned to teach itself.",
+      "The admin bar got its modern shape. A polish release that quietly became the friendly one."
+    ],
+    motif:{ bpm:102, chords:[[60,64,67,70,74],[58,62,65,68,72],[55,58,62,65,69],[63,66,70,73,77]], bass:[36,34,31,39], mel:[77,79,80,82,79,77] },
+    portraitKey:"sax2", adminKey:"sonnyadmin"
   },
-  { v:"4.0", name:"Benny", date:"2014-09-04", musician:"Benny Goodman",
-    era:"ATRIUM / 2014",
-    hist:"September 4, 2014, named for swing clarinetist Benny Goodman. A symbolic version bump with no rewrite — 'Benny' delivered a smoother grid-style media library, embed previews inline in the editor, and a content-focused plugin install flow. Language-pack internationalization was improved. The release that made WordPress feel, for the first time, truly modern — the MP6 flat admin from 3.8 had bedded in, and everything looked intentional.",
-    accent:"#f0d28c",
-    bpm:78, chord:[[53,57,60,64],[55,59,62,65],[52,55,59,62]], bass:[29,31,33,34],
-    palette:{wall:[220,210,180],wall2:[150,135,100],floor:[110,92,62],ceil:[240,230,205],fog:[210,195,160],light:[255,230,170],ambient:0.5},
-    tex:"marble", shot:"mp6grid",
-    trick:"FLIP", trickLabel:"WORLD INVERTED"
+  {
+    v:"4.0", name:"Benny", musician:"Benny Goodman (cl)", date:"2014 · 09 · 04", era:"The Marble Atrium",
+    camera:"dolly-zoom grid", trick:"FLIP", register:"proud · marble atrium",
+    palette:["#d8ccaf","#f0e7cb","#b99b6a","#756045","#2a1f12"],
+    headline:"A grid-style media library; inline oEmbeds; language packs.",
+    paras:[
+      "September 4, 2014. Named for swing clarinetist Benny Goodman.",
+      "A symbolic version bump — no rewrite, but a felt maturity.",
+      "The media library reflowed into a grid; embeds previewed right inside the editor; plugin-install shifted content-first.",
+      "Language packs streamlined internationalisation — WordPress became genuinely multilingual from core.",
+      "The moment WordPress felt, for the first time, deliberately designed — not just accreted."
+    ],
+    motif:{ bpm:78, chords:[[55,59,62,66,69],[57,60,64,67,71],[52,55,59,62,66],[57,60,64,68,71]], bass:[31,33,28,33], mel:[72,74,76,74,72,71,69] },
+    portraitKey:"clarinet", adminKey:"mp6grid"
   },
-  { v:"5.0", name:"Bebo", date:"2018-12-06", musician:"Bebo Valdés",
-    era:"GALLERY / 2018",
-    hist:"December 6, 2018, named for Cuban pianist Bebo Valdés. 'Bebo' shipped Gutenberg — the block editor — the biggest editing change since 2.0's WYSIWYG. Twenty Nineteen arrived as the first block-ready default theme. The release was contentious at launch: the Classic Editor plugin passed a million active installs in weeks. Inevitable in hindsight. From Bebo onward, every post became a composition of blocks.",
-    accent:"#c6f0d1",
-    bpm:88, chord:[[58,62,65,69],[60,63,67,70],[56,60,63,67]], bass:[34,36,39,41],
-    palette:{wall:[240,244,248],wall2:[190,200,210],floor:[225,230,236],ceil:[250,252,254],fog:[220,230,240],light:[255,255,255],ambient:0.7},
-    tex:"glass", shot:"gutenberg",
-    trick:"FLY", trickLabel:"ZERO GRAVITY"
+  {
+    v:"5.0", name:"Bebo", musician:"Bebo Valdés (p)", date:"2018 · 12 · 06", era:"The Gallery",
+    camera:"macro pull (block → post)", trick:"FLY", register:"gallery · white",
+    palette:["#f5f7fa","#dde3eb","#a8b4c2","#4a5b72","#111826"],
+    headline:"Gutenberg. A post became a composition of blocks.",
+    paras:[
+      "December 6, 2018. Named for Cuban pianist Bebo Valdés.",
+      "5.0 shipped Gutenberg: the block editor. The biggest editing change since 2.0's WYSIWYG.",
+      "A paragraph became a paragraph block; an image, a block; a quote, a block; a column layout, blocks inside a block.",
+      "Twenty Nineteen arrived as the first block-ready default theme.",
+      "The release was contentious at launch — Classic Editor installs exceeded a million in weeks — and inevitable in hindsight."
+    ],
+    motif:{ bpm:88, chords:[[65,68,72,75,79],[61,64,68,71,75],[63,66,69,72,76],[67,70,74,77,81]], bass:[41,37,39,43], mel:[77,79,81,79,77,76,74] },
+    portraitKey:"bebopiano", adminKey:"gutenberg"
   },
-  { v:"6.0", name:"Arturo", date:"2022-05-24", musician:"Arturo O'Farrill",
-    era:"SITE EDITOR / 2022",
-    hist:"May 24, 2022, named for Afro-Cuban jazz pianist Arturo O'Farrill. 'Arturo' advanced Full Site Editing with style variations in block themes, a distraction-free Write mode, and locking controls for block patterns. A new Webfonts API landed. The browse-templates flow in the site editor matured. The release where designers could finally shape a whole WordPress site — header, footer, templates, styles — in one visual interface without touching PHP.",
-    accent:"#ff5ad9",
-    bpm:104, chord:[[64,68,71,75],[62,66,69,73],[67,71,74,78]], bass:[40,38,43,41],
-    palette:{wall:[28,4,40],wall2:[60,10,80],floor:[10,4,24],ceil:[14,4,40],fog:[12,4,28],light:[255,90,220],ambient:0.22},
-    tex:"neon", shot:"siteeditor",
-    trick:"NEGATIVE", trickLabel:"PHOTO NEGATIVE"
+  {
+    v:"6.0", name:"Arturo", musician:"Arturo O'Farrill (p)", date:"2022 · 05 · 24", era:"Neon Site-Editor",
+    camera:"Dutch tilt + scanline", trick:"NEGATIVE", register:"neon · electric",
+    palette:["#0b021a","#3a0b6e","#8b2fce","#ff5ad9","#ffe7fb"],
+    headline:"Full-site editing matured: styles, patterns, template locking.",
+    paras:[
+      "May 24, 2022. Named for Afro-Cuban jazz pianist Arturo O'Farrill.",
+      "6.0 advanced Full-Site Editing with style variations, distraction-free Write mode, and locking controls for block patterns.",
+      "A new Webfonts API landed. Template browsing in the site editor matured.",
+      "Designers could shape a whole site — header, footer, templates, styles — without opening a PHP file.",
+      "The neon release: theme.json let colour, type, and spacing be spoken as a single language."
+    ],
+    motif:{ bpm:104, chords:[[63,67,70,74,77],[68,72,75,79,82],[61,65,68,72,75],[66,70,73,77,80]], bass:[39,44,37,42], mel:[79,82,84,82,79,77] },
+    portraitKey:"keytar", adminKey:"siteeditor"
   },
-  { v:"7.0", name:"Monk", date:"2026-02-10", musician:"Thelonious Monk (reprise)",
-    era:"VOID / 2026",
-    hist:"February 10, 2026 — a landmark reprise closing the codename circle back to Thelonious Monk. 'Monk' lands collaborative editing in core after years in the Phase-3 labs: multiple cursors, presence, comments threaded into the block canvas itself. Twenty Twenty-Six ships with an AI-assisted block-styling helper that proposes theme-consistent variations. Speculative, of course — but presented here as the quiet, white, open-ended room where the platform starts writing with you instead of for you.",
-    accent:"#a9b8ff",
-    bpm:60, chord:[[60,64,67,71,74],[62,65,69,72,76],[57,60,64,67,71]], bass:[36,38,33,34],
-    palette:{wall:[245,248,252],wall2:[210,220,235],floor:[238,242,248],ceil:[252,254,255],fog:[240,244,252],light:[250,250,255],ambient:0.85},
-    tex:"void", shot:"ai",
-    trick:null, trickLabel:"—"
+  {
+    v:"7.0", name:"Monk", musician:"Thelonious Monk (reprise)", date:"2026 · 02 · 10", era:"The Void",
+    camera:"slow zoom-out void", trick:"WHITEN", register:"elegiac · futurist",
+    palette:["#fafbff","#e8eaf0","#c8ccd8","#7a8299","#3a4254"],
+    headline:"Collaborative editing in core; an AI styling helper quietly listens.",
+    paras:[
+      "February 10, 2026. A landmark reprise closing the codename circle back to Thelonious Monk.",
+      "7.0 lands collaborative editing in core after years of Phase-3 labs: multiple cursors, presence, threaded comments on the block canvas.",
+      "Twenty Twenty-Six ships with an AI-assisted styling helper that proposes theme-consistent variations.",
+      "Speculative, of course — presented here as the quiet, open-ended room where the platform begins writing with you.",
+      "A coda in whites and soft greys. The museum does not end; it exhales."
+    ],
+    motif:{ bpm:60, chords:[[65,69,72,76,79,83],[62,66,69,72,76,79],[63,67,70,74,77,81],[60,64,67,71,74,78]], bass:[41,38,39,36], mel:[79,81,83,79,77,76,74,72] },
+    portraitKey:"headphones", adminKey:"ai"
   }
 ];
 
-/* ---------- Canvas setup ---------- */
-const canvas = document.getElementById('view');
-const ctx = canvas.getContext('2d', { alpha:false, willReadFrequently:true });
-const fxCanvas = document.getElementById('fx');
-const fx = fxCanvas.getContext('2d');
-let W = 800, H = 450;
-let screenW=1, screenH=1;
+/* ---------- Scroll layout ----------
+   overture: 0..400
+   movements: each 1700px
+   coda: last 400
+*/
+const OVERTURE = 400;
+const CODA = 400;
+const MLEN = 1700;
+const TOTAL = OVERTURE + M.length * MLEN + CODA; // 400+15300+400 = 16100
+document.body.style.height = TOTAL + "px";
+
+/* beat ranges within a movement (fraction): approach, anticipation, arrival, sustained, departure */
+const BEATS = [
+  {key:"approach",    a:0.00, b:0.22},
+  {key:"anticipation",a:0.22, b:0.38},
+  {key:"arrival",     a:0.38, b:0.50},
+  {key:"sustained",   a:0.50, b:0.86},
+  {key:"departure",   a:0.86, b:1.00}
+];
+
+/* ---------- Smoothed scroll ---------- */
+let scrollTarget = 0;
+let scrollSmooth = 0;
+window.addEventListener("scroll", ()=>{ scrollTarget = window.scrollY; }, {passive:true});
+
+/* ---------- Canvas ---------- */
+const canvas = document.getElementById("view");
+const ctx = canvas.getContext("2d", {alpha:false});
+let DPR = Math.min(window.devicePixelRatio||1, 2);
+let W=1, H=1;
 function resize(){
-  screenW = window.innerWidth; screenH = window.innerHeight;
-  const scale = (screenW > 1400) ? 0.55 : (screenW > 900 ? 0.65 : 0.75);
-  W = Math.max(480, Math.floor(screenW * scale));
-  H = Math.max(270, Math.floor(screenH * scale));
-  canvas.width = W; canvas.height = H;
-  fxCanvas.width = W; fxCanvas.height = H;
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.floor(W*DPR); canvas.height = Math.floor(H*DPR);
+  canvas.style.width = W+"px"; canvas.style.height = H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
 }
-resize();
-window.addEventListener('resize', resize);
+resize(); window.addEventListener("resize", resize);
 
-/* ---------- Map ---------- */
-const MAP_W = 9;
-const ROOM_LEN = 18;
-const CAP = 2;
-const MAP_H = ROOMS.length * ROOM_LEN + CAP * 2;
-const map = new Uint8Array(MAP_W * MAP_H);
-function mget(x,y){ if(x<0||y<0||x>=MAP_W||y>=MAP_H) return 255; return map[y*MAP_W+x]; }
-function mset(x,y,v){ if(x<0||y<0||x>=MAP_W||y>=MAP_H) return; map[y*MAP_W+x]=v; }
-for(let y=0;y<MAP_H;y++){
-  const r = Math.max(0, Math.min(ROOMS.length-1, Math.floor((y-CAP)/ROOM_LEN)));
-  mset(0,y, r+1); mset(MAP_W-1,y, r+1);
-}
-for(let x=0;x<MAP_W;x++){ mset(x,0, 1); mset(x, MAP_H-1, ROOMS.length); }
-for(let r=1;r<ROOMS.length;r++){
-  const y = CAP + r*ROOM_LEN - 1;
-  mset(1, y, r); mset(MAP_W-2, y, r);
-  mset(1, y+1, r+1); mset(MAP_W-2, y+1, r+1);
-}
-for(let r=0;r<ROOMS.length;r++){
-  const y = CAP + r*ROOM_LEN + Math.floor(ROOM_LEN/2);
-  mset(0, y, 200 + r);
-}
-function roomAtY(y){ return Math.max(0, Math.min(ROOMS.length-1, Math.floor((y - CAP) / ROOM_LEN))); }
+/* ---------- Noise & dust ---------- */
+const noise2 = (()=>{ const s=2048; const arr=new Float32Array(s); for(let i=0;i<s;i++) arr[i]=Math.random(); return (x,y)=>arr[((x*131+y*311)|0)&(s-1)]; })();
+const dust = [];
+for(let i=0;i<140;i++) dust.push({x:Math.random(),y:Math.random(),z:.2+Math.random()*.8,s:.2+Math.random()*1.4,o:.1+Math.random()*.5});
 
-/* ---------- Procedural wall textures ---------- */
-const TEX = 64;
-function makeTex(drawer){
-  const c = document.createElement('canvas'); c.width=TEX; c.height=TEX;
-  const g = c.getContext('2d'); drawer(g);
-  const img = g.getImageData(0,0,TEX,TEX);
-  return { canvas:c, data:img.data };
-}
-function drawBrick(g, c1, c2, mortar){
-  g.fillStyle = rgb(mortar); g.fillRect(0,0,TEX,TEX);
-  const bh = 8, bw = 16;
-  for(let row=0;row<TEX/bh;row++){
-    const offset = (row%2)*8;
-    for(let col=-1;col<TEX/bw+1;col++){
-      const x = col*bw + offset, y = row*bh;
-      const base = mixColors(c1,c2,Math.random()*0.7);
-      g.fillStyle = rgb(base); g.fillRect(x+1,y+1,bw-2,bh-2);
-      g.fillStyle = `rgba(255,255,255,${0.06+Math.random()*0.05})`; g.fillRect(x+1,y+1,bw-2,1);
-      g.fillStyle = `rgba(0,0,0,${0.18+Math.random()*0.1})`; g.fillRect(x+1,y+bh-2,bw-2,1);
+/* ---------- Pixel portraits (hand-authored 24×32) ---------- */
+/* Use string pixel grids — 0=clear, 1=silhouette, 2=highlight, 3=accent, 4=bg-halo */
+const PORT = {};
+function paintPortrait(key, palette){
+  const c = document.createElement("canvas"); c.width=72; c.height=96;
+  const g = c.getContext("2d");
+  // halo
+  const grd = g.createRadialGradient(36,44,6,36,44,56);
+  grd.addColorStop(0, rgb(hex(palette[3]),0.4));
+  grd.addColorStop(1, rgb(hex(palette[0]),0));
+  g.fillStyle = rgb(hex(palette[0])); g.fillRect(0,0,72,96);
+  g.fillStyle = grd; g.fillRect(0,0,72,96);
+  const sil = PORT_PX[key] || PORT_PX.trumpet;
+  const pxW=24, pxH=32, cell=3;
+  const ox=(72-pxW*cell)/2, oy=(96-pxH*cell)/2;
+  for(let y=0;y<pxH;y++){
+    for(let x=0;x<pxW;x++){
+      const v = sil[y][x];
+      if(v===0) continue;
+      let col;
+      if(v===1) col = hex(palette[0]);
+      else if(v===2) col = hex(palette[3]);
+      else if(v===3) col = hex(palette[4]);
+      else if(v===4) col = mix(hex(palette[2]), hex(palette[4]), 0.5);
+      else col = hex(palette[2]);
+      g.fillStyle = rgb(col);
+      g.fillRect(ox+x*cell, oy+y*cell, cell, cell);
     }
   }
-}
-function drawStone(g,c1,c2){
-  g.fillStyle = rgb(c2); g.fillRect(0,0,TEX,TEX);
-  for(let i=0;i<14;i++){
-    const x=Math.random()*TEX,y=Math.random()*TEX; const r=6+Math.random()*10;
-    const col = mixColors(c1,c2,Math.random()*0.6);
-    g.fillStyle = rgb(col); g.beginPath();
-    const pts=6+Math.floor(Math.random()*3);
-    for(let p=0;p<pts;p++){ const ang=p/pts*Math.PI*2; const rr=r*(0.7+Math.random()*0.4); g.lineTo(x+Math.cos(ang)*rr,y+Math.sin(ang)*rr); }
-    g.closePath();g.fill(); g.strokeStyle=`rgba(0,0,0,0.4)`;g.stroke();
-  }
-}
-function drawWidget(g,c1,c2,accent){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  g.strokeStyle = rgb(c2); g.lineWidth = 1;
-  for(let y=4;y<TEX;y+=14){
-    g.fillStyle = rgb(mixColors(c1,c2,0.5)); g.fillRect(4, y, TEX-8, 10);
-    g.strokeRect(4, y, TEX-8, 10);
-    g.fillStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.8)`;
-    g.fillRect(6, y+2, 3, 6);
-  }
-  g.fillStyle = `rgba(255,255,255,0.05)`; g.fillRect(0,0,TEX,TEX);
-}
-function drawTech(g,c1,c2,accent){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  g.strokeStyle = rgb(c2); g.lineWidth=1;
-  g.strokeRect(2,2,TEX-4,TEX-4); g.strokeRect(6,6,TEX-12,TEX-12);
-  g.fillStyle = rgb(c2);
-  [[8,8],[TEX-8,8],[8,TEX-8],[TEX-8,TEX-8]].forEach(([x,y])=>{g.beginPath();g.arc(x,y,1.5,0,Math.PI*2);g.fill();});
-  for(let i=0;i<TEX;i+=8){ g.fillStyle='rgba(255,200,40,0.5)'; g.fillRect(i, TEX-4, 4, 2); }
-  g.fillStyle=`rgba(${accent[0]},${accent[1]},${accent[2]},0.6)`; g.fillRect(TEX/2-8,TEX/2-2,16,4);
-}
-function drawVelvet(g,c1,c2,accent){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  g.strokeStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.4)`; g.lineWidth=0.8;
-  for(let x=-TEX;x<TEX*2;x+=12){
-    g.beginPath();g.moveTo(x,0);g.lineTo(x+TEX,TEX);g.stroke();
-    g.beginPath();g.moveTo(x,TEX);g.lineTo(x+TEX,0);g.stroke();
-  }
-  const grad = g.createLinearGradient(0,0,TEX,TEX);
-  grad.addColorStop(0,'rgba(255,255,255,0.12)');
-  grad.addColorStop(0.5,'rgba(0,0,0,0.1)');
-  grad.addColorStop(1,'rgba(255,255,255,0.08)');
-  g.fillStyle=grad;g.fillRect(0,0,TEX,TEX);
-}
-function drawMarble(g,c1,c2,gold){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  for(let i=0;i<4;i++){
-    g.strokeStyle = `rgba(${gold[0]},${gold[1]},${gold[2]},${0.3+Math.random()*0.3})`;
-    g.lineWidth = 0.5+Math.random(); g.beginPath();
-    let x=0,y=Math.random()*TEX; g.moveTo(x,y);
-    while(x<TEX){ x+=4;y+=(Math.random()-0.5)*8; g.lineTo(x,y); }
-    g.stroke();
-  }
-  const grad=g.createLinearGradient(0,0,TEX,TEX);
-  grad.addColorStop(0,'rgba(255,255,255,0.12)'); grad.addColorStop(1,'rgba(0,0,0,0.18)');
-  g.fillStyle=grad;g.fillRect(0,0,TEX,TEX);
-  g.fillStyle=rgb(gold); g.fillRect(0,0,TEX,2);g.fillRect(0,TEX-2,TEX,2);
-}
-function drawGlass(g,c1,c2){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  for(let x=0;x<TEX;x+=2){ g.fillStyle=`rgba(255,255,255,${0.05+Math.random()*0.08})`; g.fillRect(x,0,1,TEX); }
-  g.strokeStyle=rgb(c2);g.lineWidth=1;
-  for(let x=0;x<=TEX;x+=16){ g.beginPath();g.moveTo(x,0);g.lineTo(x,TEX);g.stroke(); }
-  for(let y=0;y<=TEX;y+=16){ g.beginPath();g.moveTo(0,y);g.lineTo(TEX,y);g.stroke(); }
-}
-function drawNeon(g,c1,c2,accent){
-  g.fillStyle = rgb(c1); g.fillRect(0,0,TEX,TEX);
-  g.strokeStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.9)`; g.lineWidth = 1;
-  for(let x=0;x<=TEX;x+=8){ g.beginPath();g.moveTo(x,0);g.lineTo(x,TEX);g.stroke(); }
-  for(let y=0;y<=TEX;y+=8){ g.beginPath();g.moveTo(0,y);g.lineTo(TEX,y);g.stroke(); }
-  const grad=g.createLinearGradient(0,TEX/2,0,TEX);
-  grad.addColorStop(0,`rgba(${accent[0]},${accent[1]},${accent[2]},0.4)`);
-  grad.addColorStop(1,'rgba(0,0,0,0)');
-  g.fillStyle=grad;g.fillRect(0,TEX/2,TEX,TEX/2);
-}
-function drawVoid(g,c1,c2){
-  const grad=g.createLinearGradient(0,0,0,TEX);
-  grad.addColorStop(0,rgb(c2)); grad.addColorStop(1,rgb(c1));
-  g.fillStyle=grad;g.fillRect(0,0,TEX,TEX);
-  for(let y=8;y<TEX;y+=16){ g.fillStyle='rgba(180,190,220,0.1)'; g.fillRect(0,y,TEX,1); }
-}
-function drawPlaqueTex(g, accent, label){
-  g.fillStyle = '#0a0806'; g.fillRect(0,0,TEX,TEX);
-  g.strokeStyle = rgb(accent); g.lineWidth = 2; g.strokeRect(2,2,TEX-4,TEX-4);
-  g.strokeStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.4)`; g.strokeRect(6,6,TEX-12,TEX-12);
-  g.fillStyle = rgb(accent); g.font = 'bold 13px "Courier New",monospace'; g.textAlign='center';
-  g.fillText(label, TEX/2, TEX/2 - 2);
-  g.font = '8px "Courier New",monospace';
-  g.fillStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.6)`;
-  g.fillText('WP', TEX/2, TEX/2 + 12);
-  g.fillStyle = rgb(accent);
-  g.fillRect(4,4,3,3);g.fillRect(TEX-7,4,3,3);g.fillRect(4,TEX-7,3,3);g.fillRect(TEX-7,TEX-7,3,3);
-}
-const textures = [];
-for(let r=0;r<ROOMS.length;r++){
-  const room = ROOMS[r]; const p = room.palette; const accent = hexToRgb(room.accent);
-  let tx;
-  if(room.tex==='brick') tx = makeTex(g=>drawBrick(g, p.wall, p.wall2, [30,15,10]));
-  else if(room.tex==='stone') tx = makeTex(g=>drawStone(g, p.wall, p.wall2));
-  else if(room.tex==='widget') tx = makeTex(g=>drawWidget(g, p.wall, p.wall2, accent));
-  else if(room.tex==='tech') tx = makeTex(g=>drawTech(g, p.wall, p.wall2, accent));
-  else if(room.tex==='velvet') tx = makeTex(g=>drawVelvet(g, p.wall, p.wall2, accent));
-  else if(room.tex==='marble') tx = makeTex(g=>drawMarble(g, p.wall, p.wall2, accent));
-  else if(room.tex==='glass') tx = makeTex(g=>drawGlass(g, p.wall, p.wall2));
-  else if(room.tex==='neon') tx = makeTex(g=>drawNeon(g, p.wall, p.wall2, accent));
-  else tx = makeTex(g=>drawVoid(g, p.wall, p.wall2));
-  textures[r+1] = tx;
-  textures[200+r] = makeTex(g=>drawPlaqueTex(g, accent, room.v));
-}
-
-/* ---------- Pixel-art portraits (48×64, putImageData) ---------- */
-const PORT_W = 48, PORT_H = 64;
-function makePixelArt(rows, palette){
-  const c = document.createElement('canvas'); c.width = PORT_W; c.height = PORT_H;
-  const g = c.getContext('2d');
-  const img = g.createImageData(PORT_W, PORT_H);
-  for(let y=0;y<PORT_H;y++){
-    const row = rows[y] || "";
-    for(let x=0;x<PORT_W;x++){
-      const ch = row[x] || '.';
-      const col = palette[ch] || [0,0,0,0];
-      const i = (y*PORT_W + x)*4;
-      img.data[i] = col[0]; img.data[i+1] = col[1]; img.data[i+2] = col[2];
-      img.data[i+3] = col[3] != null ? col[3] : 255;
-    }
-  }
-  g.putImageData(img,0,0);
+  // CRT scanlines
+  g.globalAlpha = 0.18;
+  for(let y=0;y<96;y+=2){ g.fillStyle="#000"; g.fillRect(0,y,72,1); }
+  g.globalAlpha = 1;
   return c;
 }
-// Procedurally build a 48x64 portrait for each room.
-function procFace(opts){
-  const rows = [];
-  for(let y=0;y<PORT_H;y++) rows.push(new Array(PORT_W).fill('b'));
-  function setPix(x,y,ch){ if(y<0||y>=PORT_H||x<0||x>=PORT_W) return; rows[y][x] = ch; }
-  function setCircle(cx,cy,rx,ry,ch){
-    for(let y=cy-ry;y<=cy+ry;y++) for(let x=cx-rx;x<=cx+rx;x++){
-      const dx=(x-cx)/rx, dy=(y-cy)/ry; if(dx*dx+dy*dy<=1) setPix(x,y,ch);
-    }
-  }
-  function setRect(x0,y0,x1,y1,ch){
-    for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++) setPix(x,y,ch);
-  }
-  // HAT / HAIR
-  if(opts.hat === 'porkpie'){ setRect(10,4,38,8,'H'); setRect(6,8,42,12,'H'); }
-  else if(opts.hat === 'fedora'){ setRect(12,3,36,7,'H'); setRect(4,7,44,11,'H'); setRect(6,6,42,8,'H'); }
-  else if(opts.hat === 'pomp'){ setCircle(24,9,14,6,'H'); setRect(14,10,34,16,'H'); }
-  else if(opts.hat === 'afro'){ setCircle(24,11,17,10,'H'); }
-  else if(opts.hat === 'short'){ setCircle(24,12,14,6,'H'); }
-  else if(opts.hat === 'smooth'){ setCircle(24,13,11,4,'H'); }
-  // FACE
-  setCircle(24,24,12,14,'s');
-  setPix(11,24,'s'); setPix(12,24,'s'); setPix(36,24,'s'); setPix(37,24,'s');
-  for(let x=13;x<=35;x++){ if(rows[35][x]==='s') rows[35][x]='S'; }
-  // eyes / glasses
-  if(opts.glasses){
-    setRect(15,22,21,25,'g'); setRect(27,22,33,25,'g');
-    setPix(22,23,'k'); setPix(26,23,'k');
-  } else {
-    setPix(18,23,'e'); setPix(19,23,'e'); setPix(29,23,'e'); setPix(30,23,'e');
-  }
-  setPix(24,27,'S'); setPix(23,28,'S'); setPix(24,28,'S'); setPix(25,28,'S');
-  setRect(20,31,28,32,'M');
-  // NECK + SHOULDERS
-  setRect(21,36,27,40,'s');
-  setRect(2,40,46,52,'c');
-  setRect(4,41,44,44,'C');
-  if(opts.tie){ setRect(23,40,25,50,'i'); setPix(22,40,'i'); setPix(26,40,'i'); }
-  // INSTRUMENT
-  if(opts.instrument === 'piano'){
-    setRect(4,52,44,60,'w');
-    for(let k=0;k<11;k++){ const x = 4 + k*4; for(let yy=52; yy<=60; yy++) setPix(x,yy,'k'); }
-    for(let k=0;k<10;k++){ if(k===2||k===6) continue; const x = 6 + k*4; setRect(x,52,x+1,56,'k'); }
-  } else if(opts.instrument === 'trumpet'){
-    setRect(28,44,42,46,'i'); setRect(28,47,30,49,'i');
-    setCircle(42,46,5,4,'I');
-    setPix(31,43,'k'); setPix(34,43,'k'); setPix(37,43,'k');
-  } else if(opts.instrument === 'sax'){
-    setRect(30,43,32,50,'i'); setRect(32,50,34,56,'i'); setRect(34,56,42,60,'i');
-    setCircle(42,58,6,5,'I');
-    setPix(31,45,'k'); setPix(33,52,'k'); setPix(36,58,'k');
-  } else if(opts.instrument === 'clarinet'){
-    setRect(31,42,34,60,'k'); setRect(32,43,33,59,'c');
-    setPix(32,46,'i'); setPix(32,50,'i'); setPix(32,54,'i');
-    setRect(30,60,36,62,'i');
-  }
-  if(opts.glow){
-    for(let x=0;x<PORT_W;x++){ setPix(x,0,'i'); setPix(x,PORT_H-1,'i'); }
-    for(let y=0;y<PORT_H;y++){ setPix(0,y,'i'); setPix(PORT_W-1,y,'i'); }
-  }
-  return rows.map(r => r.join(''));
-}
-function buildPortrait(roomIndex){
-  const r = ROOMS[roomIndex];
-  const accent = hexToRgb(r.accent);
-  const bg1 = r.palette.wall2, bg2 = r.palette.wall;
-  const basePal = {
-    '.':[0,0,0,0],
-    'b':[bg1[0],bg1[1],bg1[2],255],
-    'B':[bg2[0],bg2[1],bg2[2],255],
-    's':[210,170,130,255],
-    'S':[150,110,80,255],
-    'e':[30,20,14,255],
-    'M':[80,30,30,255],
-    'H':[20,16,12,255],
-    'c':[40,32,28,255],
-    'C':[90,76,60,255],
-    'i':[accent[0],accent[1],accent[2],255],
-    'I':[255,240,180,255],
-    'g':[10,10,10,255],
-    'k':[0,0,0,255],
-    'w':[245,245,240,255]
-  };
-  const configs = [
-    { hat:'fedora', glasses:false, instrument:'trumpet', tie:true, accent },  // 1.0 Miles
-    { hat:'smooth', glasses:false, instrument:'piano', tie:true, accent },    // 2.0 Duke
-    { hat:'short',  glasses:true,  instrument:'sax', tie:false, accent },     // 2.2 Getz
-    { hat:'porkpie',glasses:true,  instrument:'piano', tie:false, accent },   // 3.0 Thelonious
-    { hat:'pomp',   glasses:true,  instrument:'sax', tie:true, accent },      // 3.3 Sonny
-    { hat:'short',  glasses:true,  instrument:'clarinet', tie:true, accent }, // 4.0 Benny
-    { hat:'short',  glasses:false, instrument:'piano', tie:true, accent },    // 5.0 Bebo
-    { hat:'afro',   glasses:false, instrument:'piano', tie:false, accent },   // 6.0 Arturo
-    { hat:'porkpie',glasses:true,  instrument:'piano', tie:false, accent, glow:true } // 7.0 Monk
-  ];
-  return makePixelArt(procFace(configs[roomIndex]), basePal);
-}
-
-/* ---------- Era-screenshot mocks ---------- */
-function drawEraShot(ctx, kind, w, h, accent){
-  const clr = accent || '#3858a0';
-  ctx.fillStyle = '#e8e8e8'; ctx.fillRect(0,0,w,h);
-  if(kind === 'b2cafelog'){
-    ctx.fillStyle = '#f5f5f5'; ctx.fillRect(0,0,w,14);
-    ctx.fillStyle = '#333'; ctx.font = '8px monospace'; ctx.fillText('b2/wp-admin', 4, 10);
-    ctx.fillStyle = '#888'; ctx.fillRect(0,14,w,1);
-    ctx.fillStyle = '#0033aa'; ctx.font = '7px monospace';
-    ['Write','Manage','Links','Options','Logout'].forEach((t,i)=>{ ctx.fillText(t, 4 + i*48, 26); });
-    ctx.fillStyle = '#222'; ctx.font = '7px monospace'; ctx.fillText('Write a New Post', 4, 42);
-    ctx.fillStyle = '#fff'; ctx.fillRect(4,46,w-8,h-52);
-    ctx.strokeStyle = '#999'; ctx.strokeRect(4,46,w-8,h-52);
-    ctx.fillStyle = '#555'; ctx.font = '6px monospace'; ctx.fillText('TITLE:', 8, 56);
-    ctx.fillStyle='#888'; ctx.fillRect(40,54,w-52,8);
-    ctx.fillStyle = '#fff'; ctx.fillRect(41,55,w-54,6);
-  } else if(kind === 'tinymce'){
-    ctx.fillStyle = '#464646'; ctx.fillRect(0,0,w,14);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 8px monospace'; ctx.fillText('WordPress', 4, 10);
-    ctx.fillStyle = '#ddd'; ctx.fillRect(4,22,w-8,14);
-    ctx.strokeStyle = '#888'; ctx.strokeRect(4,22,w-8,14);
-    ctx.fillStyle = '#222'; ctx.font = 'bold 7px serif';
-    ['B','I','U'].forEach((t,i)=>{ ctx.fillText(t, 8+i*12, 32); });
-    ctx.font = '6px monospace';
-    ['link','img','ul','ol','"','—'].forEach((t,i)=>{ ctx.fillText(t, 44+i*14, 32); });
-    ctx.fillStyle = '#fff'; ctx.fillRect(4,36,w-8,h-40);
-    ctx.strokeRect(4,36,w-8,h-40);
-    ctx.fillStyle = '#555'; ctx.fillRect(8,40,w-60,1);
-    ctx.fillRect(8,46,w-40,1); ctx.fillRect(8,52,w-80,1);
-  } else if(kind === 'widgets'){
-    ctx.fillStyle = '#3858a0'; ctx.fillRect(0,0,w,12);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px sans-serif'; ctx.fillText('Widgets', 4, 9);
-    ctx.fillStyle = '#ccc'; ctx.fillRect(4,16,60,h-20);
-    ctx.strokeStyle = '#888'; ctx.strokeRect(4,16,60,h-20);
-    ctx.font = '6px sans-serif';
-    ['Pages','Calendar','Archives','Links','Meta'].forEach((t,i)=>{
-      ctx.fillStyle = '#eee'; ctx.fillRect(8,20+i*9,52,7);
-      ctx.strokeStyle = '#999'; ctx.strokeRect(8,20+i*9,52,7);
-      ctx.fillStyle = '#222'; ctx.fillText(t, 10, 26+i*9);
-    });
-    ctx.fillStyle = '#eef'; ctx.fillRect(70,16,w-74,h-20);
-    ctx.strokeStyle = clr; ctx.strokeRect(70,16,w-74,h-20);
-    ctx.fillStyle = '#666'; ctx.font = '6px sans-serif'; ctx.fillText('Sidebar 1', 74, 24);
-    ctx.fillStyle = '#fff'; ctx.fillRect(74,28,w-82,9);
-    ctx.strokeStyle = '#aaa'; ctx.strokeRect(74,28,w-82,9);
-    ctx.fillStyle = '#222'; ctx.fillText('Search', 76, 34);
-  } else if(kind === 'admin27'){
-    ctx.fillStyle = '#222'; ctx.fillRect(0,0,w,12);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px sans-serif'; ctx.fillText('Dashboard', 4, 9);
-    ctx.fillStyle = '#464646'; ctx.fillRect(0,12,40,h-12);
-    ctx.fillStyle = '#ccc'; ctx.font = '6px sans-serif';
-    ['Posts','Media','Pages','Links','Comments','Appearance','Plugins'].forEach((t,i)=>{ ctx.fillText(t, 4, 22+i*8); });
-    ctx.fillStyle = '#f5f5f5'; ctx.fillRect(40,12,w-40,h-12);
-    for(let i=0;i<4;i++){
-      const x = 44 + (i%2)*((w-48)/2);
-      const y = 16 + Math.floor(i/2)*((h-20)/2);
-      ctx.fillStyle='#fff'; ctx.fillRect(x,y,(w-52)/2,(h-24)/2);
-      ctx.strokeStyle='#bbb'; ctx.strokeRect(x,y,(w-52)/2,(h-24)/2);
-      ctx.fillStyle = '#2583ad'; ctx.fillRect(x,y,(w-52)/2,6);
-    }
-  } else if(kind === 'sonnyadmin'){
-    ctx.fillStyle = '#333'; ctx.fillRect(0,0,w,10);
-    ctx.fillStyle = '#fff'; ctx.font='bold 6px sans-serif'; ctx.fillText('WordPress · Admin', 4, 7);
-    ctx.fillStyle = '#1d1d1d'; ctx.fillRect(0,10,36,h-10);
-    ctx.fillStyle = '#ddd'; ctx.font = '5px sans-serif';
-    ['Dash','Posts','Media','Links','Pages','Comments','Appearance','Plugins','Users','Tools','Settings'].forEach((t,i)=>{ ctx.fillText(t, 3, 18+i*6); });
-    ctx.fillStyle = '#444'; ctx.fillRect(36,28,60,30);
-    ctx.fillStyle = '#fff';
-    ['All Posts','Add New','Categories','Tags'].forEach((t,i)=>{ ctx.fillText(t, 40, 34+i*6); });
-    ctx.fillStyle = clr;
-    ctx.beginPath(); ctx.moveTo(100,40); ctx.lineTo(120,34); ctx.lineTo(w-4,34); ctx.lineTo(w-4,50); ctx.lineTo(120,50); ctx.lineTo(100,40); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 5px sans-serif'; ctx.fillText('New: Drag & drop!', 122, 42);
-  } else if(kind === 'mp6grid'){
-    ctx.fillStyle = '#23282d'; ctx.fillRect(0,0,w,10);
-    ctx.fillStyle = '#f1f1f1'; ctx.fillRect(0,10,36,h-10);
-    ctx.fillStyle = '#444'; ctx.font = '5px sans-serif';
-    ['Dash','Posts','Media','Pages','Appearance'].forEach((t,i)=>{ ctx.fillText(t, 3, 18+i*7); });
-    ctx.fillStyle = '#fff'; ctx.fillRect(36,10,w-36,h-10);
-    ctx.fillStyle = '#23282d'; ctx.font = 'bold 7px sans-serif'; ctx.fillText('Media Library', 40, 20);
-    for(let gx=0;gx<6;gx++) for(let gy=0;gy<3;gy++){
-      const x = 40 + gx*(w-44)/6;
-      const y = 24 + gy*((h-28)/3);
-      const wi = (w-44)/6 - 2; const hi = (h-28)/3 - 2;
-      ctx.fillStyle = `hsl(${(gx*50+gy*30)%360},40%,60%)`;
-      ctx.fillRect(x,y,wi,hi);
-      ctx.fillStyle = '#fff'; ctx.fillRect(x+wi-6, y+hi-3, 6, 3);
-    }
-  } else if(kind === 'gutenberg'){
-    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = '#eee'; ctx.fillRect(0,0,w,10);
-    ctx.fillStyle = '#000'; ctx.font = 'bold 7px sans-serif'; ctx.fillText('+', 4, 8);
-    ctx.fillStyle = '#444'; ctx.font = '6px sans-serif'; ctx.fillText('Save | Preview', w-60, 8);
-    ctx.fillStyle = '#000'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('Hello, blocks', 12, 22);
-    const bx = 12, bw = w-24;
-    ctx.fillStyle = '#eee'; ctx.fillRect(bx,28,bw,12);
-    ctx.strokeStyle = clr; ctx.strokeRect(bx,28,bw,12);
-    ctx.fillStyle = '#222'; ctx.font = '6px sans-serif'; ctx.fillText('Paragraph block', bx+3, 36);
-    ctx.fillStyle = '#f3f3f3'; ctx.fillRect(bx,42,bw,18);
-    ctx.strokeRect(bx,42,bw,18);
-    ctx.fillStyle = '#888'; ctx.fillText('[ Image block ]', bx+3, 52);
-    ctx.fillStyle = '#eef'; ctx.fillRect(bx,62,bw,h-66);
-    ctx.strokeRect(bx,62,bw,h-66);
-    ctx.fillStyle = '#222'; ctx.fillText('List block', bx+3, 70);
-    ctx.fillStyle = clr; ctx.beginPath(); ctx.arc(bx-4, 40, 4, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 6px sans-serif'; ctx.fillText('+', bx-6, 42);
-  } else if(kind === 'siteeditor'){
-    ctx.fillStyle = '#1e1e1e'; ctx.fillRect(0,0,w,10);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 6px sans-serif'; ctx.fillText('Site Editor', 4, 7);
-    ctx.fillStyle = '#2c2c2c'; ctx.fillRect(0,10,52,h-10);
-    ctx.fillStyle = '#ccc'; ctx.font = '5px sans-serif';
-    ['Navigation','Styles','Pages','Templates','Patterns'].forEach((t,i)=>{ ctx.fillText(t, 3, 20+i*7); });
-    ctx.fillStyle = '#f6f6f6'; ctx.fillRect(52,10,w-52,h-10);
-    ctx.fillStyle = clr; ctx.fillRect(58,16,w-64,10);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 5px sans-serif'; ctx.fillText('Site Header', 60, 22);
-    ctx.fillStyle = '#fff'; ctx.fillRect(58,28,w-64,h-42);
-    ctx.strokeStyle = clr; ctx.strokeRect(58,28,w-64,h-42);
-    ctx.fillStyle = '#222'; ctx.fillText('Template: Single Post', 60, 34);
-    ctx.fillStyle = '#ddd'; ctx.fillRect(60,38,(w-68),4);
-    ctx.fillRect(60,44,(w-68)*0.7,4);
-    ctx.fillStyle = clr; ctx.fillRect(58,h-14,w-64,6);
-  } else if(kind === 'ai'){
-    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = '#f0f0f7'; ctx.fillRect(0,0,w,10);
-    ctx.fillStyle = '#222'; ctx.font = 'bold 6px sans-serif'; ctx.fillText('WordPress 7.0 — Collaborative', 4, 7);
-    ctx.fillStyle = '#222'; ctx.font = '6px sans-serif'; ctx.fillText('A shared post.', 10, 22);
-    ctx.fillStyle = '#ddd'; ctx.fillRect(10,26,w-90,3); ctx.fillRect(10,32,w-100,3); ctx.fillRect(10,38,w-80,3);
-    ctx.fillStyle = clr; ctx.fillRect(w-92,30,2,8); ctx.fillRect(w-100,38,10,5);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 5px sans-serif'; ctx.fillText('Mia', w-98,42);
-    ctx.fillStyle = '#eef2ff'; ctx.fillRect(w-66,10,66,h-10);
-    ctx.strokeStyle = clr; ctx.strokeRect(w-66,10,66,h-10);
-    ctx.fillStyle = clr; ctx.font = 'bold 6px sans-serif'; ctx.fillText('✧ AI STYLIST', w-62, 20);
-    ctx.fillStyle = '#222'; ctx.font = '5px sans-serif'; ctx.fillText('Try variant →', w-62, 30);
-    ['Serene','Classic','Vivid'].forEach((t,i)=>{
-      ctx.fillStyle = `hsl(${i*70+200},60%,70%)`;
-      ctx.fillRect(w-62, 34+i*9, 58, 7);
-      ctx.fillStyle = '#fff'; ctx.fillText(t, w-60, 40+i*9);
-    });
-  }
-}
-const eraShots = [];
-for(let r=0;r<ROOMS.length;r++){
-  const c = document.createElement('canvas'); c.width = 180; c.height = 96;
-  drawEraShot(c.getContext('2d'), ROOMS[r].shot, 180, 96, ROOMS[r].accent);
-  eraShots.push(c);
-}
-const portraitCanvases = [];
-for(let r=0;r<ROOMS.length;r++) portraitCanvases.push(buildPortrait(r));
-
-/* ---------- Fact tokens ---------- */
-const tokenCanvases = [];
-(function buildTokens(){
-  for(let r=0;r<ROOMS.length;r++){
-    const c = document.createElement('canvas'); c.width = 64; c.height = 64;
-    const g = c.getContext('2d'); g.clearRect(0,0,64,64);
-    const acc = ROOMS[r].accent;
-    if(r === 0){
-      g.fillStyle = '#ffeec0'; g.fillRect(8,16,48,32);
-      g.fillStyle = '#222'; g.font = 'bold 10px "Courier New",monospace'; g.textAlign='center';
-      g.fillText('<?php', 32, 28); g.fillText('?>', 32, 42);
-      g.strokeStyle = '#c00'; g.lineWidth=3; g.beginPath(); g.moveTo(12,20); g.lineTo(52,44); g.stroke();
-    } else if(r === 1){
-      g.fillStyle = '#ddd'; g.fillRect(4,24,56,16); g.strokeStyle = '#555'; g.strokeRect(4,24,56,16);
-      g.fillStyle = '#000'; g.font = 'bold 10px serif';
-      g.fillText('B',14,36); g.fillText('I',28,36); g.fillText('U',42,36);
-    } else if(r === 2){
-      g.textAlign='left';
-      for(let i=0;i<3;i++){ g.fillStyle='#fff'; g.fillRect(6,10+i*18,52,12); g.strokeStyle=acc; g.strokeRect(6,10+i*18,52,12); g.fillStyle='#222'; g.font='bold 6px sans-serif'; g.fillText(['Pages','Archives','Meta'][i], 10, 19+i*18); }
-    } else if(r === 3){
-      g.fillStyle = '#3858a0'; g.beginPath(); g.arc(24,32,18,0,Math.PI*2); g.fill();
-      g.fillStyle = '#aaa'; g.beginPath(); g.arc(44,32,10,0,Math.PI*2); g.fill();
-      g.fillStyle = '#fff'; g.font = 'bold 8px sans-serif'; g.textAlign='center';
-      g.fillText('WP', 24, 35);
-      g.fillStyle = '#222'; g.fillText('MU', 44, 34);
-    } else if(r === 4){
-      g.fillStyle = '#fff'; g.fillRect(6,16,20,28);
-      g.strokeStyle = '#888'; g.strokeRect(6,16,20,28);
-      g.fillStyle = '#888'; g.fillRect(6,16,20,4);
-      g.fillStyle = acc; g.fillRect(30,10,28,24);
-      g.beginPath(); g.moveTo(30,30); g.lineTo(34,38); g.lineTo(38,30); g.closePath(); g.fill();
-      g.fillStyle = '#000'; g.font='bold 6px sans-serif'; g.fillText('NEW!', 44, 24);
-    } else if(r === 5){
-      for(let gx=0;gx<3;gx++) for(let gy=0;gy<3;gy++){
-        g.fillStyle = `hsl(${(gx*50+gy*80)%360},60%,60%)`;
-        g.fillRect(8+gx*16, 8+gy*16, 14, 14);
-      }
-    } else if(r === 6){
-      const cols = [acc,'#fff','#ddd'];
-      for(let i=0;i<3;i++){ g.fillStyle = cols[i]; g.fillRect(10+i*6, 16+i*6, 36, 14); g.strokeStyle='#333'; g.strokeRect(10+i*6,16+i*6,36,14); }
-    } else if(r === 7){
-      g.strokeStyle = acc; g.lineWidth=2; g.strokeRect(6,8,52,40); g.strokeRect(10,12,44,6); g.strokeRect(10,22,26,22); g.strokeRect(40,22,14,22);
-      for(let i=0;i<3;i++){ g.fillStyle = `hsl(${i*120+200},60%,60%)`; g.beginPath(); g.arc(14+i*16, 56, 5, 0, Math.PI*2); g.fill(); }
-    } else if(r === 8){
-      g.font = 'bold 8px sans-serif'; g.textAlign='center';
-      g.fillStyle = acc; g.fillText('AI', 32, 20);
-      g.fillStyle = '#fff'; g.fillRect(10,30,3,10); g.fillStyle='#c99bff'; g.fillRect(30,36,3,10); g.fillStyle='#6adfb8'; g.fillRect(50,42,3,10);
-      g.fillStyle='#fff'; g.font='6px sans-serif'; g.fillText('Alice', 14,54); g.fillText('Bo', 32, 58); g.fillText('Mia', 52, 60);
-    }
-    tokenCanvases.push(c);
-  }
-})();
-
-/* ---------- Player ---------- */
-const player = {
-  x: MAP_W/2, y: CAP + 0.8,
-  targetY: CAP + 0.8,
-  yaw: Math.PI/2, targetYaw: Math.PI/2,
-  bob: 0
+/* PORT_PX: 32 rows × 24 cols. Values: 0 bg; 1 dark-silhouette; 2 mid; 3 hi; 5 deep */
+const PX = (s)=> s.split("\n").filter(r=>r.length>0).map(r=>r.split("").map(ch=>ch===" "?0:(ch==="."?0:parseInt(ch))));
+const PORT_PX = {
+  // trumpet silhouette (Miles)
+  trumpet: PX(`
+........................
+........................
+........55555...........
+.......5222225..........
+.......522222255........
+.......52222225.........
+.......52555525.........
+........55555...........
+........11111...........
+.......1222221..........
+......12222221..........
+......12222221..........
+.....1222222221.........
+.....1222222221..........
+....1222222222233333333.
+....12222222221333333333
+....1222222222133333333.
+....1222222221..........
+....12222222221.........
+....122222222221........
+....12222222222.........
+....1222222222..........
+.....122222221..........
+.....1111111............
+......11111.............
+......11111.............
+......11111.............
+.....1111111............
+....111111111...........
+...11111111111..........
+..111111111111111.......
+...1.............1......
+`),
+  piano: PX(`
+........................
+........................
+........55555...........
+.......5333335..........
+.......5322225..........
+......53322225..........
+......53322235..........
+.......555555...........
+.......11111............
+......1222221...........
+.....122222221..........
+.....123332221..........
+....122322222221........
+....122322222221........
+....122222222221........
+....122222222221........
+....12222222221.........
+....1222222222..........
+....1222222222..........
+....122222222...........
+....12222221............
+....1111111.............
+....1111111.............
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  sax: PX(`
+........................
+........................
+.......5555.............
+......522225............
+......522225............
+......522225............
+.......5555.............
+........1...............
+.......121..............
+.......121..............
+......12321.............
+......12321.............
+......12321..3..........
+......12321.333.........
+......12321.33..........
+.......131.333..........
+........1.333...........
+........1333............
+........133.............
+........133.............
+........1133............
+........12233...........
+........122233..........
+........1222233.........
+........12222233........
+........122222233.......
+........1222222223......
+........12222222223.....
+........122222222233....
+........1222222222233...
+.........11111111111....
+.........2222222222.....
+`),
+  monkpiano: PX(`
+........................
+........................
+.......555555...........
+......55333335..........
+......53322335..........
+......53322335..........
+.......533335...........
+........1111............
+.......122221...........
+......12222221..........
+.....1223333221.........
+.....1223333221.........
+....122333322221........
+....122333322221........
+....122222222221........
+....122222222221........
+....122222222221........
+....122222222221........
+....12222222222.........
+....12222222222.........
+....1222222222..........
+.....11111111...........
+.....111111.............
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  sax2: PX(`
+........................
+........................
+........5555............
+.......522225...........
+.......522225...........
+.......522225...........
+........5555............
+.........1..............
+........121.............
+........121.............
+.......12321............
+.......12321............
+.......12321.3..........
+.......12321.33.........
+.......12321.33.........
+........131.33..........
+.........1.33...........
+.........133............
+.........13.............
+.........133............
+.........1133...........
+.........12233..........
+.........122233.........
+.........1222233........
+.........12222233.......
+.........122222233......
+.........1222222233.....
+.........12222222233....
+.........122222222233...
+..........1111111111....
+..........22222222......
+........................
+`),
+  clarinet: PX(`
+........................
+........................
+.........5555...........
+........522225..........
+........522225..........
+........522225..........
+.........5555...........
+..........1.............
+.........121............
+.........121............
+.........121............
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........12321...........
+........122221..........
+........12222221........
+........12222221........
+.........111111.........
+..........33333.........
+..........33333.........
+`),
+  bebopiano: PX(`
+........................
+........................
+.......5555555..........
+......522222225.........
+.....52222222225........
+.....52222222225........
+......522222225.........
+.......5555555..........
+........11111...........
+.......1222221..........
+......122222221.........
+.....12222222221........
+.....12233333221........
+....12223333322221......
+....122233333222211.....
+....122222222222211.....
+....12222222222221......
+....12222222222221......
+....1222222222222.......
+....122222222222........
+....12222222222.........
+....1222222221..........
+....111111111...........
+....111111..............
+...1111111..............
+..111111111.............
+.1111111111.............
+11111111111.............
+111111111111............
+11111111111111..........
+1111111111111.........1.
+.1...................1..
+`),
+  keytar: PX(`
+........................
+........................
+.......555555...........
+......53333335..........
+......53333335..........
+......53333335..........
+.......555555...........
+........11111...........
+.......1333331..........
+......13333331..........
+.....133333331..........
+....1333333331..........
+...13333333331..........
+..133333333331..........
+.1333333333331..........
+13333333333331..........
+13333333333331..........
+.1333333333331..........
+..133333333331..........
+...13333333331..........
+....1333333331..........
+.....133333331..........
+......13333331..........
+.......1333331..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........111111..........
+........5555555.........
+........5555555.........
+`),
+  headphones: PX(`
+........................
+.......5555555..........
+......522222225.........
+.....52222222225........
+....5222222222225.......
+....5222222222225.......
+....52222222222225......
+...522..........225.....
+...52............25.....
+...52............25.....
+...52............25.....
+...52.....11.....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52....1221....25.....
+...52.....11.....25.....
+...52............25.....
+...52............25.....
+...52............25.....
+...555............555...
+...525............525...
+...525............525...
+...525............525...
+...525............525...
+...525............525...
+...5225..........5225...
+....555..........555....
+........................
+........................
+........................
+........................
+`)
 };
-const FOV = Math.PI/2.6;
+function buildPortraits(){
+  for(const m of M){ PORT[m.portraitKey] = paintPortrait(m.portraitKey, m.palette); }
+}
 
-/* ---------- Raycaster ---------- */
-function renderFrame(){
-  const buf = ctx.getImageData(0,0,W,H);
-  const d = buf.data;
-  const rp = roomAtY(player.y);
-  const pal = ROOMS[rp].palette;
-  const fog = pal.fog;
-  for(let y=0;y<H;y++){
-    const t = y < H/2 ? (y/(H/2)) : ((H-y)/(H/2));
-    const isCeil = y < H/2;
-    const base = isCeil ? pal.ceil : pal.floor;
-    const mix = 0.3 + 0.7*t;
-    const r = base[0]*mix + fog[0]*(1-mix);
-    const g = base[1]*mix + fog[1]*(1-mix);
-    const b = base[2]*mix + fog[2]*(1-mix);
-    for(let x=0;x<W;x++){
-      const i=(y*W+x)*4;
-      d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+/* ---------- Era-accurate admin mocks (280×140) ---------- */
+const SHOT = {};
+function mockFrame(g,w,h, bg,fg){
+  g.fillStyle = bg; g.fillRect(0,0,w,h);
+}
+function drawB2cafelog(g){
+  // 2003/2004 b2/cafelog-ish: dark bg, orange title, centered form
+  const w=280,h=140;
+  g.fillStyle="#14120e"; g.fillRect(0,0,w,h);
+  g.fillStyle="#2a1408"; g.fillRect(0,0,w,22);
+  g.fillStyle="#ff6a3d"; g.font="700 11px 'IBM Plex Mono',monospace";
+  g.fillText("b2/cafelog »  WordPress 1.0 'Miles'", 8, 15);
+  g.fillStyle="#b06238"; g.font="9px 'IBM Plex Mono',monospace";
+  g.fillText("Post a new entry", 10, 36);
+  g.strokeStyle="#4a2814"; g.strokeRect(10,42,w-20,22);
+  g.fillStyle="#1b100a"; g.fillRect(11,43,w-22,20);
+  g.fillStyle="#e9b173"; g.font="9px 'IBM Plex Mono',monospace";
+  g.fillText("Title: Hello world!", 14, 57);
+  g.strokeStyle="#4a2814"; g.strokeRect(10,68,w-20,48);
+  g.fillStyle="#1b100a"; g.fillRect(11,69,w-22,46);
+  g.fillStyle="#e9b173";
+  g.fillText("Welcome to WordPress. This is your", 14, 82);
+  g.fillText("first post. Edit or delete it, then", 14, 94);
+  g.fillText("start blogging!", 14, 106);
+  g.fillStyle="#ff6a3d"; g.fillRect(10,122,50,12);
+  g.fillStyle="#14120e"; g.font="700 8px 'IBM Plex Mono',monospace";
+  g.fillText("Publish", 16, 131);
+}
+function drawTinyMCE(g){
+  // 2005 Kubrick-era: blue top bar, TinyMCE toolbar
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  // Kubrick blue bar
+  g.fillStyle="#21759b"; g.fillRect(0,0,w,24);
+  g.fillStyle="#fff"; g.font="700 11px 'Trebuchet MS',sans-serif";
+  g.fillText("WordPress › Write › Post", 8, 16);
+  // tabs
+  g.fillStyle="#dfdfdf"; g.fillRect(0,24,w,18);
+  g.fillStyle="#21759b"; g.font="9px 'Trebuchet MS',sans-serif";
+  g.fillText("Write  Manage  Comments  Blogroll  Presentation  Plugins  Users  Options", 6, 36);
+  // title input
+  g.fillStyle="#fff"; g.fillRect(8,46,w-16,16); g.strokeStyle="#ccc"; g.strokeRect(8,46,w-16,16);
+  g.fillStyle="#333"; g.font="9px 'Trebuchet MS',sans-serif";
+  g.fillText("Hello world!", 12, 58);
+  // TinyMCE toolbar
+  g.fillStyle="#e5e5e5"; g.fillRect(8,66,w-16,18); g.strokeStyle="#b5b5b5"; g.strokeRect(8,66,w-16,18);
+  const tools=["B","I","U","·","“”","⌖","▤","▥","–","≡","≣","≢","⎘","—","🔗","⇌","✂"];
+  g.fillStyle="#333"; g.font="700 10px 'Trebuchet MS',sans-serif";
+  for(let i=0;i<tools.length;i++){ g.fillText(tools[i], 12+i*14, 78); }
+  // editor area
+  g.fillStyle="#fff"; g.fillRect(8,86,w-16,40); g.strokeStyle="#b5b5b5"; g.strokeRect(8,86,w-16,40);
+  g.fillStyle="#333"; g.font="9px Georgia,serif";
+  g.fillText("Welcome to WordPress. This is your first", 12, 98);
+  g.fillText("post. Edit or delete it, then start writing!", 12, 110);
+  // publish button
+  g.fillStyle="#21759b"; g.fillRect(8,128,50,10);
+  g.fillStyle="#fff"; g.font="700 8px 'Trebuchet MS',sans-serif"; g.fillText("Publish", 16, 136);
+}
+function drawWidgets(g){
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  g.fillStyle="#21759b"; g.fillRect(0,0,w,22);
+  g.fillStyle="#fff"; g.font="700 10px 'Trebuchet MS',sans-serif";
+  g.fillText("Presentation › Widgets", 8, 15);
+  // Available widgets
+  g.fillStyle="#444"; g.font="700 9px 'Trebuchet MS',sans-serif";
+  g.fillText("AVAILABLE WIDGETS", 8, 36);
+  const avail=["Recent Posts","Tag Cloud","Archives","Categories","RSS","Search"];
+  for(let i=0;i<avail.length;i++){
+    const x=8+(i%2)*82, y=42+Math.floor(i/2)*16;
+    g.fillStyle="#e0eef6"; g.fillRect(x,y,80,14);
+    g.strokeStyle="#7ab"; g.strokeRect(x,y,80,14);
+    g.fillStyle="#21759b"; g.font="8px 'Trebuchet MS',sans-serif";
+    g.fillText(avail[i], x+4, y+10);
+    // drag handle dots
+    g.fillStyle="#7ab"; g.fillText("⋮⋮", x+70, y+11);
+  }
+  // Sidebar column
+  g.fillStyle="#444"; g.font="700 9px 'Trebuchet MS',sans-serif";
+  g.fillText("SIDEBAR 1", 180, 36);
+  g.strokeStyle="#b5b5b5"; g.strokeRect(180,40,92,96);
+  g.fillStyle="#fff"; g.fillRect(181,41,90,94);
+  const placed=["Search","Recent Posts","Categories"];
+  for(let i=0;i<placed.length;i++){
+    const y=44+i*18;
+    g.fillStyle="#f5faff"; g.fillRect(184,y,86,15);
+    g.strokeStyle="#21759b"; g.strokeRect(184,y,86,15);
+    g.fillStyle="#21759b"; g.font="8px 'Trebuchet MS',sans-serif";
+    g.fillText(placed[i], 188, y+11);
+    g.fillText("⋮⋮", 260, y+11);
+  }
+}
+function drawAdmin27(g){
+  const w=280,h=140;
+  // 2.7+ era admin, grey with blue accents; used for 3.0
+  g.fillStyle="#f9f9f9"; g.fillRect(0,0,w,h);
+  // top admin bar
+  g.fillStyle="#464646"; g.fillRect(0,0,w,18);
+  g.fillStyle="#ddd"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("WordPress  › Dashboard", 8, 12);
+  g.fillStyle="#aaa"; g.fillText("Howdy, matt", w-68, 12);
+  // sidebar
+  g.fillStyle="#ececec"; g.fillRect(0,18,62,h-18);
+  g.strokeStyle="#ccc"; g.beginPath(); g.moveTo(62,18); g.lineTo(62,h); g.stroke();
+  const items=["Dashboard","Posts","Media","Links","Pages","Comments","Appearance","Plugins","Users","Tools","Settings"];
+  g.font="8px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===6? "#21759b":"#333";
+    if(i===6){ g.fillStyle="#d8ecf6"; g.fillRect(0,26+i*10,62,10); g.fillStyle="#21759b"; }
+    g.fillText(items[i], 6, 34+i*10);
+  }
+  // content area with boxes
+  g.fillStyle="#333"; g.font="700 11px 'Helvetica Neue',sans-serif";
+  g.fillText("Dashboard", 70, 34);
+  const boxes=[{t:"Right Now",x:70,y:42,w:100,h:40},{t:"Recent Comments",x:174,y:42,w:100,h:40},{t:"QuickPress",x:70,y:86,w:100,h:46},{t:"Incoming Links",x:174,y:86,w:100,h:46}];
+  for(const b of boxes){
+    g.fillStyle="#fff"; g.fillRect(b.x,b.y,b.w,b.h); g.strokeStyle="#dfdfdf"; g.strokeRect(b.x,b.y,b.w,b.h);
+    g.fillStyle="#ececec"; g.fillRect(b.x,b.y,b.w,12);
+    g.fillStyle="#333"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText(b.t, b.x+4, b.y+9);
+    g.fillStyle="#999"; g.font="8px 'Helvetica Neue',sans-serif";
+    for(let i=0;i<2;i++) g.fillText("• item "+(i+1), b.x+5, b.y+22+i*10);
+  }
+}
+function drawSonny(g){
+  // 3.3: admin bar + flyout menu + blue pointer bubble
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  g.fillStyle="#222"; g.fillRect(0,0,w,22);
+  g.fillStyle="#eee"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("⌂  My Blog  + New", 8, 14);
+  g.fillStyle="#999"; g.fillText("Howdy, matt ▾", w-72, 14);
+  // sidebar
+  g.fillStyle="#ececec"; g.fillRect(0,22,54,h-22);
+  g.strokeStyle="#ccc"; g.beginPath(); g.moveTo(54,22); g.lineTo(54,h); g.stroke();
+  const items=["Dashboard","Posts","Media","Pages","Comments","Appearance","Plugins","Users","Tools","Settings"];
+  g.font="8px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===2? "#21759b":"#444";
+    if(i===2){ g.fillStyle="#21759b"; g.fillRect(0,28+i*10,54,10); g.fillStyle="#fff"; }
+    g.fillText(items[i], 5, 36+i*10);
+  }
+  // flyout for Media
+  g.fillStyle="#333"; g.fillRect(54,48,72,38);
+  g.fillStyle="#fff"; g.font="8px 'Helvetica Neue',sans-serif";
+  const sub=["Library","Add New"];
+  for(let i=0;i<sub.length;i++) g.fillText(sub[i], 60, 60+i*12);
+  // drag-drop uploader
+  g.fillStyle="#fff"; g.fillRect(134,40,w-142,62); g.strokeStyle="#bbb"; g.setLineDash([4,3]); g.strokeRect(134,40,w-142,62); g.setLineDash([]);
+  g.fillStyle="#777"; g.font="9px 'Helvetica Neue',sans-serif";
+  g.fillText("Drop files here", 160, 68);
+  g.fillStyle="#21759b"; g.font="8px 'Helvetica Neue',sans-serif";
+  g.fillText("or select from your computer", 150, 82);
+  // blue pointer bubble near Users
+  g.fillStyle="#2e93c9"; g.beginPath(); g.moveTo(54,100); g.lineTo(60,96); g.lineTo(60,104); g.closePath(); g.fill();
+  g.fillStyle="#2e93c9"; g.fillRect(60,88,84,28);
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif";
+  g.fillText("New feature!", 66, 100);
+  g.font="8px 'Helvetica Neue',sans-serif";
+  g.fillText("Try the new admin bar.", 66, 110);
+}
+function drawMp6Grid(g){
+  // MP6 4.0: dark sidebar, media grid
+  const w=280,h=140;
+  g.fillStyle="#f1f1f1"; g.fillRect(0,0,w,h);
+  // dark admin bar
+  g.fillStyle="#23282d"; g.fillRect(0,0,w,18);
+  g.fillStyle="#eee"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("⌂  My Blog  + New", 8, 12);
+  g.fillStyle="#9aa"; g.fillText("Howdy, matt", w-64, 12);
+  // dark sidebar
+  g.fillStyle="#32373c"; g.fillRect(0,18,48,h-18);
+  const items=["⌂","✎","◧","⚙","⌘","✎","◈","★","♠","⚒","⚙"];
+  g.fillStyle="#b4b9be"; g.font="700 10px 'Helvetica Neue',sans-serif";
+  for(let i=0;i<items.length;i++){
+    g.fillStyle = i===2? "#fff":"#b4b9be";
+    if(i===2){ g.fillStyle="#0073aa"; g.fillRect(0,24+i*10,48,10); g.fillStyle="#fff"; }
+    g.fillText(items[i], 8, 32+i*10);
+  }
+  // header
+  g.fillStyle="#444"; g.font="700 11px 'Helvetica Neue',sans-serif";
+  g.fillText("Media Library", 56, 32);
+  // grid
+  const cols=6, rows=3, gw=32, gh=26, gap=4, ox=56, oy=40;
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      const i=y*cols+x;
+      const hue = (i*37)%360;
+      g.fillStyle = `hsl(${hue},30%,${35+((i*17)%30)}%)`;
+      g.fillRect(ox+x*(gw+gap), oy+y*(gh+gap), gw, gh);
+      // inner highlight
+      g.fillStyle="rgba(255,255,255,0.06)";
+      g.fillRect(ox+x*(gw+gap), oy+y*(gh+gap), gw, 4);
     }
   }
-  const dirX = Math.cos(player.yaw), dirY = Math.sin(player.yaw);
-  const planeScale = Math.tan(FOV/2);
-  const planeX =  dirY * planeScale * (W/H) * 0.65;
-  const planeY = -dirX * planeScale * (W/H) * 0.65;
-  const zbuf = new Float32Array(W);
-  const sprites = [];
-  for(let col=0; col<W; col++){
-    const camX = 2*col/W - 1;
-    const rdx = dirX + planeX*camX;
-    const rdy = dirY + planeY*camX;
-    let mapX = Math.floor(player.x); let mapY = Math.floor(player.y);
-    const deltaX = Math.abs(1/rdx); const deltaY = Math.abs(1/rdy);
-    let stepX, stepY, sideDistX, sideDistY;
-    if(rdx < 0){ stepX=-1; sideDistX = (player.x-mapX)*deltaX; }
-    else{ stepX=1; sideDistX=(mapX+1-player.x)*deltaX; }
-    if(rdy < 0){ stepY=-1; sideDistY=(player.y-mapY)*deltaY; }
-    else{ stepY=1; sideDistY=(mapY+1-player.y)*deltaY; }
-    let hit = 0, side = 0, tileId = 0;
-    for(let iter=0; iter<MAP_H*2; iter++){
-      if(sideDistX < sideDistY){ sideDistX+=deltaX; mapX+=stepX; side=0; }
-      else{ sideDistY+=deltaY; mapY+=stepY; side=1; }
-      const t = mget(mapX, mapY);
-      if(t!==0 && t!==255){ hit=1; tileId=t; break; }
-    }
-    if(!hit){ zbuf[col] = 999; continue; }
-    const perpDist = side===0 ? (sideDistX - deltaX) : (sideDistY - deltaY);
-    if(perpDist <= 0.001){ zbuf[col] = 999; continue; }
-    zbuf[col] = perpDist;
-    const lineH = Math.floor(H / perpDist);
-    const drawStart = -lineH/2 + H/2;
-    const drawEnd = lineH/2 + H/2;
-    const ds = Math.max(0, drawStart|0), de = Math.min(H-1, drawEnd|0);
-    let wallX;
-    if(side===0) wallX = player.y + perpDist*rdy;
-    else wallX = player.x + perpDist*rdx;
-    wallX -= Math.floor(wallX);
-    let texX = Math.floor(wallX * TEX);
-    if(side===0 && rdx>0) texX = TEX - texX - 1;
-    if(side===1 && rdy<0) texX = TEX - texX - 1;
-    const tex = textures[tileId]; if(!tex) continue;
-    const texData = tex.data;
-    const rForThis = roomAtY(mapY);
-    const palH = ROOMS[rForThis].palette;
-    const fogH = palH.fog;
-    let bright = 1.0;
-    if(side===1) bright *= 0.78;
-    if(rForThis<=1){ bright *= (0.85 + 0.15*Math.sin(time*8 + col*0.17) + 0.05*Math.sin(time*23.5)); }
-    if(rForThis===7){ bright *= (0.9 + 0.15*Math.sin(time*3 + mapY*0.5)); }
-    if(tileId >= 200){ bright *= 1.2; }
-    const fogDist = Math.min(1, perpDist/18);
-    const ambient = palH.ambient;
-    for(let y=ds; y<=de; y++){
-      const texY = Math.min(TEX-1, Math.max(0, Math.floor(((y - (-lineH/2 + H/2))*TEX)/lineH)));
-      const ti = (texY*TEX + texX)*4;
-      let r = texData[ti], g = texData[ti+1], b = texData[ti+2];
-      r *= bright; g *= bright; b *= bright;
-      r = r*(1-fogDist) + fogH[0]*fogDist*(1-ambient*0.3);
-      g = g*(1-fogDist) + fogH[1]*fogDist*(1-ambient*0.3);
-      b = b*(1-fogDist) + fogH[2]*fogDist*(1-ambient*0.3);
-      const di = (y*W + col)*4;
-      d[di]=r; d[di+1]=g; d[di+2]=b;
-    }
-    if(tileId >= 200){
-      const pr = tileId - 200;
-      if(!sprites[pr] || sprites[pr].dist > perpDist) sprites[pr] = { dist: perpDist, col };
+}
+function drawGutenberg(g){
+  const w=280,h=140;
+  g.fillStyle="#fff"; g.fillRect(0,0,w,h);
+  // top bar
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,22);
+  g.fillStyle="#fff"; g.font="700 10px 'Helvetica Neue',sans-serif";
+  g.fillText("+ ↶ ↷    Post", 8, 15);
+  g.fillStyle="#007cba"; g.fillRect(w-46,4,40,14);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif"; g.fillText("Publish", w-42, 14);
+  // canvas
+  g.fillStyle="#f0f0f1"; g.fillRect(0,22,w,h-22);
+  g.fillStyle="#fff"; g.fillRect(22,28,w-90,h-34);
+  g.strokeStyle="#e0e0e0"; g.strokeRect(22,28,w-90,h-34);
+  // H1
+  g.fillStyle="#1e1e1e"; g.font="700 13px Georgia,serif"; g.fillText("Gutenberg", 32, 48);
+  // paragraph block (with handles)
+  g.strokeStyle="#007cba"; g.strokeRect(30,54,w-106,20);
+  g.fillStyle="#1e1e1e"; g.font="9px Georgia,serif"; g.fillText("A post is a composition of blocks.", 34, 67);
+  // toolbar above paragraph
+  g.fillStyle="#1e1e1e"; g.fillRect(30,44,80,8);
+  g.fillStyle="#fff"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("¶ B I “ ⌨", 34, 50);
+  // image block placeholder
+  g.fillStyle="#e0e0e0"; g.fillRect(30,78,90,30);
+  g.fillStyle="#888"; g.font="8px 'Helvetica Neue',sans-serif"; g.fillText("🖼 image", 54, 95);
+  // quote block
+  g.fillStyle="#1e1e1e"; g.fillRect(124,78,w-200,30);
+  g.fillStyle="#fff"; g.font="italic 8px Georgia,serif"; g.fillText("“inevitable in hindsight.”", 130, 96);
+  // + inserter
+  g.fillStyle="#007cba"; g.beginPath(); g.arc(30,116,5,0,TAU); g.fill();
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("+", 27, 119);
+  // right sidebar
+  g.fillStyle="#fff"; g.fillRect(w-62,22,62,h-22);
+  g.strokeStyle="#e0e0e0"; g.strokeRect(w-62,22,62,h-22);
+  g.fillStyle="#1e1e1e"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("Document  Block", w-58, 32);
+  g.fillStyle="#555";  g.font="7px 'Helvetica Neue',sans-serif";
+  g.fillText("Status", w-58, 46);
+  g.fillText("Categories", w-58, 58);
+  g.fillText("Tags", w-58, 70);
+  g.fillText("Featured image", w-58, 82);
+}
+function drawSiteEditor(g){
+  const w=280,h=140;
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,h);
+  // top
+  g.fillStyle="#0b0b0c"; g.fillRect(0,0,w,20);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("W  ◧  Templates › Home", 8, 13);
+  g.fillStyle="#007cba"; g.fillRect(w-42,3,34,14);
+  g.fillStyle="#fff"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("Save", w-36, 13);
+  // left: styles panel
+  g.fillStyle="#2a2a2a"; g.fillRect(0,20,58,h-20);
+  g.fillStyle="#bbb"; g.font="700 8px 'Helvetica Neue',sans-serif";
+  g.fillText("Styles", 6, 32);
+  g.fillText("Browse", 6, 44);
+  g.fillText("Colors", 6, 56);
+  g.fillText("Typography", 6, 68);
+  // style variation swatches
+  const sw=["#ff5ad9","#8b2fce","#3a0b6e","#ffe7fb"];
+  for(let i=0;i<sw.length;i++){
+    g.fillStyle=sw[i]; g.fillRect(6+i*12, 76, 10, 10);
+    g.strokeStyle="#555"; g.strokeRect(6+i*12, 76, 10, 10);
+  }
+  // canvas with template regions
+  const cx=62, cy=24, cw=w-70, ch=h-30;
+  g.fillStyle="#fafafa"; g.fillRect(cx,cy,cw,ch);
+  // header region
+  g.fillStyle="#111"; g.fillRect(cx+4,cy+4,cw-8,16);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif"; g.fillText("HEADER / LOGO        MENU", cx+8, cy+15);
+  // hero
+  g.fillStyle="#ffe7fb"; g.fillRect(cx+4,cy+24,cw-8,26);
+  g.fillStyle="#3a0b6e"; g.font="700 10px Georgia,serif"; g.fillText("HERO PATTERN", cx+10, cy+42);
+  // grid
+  for(let i=0;i<3;i++){ g.fillStyle="#eee"; g.fillRect(cx+4+i*((cw-12)/3+4), cy+54, (cw-12)/3, 22); g.strokeStyle="#aaa"; g.strokeRect(cx+4+i*((cw-12)/3+4), cy+54, (cw-12)/3, 22);}
+  // footer
+  g.fillStyle="#222"; g.fillRect(cx+4,cy+80,cw-8,14);
+  g.fillStyle="#bbb"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("FOOTER", cx+8, cy+90);
+}
+function drawAI(g){
+  const w=280,h=140;
+  g.fillStyle="#fcfcfe"; g.fillRect(0,0,w,h);
+  g.fillStyle="#1e1e1e"; g.fillRect(0,0,w,20);
+  g.fillStyle="#fff"; g.font="700 9px 'Helvetica Neue',sans-serif";
+  g.fillText("+  Post  · 3 editing now", 8, 13);
+  // collaborators
+  g.fillStyle="#e8f0fe"; g.beginPath(); g.arc(w-30,10,6,0,TAU); g.fill();
+  g.fillStyle="#fde8f1"; g.beginPath(); g.arc(w-18,10,6,0,TAU); g.fill();
+  g.fillStyle="#e8fde9"; g.beginPath(); g.arc(w-6,10,6,0,TAU); g.fill();
+  // canvas
+  g.fillStyle="#fff"; g.fillRect(18,26,w-36,h-34); g.strokeStyle="#eee"; g.strokeRect(18,26,w-36,h-34);
+  // block with glowing AI halo
+  g.save();
+  g.shadowColor="rgba(120,160,255,0.55)"; g.shadowBlur=12;
+  g.strokeStyle="#a9b8ff"; g.lineWidth=1.5; g.strokeRect(26,36,w-52,28);
+  g.restore();
+  g.fillStyle="#1e1e1e"; g.font="700 11px Georgia,serif"; g.fillText("The Museum", 30, 52);
+  g.fillStyle="#555"; g.font="9px Georgia,serif"; g.fillText("A quiet, open-ended room.", 30, 62);
+  // two cursors
+  g.fillStyle="#2a6ae0"; g.fillRect(90,50,1,10); g.fillStyle="#2a6ae0"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("matt", 92, 58);
+  g.fillStyle="#d43fa8"; g.fillRect(150,50,1,10); g.fillStyle="#d43fa8"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("rosa", 152, 58);
+  // AI suggestion card
+  g.fillStyle="#f4f6ff"; g.fillRect(26,74,w-52,24); g.strokeStyle="#a9b8ff"; g.strokeRect(26,74,w-52,24);
+  g.fillStyle="#3a4254"; g.font="700 8px 'Helvetica Neue',sans-serif"; g.fillText("✦ Suggestion", 30, 86);
+  g.fillStyle="#555"; g.font="8px 'Helvetica Neue',sans-serif"; g.fillText("Try a larger serif for this title.", 30, 96);
+  g.fillStyle="#a9b8ff"; g.fillRect(w-64,80,36,12); g.fillStyle="#fff"; g.font="700 7px 'Helvetica Neue',sans-serif"; g.fillText("Accept", w-56, 89);
+  // comment
+  g.fillStyle="#fffbe8"; g.fillRect(26,104,w-52,22); g.strokeStyle="#e8dfa2"; g.strokeRect(26,104,w-52,22);
+  g.fillStyle="#6a5a1a"; g.font="italic 8px Georgia,serif"; g.fillText("rosa: love the quiet — should we add…", 30, 118);
+}
+function buildAdminMocks(){
+  const fns = { b2cafelog:drawB2cafelog, tinymce:drawTinyMCE, widgets:drawWidgets, admin27:drawAdmin27, sonnyadmin:drawSonny, mp6grid:drawMp6Grid, gutenberg:drawGutenberg, siteeditor:drawSiteEditor, ai:drawAI };
+  for(const key of Object.keys(fns)){
+    const c = document.createElement("canvas"); c.width=280; c.height=140;
+    const g = c.getContext("2d"); fns[key](g); SHOT[key]=c;
+  }
+}
+
+/* ---------- Minimap (graph SVG) ---------- */
+function buildMinimap(){
+  const svg = document.getElementById("m-svg");
+  const w=320, h=96;
+  const pad = 18;
+  const sx = (i)=> pad + (w-pad*2) * (i/(M.length-1));
+  const sy = 34; // main spine
+  let html = "";
+  // spine
+  html += `<line x1="${pad}" y1="${sy}" x2="${w-pad}" y2="${sy}" stroke="rgba(233,201,122,0.4)" stroke-width="1"/>`;
+  // wings (fork below 2.0 Kubrick archive + 3.0 lab annex)
+  html += `<path d="M ${sx(1)} ${sy} Q ${sx(1)-10} ${sy+14} ${sx(1)-22} ${sy+22}" stroke="rgba(233,201,122,0.3)" stroke-width="1" fill="none" stroke-dasharray="2 3"/>`;
+  html += `<circle cx="${sx(1)-22}" cy="${sy+22}" r="3" fill="none" stroke="rgba(233,201,122,0.35)"/>`;
+  html += `<text x="${sx(1)-34}" y="${sy+34}" fill="#8d7b54" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">KUBRICK·ARCHIVE</text>`;
+  html += `<path d="M ${sx(3)} ${sy} Q ${sx(3)+6} ${sy+18} ${sx(3)+18} ${sy+28}" stroke="rgba(233,201,122,0.3)" stroke-width="1" fill="none" stroke-dasharray="2 3"/>`;
+  html += `<circle cx="${sx(3)+18}" cy="${sy+28}" r="3" fill="none" stroke="rgba(233,201,122,0.35)"/>`;
+  html += `<text x="${sx(3)+22}" y="${sy+30}" fill="#8d7b54" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">WP-MU ANNEX</text>`;
+  // shortcut 3.3 → 6.0
+  html += `<path d="M ${sx(4)} ${sy-4} C ${sx(4)+30} ${sy-28} ${sx(7)-30} ${sy-28} ${sx(7)} ${sy-4}" stroke="rgba(198,139,255,0.55)" stroke-width="1" fill="none" stroke-dasharray="3 2"/>`;
+  html += `<text x="${(sx(4)+sx(7))/2 - 32}" y="${sy-30}" fill="#9c7adf" font-family="IBM Plex Mono,Menlo,monospace" font-size="6" letter-spacing="1">VELVET → NEON SHORTCUT</text>`;
+  // nodes
+  for(let i=0;i<M.length;i++){
+    const x=sx(i), y=sy;
+    const color = M[i].palette[3];
+    html += `<circle id="mnode${i}" cx="${x}" cy="${y}" r="4" fill="#0a0806" stroke="${color}" stroke-width="1.2"/>`;
+    html += `<text x="${x}" y="${y+14}" fill="#c5ae7a" font-family="IBM Plex Mono,Menlo,monospace" font-size="7" text-anchor="middle" letter-spacing="0.5">${M[i].v}</text>`;
+    html += `<text x="${x}" y="${y-10}" fill="#8d7b54" font-family="Didot,Georgia,serif" font-size="7" text-anchor="middle" font-style="italic">${M[i].name}</text>`;
+  }
+  // current pulse
+  html += `<circle id="mpulse" cx="${sx(0)}" cy="${sy}" r="8" fill="none" stroke="#e9c97a" stroke-width="1" opacity="0.5"/>`;
+  svg.innerHTML = html;
+}
+
+/* ---------- Audio engine ---------- */
+let AC = null, master = null, reverb=null, convGain=null, dryGain=null;
+let audioReady = false;
+let activeOsc = [];
+let schedulerTimer = null;
+let curMovement = -1;
+let motifNextTime = 0;
+function makeImpulse(len, decay){
+  const rate = AC.sampleRate;
+  const length = rate * len;
+  const imp = AC.createBuffer(2, length, rate);
+  for(let ch=0;ch<2;ch++){
+    const d = imp.getChannelData(ch);
+    for(let i=0;i<length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/length, decay);
+  }
+  return imp;
+}
+function initAudio(){
+  if(AC) return;
+  AC = new (window.AudioContext||window.webkitAudioContext)();
+  master = AC.createGain(); master.gain.value = 0.0; master.connect(AC.destination);
+  const comp = AC.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=4; comp.attack.value=.01; comp.release.value=.25;
+  comp.connect(master);
+  reverb = AC.createConvolver(); reverb.buffer = makeImpulse(2.8, 2.0);
+  convGain = AC.createGain(); convGain.gain.value = 0.45;
+  dryGain = AC.createGain(); dryGain.gain.value = 0.9;
+  reverb.connect(convGain); convGain.connect(comp); dryGain.connect(comp);
+  audioReady = true;
+}
+function mtof(m){ return 440 * Math.pow(2,(m-69)/12); }
+function fadeIn(){
+  if(!AC) return;
+  master.gain.cancelScheduledValues(AC.currentTime);
+  master.gain.setValueAtTime(master.gain.value, AC.currentTime);
+  master.gain.linearRampToValueAtTime(0.32, AC.currentTime + 1.8);
+}
+function playVoice(freq, start, dur, type, gain){
+  const o = AC.createOscillator(); o.type = type || "triangle"; o.frequency.value = freq;
+  const g = AC.createGain();
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(gain||0.08, start + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g); g.connect(dryGain); g.connect(reverb);
+  o.start(start); o.stop(start + dur + 0.05);
+  activeOsc.push(o);
+  if(activeOsc.length>120){ const old = activeOsc.shift(); try{old.stop();}catch{} }
+}
+function playHat(start, dur, gain){
+  const noiseBuf = AC.createBuffer(1, AC.sampleRate*0.1, AC.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 3);
+  const src = AC.createBufferSource(); src.buffer = noiseBuf;
+  const hp = AC.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=6000;
+  const g = AC.createGain(); g.gain.value = gain||0.04;
+  src.connect(hp); hp.connect(g); g.connect(dryGain);
+  src.start(start); src.stop(start + dur);
+}
+
+/* Schedule motif for current movement — voice lead across boundaries */
+let motifState = { idx:-1, beat:0, lastChord:null };
+function scheduleMotif(now, mIdx, intensity){
+  if(!AC) return;
+  const m = M[mIdx]; if(!m) return;
+  const spb = 60 / m.motif.bpm;
+  while(motifNextTime < now + 0.6){
+    if(motifNextTime < now) motifNextTime = now + 0.05;
+    const t = motifNextTime;
+    const chordIdx = motifState.beat % m.motif.chords.length;
+    const chord = m.motif.chords[chordIdx];
+    const bass = m.motif.bass[chordIdx % m.motif.bass.length];
+    const mel = m.motif.mel[motifState.beat % m.motif.mel.length];
+    const vol = intensity;
+    // bass on the 1
+    playVoice(mtof(bass), t, spb*1.6, "sine", 0.10*vol);
+    // chord pad voices (triangle)
+    for(let i=0;i<chord.length;i++) playVoice(mtof(chord[i]), t+0.02, spb*1.8, "triangle", 0.035*vol);
+    // melody on off-beats (sine)
+    playVoice(mtof(mel+12), t + spb*0.5, spb*0.9, "sine", 0.08*vol);
+    // soft hat on the &
+    playHat(t + spb*0.5, 0.1, 0.022*vol);
+    if(motifState.beat%2===1) playHat(t + spb*0.75, 0.08, 0.015*vol);
+    motifNextTime += spb;
+    motifState.beat++;
+    motifState.lastChord = chord;
+  }
+}
+
+/* ---------- Scene paint helpers ---------- */
+function fillBackdrop(g, palette, beat){
+  // gradient stops derived from palette + beat
+  const top = hex(palette[0]);
+  const mid = hex(palette[1]);
+  const bot = hex(palette[0]);
+  const grd = g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, rgb(top));
+  grd.addColorStop(0.5, rgb(mid));
+  grd.addColorStop(1, rgb(bot));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function drawDust(g, palette, sub, time){
+  g.save();
+  for(const p of dust){
+    const y = (p.y + time*0.00004*p.z + sub*0.2) % 1;
+    const x = (p.x + Math.sin(time*0.0003+p.z*7)*0.02) % 1;
+    const sz = p.s * (0.5 + 0.5*p.z);
+    g.fillStyle = rgb(hex(palette[3]), p.o*0.35);
+    g.beginPath(); g.arc(x*W, y*H, sz, 0, TAU); g.fill();
+  }
+  g.restore();
+}
+function vignette(g, strength){
+  const grd = g.createRadialGradient(W/2, H*0.5, Math.min(W,H)*0.2, W/2, H*0.5, Math.max(W,H)*0.7);
+  grd.addColorStop(0, "rgba(0,0,0,0)");
+  grd.addColorStop(1, `rgba(0,0,0,${strength})`);
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function rimLight(g, palette, sub, beat){
+  const c = hex(palette[3]);
+  const a = beat.name==="arrival" ? (0.22 + smooth(beat.frac)*0.35) : (beat.name==="sustained" ? 0.25 : 0.12);
+  const grd = g.createRadialGradient(W/2, H*0.45, 40, W/2, H*0.45, Math.max(W,H)*0.9);
+  grd.addColorStop(0, rgb(c, a));
+  grd.addColorStop(1, rgb(c, 0));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+}
+function godrays(g, palette, strength){
+  if(strength<=0.01) return;
+  g.save(); g.globalCompositeOperation = "screen";
+  const cx = W*0.5, cy = H*0.15;
+  const c = hex(palette[4]);
+  for(let i=0;i<16;i++){
+    const ang = -Math.PI/2 + (i-8)*0.08;
+    g.beginPath(); g.moveTo(cx,cy);
+    const dx = Math.cos(ang)*W, dy = Math.sin(ang)*H*2;
+    g.lineTo(cx+dx+30, cy+dy); g.lineTo(cx+dx-30, cy+dy); g.closePath();
+    g.fillStyle = rgb(c, 0.02*strength);
+    g.fill();
+  }
+  g.restore();
+}
+
+/* ---------- Per-movement renderers ----------
+   Each takes (g, sub, beat, time, m).
+   sub ∈ [0,1] is position within movement.
+   beat = {name, frac} indicates which of 5 beats + local frac [0,1].
+*/
+const RENDER = {};
+
+/* 1.0 Miles — The Bunker: first-person corridor. Doorway narrows; candle flare on arrival; diorama on sustained. */
+RENDER["1.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  fillBackdrop(g, p, beat);
+  // fog + floor
+  const floorY = H*0.68;
+  // ceiling
+  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,floorY);
+  // floor
+  const fgrd = g.createLinearGradient(0,floorY,0,H);
+  fgrd.addColorStop(0, rgb(hex(p[0]),1));
+  fgrd.addColorStop(1, rgb(hex(p[1]),1));
+  g.fillStyle = fgrd; g.fillRect(0,floorY,W,H-floorY);
+  // receding corridor frames (one-point perspective)
+  const depth = 14;
+  for(let i=depth;i>=0;i--){
+    const s = 1 - i/depth; // 0 far, 1 near
+    const w = lerp(W*0.12, W*1.4, s);
+    const h = lerp(H*0.22, H*1.2, s);
+    const x = W/2 - w/2;
+    const y = H*0.48 - h*0.4;
+    const intensity = s;
+    g.strokeStyle = rgb(mix(hex(p[0]),hex(p[2]), intensity*0.7), 0.6 - i*0.04);
+    g.lineWidth = 1.5 + s*2;
+    g.strokeRect(x, y, w, h);
+    if(i===Math.floor(depth*0.5)){
+      g.fillStyle = rgb(hex(p[2]), 0.1); g.fillRect(x,y,w,h);
     }
   }
-  ctx.putImageData(buf, 0, 0);
-  drawAmbientFx(rp);
-  drawSprites(zbuf, dirX, dirY, planeX, planeY);
-  nearestPlaque = null;
-  for(let r=0;r<ROOMS.length;r++){
-    if(sprites[r] && sprites[r].dist < 4.5){
-      if(!nearestPlaque || sprites[r].dist < nearestPlaque.dist){
-        nearestPlaque = { room:r, dist: sprites[r].dist };
+  // distant door (the "approach" beat shows a small candle; it grows during anticipation)
+  const reveal = beat.name==="approach" ? beat.frac*0.3 : (beat.name==="anticipation" ? 0.3 + beat.frac*0.5 : (beat.name==="arrival" ? 0.8 + beat.frac*0.2 : 1.0));
+  // candle flame at far point
+  const cx = W/2, cy = H*0.4;
+  const flick = 0.9 + Math.sin(time*0.012)*0.1 + Math.sin(time*0.03)*0.04;
+  const flameR = 8 + reveal*30;
+  const fgrd2 = g.createRadialGradient(cx,cy,1,cx,cy,flameR*4);
+  fgrd2.addColorStop(0, rgb([255,230,180], 0.95*flick*reveal));
+  fgrd2.addColorStop(0.3, rgb(hex(p[2]), 0.6*flick*reveal));
+  fgrd2.addColorStop(1, rgb(hex(p[0]), 0));
+  g.fillStyle = fgrd2; g.fillRect(0,0,W,H);
+  // fact token 1 — permalink slugs drifting in
+  g.save();
+  const fts = [" /?p=123 ", " /archive.php?cat=5 ", " /2004/01/hello-world/ ", " /%postname%/ "];
+  for(let i=0;i<fts.length;i++){
+    const phase = (time*0.00006 + i*0.25) % 1;
+    const x = W*0.1 + phase*W*0.8;
+    const y = H*0.75 + Math.sin(phase*TAU+i)*20;
+    const op = Math.sin(phase*Math.PI) * (beat.name==="sustained" ? 0.5 : 0.2);
+    g.font = "500 12px IBM Plex Mono,Menlo,monospace";
+    g.fillStyle = rgb(hex(p[3]), op);
+    g.fillText(fts[i], x, y);
+  }
+  g.restore();
+  // fact token 2 — hook bubbles puffing out during sustained
+  if(beat.name==="sustained" || beat.name==="arrival"){
+    g.save();
+    const hooks = ["add_filter()","add_action()","do_action()","apply_filters()"];
+    for(let i=0;i<hooks.length;i++){
+      const phase = ((time*0.0002 + i*0.25) % 1);
+      const a = 1-phase;
+      const x = W*0.15 + i*W*0.18 + Math.sin(time*0.002+i)*20;
+      const y = H*0.58 - phase*80;
+      g.font = "600 11px IBM Plex Mono,Menlo,monospace";
+      g.fillStyle = rgb(hex(p[4]), 0.6*a);
+      g.fillText(hooks[i], x, y);
+    }
+    g.restore();
+  }
+  // wall carving "1.0 · MILES" during anticipation
+  if(beat.name!=="approach"){
+    const carveOp = beat.name==="anticipation"? beat.frac : 1;
+    g.save();
+    g.font = "600 44px Didot, Georgia, serif";
+    g.fillStyle = rgb(hex(p[2]), 0.15*carveOp);
+    const tx = W/2, ty = H*0.3;
+    g.textAlign="center"; g.shadowColor = rgb(hex(p[0])); g.shadowBlur=4; g.shadowOffsetY = 2;
+    g.fillText("1.0 · MILES", tx, ty);
+    g.restore();
+  }
+  rimLight(g, p, sub, beat);
+  godrays(g, p, beat.name==="arrival"?1:0.3);
+  drawDust(g, p, sub, time);
+  vignette(g, 0.35);
+};
+
+/* 2.0 Duke — Crypt Library: cinematic side-scroll alcoves */
+RENDER["2.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  fillBackdrop(g, p, beat);
+  // side-scroll pan driven by sub
+  const pan = sub * W * 2.5;
+  // Backwall texture
+  g.fillStyle = rgb(hex(p[1])); g.fillRect(0,0,W,H);
+  // columns receding
+  for(let i=0;i<12;i++){
+    const x = i*W*0.25 - pan*0.5;
+    const xm = ((x % (W*1.2))+W*1.2)%(W*1.2) - W*0.1;
+    g.fillStyle = rgb(hex(p[1]), 0.8);
+    g.fillRect(xm, H*0.1, 4, H*0.8);
+    g.fillStyle = rgb(hex(p[2]), 0.5);
+    g.fillRect(xm-10, H*0.08, 24, 10);
+    g.fillRect(xm-10, H*0.9, 24, 10);
+  }
+  // alcoves holding scrolls / busts
+  const alcoveCount = 7;
+  for(let i=0;i<alcoveCount;i++){
+    const ax = (i*W*0.38 - pan*1.0);
+    const axm = ((ax%(W*3))+W*3)%(W*3) - W;
+    if(axm<-200||axm>W+200) continue;
+    const ay = H*0.3;
+    const aw = 140, ah = H*0.42;
+    g.fillStyle = rgb(hex(p[0]));
+    g.fillRect(axm, ay, aw, ah);
+    // arch
+    g.fillStyle = rgb(hex(p[1]));
+    g.beginPath(); g.arc(axm+aw/2, ay, aw/2, 0, Math.PI, true); g.fill();
+    // scroll contents: TinyMCE toolbar icons float in alcove
+    const icons = ["B","I","U","¶","“”","⌖","🔗","—"];
+    for(let k=0;k<icons.length;k++){
+      const ix = axm+10+k*16, iy = ay+30+Math.sin(time*0.003+k+i)*4;
+      g.fillStyle = rgb(hex(p[4]), 0.7);
+      g.font="700 12px IBM Plex Mono,Menlo,monospace";
+      g.fillText(icons[k], ix, iy);
+    }
+    // user-role crowns below
+    const roles = ["A","E","Au","C","S"];
+    for(let k=0;k<roles.length;k++){
+      const rx = axm+12+k*22, ry = ay+ah-20;
+      const lit = (i*roles.length + k) % 5 === Math.floor(time*0.002)%5;
+      g.fillStyle = rgb(hex(p[lit?4:2]), lit?0.9:0.5);
+      g.font="700 10px IBM Plex Mono,Menlo,monospace";
+      g.fillText("♔"+roles[k], rx, ry);
+    }
+  }
+  // candle flames on columns
+  for(let i=0;i<24;i++){
+    const x = (i*100 - pan*0.8) % (W+200) - 40;
+    const fy = H*0.5 + Math.sin(time*0.004+i)*2;
+    const grd = g.createRadialGradient(x,fy,1,x,fy,40);
+    grd.addColorStop(0, rgb([255,220,140], 0.6));
+    grd.addColorStop(1, rgb(hex(p[0]), 0));
+    g.fillStyle = grd; g.fillRect(x-40,fy-40,80,80);
+  }
+  // Arrival: curtain pull — giant "2.0 · DUKE" descends
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save();
+    g.fillStyle = rgb(hex(p[4]), 0.92*k);
+    g.font = "700 64px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillText("2.0 · DUKE", W/2, H*0.25 + (1-k)*40);
+    g.restore();
+  }
+  rimLight(g,p,sub,beat);
+  drawDust(g,p,sub,time);
+  vignette(g, 0.42);
+};
+
+/* 2.2 Getz — Widget Workshop: overhead workbench. */
+RENDER["2.2"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // wood-grain top-down workbench
+  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,H);
+  for(let i=0;i<20;i++){
+    g.fillStyle = rgb(mix(hex(p[0]), hex(p[1]), 0.4 + 0.2*Math.sin(i*1.3)));
+    g.fillRect(0, (i*H/20)|0, W, Math.ceil(H/20)+1);
+  }
+  // sidebar (right)
+  const sbX = W*0.62, sbY = H*0.15, sbW = W*0.28, sbH = H*0.7;
+  g.fillStyle = rgb(hex(p[4]), 0.1);
+  g.fillRect(sbX, sbY, sbW, sbH);
+  g.strokeStyle = rgb(hex(p[3]), 0.4); g.lineWidth = 2;
+  g.strokeRect(sbX, sbY, sbW, sbH);
+  g.font="500 10px IBM Plex Mono,Menlo,monospace";
+  g.fillStyle = rgb(hex(p[3]));
+  g.fillText("SIDEBAR", sbX+6, sbY-6);
+  // docked widgets based on sub
+  const widgets = ["Search","Recent Posts","Archives","Categories","Tag Cloud","RSS"];
+  for(let i=0;i<widgets.length;i++){
+    const dockT = clamp((sub*1.3 - i*0.08), 0, 1);
+    const srcX = W*0.08 + i*W*0.08;
+    const srcY = H*0.55 + Math.sin(time*0.002+i)*6;
+    const dstX = sbX+8, dstY = sbY+8+i*22;
+    const x = lerp(srcX, dstX, ease(dockT));
+    const y = lerp(srcY, dstY, ease(dockT));
+    g.fillStyle = rgb(hex(p[2]), 0.85);
+    g.fillRect(x, y, 110, 18);
+    g.strokeStyle = rgb(hex(p[4]), 0.8);
+    g.strokeRect(x, y, 110, 18);
+    g.fillStyle = rgb(hex(p[4]));
+    g.font="600 10px Inter,sans-serif";
+    g.fillText(widgets[i], x+6, y+12);
+    g.fillStyle = rgb(hex(p[4]), 0.5);
+    g.fillText("⋮⋮", x+96, y+12);
+  }
+  // Atom RSS icon pulsing — fact token #1
+  const rx = W*0.22, ry = H*0.2, pulse = 0.9 + Math.sin(time*0.005)*0.15;
+  const rR = 30*pulse;
+  g.fillStyle = rgb(hex(p[3]), 0.22); g.beginPath(); g.arc(rx,ry,rR*1.4,0,TAU); g.fill();
+  g.fillStyle = rgb(hex(p[4]));
+  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR/6, 0, TAU); g.fill();
+  g.lineWidth=3; g.strokeStyle=rgb(hex(p[4]));
+  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR*0.5, -Math.PI/2, 0); g.stroke();
+  g.beginPath(); g.arc(rx-rR/3, ry+rR/3, rR*0.85, -Math.PI/2, 0); g.stroke();
+  g.font="500 10px IBM Plex Mono,monospace"; g.fillStyle = rgb(hex(p[4]), 0.6);
+  g.fillText("ATOM 1.0", rx-26, ry+rR+14);
+  // Arrival: label tumbles in
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha = k;
+    g.font = "700 54px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.translate(W/2, H*0.12); g.rotate(-0.03 + k*0.03);
+    g.fillText("2.2 · GETZ", 0, 0);
+    g.restore();
+  }
+  rimLight(g,p,sub,beat);
+  drawDust(g,p,sub,time);
+  vignette(g, 0.25);
+};
+
+/* 3.0 Thelonious — Laboratory: orbit around a planet, moon merging */
+RENDER["3.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // deep cool gradient
+  const grd = g.createRadialGradient(W*0.5, H*0.55, 20, W*0.5, H*0.55, Math.max(W,H)*0.9);
+  grd.addColorStop(0, rgb(hex(p[1])));
+  grd.addColorStop(1, rgb(hex(p[0])));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  // starfield
+  for(let i=0;i<120;i++){
+    const sx = (i*137 + Math.floor(time*0.05))%W;
+    const sy = (i*91)%H;
+    const a = 0.3 + 0.5*Math.sin(time*0.003+i);
+    g.fillStyle = rgb(hex(p[4]), a*0.4);
+    g.fillRect(sx|0, sy|0, 1, 1);
+  }
+  // orbit angle driven by sub
+  const orbit = time*0.0004 + sub*TAU*0.5;
+  const cx = W*0.5, cy = H*0.55;
+  const planetR = Math.min(W,H)*0.18;
+  // rings
+  g.save(); g.translate(cx,cy); g.rotate(orbit*0.3);
+  for(let i=0;i<3;i++){
+    const rr = planetR*1.4 + i*10;
+    g.strokeStyle = rgb(hex(p[3]), 0.15);
+    g.beginPath(); g.ellipse(0,0, rr, rr*0.28, 0, 0, TAU); g.stroke();
+  }
+  g.restore();
+  // planet
+  const pgrd = g.createRadialGradient(cx-planetR*0.3, cy-planetR*0.3, planetR*0.1, cx, cy, planetR);
+  pgrd.addColorStop(0, rgb(hex(p[3])));
+  pgrd.addColorStop(0.7, rgb(hex(p[2])));
+  pgrd.addColorStop(1, rgb(hex(p[1])));
+  g.fillStyle = pgrd; g.beginPath(); g.arc(cx,cy,planetR,0,TAU); g.fill();
+  // continents (custom post types glyphs)
+  g.save(); g.beginPath(); g.arc(cx,cy,planetR,0,TAU); g.clip();
+  g.fillStyle = rgb(hex(p[1]), 0.55);
+  for(let i=0;i<5;i++){
+    g.beginPath();
+    const a = orbit + i*1.2;
+    const rx = cx + Math.cos(a)*planetR*0.5;
+    const ry = cy + Math.sin(a)*planetR*0.4;
+    g.arc(rx, ry, planetR*0.22, 0, TAU); g.fill();
+  }
+  g.restore();
+  // moon — fact token #1: WP-MU merging in
+  const mergeT = beat.name==="approach"? beat.frac*0.3 : (beat.name==="anticipation"? 0.3 + beat.frac*0.5 : (beat.name==="arrival"? 0.8 + beat.frac*0.2 : 1.0));
+  const moonR = planetR*0.35;
+  const angleIn = -Math.PI*0.7;
+  const startDist = planetR*3.5, endDist = planetR + moonR*0.2;
+  const dist = lerp(startDist, endDist, ease(mergeT));
+  const mx = cx + Math.cos(angleIn)*dist;
+  const my = cy + Math.sin(angleIn)*dist;
+  const mgrd = g.createRadialGradient(mx-moonR*0.3, my-moonR*0.3, moonR*0.1, mx, my, moonR);
+  mgrd.addColorStop(0, rgb(hex(p[4])));
+  mgrd.addColorStop(1, rgb(hex(p[2])));
+  g.fillStyle = mgrd; g.beginPath(); g.arc(mx, my, moonR, 0, TAU); g.fill();
+  g.fillStyle = rgb(hex(p[0]));
+  g.font = "700 10px IBM Plex Mono,monospace"; g.textAlign="center";
+  g.fillText("MU", mx, my+4);
+  g.textAlign="left";
+  // merge glow on arrival
+  if(beat.name==="arrival"){
+    const k = smooth(beat.frac);
+    const ggrd = g.createRadialGradient(cx,cy,planetR*0.5, cx,cy, planetR*3);
+    ggrd.addColorStop(0, rgb(hex(p[4]), 0.4*k));
+    ggrd.addColorStop(1, rgb(hex(p[4]), 0));
+    g.fillStyle = ggrd; g.fillRect(0,0,W,H);
+  }
+  // fact token #2: Twenty Ten theme thumbnail floats in on sustained
+  if(beat.name==="sustained" || beat.name==="arrival"){
+    const ox = W*0.8, oy = H*0.65;
+    const thumb = 120;
+    g.save(); g.translate(ox, oy); g.rotate(Math.sin(time*0.001)*0.04);
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillRect(-thumb/2, -thumb/2, thumb, thumb);
+    g.fillStyle = rgb(hex(p[1]));
+    g.fillRect(-thumb/2+8, -thumb/2+8, thumb-16, 16);
+    for(let i=0;i<4;i++){ g.fillStyle = rgb(hex(p[2]), 0.7); g.fillRect(-thumb/2+8, -thumb/2+30+i*12, thumb-16, 8); }
+    g.fillStyle = rgb(hex(p[0])); g.font = "700 10px IBM Plex Mono,monospace"; g.textAlign="center";
+    g.fillText("Twenty Ten", 0, -thumb/2+20);
+    g.restore();
+    g.textAlign="left";
+  }
+  // release label
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha = k;
+    g.font = "400 56px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("3.0 · THELONIOUS", W/2, H*0.2);
+    g.restore();
+  }
+  rimLight(g,p,sub,beat);
+  drawDust(g,p,sub,time);
+  vignette(g, 0.4);
+};
+
+/* 3.3 Sonny — Velvet Pointer: Dutch tilt, drag-drop rain, pointer bubbles */
+RENDER["3.3"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  g.save();
+  // slight Dutch tilt
+  const tilt = 0.05 * Math.sin(time*0.0008);
+  g.translate(W/2, H/2); g.rotate(tilt); g.translate(-W/2, -H/2);
+  // velvet backdrop
+  const grd = g.createRadialGradient(W*0.5, H*0.5, 40, W*0.5, H*0.5, Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[2])));
+  grd.addColorStop(1, rgb(hex(p[0])));
+  g.fillStyle = grd; g.fillRect(-W*0.2, -H*0.2, W*1.4, H*1.4);
+  // velvet texture (vertical drapes)
+  for(let i=0;i<36;i++){
+    const x = (i/36)*W*1.4 - W*0.2;
+    g.fillStyle = rgb(hex(p[1]), 0.06 + 0.05*Math.sin(i*0.7));
+    g.fillRect(x, -H*0.2, 6, H*1.4);
+  }
+  // portal ring
+  const cx = W*0.5, cy = H*0.5;
+  const ringR = Math.min(W,H)*0.3 * (0.9 + Math.sin(time*0.002)*0.04);
+  for(let i=6;i>=0;i--){
+    g.strokeStyle = rgb(hex(p[3]), 0.3 - i*0.04);
+    g.lineWidth = 1+i*1.2;
+    g.beginPath(); g.arc(cx,cy, ringR+i*6, 0, TAU); g.stroke();
+  }
+  // drag-drop rain — pixel files falling UP (upload)
+  for(let i=0;i<40;i++){
+    const phase = ((time*0.0003 + i*0.27) % 1);
+    const x = W*0.15 + ((i*57)%80)*(W*0.7/80);
+    const y = lerp(H*1.1, -40, phase);
+    const op = Math.sin(phase*Math.PI);
+    g.fillStyle = rgb(hex(p[4]), op*0.7);
+    g.fillRect(x, y, 10, 12);
+    g.fillStyle = rgb(hex(p[2]), op*0.9);
+    g.fillRect(x+6, y, 4, 4);
+    g.fillStyle = rgb(hex(p[0]), op);
+    g.font = "500 6px IBM Plex Mono,monospace"; g.fillText(".jpg", x+1, y+20);
+  }
+  g.restore();
+  // pointer bubbles (outside tilt so they read)
+  if(beat.name!=="approach"){
+    const bubbles = [
+      {x:W*0.2, y:H*0.3, txt:"Try the new admin bar!"},
+      {x:W*0.72, y:H*0.68, txt:"Drag files here."},
+      {x:W*0.16, y:H*0.72, txt:"Flyout menus, anywhere."}
+    ];
+    for(let i=0;i<bubbles.length;i++){
+      const show = clamp(sub*1.5 - i*0.18, 0, 1);
+      if(show<=0) continue;
+      const b = bubbles[i];
+      g.save(); g.globalAlpha = smooth(show);
+      g.fillStyle = rgb(hex(p[3]));
+      g.beginPath();
+      const bw=180, bh=34;
+      g.moveTo(b.x,b.y); g.lineTo(b.x+bw,b.y); g.lineTo(b.x+bw,b.y+bh); g.lineTo(b.x+20,b.y+bh);
+      g.lineTo(b.x+12,b.y+bh+8); g.lineTo(b.x+8,b.y+bh); g.lineTo(b.x,b.y+bh); g.closePath();
+      g.fill();
+      g.fillStyle = rgb(hex(p[0]));
+      g.font="600 12px Inter,sans-serif";
+      g.fillText(b.txt, b.x+12, b.y+22);
+      g.restore();
+    }
+  }
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha=k;
+    g.font = "400 52px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("3.3 · SONNY", W/2, H*0.15);
+    g.restore();
+  }
+  drawDust(g,p,sub,time);
+  vignette(g, 0.45);
+};
+
+/* 4.0 Benny — Marble Atrium: dolly-zoom media grid wall */
+RENDER["4.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // marble floor + sky
+  const sky = g.createLinearGradient(0,0,0,H*0.55);
+  sky.addColorStop(0, rgb(hex(p[1])));
+  sky.addColorStop(1, rgb(hex(p[0])));
+  g.fillStyle = sky; g.fillRect(0,0,W,H*0.55);
+  const floor = g.createLinearGradient(0,H*0.55,0,H);
+  floor.addColorStop(0, rgb(hex(p[2])));
+  floor.addColorStop(1, rgb(hex(p[3])));
+  g.fillStyle = floor; g.fillRect(0,H*0.55,W,H*0.45);
+  // marble veins on floor
+  for(let i=0;i<30;i++){
+    g.strokeStyle = rgb(hex(p[3]), 0.12);
+    g.lineWidth = 1;
+    g.beginPath();
+    const y0 = H*0.55 + (i*12)%(H*0.45);
+    g.moveTo(0, y0);
+    for(let x=0;x<=W;x+=20){ g.lineTo(x, y0 + Math.sin(x*0.02+i)*4); }
+    g.stroke();
+  }
+  // dolly-zoom: grid recedes as sub increases (pull-back)
+  const zoom = lerp(1.8, 0.6, ease(sub));
+  const gridCols = 7, gridRows = 4;
+  const cellW = (W*0.65/gridCols)*zoom, cellH = (H*0.4/gridRows)*zoom;
+  const ox = W*0.5 - (gridCols*cellW)/2;
+  const oy = H*0.18;
+  for(let r=0;r<gridRows;r++){
+    for(let c=0;c<gridCols;c++){
+      const reflow = (sub*2 + c*0.07 + r*0.12)%1;
+      const x = ox + c*cellW + Math.sin(time*0.001+c+r)*reflow*6;
+      const y = oy + r*cellH;
+      const hue = (c*17 + r*41)%360;
+      g.fillStyle = `hsl(${hue},${30+((c+r)%3)*10}%,${55-r*4}%)`;
+      g.fillRect(x,y,cellW-4,cellH-4);
+      g.fillStyle = "rgba(255,255,255,0.12)"; g.fillRect(x,y,cellW-4,4);
+    }
+  }
+  // globe of language packs (fact token #2)
+  const gx = W*0.85, gy = H*0.75, gR = 40;
+  g.save(); g.translate(gx, gy);
+  g.strokeStyle = rgb(hex(p[4]), 0.6); g.lineWidth=1;
+  g.beginPath(); g.arc(0,0,gR,0,TAU); g.stroke();
+  for(let i=0;i<6;i++){
+    g.beginPath();
+    g.ellipse(0,0, gR, gR*Math.abs(Math.cos(i/6*Math.PI+time*0.0005)), 0, 0, TAU); g.stroke();
+  }
+  const flags = ["en","es","fr","de","ja","zh","pt","ru"];
+  for(let i=0;i<flags.length;i++){
+    const a = time*0.001 + i/flags.length*TAU;
+    const x = Math.cos(a)*gR*1.2, y = Math.sin(a)*gR*0.4;
+    g.fillStyle = rgb(hex(p[4]));
+    g.font="700 9px IBM Plex Mono,monospace"; g.fillText(flags[i], x-6, y+3);
+  }
+  g.restore();
+  // inline oEmbed card drifting
+  if(beat.name==="sustained" || beat.name==="arrival"){
+    const ocx = W*0.14, ocy = H*0.7 + Math.sin(time*0.0015)*10;
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillRect(ocx, ocy, 160, 80);
+    g.strokeStyle = rgb(hex(p[3])); g.strokeRect(ocx, ocy, 160, 80);
+    g.fillStyle = rgb(hex(p[2])); g.fillRect(ocx+8, ocy+8, 60, 44);
+    g.fillStyle = rgb(hex(p[4]));
+    g.beginPath(); g.moveTo(ocx+26, ocy+22); g.lineTo(ocx+50, ocy+30); g.lineTo(ocx+26, ocy+38); g.closePath(); g.fill();
+    g.fillStyle = rgb(hex(p[4])); g.font="600 9px Inter,sans-serif";
+    g.fillText("inline embed preview", ocx+72, ocy+22);
+  }
+  // arrival label
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha=k;
+    g.font = "400 62px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("4.0 · BENNY", W/2, H*0.14);
+    g.restore();
+  }
+  rimLight(g,p,sub,beat);
+  drawDust(g,p,sub,time);
+  vignette(g, 0.22);
+};
+
+/* 5.0 Bebo — Gallery: macro pull from a single block to a post */
+RENDER["5.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // gallery white
+  g.fillStyle = rgb(hex(p[0])); g.fillRect(0,0,W,H);
+  g.fillStyle = rgb(hex(p[1])); g.fillRect(0,H*0.82,W,H*0.18);
+  // scale — start 6x (inside paragraph), end 1x (whole post)
+  const zoom = lerp(6.0, 0.85, smooth(sub));
+  const cx = W/2, cy = H/2;
+  g.save(); g.translate(cx,cy); g.scale(zoom, zoom); g.translate(-cx,-cy);
+  // "post" diagram — several blocks stacked
+  const postW = W*0.5, postH = H*0.75;
+  const px = (W-postW)/2, py = H*0.12;
+  g.fillStyle = rgb(hex(p[0])); g.fillRect(px, py, postW, postH);
+  g.strokeStyle = rgb(hex(p[2]), 0.5); g.lineWidth = 1.5/zoom;
+  g.strokeRect(px, py, postW, postH);
+  // title block
+  g.fillStyle = rgb(hex(p[4])); g.font = `400 ${28/Math.max(zoom,1)}px Didot,Georgia,serif`;
+  g.fillText("Gutenberg", px+20/zoom, py+40/zoom);
+  // paragraph block (highlighted with selection frame)
+  const parBlock = {x:px+20, y:py+60, w:postW-40, h:50};
+  // blocks appearing based on sub reveal
+  const revealCount = Math.floor(sub*10) - 1;
+  const blocks = [
+    {type:"P", text:"A post is a composition of blocks."},
+    {type:"IMG"},
+    {type:"H2", text:"Everything composes."},
+    {type:"QUOTE", text:"“inevitable in hindsight.”"},
+    {type:"COLS"},
+    {type:"P", text:"Twenty Nineteen was the first block-ready default."}
+  ];
+  let by = py+60;
+  for(let i=0;i<blocks.length;i++){
+    const show = clamp(sub*1.8 - i*0.15, 0, 1);
+    if(show<=0) continue;
+    const b = blocks[i];
+    const bh = b.type==="IMG"?70 : b.type==="COLS"?50 : 36;
+    g.save();
+    g.globalAlpha = show;
+    g.strokeStyle = rgb(hex(p[3]), 0.8); g.lineWidth = 1/zoom;
+    g.strokeRect(px+20, by, postW-40, bh);
+    if(b.type==="P"){
+      g.fillStyle = rgb(hex(p[4]));
+      g.font = `400 ${14/Math.max(zoom,1)}px "Iowan Old Style",Georgia,serif`;
+      g.fillText(b.text, px+28, by+22);
+    } else if(b.type==="IMG"){
+      g.fillStyle = rgb(hex(p[2]), 0.6);
+      g.fillRect(px+28, by+8, postW-56, bh-16);
+      g.fillStyle = rgb(hex(p[4]), 0.7);
+      g.font = `400 ${10/Math.max(zoom,1)}px Inter,sans-serif`; g.fillText("🖼 image block", px+36, by+bh/2);
+    } else if(b.type==="H2"){
+      g.fillStyle = rgb(hex(p[4])); g.font = `700 ${18/Math.max(zoom,1)}px Didot,serif`;
+      g.fillText(b.text, px+28, by+24);
+    } else if(b.type==="QUOTE"){
+      g.fillStyle = rgb(hex(p[3])); g.fillRect(px+28, by+6, 2, bh-12);
+      g.fillStyle = rgb(hex(p[4])); g.font = `italic 400 ${13/Math.max(zoom,1)}px "Iowan Old Style",Georgia,serif`;
+      g.fillText(b.text, px+36, by+22);
+    } else if(b.type==="COLS"){
+      for(let k=0;k<3;k++){
+        g.fillStyle = rgb(hex(p[2]), 0.4);
+        g.fillRect(px+28 + k*((postW-64)/3 + 4), by+8, (postW-64)/3, bh-16);
       }
     }
+    g.restore();
+    by += bh + 6;
   }
-}
-let nearestPlaque = null;
+  g.restore();
+  // arrival label
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha=k;
+    g.font = "400 60px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("5.0 · BEBO", W/2, H*0.14);
+    g.restore();
+  }
+  drawDust(g,p,sub,time);
+  vignette(g, 0.15);
+};
 
-function drawAmbientFx(rp){
-  if(rp === 0){
-    const p = 0.3 + 0.15*Math.sin(time*2);
-    ctx.fillStyle = `rgba(80,10,10,${p*0.25})`; ctx.fillRect(0,0,W,H);
-    radialVignette('rgba(20,0,0,0.7)');
-  } else if(rp === 1){
-    radialVignette('rgba(0,0,0,0.55)');
-    const a = 0.2 + 0.1*Math.sin(time*11);
-    const grad = ctx.createLinearGradient(0,H*0.6,0,H);
-    grad.addColorStop(0,'rgba(255,160,60,0)');
-    grad.addColorStop(1,`rgba(255,120,30,${a})`);
-    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  } else if(rp === 2){
-    const g2 = ctx.createLinearGradient(0,0,W,H);
-    g2.addColorStop(0,'rgba(100,255,200,0.05)'); g2.addColorStop(1,'rgba(0,100,80,0.15)');
-    ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
-    radialVignette('rgba(0,30,20,0.3)');
-  } else if(rp === 3){
-    const grad = ctx.createLinearGradient(0,0,0,H*0.3);
-    grad.addColorStop(0,'rgba(220,240,255,0.12)'); grad.addColorStop(1,'rgba(220,240,255,0)');
-    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-    radialVignette('rgba(0,20,30,0.2)');
-  } else if(rp === 4){
-    const g = ctx.createRadialGradient(W/2,H*0.4, W*0.2, W/2,H*0.4, W*0.9);
-    g.addColorStop(0,'rgba(200,155,255,0.2)'); g.addColorStop(1,'rgba(20,0,40,0.5)');
-    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-  } else if(rp === 5){
-    const grad = ctx.createLinearGradient(0,0,0,H*0.5);
-    grad.addColorStop(0,'rgba(255,230,170,0.22)'); grad.addColorStop(1,'rgba(255,230,170,0)');
-    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  } else if(rp === 6){
-    ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fillRect(0,0,W,H);
-  } else if(rp === 7){
-    for(let y=0;y<H;y+=2){ ctx.fillStyle='rgba(255,90,220,0.04)'; ctx.fillRect(0,y,W,1); }
-    radialVignette('rgba(30,0,40,0.5)');
-    const g2 = ctx.createLinearGradient(0,H*0.45,0,H*0.55);
-    g2.addColorStop(0,'rgba(255,90,220,0)'); g2.addColorStop(0.5,'rgba(255,90,220,0.35)'); g2.addColorStop(1,'rgba(90,230,255,0)');
-    ctx.fillStyle=g2;ctx.fillRect(0,H*0.45,W,H*0.1);
-  } else if(rp === 8){
-    ctx.fillStyle='rgba(240,245,255,0.08)'; ctx.fillRect(0,0,W,H);
-    const grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,'rgba(255,255,255,0.25)'); grad.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+/* 6.0 Arturo — Neon Site-Editor */
+RENDER["6.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // gradient night
+  const grd = g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, rgb(hex(p[0])));
+  grd.addColorStop(1, rgb(hex(p[1])));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  // neon sun
+  const sx = W*0.5, sy = H*0.7;
+  const sR = Math.min(W,H)*0.28;
+  for(let i=0;i<12;i++){
+    g.fillStyle = rgb(hex(p[3]), 0.04);
+    g.beginPath(); g.arc(sx,sy,sR+i*14,0,TAU); g.fill();
   }
-}
-function radialVignette(color){
-  const g = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3, W/2,H/2,Math.max(W,H)*0.7);
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,color);
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const sun = g.createLinearGradient(sx, sy-sR, sx, sy);
+  sun.addColorStop(0, rgb(hex(p[3])));
+  sun.addColorStop(1, rgb(hex(p[2])));
+  g.fillStyle = sun; g.beginPath(); g.arc(sx,sy,sR,0,TAU); g.fill();
+  // scanlines across sun
+  g.fillStyle = rgb(hex(p[0]), 0.8);
+  for(let i=0;i<6;i++){ const y = sy - sR*0.3 + i*8; g.fillRect(sx-sR, y, sR*2, 2); }
+  // Dutch tilt for the site-editor overlay
+  g.save();
+  const tilt = 0.06;
+  g.translate(W/2, H/2); g.rotate(tilt); g.translate(-W/2, -H/2);
+  // template canvas
+  const tx = W*0.2, ty = H*0.1, tw = W*0.6, th = H*0.55;
+  g.fillStyle = rgb(hex(p[4]), 0.1);
+  g.fillRect(tx, ty, tw, th);
+  g.strokeStyle = rgb(hex(p[3])); g.lineWidth = 1.5; g.strokeRect(tx,ty,tw,th);
+  // regions light up sequentially
+  const regions = [
+    {y0:0, y1:0.12, label:"HEADER"},
+    {y0:0.14, y1:0.42, label:"HERO PATTERN"},
+    {y0:0.44, y1:0.72, label:"POSTS GRID"},
+    {y0:0.74, y1:1.0, label:"FOOTER"}
+  ];
+  for(let i=0;i<regions.length;i++){
+    const rOn = clamp(sub*2 - i*0.3, 0, 1);
+    const r = regions[i];
+    const rx = tx+8, ry = ty + r.y0*th + 6;
+    const rw = tw-16, rh = (r.y1-r.y0)*th - 8;
+    if(rOn>0){
+      g.save();
+      g.shadowColor = rgb(hex(p[3]), 0.8*rOn); g.shadowBlur = 18*rOn;
+      g.strokeStyle = rgb(hex(p[3]), 0.7+0.3*rOn); g.lineWidth = 1.2;
+      g.strokeRect(rx, ry, rw, rh);
+      g.restore();
+      g.fillStyle = rgb(hex(p[3]), 0.3*rOn);
+      g.fillRect(rx, ry, rw*smooth(rOn), rh);
+    } else {
+      g.strokeStyle = rgb(hex(p[2]), 0.2); g.strokeRect(rx, ry, rw, rh);
+    }
+    g.fillStyle = rgb(hex(p[4]), 0.8);
+    g.font="600 10px IBM Plex Mono,monospace"; g.fillText(r.label, rx+8, ry+14);
+  }
+  g.restore();
+  // style-variation swatches rotating
+  const swCount = 6;
+  const swY = H*0.82;
+  for(let i=0;i<swCount;i++){
+    const x = W*0.2 + i*(W*0.1) + Math.sin(time*0.001+i)*3;
+    const rot = time*0.0005 + i*0.5;
+    g.save(); g.translate(x, swY); g.rotate(rot);
+    const c = i%3===0 ? p[3] : (i%3===1 ? p[2] : p[4]);
+    g.fillStyle = rgb(hex(c));
+    g.fillRect(-14,-14,28,28);
+    g.strokeStyle = rgb(hex(p[4]), 0.8); g.strokeRect(-14,-14,28,28);
+    g.restore();
+  }
+  g.fillStyle = rgb(hex(p[4]), 0.6);
+  g.font = "500 10px IBM Plex Mono,monospace";
+  g.fillText("STYLE VARIATIONS", W*0.2, swY-22);
+  // scanline glitch overlay during sustained/arrival
+  if(beat.name==="arrival" || beat.name==="sustained"){
+    g.fillStyle = rgb(hex(p[0]), 0.08);
+    for(let y=0;y<H;y+=3) g.fillRect(0,y,W,1);
+  }
+  // arrival label
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha=k;
+    g.font = "400 58px Didot, Georgia, serif"; g.textAlign="center";
+    g.shadowColor = rgb(hex(p[3])); g.shadowBlur = 24;
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("6.0 · ARTURO", W/2, H*0.12);
+    g.restore();
+  }
+  drawDust(g,p,sub,time);
+  vignette(g, 0.5);
+};
+
+/* 7.0 Monk — Void: slow zoom-out, cursors, AI halo */
+RENDER["7.0"] = function(g, sub, beat, time, m){
+  const p = m.palette;
+  // white void gradient
+  const grd = g.createRadialGradient(W*0.5, H*0.5, 20, W*0.5, H*0.5, Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[0])));
+  grd.addColorStop(1, rgb(hex(p[1])));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  // soft grid whisper
+  g.strokeStyle = rgb(hex(p[2]), 0.08); g.lineWidth = 1;
+  for(let i=0;i<30;i++){ g.beginPath(); g.moveTo(i*W/30,0); g.lineTo(i*W/30,H); g.stroke(); }
+  // zoom-out card: editor doc
+  const zoom = lerp(2.2, 0.7, smooth(sub));
+  const cx = W/2, cy = H/2;
+  g.save(); g.translate(cx,cy); g.scale(zoom, zoom); g.translate(-cx, -cy);
+  const dx = W*0.25, dy = H*0.2, dw = W*0.5, dh = H*0.6;
+  g.fillStyle = rgb(hex(p[0]));
+  g.fillRect(dx, dy, dw, dh);
+  g.strokeStyle = rgb(hex(p[2]), 0.4); g.lineWidth=0.6/zoom; g.strokeRect(dx,dy,dw,dh);
+  // title
+  g.fillStyle = rgb(hex(p[4])); g.font = "400 22px Didot,Georgia,serif";
+  g.fillText("The Museum", dx+20, dy+36);
+  // body lines
+  g.fillStyle = rgb(hex(p[3]));
+  g.font = "400 12px 'Iowan Old Style',Georgia,serif";
+  const bodyLines = [
+    "Nine movements.",
+    "Twenty-two years of a platform written with many hands.",
+    "A room that does not end — it exhales."
+  ];
+  for(let i=0;i<bodyLines.length;i++){
+    const a = clamp(sub*2 - i*0.12, 0, 1);
+    g.globalAlpha = a;
+    g.fillText(bodyLines[i], dx+20, dy+62+i*22);
+  }
+  g.globalAlpha = 1;
+  // cursors
+  const cursorPos = [{x:dx+90, y:dy+56, col:p[4], name:"matt"},{x:dx+160, y:dy+82, col:p[3], name:"rosa"}];
+  const blink = (time*0.003)%2<1;
+  for(const cu of cursorPos){
+    if(blink){ g.fillStyle = cu.col; g.fillRect(cu.x, cu.y, 1.5, 14); }
+    g.fillStyle = cu.col; g.font = "500 9px IBM Plex Mono,monospace";
+    g.fillText(cu.name, cu.x+3, cu.y+26);
+  }
+  // AI halo around title
+  if(beat.name!=="approach"){
+    const haloAlpha = beat.name==="sustained"? 0.55 : (beat.name==="arrival"? smooth(beat.frac)*0.5 : 0.3);
+    g.save();
+    g.shadowColor = rgb(hex(p[3]), 0.9);
+    g.shadowBlur = 24;
+    g.strokeStyle = rgb(hex(p[3]), haloAlpha); g.lineWidth = 1.5;
+    g.strokeRect(dx+16, dy+16, dw-32, 34);
+    g.restore();
+  }
+  g.restore();
+  // arrival label
+  if(beat.name==="arrival"){
+    const k = ease(beat.frac);
+    g.save(); g.globalAlpha=k;
+    g.font = "400 56px Didot, Georgia, serif"; g.textAlign="center";
+    g.fillStyle = rgb(hex(p[4]));
+    g.fillText("7.0 · MONK", W/2, H*0.12);
+    g.restore();
+  }
+  drawDust(g,p,sub,time);
+  vignette(g, 0.08);
+};
+
+/* Overture */
+function renderOverture(g, t, time){
+  // fade from pure black through palette 1.0
+  const p = M[0].palette;
+  const grd = g.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[1]), t));
+  grd.addColorStop(1, rgb([5,6,10]));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  // title
+  g.save();
+  g.globalAlpha = 1 - t*0.7;
+  g.fillStyle = "#f4ecd6";
+  g.font = "400 62px Didot,Georgia,serif"; g.textAlign="center";
+  g.fillText("Nine Movements", W/2, H*0.42);
+  g.font = "400 italic 15px 'Iowan Old Style',Georgia,serif";
+  g.fillStyle = "#c5ae7a";
+  g.fillText("a suite in nine parts for the WordPress Museum", W/2, H*0.48);
+  g.font = "500 10px IBM Plex Mono,monospace";
+  g.fillStyle = "#8d7b54";
+  g.fillText("1.0  ·  2.0  ·  2.2  ·  3.0  ·  3.3  ·  4.0  ·  5.0  ·  6.0  ·  7.0", W/2, H*0.55);
+  g.restore();
+  drawDust(g, p, t, time);
 }
 
-/* ---------- Billboard sprites ---------- */
-function drawSprites(zbuf, dirX, dirY, planeX, planeY){
-  fx.clearRect(0,0,W,H);
-  for(let r=0;r<ROOMS.length;r++){
-    const plaqueY = CAP + r*ROOM_LEN + ROOM_LEN/2;
-    // Era-screenshot: right wall across from plaque
-    drawSprite(MAP_W-1.02, plaqueY, -0.1, eraShots[r], 2.4, 1.3, zbuf, dirX, dirY, planeX, planeY);
-    // Fact token floating in the middle of the corridor
-    const xx = MAP_W/2 + 0.7 * Math.sin(time*0.8 + r);
-    const yOff = -0.5 + 0.15 * Math.sin(time*1.6 + r*0.4);
-    drawSprite(xx, plaqueY - 1.5, yOff, tokenCanvases[r], 0.9, 0.9, zbuf, dirX, dirY, planeX, planeY);
-  }
+/* Coda */
+function renderCoda(g, t, time){
+  const p = M[M.length-1].palette;
+  const grd = g.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H));
+  grd.addColorStop(0, rgb(hex(p[0])));
+  grd.addColorStop(1, rgb(mix(hex(p[0]), [255,255,255], t)));
+  g.fillStyle = grd; g.fillRect(0,0,W,H);
+  g.save();
+  g.globalAlpha = 1-t*0.4;
+  g.fillStyle = "#3a4254";
+  g.textAlign="center";
+  g.font = "400 italic 17px 'Iowan Old Style',Georgia,serif";
+  g.fillText("the suite continues, elsewhere.", W/2, H*0.46);
+  g.font = "500 10px IBM Plex Mono,monospace";
+  g.fillStyle = "#7a8299";
+  g.fillText("— end —", W/2, H*0.52);
+  g.restore();
+  // fade to pure white
+  document.getElementById("whitefade").style.opacity = String(t*0.5);
 }
-function drawSprite(sx, sy, yOffset, imgCanvas, worldW, worldH, zbuf, dirX, dirY, planeX, planeY){
-  const dx = sx - player.x;
-  const dy = sy - player.y;
-  const invDet = 1.0 / (planeX * dirY - dirX * planeY);
-  const tX = invDet * (dirY * dx - dirX * dy);
-  const tY = invDet * (-planeY * dx + planeX * dy);
-  if(tY <= 0.05) return;
-  const screenX = (W/2) * (1 + tX / tY);
-  const spriteH = Math.abs((H / tY) * worldH);
-  const spriteW = Math.abs((H / tY) * worldW);
-  const vShift = (yOffset/tY) * H;
-  const drawStartY = (-spriteH/2 + H/2) + vShift;
-  const drawStartX = -spriteW/2 + screenX;
-  const drawEndX = spriteW/2 + screenX;
-  const x0 = Math.max(0, Math.floor(drawStartX));
-  const x1 = Math.min(W-1, Math.floor(drawEndX));
-  if(x1 < x0) return;
-  for(let x=x0;x<=x1;x++){
-    if(tY < zbuf[x]){
-      const texX = Math.floor((x - drawStartX) * imgCanvas.width / spriteW);
-      if(texX < 0 || texX >= imgCanvas.width) continue;
-      fx.drawImage(imgCanvas, texX, 0, 1, imgCanvas.height, x, drawStartY, 1, spriteH);
+
+/* ---------- Scene dispatch ---------- */
+function getBeat(sub){
+  for(let i=0;i<BEATS.length;i++){
+    const b = BEATS[i];
+    if(sub >= b.a && sub <= b.b){
+      const frac = (sub - b.a) / (b.b - b.a);
+      return {name:b.key, frac, i};
     }
   }
+  return {name:"departure", frac:1, i:4};
+}
+function scrollToMovement(y){
+  if(y < OVERTURE) return {m:-1, sub:y/OVERTURE};
+  if(y > OVERTURE + M.length*MLEN) return {m:M.length, sub:(y-OVERTURE-M.length*MLEN)/CODA};
+  const idx = Math.floor((y - OVERTURE)/MLEN);
+  const sub = ((y - OVERTURE) - idx*MLEN)/MLEN;
+  return {m:idx, sub};
 }
 
-/* ---------- Impossible-trick camera effects ----------
-   Each room has a `trick` that activates late in that room and fades out
-   early in the next. We smoothly map scroll -> trick-intensity and apply
-   CSS transforms/filters to #stage.
-*/
-const stageEl = document.getElementById('stage');
-function applyTrickEffect(){
-  const fracRoom = (player.y - CAP) / ROOM_LEN;
-  const currentRoom = Math.floor(fracRoom);
-  const insideFrac = fracRoom - currentRoom;
-  let active = false, t = 0, trickRoom = -1;
-  if(currentRoom >= 0 && currentRoom < ROOMS.length && ROOMS[currentRoom].trick && insideFrac > 0.55){
-    active = true;
-    t = (insideFrac - 0.55) / 0.9; // 0..~0.5 within current room end
-    trickRoom = currentRoom;
-  } else if(currentRoom > 0 && currentRoom <= ROOMS.length && ROOMS[currentRoom-1].trick && insideFrac < 0.45){
-    active = true;
-    // carry-over from prev room trick (continue t past 0.5..1)
-    t = 0.5 + (insideFrac / 0.45) * 0.5;
-    trickRoom = currentRoom - 1;
+/* ---------- UI updates ---------- */
+function setAccent(color){
+  document.documentElement.style.setProperty("--accent", color);
+}
+function updateHUD(curM, sub, beat){
+  const rel = document.getElementById("h-release");
+  const mvt = document.getElementById("h-movement");
+  const eraE = document.getElementById("h-era");
+  if(curM<0){
+    rel.textContent = "OVERTURE"; mvt.textContent = "Nine Movements"; eraE.textContent = "WORDPRESS · 2003 → 2026";
+  } else if(curM>=M.length){
+    rel.textContent = "CODA"; mvt.textContent = "— end —"; eraE.textContent = "after the ninth movement";
+  } else {
+    const m = M[curM];
+    rel.textContent = `WORDPRESS ${m.v} · ${m.musician}`;
+    mvt.textContent = m.era;
+    eraE.textContent = `${m.date} · ${m.register}`;
+    setAccent(m.palette[3]);
   }
-  if(!active){
-    stageEl.style.transform = '';
-    stageEl.style.filter = '';
-    return -1;
+  const bnodes = document.querySelectorAll("#beats .b");
+  bnodes.forEach((el,i)=>{
+    el.classList.remove("on","past");
+    if(curM<0||curM>=M.length) return;
+    if(i===beat.i) el.classList.add("on");
+    else if(i<beat.i) el.classList.add("past");
+  });
+}
+function updateMinimap(y, curM, sub){
+  const pct = clamp(y/TOTAL, 0, 1);
+  document.getElementById("m-prog").textContent = String(Math.floor(pct*100)).padStart(2,"0")+"%";
+  const svg = document.getElementById("m-svg");
+  const sx = (i)=> 18 + (320-36)*(i/(M.length-1));
+  const pulse = document.getElementById("mpulse");
+  if(pulse){
+    let x;
+    if(curM<0) x = sx(0);
+    else if(curM>=M.length) x = sx(M.length-1);
+    else x = lerp(sx(curM), sx(Math.min(M.length-1, curM+1)), sub);
+    pulse.setAttribute("cx", x);
+    const r = 6 + 2*Math.sin(Date.now()*0.005);
+    pulse.setAttribute("r", r);
   }
-  t = Math.max(0, Math.min(1, t));
-  const arc = Math.sin(Math.PI * t);
-  const trick = ROOMS[trickRoom].trick;
-  let tfm = '', filt = '';
-  if(trick === 'JUMP'){
-    tfm = `translateY(${-arc*22}vh) scale(${1 - arc*0.04})`;
-  } else if(trick === 'FALL'){
-    tfm = `rotateX(${arc*22}deg) translateY(${arc*16}vh)`;
-    filt = `brightness(${1 - arc*0.3})`;
-  } else if(trick === 'WALL'){
-    tfm = `rotate(${arc*-90}deg) scale(${1 - arc*0.08})`;
-  } else if(trick === 'SHRINK'){
-    tfm = `scale(${1 - arc*0.7})`;
-    filt = `blur(${arc*1.2}px)`;
-  } else if(trick === 'PORTAL'){
-    tfm = `scale(${1 + Math.sin(t*Math.PI*2)*0.28}) rotate(${arc*16}deg)`;
-    filt = `hue-rotate(${arc*180}deg) saturate(${1+arc*1.5})`;
-  } else if(trick === 'FLIP'){
-    tfm = `rotate(${arc*180}deg)`;
-  } else if(trick === 'FLY'){
-    tfm = `translateY(${Math.sin(t*Math.PI*3)*-10}vh) translateX(${Math.cos(t*Math.PI*2)*6}vw) rotate(${Math.sin(t*Math.PI*4)*6}deg)`;
-  } else if(trick === 'NEGATIVE'){
-    filt = `invert(${arc}) saturate(${1 - arc*0.8}) hue-rotate(${arc*90}deg)`;
-    tfm = `scale(${1 + arc*0.04})`;
+  // highlight current node
+  for(let i=0;i<M.length;i++){
+    const n = document.getElementById("mnode"+i);
+    if(!n) continue;
+    if(i===curM){ n.setAttribute("fill", M[i].palette[3]); n.setAttribute("r","5"); }
+    else if(i<curM){ n.setAttribute("fill", M[i].palette[3]+"aa" /*not valid but browsers ignore*/); n.setAttribute("fill-opacity","0.8"); n.setAttribute("r","4"); }
+    else { n.setAttribute("fill", "#0a0806"); n.setAttribute("r","4"); n.setAttribute("fill-opacity","1");}
   }
-  stageEl.style.transform = tfm;
-  stageEl.style.filter = filt;
-  return trickRoom;
+  const fromE = document.getElementById("m-from"); const toE = document.getElementById("m-to");
+  if(curM<0){ fromE.textContent="overture"; toE.textContent=M[0].era; }
+  else if(curM>=M.length){ fromE.textContent=M[M.length-1].era; toE.textContent="coda"; }
+  else {
+    fromE.textContent = M[curM].era;
+    toE.textContent = curM+1<M.length ? M[curM+1].era : "coda";
+  }
 }
 
-const bannerEl = document.getElementById('trick-banner');
-let lastBanner = -1;
-function showTrickBanner(r){
-  if(r === lastBanner) return;
-  lastBanner = r;
-  if(r < 0 || !ROOMS[r].trick){ bannerEl.classList.remove('show'); return; }
-  bannerEl.textContent = ROOMS[r].trickLabel;
-  bannerEl.style.color = ROOMS[r].accent;
-  bannerEl.style.borderColor = ROOMS[r].accent;
-  bannerEl.classList.add('show');
-  setTimeout(()=>{ bannerEl.classList.remove('show'); }, 1500);
+/* ---------- Plaque ---------- */
+let plaqueState = { curM:-1 };
+function updatePlaque(curM, sub, beat){
+  const plaque = document.getElementById("plaque");
+  const shouldShow = curM>=0 && curM<M.length && (beat.name==="arrival" || beat.name==="sustained" || (beat.name==="departure" && beat.frac<0.4));
+  if(shouldShow){
+    if(plaqueState.curM !== curM){
+      plaqueState.curM = curM;
+      const m = M[curM];
+      document.getElementById("p-meta").textContent = `WORDPRESS ${m.v} · ${m.date} · ${m.musician}`;
+      document.getElementById("p-name").textContent = `${m.era} — "${m.name}"`;
+      document.getElementById("p-headline").textContent = m.headline;
+      document.getElementById("p-tag").textContent = `${m.adminKey.toUpperCase()} · ERA MOCK`;
+      // portrait
+      const portCanvas = document.getElementById("p-port");
+      const pg = portCanvas.getContext("2d"); pg.clearRect(0,0,72,96);
+      if(PORT[m.portraitKey]) pg.drawImage(PORT[m.portraitKey], 0, 0);
+      // shot
+      const shotCanvas = document.getElementById("p-shot");
+      const sg = shotCanvas.getContext("2d"); sg.clearRect(0,0,280,140);
+      if(SHOT[m.adminKey]) sg.drawImage(SHOT[m.adminKey], 0, 0);
+      // prose
+      const proseEl = document.getElementById("p-prose");
+      proseEl.innerHTML = m.paras.map((t,i)=>`<p data-i="${i}">${t}</p>`).join("");
+      // CTA
+      const btn = document.getElementById("p-btn");
+      btn.dataset.v = m.v;
+    }
+    plaque.classList.add("show");
+    plaque.style.setProperty("--accent", M[curM].palette[3]);
+    // Layered reveal: reveal paragraphs based on beat+sub
+    const reveal = beat.name==="arrival" ? beat.frac : (beat.name==="sustained" ? 0.2 + beat.frac*0.95 : 1);
+    const paras = document.querySelectorAll("#p-prose p");
+    paras.forEach((el,i)=>{
+      const threshold = i * (1/paras.length) * 0.95 + 0.02;
+      el.classList.toggle("on", reveal > threshold);
+    });
+  } else {
+    plaque.classList.remove("show");
+    if(!shouldShow) plaqueState.curM = -1;
+  }
+}
+
+/* ---------- Playground ---------- */
+document.getElementById("p-btn").addEventListener("click", (e)=>{
+  const v = e.currentTarget.dataset.v;
+  if(!v) return;
+  const frame = document.getElementById("pg-frame");
+  frame.src = `https://playground.wordpress.net/?wp=${encodeURIComponent(v)}`;
+  document.getElementById("pg-title").textContent = `PLAYGROUND · WordPress ${v}`;
+  document.getElementById("playground").classList.add("open");
+});
+document.getElementById("pg-close").addEventListener("click", ()=>{
+  document.getElementById("playground").classList.remove("open");
+  document.getElementById("pg-frame").src = "about:blank";
+});
+
+/* ---------- Scrollbar hairline ---------- */
+function updateScrollbar(){
+  const pct = clamp(scrollSmooth/TOTAL, 0, 1);
+  document.getElementById("sf").style.width = (pct*100)+"%";
 }
 
 /* ---------- Main loop ---------- */
-let time = 0;
-let lastT = performance.now();
-function frame(now){
-  const dt = Math.min(0.05, (now - lastT)/1000);
-  lastT = now; time += dt;
-  const scrollMax = document.body.scrollHeight - window.innerHeight;
-  const s = scrollMax > 0 ? window.scrollY / scrollMax : 0;
-  const inner = MAP_H - 2*CAP - 1.6;
-  player.targetY = CAP + 0.8 + s * inner;
-  const lerp = 1 - Math.exp(-dt * 5.0);
-  player.y += (player.targetY - player.y) * lerp;
-  let targetYaw = Math.PI/2;
-  const r = roomAtY(player.y);
-  const midY = CAP + r*ROOM_LEN + ROOM_LEN/2;
-  const plaqueDelta = player.y - midY;
-  if(plaqueDelta > -3 && plaqueDelta < 3){
-    const prox = 1 - Math.abs(plaqueDelta)/3;
-    targetYaw = Math.PI/2 + 0.35 * prox;
-  }
-  player.targetYaw = targetYaw;
-  player.yaw += (player.targetYaw - player.yaw) * (1 - Math.exp(-dt*3.5));
-  const speed = Math.abs(player.targetY - player.y);
-  player.bob = Math.sin(time*6) * Math.min(0.12, speed*4);
-  player.y += player.bob * 0.002;
-  renderFrame();
-  const trickRoom = applyTrickEffect();
-  if(trickRoom >= 0) showTrickBanner(trickRoom);
-  updateUI(r);
-  updateAudio(r);
-  requestAnimationFrame(frame);
-}
+let rafId = 0;
+let lastT = 0;
+let started = false;
+let fpsAcc = 0, fpsN = 0, fps = 60;
+function frame(t){
+  const dt = Math.min(50, t-lastT); lastT = t;
+  fpsAcc += 1000/(Math.max(1,dt)); fpsN++;
+  if(fpsN>30){ fps = fpsAcc/fpsN; fpsAcc=0; fpsN=0; }
 
-/* ---------- UI ---------- */
-const elRoom = document.getElementById('hud-room');
-const elYear = document.getElementById('year');
-const elEra  = document.getElementById('era');
-const elFace = document.getElementById('face');
-const elDots = document.getElementById('dots');
-const elMiniLabel = document.getElementById('mini-label');
-const elTrickLabel = document.getElementById('trick-label');
-const plaqueEl = document.getElementById('plaque');
-const pName = document.getElementById('p-name');
-const pSub  = document.getElementById('p-sub');
-const pBody = document.getElementById('p-body');
-const pBtn  = document.getElementById('p-btn');
-const portEl= document.getElementById('portrait');
-const shotEl= document.getElementById('shot');
-const hint = document.getElementById('hint');
+  scrollSmooth += (scrollTarget - scrollSmooth) * 0.12;
+  const y = scrollSmooth;
+  const st = scrollToMovement(y);
 
-for(let i=0;i<ROOMS.length;i++){
-  const d = document.createElement('div'); d.className='d'; d.title = ROOMS[i].v + ' ' + ROOMS[i].name;
-  elDots.appendChild(d);
-}
+  ctx.save();
+  // camera breathing
+  const breath = Math.sin(t*0.0008)*2;
+  ctx.translate(0, breath);
 
-let currentRoom = -1;
-let lastFlashed = -1;
-function updateUI(r){
-  if(r !== currentRoom){
-    currentRoom = r;
-    const room = ROOMS[r];
-    elRoom.textContent = `WordPress ${room.v} "${room.name}"`;
-    elYear.textContent = room.date;
-    elEra.textContent = room.era;
-    elFace.textContent = room.v;
-    elFace.style.borderColor = room.accent;
-    elFace.style.color = room.accent;
-    elFace.style.background = 'rgba(0,0,0,0.5)';
-    elTrickLabel.textContent = room.trick ? `NEXT: ${room.trickLabel}` : 'FINAL ROOM';
-    document.documentElement.style.setProperty('--accent', room.accent);
-    document.querySelectorAll('#dots .d').forEach((el,i)=>{
-      el.classList.toggle('past', i<r);
-      el.classList.toggle('now', i===r);
-    });
-    elMiniLabel.textContent = `${r+1}/9  ${room.v} — ${room.name}`;
-    pName.textContent = `${room.name} — WordPress ${room.v}`;
-    pSub.textContent = `${room.date} · ${room.musician.toUpperCase()}`;
-    pBody.textContent = room.hist;
-    pBtn.style.borderColor = room.accent;
-    pBtn.style.color = room.accent;
-    pBtn.onclick = ()=>openPlayground(room.v);
-    // Portrait: use the existing canvas scaled
-    portEl.innerHTML = '';
-    const pc = document.createElement('canvas'); pc.width = PORT_W; pc.height = PORT_H;
-    pc.getContext('2d').drawImage(portraitCanvases[r], 0, 0);
-    portEl.appendChild(pc);
-    // Era shot: higher-res redraw for the plaque card
-    shotEl.innerHTML = '';
-    const sc = document.createElement('canvas'); sc.width = 360; sc.height = 192;
-    drawEraShot(sc.getContext('2d'), room.shot, 360, 192, room.accent);
-    shotEl.appendChild(sc);
-    plaqueEl.style.setProperty('--accent', room.accent);
-    if(lastFlashed !== r){
-      lastFlashed = r;
-      const fl = document.getElementById('flash');
-      fl.style.background = room.accent; fl.style.opacity = '0.3';
-      setTimeout(()=>{ fl.style.opacity = '0'; }, 60);
-    }
-  }
-  const midY = CAP + r*ROOM_LEN + ROOM_LEN/2;
-  const nearPlaque = Math.abs(player.y - midY) < 3.0;
-  if(nearPlaque){
-    plaqueEl.classList.add('show');
-    hint.classList.remove('show');
+  ctx.fillStyle = "#05060a"; ctx.fillRect(0,0,W,H);
+
+  let beat = {name:"approach",frac:0,i:0};
+  let curM = -1;
+  if(st.m < 0){
+    renderOverture(ctx, smooth(st.sub), t);
+    curM = -1;
+  } else if(st.m >= M.length){
+    renderCoda(ctx, smooth(st.sub), t);
+    curM = M.length;
   } else {
-    plaqueEl.classList.remove('show');
-    if(window.scrollY < 40) hint.classList.add('show'); else hint.classList.remove('show');
+    curM = st.m;
+    beat = getBeat(st.sub);
+    const fn = RENDER[M[curM].v] || RENDER["1.0"];
+    fn(ctx, st.sub, beat, t, M[curM]);
   }
+
+  ctx.restore();
+
+  // UI overlays
+  updateHUD(curM, st.sub, beat);
+  updateMinimap(y, curM, st.sub);
+  updatePlaque(curM, st.sub, beat);
+  updateScrollbar();
+
+  // Audio scheduling — movement change + motif
+  if(audioReady && curM>=0 && curM<M.length){
+    if(curM !== curMovement){
+      curMovement = curM;
+      motifState.beat = 0; motifNextTime = AC.currentTime + 0.2;
+    }
+    const intensity = beat.name==="approach"? 0.25 : beat.name==="anticipation"? 0.55 : beat.name==="arrival"? 1.0 : beat.name==="sustained"? 0.85 : 0.45;
+    scheduleMotif(AC.currentTime, curM, intensity);
+  }
+
+  rafId = requestAnimationFrame(frame);
 }
 
-/* ---------- Audio ---------- */
-let audioCtx = null, masterGain = null, roomGains = [], roomLoops = [];
-function initAudio(){
-  if(audioCtx) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain(); masterGain.gain.value = 0.22;
-    masterGain.connect(audioCtx.destination);
-    for(let r=0;r<ROOMS.length;r++){
-      const g = audioCtx.createGain(); g.gain.value = 0; g.connect(masterGain);
-      roomGains.push(g);
-      roomLoops.push(buildRoomLoop(ROOMS[r], g));
-    }
-  } catch(e){ console.warn('audio failed', e); }
+/* ---------- Boot sequence ---------- */
+function bootProgress(p){ document.getElementById("bootf").style.width = (p*100)+"%"; }
+function boot(){
+  let p = 0;
+  bootProgress(0.05);
+  // stage 1: portraits
+  setTimeout(()=>{ buildPortraits(); bootProgress(0.4);
+    // stage 2: admin mocks
+    setTimeout(()=>{ buildAdminMocks(); bootProgress(0.7);
+      // stage 3: minimap
+      setTimeout(()=>{ buildMinimap(); bootProgress(0.95);
+        setTimeout(()=>{ bootProgress(1.0);
+          setTimeout(()=>{ document.getElementById("boot").classList.add("gone"); }, 500);
+        }, 160);
+      }, 120);
+    }, 120);
+  }, 180);
 }
-function midiHz(m){ return 440 * Math.pow(2, (m-69)/12); }
-function buildRoomLoop(room, outGain){
-  const pads = [];
-  for(let i=0;i<6;i++){
-    const o = audioCtx.createOscillator(); o.type = (i%2===0)?'triangle':'sine';
-    const g = audioCtx.createGain(); g.gain.value = 0;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type='lowpass'; filt.frequency.value = 1800 + Math.random()*600;
-    o.connect(filt); filt.connect(g); g.connect(outGain);
-    o.start(); pads.push({o,g,filt});
-  }
-  const bassOsc = audioCtx.createOscillator(); bassOsc.type='triangle';
-  const bassG = audioCtx.createGain(); bassG.gain.value = 0;
-  const bassFilt = audioCtx.createBiquadFilter(); bassFilt.type='lowpass'; bassFilt.frequency.value = 400;
-  bassOsc.connect(bassFilt); bassFilt.connect(bassG); bassG.connect(outGain); bassOsc.start();
-  const bufSize = audioCtx.sampleRate * 0.3;
-  const noiseBuf = audioCtx.createBuffer(1,bufSize,audioCtx.sampleRate);
-  const nd = noiseBuf.getChannelData(0);
-  for(let i=0;i<bufSize;i++) nd[i] = (Math.random()*2-1) * Math.exp(-i/(bufSize*0.18));
-  function brush(){
-    const src = audioCtx.createBufferSource(); src.buffer = noiseBuf;
-    const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value = 4000; bp.Q.value=0.8;
-    const g = audioCtx.createGain(); g.gain.value = 0.08;
-    src.connect(bp); bp.connect(g); g.connect(outGain); src.start();
-  }
-  const secPerBeat = 60/room.bpm;
-  let beat = 0, chordIdx = 0;
-  function tick(){
-    const ch = room.chord[chordIdx % room.chord.length];
-    if(beat % 4 === 0){
-      pads.forEach((p,i)=>{
-        const note = ch[i % ch.length];
-        p.o.frequency.setTargetAtTime(midiHz(note) * (i>=ch.length?2:1), audioCtx.currentTime, 0.3);
-        p.g.gain.cancelScheduledValues(audioCtx.currentTime);
-        p.g.gain.setTargetAtTime(0.07/(i+1)+0.02, audioCtx.currentTime, 0.8);
-      });
-      chordIdx++;
-    }
-    const bn = room.bass[beat % room.bass.length];
-    bassOsc.frequency.setTargetAtTime(midiHz(bn), audioCtx.currentTime, 0.05);
-    bassG.gain.cancelScheduledValues(audioCtx.currentTime);
-    bassG.gain.setTargetAtTime(0.14, audioCtx.currentTime, 0.02);
-    bassG.gain.setTargetAtTime(0.02, audioCtx.currentTime + secPerBeat*0.7, 0.1);
-    if(beat % 2 === 1) brush();
-    beat++;
-  }
-  const interval = setInterval(tick, secPerBeat*1000);
-  tick();
-  return { pads, bassOsc, interval };
-}
-function updateAudio(r){
-  if(!audioCtx) return;
-  const frac = (player.y - CAP) / ROOM_LEN;
-  for(let i=0;i<ROOMS.length;i++){
-    const dist = Math.abs(i - frac);
-    const w = Math.max(0, 1 - dist*0.9);
-    roomGains[i].gain.setTargetAtTime(w*0.9, audioCtx.currentTime, 0.35);
-  }
-}
+boot();
+rafId = requestAnimationFrame(frame);
 
-/* ---------- Playground overlay ---------- */
-const pgEl = document.getElementById('playground');
-const pgFrame = document.getElementById('pg-frame');
-const pgLabel = document.getElementById('pg-label');
-document.getElementById('pg-close').addEventListener('click', ()=>{
-  pgEl.classList.remove('open'); pgFrame.src = 'about:blank';
-});
-function openPlayground(v){
-  pgLabel.textContent = `PLAYGROUND · WordPress ${v}`;
-  pgFrame.src = `https://playground.wordpress.net/?wp=${v}`;
-  pgEl.classList.add('open');
+/* ---------- Start / audio unlock on first gesture ---------- */
+function startOnce(){
+  if(started) return; started = true;
+  try { initAudio(); fadeIn(); } catch(e){ console.warn("audio init failed", e); }
+  const sp = document.getElementById("splash");
+  if(sp) sp.classList.add("gone");
 }
+window.addEventListener("click", startOnce, {once:false});
+window.addEventListener("keydown", (e)=>{ if(e.key===" "||e.key==="Enter") startOnce(); });
+window.addEventListener("wheel", startOnce, {once:true, passive:true});
+window.addEventListener("touchstart", startOnce, {once:true, passive:true});
 
 /* ---------- Splash ---------- */
-const splash = document.getElementById('splash');
-function start(){
-  splash.classList.add('gone');
-  initAudio();
-  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  setTimeout(()=>hint.classList.add('show'), 400);
-  setTimeout(()=>hint.classList.remove('show'), 6000);
-}
-splash.addEventListener('click', start, {once:true});
-window.addEventListener('keydown', (e)=>{
-  if(splash.classList.contains('gone')) return;
-  if(e.key === ' ' || e.key === 'Enter') start();
-});
-window.addEventListener('scroll', ()=>{
-  if(!splash.classList.contains('gone')) start();
-}, {once:true});
-
-updateUI(0);
-requestAnimationFrame(frame);
+(function makeSplash(){
+  const div = document.createElement("div");
+  div.id = "splash";
+  div.innerHTML = `
+    <div class="slab">
+      <span class="k">WordPress Museum · Presentation · V10</span>
+      <h1>Nine Movements</h1>
+      <div class="subtitle">a suite of nine, in the key of a platform</div>
+      <p>Each major WordPress release — <em>1.0, 2.0, 2.2, 3.0, 3.3, 4.0, 5.0, 6.0, 7.0</em> — is a movement in five beats: approach, anticipation, arrival, the sustained moment, departure. Scroll is the baton. Click to begin.</p>
+      <div class="cta"><span class="pulse"></span>click · scroll · listen</div>
+    </div>
+  `;
+  document.body.appendChild(div);
+})();
 </script>
 </body>
 </html>
