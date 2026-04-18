@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Eleven Exhibits</title>
+<title>WordPress Museum — Twelve Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -62,6 +62,10 @@
   .v11 .art::before{content:"";position:absolute;left:32%;right:32%;top:22%;bottom:22%;border:2px solid #d9a25c;clip-path:polygon(50% 0,100% 100%,0 100%);box-shadow:0 0 30px rgba(217,162,92,.5)}
   .v11 .art::after{content:"The Artifact · cave · leap · pyramid";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#ffcc7a;font-size:.95rem;letter-spacing:.04em;text-shadow:0 0 8px rgba(217,162,92,.6)}
 
+  .v12 .art{background:radial-gradient(600px 340px at 50% 65%,#ffb74d 0%,transparent 60%),linear-gradient(180deg,#1a1006 0%,#080503 80%);position:relative;overflow:hidden}
+  .v12 .art::before{content:"";position:absolute;left:8%;right:8%;top:18%;bottom:30%;background:repeating-linear-gradient(90deg,rgba(255,183,77,.25) 0 3px,transparent 3px 14px),repeating-linear-gradient(0deg,rgba(255,183,77,.18) 0 3px,transparent 3px 14px);filter:blur(.4px)}
+  .v12 .art::after{content:"The Expedition · a real journey";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#ffd7a0;font-size:.95rem;letter-spacing:.04em;text-shadow:0 0 10px rgba(255,183,77,.55)}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -70,7 +74,7 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Eleven ways to see a history</h1>
+    <h1>Twelve ways to see a history</h1>
     <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
@@ -139,6 +143,12 @@
       <span class="pill">Exhibit XI · The Artifact</span>
       <h2>Raiders of the Release</h2>
       <p>The walls hold still now. You round corners, leap a chasm, climb a rope, duck into a cave, outrun a boulder, watch a stone door grind open onto a pyramid — and there, as an artifact on the plinth, sits the release. Each one stops the journey and fills the screen: the screenshot, the musician, the story. Then you move on.</p>
+    </a>
+    <a class="card v12" href="v12-expedition/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XII · The Expedition</span>
+      <h2>The Long Way Through</h2>
+      <p>Each level opens up: you take the long way through it before you find the artifact. When you do, you don't get a popup — the release itself in the world grows forward, fills the screen, and the level continues breathing behind it. Corners, caves, ropes, bridges, boulders, a cathedral, a moonlit garden — the journey stops being a corridor and starts being a place.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
