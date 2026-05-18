@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="506" viewBox="0 0 900 506" role="img" aria-labelledby="title desc">
+  <title id="title">Original reconstruction of the WordPress 5.0 Bebo block editor</title>
+  <desc id="desc">A rights-cleared, stylized reconstruction of a WordPress 5.0-era block editor screen emphasizing Gutenberg blocks and the editor shift.</desc>
+  <rect width="900" height="506" fill="#f6f7f7"/>
+  <rect x="0" y="0" width="900" height="52" fill="#fff" stroke="#dcdcde"/>
+  <text x="24" y="32" fill="#1d2327" font-family="Arial, sans-serif" font-size="17" font-weight="700">WordPress</text>
+  <circle cx="152" cy="26" r="12" fill="#1e8cbe"/>
+  <text x="148" y="31" fill="#fff" font-family="Arial, sans-serif" font-size="16" font-weight="700">+</text>
+  <rect x="744" y="15" width="72" height="24" fill="#1e8cbe" rx="2"/>
+  <text x="762" y="31" fill="#fff" font-family="Arial, sans-serif" font-size="12" font-weight="700">Publish</text>
+  <rect x="650" y="70" width="200" height="382" fill="#fff" stroke="#dcdcde"/>
+  <text x="674" y="106" fill="#1d2327" font-family="Arial, sans-serif" font-size="16" font-weight="700">Block</text>
+  <line x1="674" y1="126" x2="826" y2="126" stroke="#dcdcde"/>
+  <text x="674" y="164" fill="#50575e" font-family="Arial, sans-serif" font-size="13">Paragraph</text>
+  <rect x="674" y="188" width="132" height="10" fill="#dcdcde"/>
+  <rect x="674" y="216" width="96" height="10" fill="#dcdcde"/>
+  <text x="674" y="268" fill="#50575e" font-family="Arial, sans-serif" font-size="13">Typography</text>
+  <rect x="674" y="292" width="132" height="36" fill="#f0f0f1" stroke="#dcdcde"/>
+  <rect x="126" y="94" width="450" height="334" fill="#fff"/>
+  <text x="126" y="144" fill="#1d2327" font-family="Georgia, serif" font-size="36">Building with Blocks</text>
+  <rect x="126" y="178" width="430" height="48" fill="#fff" stroke="#1e8cbe" stroke-width="2"/>
+  <text x="146" y="208" fill="#50575e" font-family="Arial, sans-serif" font-size="15">Each piece of content becomes a movable block.</text>
+  <rect x="126" y="252" width="196" height="108" fill="#e7f2f8" stroke="#c3d7e2"/>
+  <text x="152" y="310" fill="#31586b" font-family="Arial, sans-serif" font-size="16" font-weight="700">Image Block</text>
+  <rect x="348" y="252" width="208" height="108" fill="#f3ece4" stroke="#dac6ae"/>
+  <text x="374" y="310" fill="#6e5636" font-family="Arial, sans-serif" font-size="16" font-weight="700">Quote Block</text>
+  <rect x="126" y="388" width="430" height="28" fill="#f0f6fa"/>
+  <text x="146" y="407" fill="#46606f" font-family="Arial, sans-serif" font-size="13">Bebo marks the editor shift: pages assembled as blocks, not one long field.</text>
+  <text x="126" y="478" fill="#687780" font-family="Arial, sans-serif" font-size="12">Original WordPress Museum reconstruction for publication use.</text>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="506" viewBox="0 0 900 506" role="img" aria-labelledby="title desc">
+  <title id="title">Original reconstruction of the WordPress 1.0.1 Miles posting screen</title>
+  <desc id="desc">A rights-cleared, stylized reconstruction of an early WordPress admin writing screen based on release evidence.</desc>
+  <rect width="900" height="506" fill="#e9ece7"/>
+  <rect x="30" y="22" width="840" height="36" fill="#165f82"/>
+  <text x="50" y="46" fill="#ffffff" font-family="Arial, sans-serif" font-size="18" font-weight="700">WordPress</text>
+  <text x="765" y="45" fill="#d7eef7" font-family="Arial, sans-serif" font-size="12">View site | Logout</text>
+  <rect x="30" y="61" width="840" height="30" fill="#d9e8ee"/>
+  <g font-family="Arial, sans-serif" font-size="13" fill="#123747">
+    <text x="48" y="81">Write</text>
+    <text x="116" y="81">Edit</text>
+    <text x="174" y="81">Categories</text>
+    <text x="278" y="81">Links</text>
+    <text x="338" y="81">Options</text>
+    <text x="420" y="81">Users</text>
+  </g>
+  <rect x="82" y="116" width="736" height="330" fill="#f8f8f5" stroke="#b8c4c6"/>
+  <text x="105" y="148" fill="#1f5367" font-family="Georgia, serif" font-size="26">Create New Post</text>
+  <line x1="105" y1="159" x2="780" y2="159" stroke="#9bb8c0" stroke-width="2"/>
+  <text x="106" y="188" fill="#23373d" font-family="Arial, sans-serif" font-size="14">Title</text>
+  <rect x="106" y="198" width="360" height="26" fill="#ffffff" stroke="#b7b7b7"/>
+  <text x="106" y="250" fill="#23373d" font-family="Arial, sans-serif" font-size="14">Post</text>
+  <g font-family="Arial, sans-serif" font-size="12">
+    <rect x="148" y="235" width="410" height="24" fill="#ececec" stroke="#b8b8b8"/>
+    <text x="160" y="251" fill="#06456c">Quicktags</text>
+    <text x="230" y="251" fill="#333333">b i link quote del ins img ul ol li code more</text>
+  </g>
+  <rect x="106" y="260" width="520" height="118" fill="#ffffff" stroke="#c3c3c3"/>
+  <text x="118" y="286" fill="#b1b1b1" font-family="Arial, sans-serif" font-size="16">Write the web, one post at a time...</text>
+  <rect x="650" y="194" width="130" height="184" fill="#f3f5f2" stroke="#c6c6c6"/>
+  <text x="664" y="220" fill="#263b42" font-family="Arial, sans-serif" font-size="13" font-weight="700">Categories</text>
+  <rect x="664" y="235" width="11" height="11" fill="#ffffff" stroke="#777777"/>
+  <text x="684" y="245" fill="#333333" font-family="Arial, sans-serif" font-size="12">General</text>
+  <text x="106" y="408" fill="#1d4d64" font-family="Arial, sans-serif" font-size="13" font-weight="700">TrackBack a URI:</text>
+  <rect x="220" y="391" width="390" height="24" fill="#ffffff" stroke="#b8b8b8"/>
+  <g font-family="Arial, sans-serif" font-size="12" font-weight="700">
+    <rect x="330" y="424" width="78" height="28" fill="#e5e5e5" stroke="#aaa"/>
+    <text x="345" y="443" fill="#333">Save</text>
+    <rect x="420" y="424" width="92" height="28" fill="#e5e5e5" stroke="#aaa"/>
+    <text x="435" y="443" fill="#333">Preview</text>
+    <rect x="526" y="424" width="82" height="28" fill="#dfeaf0" stroke="#7e9aad"/>
+    <text x="544" y="443" fill="#17475f">Publish</text>
+  </g>
+  <text x="82" y="478" fill="#68777c" font-family="Arial, sans-serif" font-size="12">Original WordPress Museum reconstruction for publication use.</text>
+</svg>

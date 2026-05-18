@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="506" viewBox="0 0 900 506" role="img" aria-labelledby="title desc">
+  <title id="title">Original reconstruction of the WordPress 3.0 Thelonious admin</title>
+  <desc id="desc">A rights-cleared, stylized reconstruction of a WordPress 3.0-era screen emphasizing custom post types, menus, Twenty Ten, and multisite.</desc>
+  <rect width="900" height="506" fill="#f3f4f5"/>
+  <rect x="0" y="0" width="176" height="506" fill="#262b30"/>
+  <rect x="0" y="0" width="900" height="32" fill="#1d2327"/>
+  <text x="20" y="22" fill="#fff" font-family="Arial, sans-serif" font-size="15" font-weight="700">WordPress</text>
+  <text x="730" y="22" fill="#c3d3dc" font-family="Arial, sans-serif" font-size="12">Screen Options | Help</text>
+  <g font-family="Arial, sans-serif" font-size="13">
+    <text x="22" y="72" fill="#fff" font-weight="700">Dashboard</text>
+    <text x="22" y="112" fill="#b9c3ca">Posts</text>
+    <text x="22" y="148" fill="#b9c3ca">Media</text>
+    <text x="22" y="184" fill="#b9c3ca">Pages</text>
+    <text x="22" y="220" fill="#fff" font-weight="700">Appearance</text>
+    <text x="42" y="248" fill="#7fc7ff">Menus</text>
+    <text x="22" y="292" fill="#b9c3ca">Plugins</text>
+    <text x="22" y="328" fill="#b9c3ca">Users</text>
+    <text x="22" y="364" fill="#b9c3ca">Tools</text>
+    <text x="22" y="400" fill="#b9c3ca">Settings</text>
+  </g>
+  <rect x="208" y="72" width="642" height="366" fill="#fff" stroke="#c4cbd1"/>
+  <text x="236" y="112" fill="#1d2327" font-family="Georgia, serif" font-size="28">The CMS Switchboard</text>
+  <rect x="236" y="140" width="270" height="218" fill="#f8f9fa" stroke="#c4cbd1"/>
+  <text x="260" y="172" fill="#263238" font-family="Arial, sans-serif" font-size="16" font-weight="700">Custom Post Types</text>
+  <g fill="#9faeb8">
+    <rect x="260" y="204" width="192" height="12"/>
+    <rect x="260" y="232" width="150" height="12"/>
+    <rect x="260" y="260" width="214" height="12"/>
+  </g>
+  <rect x="540" y="140" width="270" height="218" fill="#f8f9fa" stroke="#c4cbd1"/>
+  <text x="564" y="172" fill="#263238" font-family="Arial, sans-serif" font-size="16" font-weight="700">Network and Menus</text>
+  <rect x="566" y="202" width="96" height="54" fill="#dbeaf3" stroke="#a9c5d6"/>
+  <rect x="690" y="202" width="96" height="54" fill="#dbeaf3" stroke="#a9c5d6"/>
+  <line x1="662" y1="228" x2="690" y2="228" stroke="#5d8eaa" stroke-width="4"/>
+  <text x="568" y="298" fill="#667985" font-family="Arial, sans-serif" font-size="12">Twenty Ten, custom menus, taxonomies, and multisite arrive.</text>
+  <rect x="236" y="386" width="574" height="28" fill="#e8f1f7"/>
+  <text x="256" y="405" fill="#365464" font-family="Arial, sans-serif" font-size="13">WordPress 3.0 widens the corridor from blog software to CMS platform.</text>
+  <text x="208" y="478" fill="#687780" font-family="Arial, sans-serif" font-size="12">Original WordPress Museum reconstruction for publication use.</text>
+</svg>

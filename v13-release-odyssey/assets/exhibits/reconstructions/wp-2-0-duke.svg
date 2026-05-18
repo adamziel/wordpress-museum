@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="506" viewBox="0 0 900 506" role="img" aria-labelledby="title desc">
+  <title id="title">Original reconstruction of the WordPress 2.0 Duke writing admin</title>
+  <desc id="desc">A rights-cleared, stylized reconstruction of a WordPress 2.0-era administration screen emphasizing the richer editor and user roles.</desc>
+  <rect width="900" height="506" fill="#edf3f5"/>
+  <rect x="28" y="24" width="844" height="38" fill="#14506a"/>
+  <text x="48" y="49" fill="#fff" font-family="Arial, sans-serif" font-size="19" font-weight="700">WordPress</text>
+  <text x="724" y="48" fill="#d8edf4" font-family="Arial, sans-serif" font-size="12">Howdy, admin | Logout</text>
+  <rect x="28" y="66" width="844" height="30" fill="#dbe9ee"/>
+  <g font-family="Arial, sans-serif" font-size="13" fill="#1b4050">
+    <text x="48" y="86" font-weight="700">Write</text>
+    <text x="112" y="86">Manage</text>
+    <text x="190" y="86">Links</text>
+    <text x="248" y="86">Presentation</text>
+    <text x="366" y="86">Plugins</text>
+    <text x="438" y="86">Users</text>
+    <text x="500" y="86">Options</text>
+  </g>
+  <rect x="72" y="118" width="756" height="330" fill="#fff" stroke="#a8c4ce"/>
+  <text x="104" y="152" fill="#184a61" font-family="Georgia, serif" font-size="25">Write Post</text>
+  <rect x="104" y="176" width="526" height="34" fill="#f6fafb" stroke="#b7ccd4"/>
+  <text x="124" y="198" fill="#5f7782" font-family="Arial, sans-serif" font-size="13">Title: A more capable publishing desk</text>
+  <rect x="104" y="226" width="526" height="30" fill="#d3e4ea" stroke="#9bb8c3"/>
+  <g fill="#517080">
+    <rect x="122" y="238" width="24" height="7"/>
+    <rect x="160" y="238" width="24" height="7"/>
+    <rect x="198" y="238" width="24" height="7"/>
+    <rect x="236" y="238" width="24" height="7"/>
+    <rect x="274" y="238" width="66" height="7"/>
+  </g>
+  <rect x="104" y="256" width="526" height="120" fill="#fbfdfd" stroke="#b7ccd4"/>
+  <g fill="#9db1b8">
+    <rect x="126" y="284" width="360" height="10"/>
+    <rect x="126" y="308" width="430" height="10"/>
+    <rect x="126" y="332" width="388" height="10"/>
+  </g>
+  <rect x="664" y="176" width="124" height="42" fill="#176f8c"/>
+  <text x="693" y="202" fill="#fff" font-family="Arial, sans-serif" font-size="15" font-weight="700">Publish</text>
+  <rect x="664" y="238" width="124" height="58" fill="#eef5f7" stroke="#b7ccd4"/>
+  <text x="684" y="266" fill="#315b6b" font-family="Arial, sans-serif" font-size="13">Roles</text>
+  <text x="684" y="286" fill="#73909b" font-family="Arial, sans-serif" font-size="12">Editor / Author</text>
+  <rect x="664" y="314" width="124" height="62" fill="#eef5f7" stroke="#b7ccd4"/>
+  <text x="684" y="342" fill="#315b6b" font-family="Arial, sans-serif" font-size="13">Akismet</text>
+  <text x="684" y="362" fill="#73909b" font-family="Arial, sans-serif" font-size="12">Spam checks</text>
+  <rect x="104" y="402" width="526" height="24" fill="#e0edf1"/>
+  <text x="124" y="419" fill="#315b6b" font-family="Arial, sans-serif" font-size="12">Richer editor, new roles, persistent cache, and a refreshed administration surface.</text>
+  <text x="72" y="478" fill="#5f7782" font-family="Arial, sans-serif" font-size="12">Original WordPress Museum reconstruction for publication use.</text>
+</svg>

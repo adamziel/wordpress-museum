@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Twelve Exhibits</title>
+<title>WordPress Museum — Thirteen Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -66,6 +66,10 @@
   .v12 .art::before{content:"";position:absolute;left:8%;right:8%;top:18%;bottom:30%;background:repeating-linear-gradient(90deg,rgba(255,183,77,.25) 0 3px,transparent 3px 14px),repeating-linear-gradient(0deg,rgba(255,183,77,.18) 0 3px,transparent 3px 14px);filter:blur(.4px)}
   .v12 .art::after{content:"The Expedition · a real journey";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#ffd7a0;font-size:.95rem;letter-spacing:.04em;text-shadow:0 0 10px rgba(255,183,77,.55)}
 
+  .v13 .art{background:radial-gradient(700px 380px at 28% 52%,#5edbd4 0%,transparent 48%),radial-gradient(520px 320px at 76% 48%,#d9f27c 0%,transparent 50%),linear-gradient(150deg,#05070a 0%,#101425 55%,#070a0d 100%);position:relative;overflow:hidden}
+  .v13 .art::before{content:"";position:absolute;left:10%;right:10%;top:16%;bottom:18%;border:1px solid rgba(223,251,247,.42);box-shadow:0 0 32px rgba(94,219,212,.34),inset 0 0 24px rgba(217,242,124,.16);background:repeating-linear-gradient(90deg,rgba(255,255,255,.09) 0 2px,transparent 2px 18px),repeating-linear-gradient(0deg,rgba(94,219,212,.08) 0 2px,transparent 2px 22px)}
+  .v13 .art::after{content:"Release Odyssey · scroll, arrive, inspect";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:ui-monospace,Menlo,monospace;color:#eaffd0;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 10px rgba(94,219,212,.6)}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -74,7 +78,7 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Twelve ways to see a history</h1>
+    <h1>Thirteen ways to see a history</h1>
     <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
   </header>
   <div class="grid">
@@ -149,6 +153,12 @@
       <span class="pill">Exhibit XII · The Expedition</span>
       <h2>The Long Way Through</h2>
       <p>Each level opens up: you take the long way through it before you find the artifact. When you do, you don't get a popup — the release itself in the world grows forward, fills the screen, and the level continues breathing behind it. Corners, caves, ropes, bridges, boulders, a cathedral, a moonlit garden — the journey stops being a corridor and starts being a place.</p>
+    </a>
+    <a class="card v13" href="v13-release-odyssey/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XIII · Release Odyssey</span>
+      <h2>The Playable Archive</h2>
+      <p>A Doom-like museum corridor rebuilt as a polished product-page journey. Each release gets a longer level beat, a different color and artifact language, then a full-screen arrival moment with a high-resolution reconstruction, musician note, release trivia, and a live Playground portal.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>
