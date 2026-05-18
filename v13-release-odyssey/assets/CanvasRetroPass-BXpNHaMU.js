@@ -1,4 +1,4 @@
-import{r as e}from"./rolldown-runtime-S-ySWqyJ.js";import{i as t}from"./react-vendor-BLBwLZpb.js";import{C as n,n as r,r as i,t as a}from"./three-vendor-FpVRIyvr.js";import{a as o,r as s}from"./r3f-vendor-BxZwn1GO.js";var c=e(t(),1),l={uniforms:{tDiffuse:{value:null},uResolution:{value:new n(1,1)},uStrength:{value:0},uPixelSize:{value:2},uPaletteSteps:{value:14},uChromaticOffset:{value:.001}},vertexShader:`
+import{r as e}from"./rolldown-runtime-S-ySWqyJ.js";import{i as t}from"./react-vendor-BLBwLZpb.js";import{C as n,n as r,r as i,t as a}from"./three-vendor-FpVRIyvr.js";import{a as o,r as s}from"./r3f-vendor-fKaF96QP.js";var c=e(t(),1),l={uniforms:{tDiffuse:{value:null},uResolution:{value:new n(1,1)},uStrength:{value:0},uPixelSize:{value:2},uPaletteSteps:{value:14},uChromaticOffset:{value:.001}},vertexShader:`
     varying vec2 vUv;
 
     void main() {
