@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WordPress Museum — Thirteen Exhibits</title>
+<title>WordPress Museum — Twenty-Three Exhibits</title>
 <style>
   :root{--ink:#1b1b1f;--paper:#f6efe1;--accent:#2b6cb0;}
   *{box-sizing:border-box}
@@ -70,6 +70,46 @@
   .v13 .art::before{content:"";position:absolute;left:10%;right:10%;top:16%;bottom:18%;border:1px solid rgba(223,251,247,.42);box-shadow:0 0 32px rgba(94,219,212,.34),inset 0 0 24px rgba(217,242,124,.16);background:repeating-linear-gradient(90deg,rgba(255,255,255,.09) 0 2px,transparent 2px 18px),repeating-linear-gradient(0deg,rgba(94,219,212,.08) 0 2px,transparent 2px 22px)}
   .v13 .art::after{content:"Release Odyssey · scroll, arrive, inspect";position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:ui-monospace,Menlo,monospace;color:#eaffd0;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 10px rgba(94,219,212,.6)}
 
+  .v14 .art{background:radial-gradient(circle at 19% 22%,#ff8e54 0 8%,transparent 9%),radial-gradient(circle at 72% 31%,#8f74ff 0 11%,transparent 12%),linear-gradient(145deg,#d9f7e8,#c9e1ff 48%,#f4d8ff);box-shadow:inset 0 0 0 1px rgba(53,45,86,.12)}
+  .v14 .art::before{content:"";position:absolute;width:42px;height:42px;left:26%;top:45%;border-radius:9px;background:#ffdf4d;box-shadow:58px 23px 0 #ff658a,116px -12px 0 #5bc3a8,174px 27px 0 #5d78ff;transform:rotate(-8deg)}
+  .v14 .art::after{content:"PUBLISH  ·  EXTEND  ·  DESIGN";position:absolute;left:14px;right:14px;bottom:10px;font:700 .66rem/1 ui-monospace,Menlo,monospace;color:#403963;letter-spacing:.1em;text-align:center}
+
+  .v15 .art{background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(56,242,255,.05) 5px 6px),radial-gradient(circle at 68% 45%,rgba(0,225,255,.18),transparent 30%),#08131b;border:1px solid #1a4d5c}
+  .v15 .art::before{content:"03 / REST TRANSMISSION";position:absolute;left:16px;top:15px;color:#5ff5ff;font:.65rem/1.5 ui-monospace,Menlo,monospace;letter-spacing:.16em;border:1px solid #257485;padding:8px 11px;width:62%;box-shadow:18px 28px 0 -17px #257485,36px 56px 0 -35px #257485}
+  .v15 .art::after{content:"SIGNAL LOCKED";position:absolute;right:14px;bottom:12px;color:#ff8c34;font:700 .68rem/1 ui-monospace,Menlo,monospace;letter-spacing:.12em}
+
+  .v16 .art{background:linear-gradient(90deg,#f0e8d5 0 25%,#e95642 25% 50%,#cde7ed 50% 75%,#1c2430 75%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .v16 .art::before{content:"Aa";position:absolute;left:7%;top:19%;font:700 2.2rem/1 Georgia,serif;color:#24313a;text-shadow:72px 34px 0 #fff,145px -2px 0 #266981,218px 42px 0 #f6df79}
+  .v16 .art::after{content:"ONE POST · EIGHT THEMES";position:absolute;left:0;right:0;bottom:11px;text-align:center;color:#fff;font:700 .7rem/1 ui-monospace,Menlo,monospace;letter-spacing:.13em;text-shadow:0 1px 3px #000}
+
+  .v17 .art{background:radial-gradient(circle,#ffb6e5 0 2px,transparent 3px) 0 0/17px 17px,linear-gradient(135deg,#773bd6,#ff5dba);border:3px ridge #d8c7ff}
+  .v17 .art::before{content:"WordPress's profile";position:absolute;left:13px;right:13px;top:13px;height:54%;background:#fff;color:#7a20bb;border:3px solid #5c43d2;padding:11px;font:700 1rem/1.2 "Comic Sans MS",cursive;box-shadow:inset 68px 0 0 #d6f5ff}
+  .v17 .art::after{content:"★ plugins are my top friends ★";position:absolute;left:14px;bottom:12px;color:#fff;font:700 .75rem/1 "Comic Sans MS",cursive;text-shadow:1px 1px #4d187e}
+
+  .v18 .art{background:#f53683}
+  .v18 .art::before{content:"";position:absolute;width:90px;height:130px;left:50%;top:13%;margin-left:-45px;background:#090909;border-radius:50% 48% 38% 42%;transform:rotate(-12deg);box-shadow:-24px 62px 0 -27px #090909,28px 62px 0 -27px #090909}
+  .v18 .art::after{content:"MILES  ·  MINGUS  ·  DUKE";position:absolute;left:0;right:0;bottom:11px;text-align:center;color:#fff;font:700 .72rem/1 Arial,sans-serif;letter-spacing:.16em;border-top:3px solid #fff;padding-top:8px}
+
+  .v19 .art{background:linear-gradient(#c8d5cb 0 48%,#728078 48% 52%,#b8c9be 52%);border:7px solid #454d49;box-shadow:inset 0 0 0 3px #7f8d86}
+  .v19 .art::before{content:"hello wordpress! 〰 ✎";position:absolute;left:12%;right:12%;top:9%;height:32%;background:#eaf8e8;border:3px solid #46534b;color:#40584d;padding:13px;font:700 .83rem/1.4 "Comic Sans MS",cursive}
+  .v19 .art::after{content:"A  SEND     B  ERASE";position:absolute;left:0;right:0;bottom:13%;text-align:center;color:#314039;font:700 .67rem/1 ui-monospace,Menlo,monospace;letter-spacing:.12em}
+
+  .v20 .art{background:linear-gradient(145deg,#e9dfce,#cbbda7);perspective:300px}
+  .v20 .art::before{content:"WP";position:absolute;left:19%;top:17%;width:64px;height:94px;background:linear-gradient(145deg,#ff8b59,#a93e29);color:#fff;font:700 1.4rem/94px Arial,sans-serif;text-align:center;transform:rotateY(22deg) rotateZ(-5deg);box-shadow:70px 20px 0 #21759b,139px -4px 0 #6355a2,9px 13px 15px rgba(60,40,20,.35)}
+  .v20 .art::after{content:"THE SOFTWARE BOXES THAT NEVER WERE";position:absolute;left:0;right:0;bottom:11px;text-align:center;color:#564b3c;font:700 .64rem/1 ui-monospace,Menlo,monospace;letter-spacing:.11em}
+
+  .v21 .art{background:#fff;border:1px solid #dedede}
+  .v21 .art::before{content:"themes   plugins   community\A      jazz   freedom   blocks\A mobile      editor";white-space:pre;position:absolute;inset:26% 8% auto;text-align:center;color:#0063dc;font:700 1rem/1.6 Arial,sans-serif}
+  .v21 .art::after{content:"••";position:absolute;left:0;right:0;top:8%;text-align:center;color:#0063dc;font:700 2rem/1 Arial,sans-serif;letter-spacing:.12em;text-shadow:16px 0 #ff0084}
+
+  .v22 .art{background:linear-gradient(17deg,transparent 0 28%,#ffd828 29% 56%,transparent 57%),linear-gradient(127deg,#ff6046 0 34%,#e8d9f9 35% 65%,#176b5a 66%);border:1px solid #222}
+  .v22 .art::before{content:"BLOCKS!";position:absolute;left:11%;top:19%;background:#fff;padding:5px 10px;color:#172be8;font:900 2rem/1 Impact,"Arial Black",sans-serif;transform:rotate(-8deg);box-shadow:5px 5px 0 #111}
+  .v22 .art::after{content:"CUT · PASTE · PUBLISH";position:absolute;right:8%;bottom:14%;background:#111;color:#fff;padding:8px 10px;font:700 .66rem/1 ui-monospace,Menlo,monospace;letter-spacing:.11em;transform:rotate(4deg)}
+
+  .v23 .art{background:radial-gradient(circle at 22% 25%,rgba(255,255,255,.82) 0 5%,transparent 6%),radial-gradient(circle at 70% 29%,rgba(255,255,255,.7) 0 9%,transparent 10%),linear-gradient(#54c9f3 0 56%,#70ca48 57% 72%,#208c61 73%);box-shadow:inset 0 0 28px rgba(0,116,143,.24)}
+  .v23 .art::before{content:"";position:absolute;left:12%;right:12%;bottom:14%;height:38%;border-radius:50% 50% 44% 46%;background:radial-gradient(circle at 40% 28%,#fff 0 5%,#6ee3ec 6% 9%,transparent 10%),linear-gradient(#43bfd5,#126d8a);border:4px solid rgba(255,255,255,.7)}
+  .v23 .art::after{content:"PUBLISHING IS ALIVE";position:absolute;left:0;right:0;top:12px;text-align:center;color:#fff;font:800 .76rem/1 Arial,sans-serif;letter-spacing:.14em;text-shadow:0 2px 4px #167096}
+
   footer{margin-top:3rem;text-align:center;color:#8a8a92;font-size:.85rem}
   footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
@@ -78,8 +118,8 @@
 <div class="frame">
   <header>
     <div class="eyebrow">wordpress.org / museum</div>
-    <h1>Thirteen ways to see a history</h1>
-    <p class="sub">Every WordPress release from 2003 to today, rendered as seven wildly different exhibits. Pick a door.</p>
+    <h1>Twenty-three ways to see a history</h1>
+    <p class="sub">WordPress history as desktops, songs, artifacts, signals, profiles, photos, paper, and living worlds. Pick a door.</p>
   </header>
   <div class="grid">
     <a class="card v1" href="v1-desktop/">
@@ -159,6 +199,66 @@
       <span class="pill">Exhibit XIII · Release Odyssey</span>
       <h2>The Playable Archive</h2>
       <p>A scroll-controlled multi-level game of separate release worlds: jump across the Miles mountain lake, crawl through Mingus underground ducts, swim past Strayhorn fish and bubbles, fall through Duke machinery, fly over Thelonious city skies, slide through Benny media towers, and ride the Bebo block foundry into a live Playground portal.</p>
+    </a>
+    <a class="card v14" href="v14-memory-objects/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XIV · Object Worlds</span>
+      <h2>Memory Objects</h2>
+      <p>RSS tiles, plugin plugs, theme swatches, comment bubbles, and blocks gain weight and personality. Six verbs replace the release timeline; each object opens a different WordPress memory.</p>
+    </a>
+    <a class="card v15" href="v15-signal-lab/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XV · Flash Futurism</span>
+      <h2>Signal Lab</h2>
+      <p>A gunmetal-and-cyan instrument receives five transmissions from WordPress history. Tune the dial, patch the REST circuit, decode the signal, then route one live build to Playground.</p>
+    </a>
+    <a class="card v16" href="v16-zen-garden/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XVI · Theme Lab</span>
+      <h2>The Theme Lab</h2>
+      <p>One immutable post wears eight radically different designs. Switch eras, inspect the shared structure, and watch the theme system change clothes without changing the words underneath.</p>
+    </a>
+    <a class="card v17" href="v17-profile-wall/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XVII · Social Web</span>
+      <h2>The Profile Wall</h2>
+      <p>WordPress gets the gloriously overdecorated profile it deserved: plugins become Top Friends, themes become outfits, contributors fill the wall, and the guestbook is waiting for your signature.</p>
+    </a>
+    <a class="card v18" href="v18-silhouettes/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XVIII · Poster Film</span>
+      <h2>The Codename Sessions</h2>
+      <p>Eight jazz codenames become eight saturated silhouette cuts joined by one unbroken white cable. Scroll, tap, or play the kinetic poster sequence straight through.</p>
+    </a>
+    <a class="card v19" href="v19-pictochat/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XIX · Pocket Chat</span>
+      <h2>PictoPress</h2>
+      <p>A friendly dual-screen appliance for four rooms of WordPress history. Draw a note, stamp it, send it, and watch contributors from another era answer in pixels.</p>
+    </a>
+    <a class="card v20" href="v20-shrinkwrap/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XX · Box Archaeology</span>
+      <h2>Shrinkwrap</h2>
+      <p>WordPress was never sold in a box, so the museum manufactured the stockroom that never existed. Unwrap manuals, discs, receipts, installer cards, and nine different stories from the software aisle.</p>
+    </a>
+    <a class="card v21" href="v21-folksonomy/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XXI · Folksonomy</span>
+      <h2>Everyone's Archive</h2>
+      <p>Twenty-eight hand-drawn snapshots, seventeen human tags, and no timeline. Every tag rearranges the archive into a different composition: contact sheet, salon wall, map, light table, cluster, or annotated photo.</p>
+    </a>
+    <a class="card v22" href="v22-collage/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XXII · Gutenberg Zine</span>
+      <h2>Paste-Up</h2>
+      <p>WordPress 5.0 is told as torn paper, loud type, stickers, arguments, and a workbench where scraps snap into blocks. Assembly is not decoration here; it is the entire point.</p>
+    </a>
+    <a class="card v23" href="v23-terrarium/">
+      <div class="art"></div>
+      <span class="pill">Exhibit XXIII · Living System</span>
+      <h2>The Publishing Terrarium</h2>
+      <p>A glossy Frutiger Aero ecosystem where posts grow, comments pollinate, RSS bubbles rise, and updates change the weather. Tend the system until today's WordPress condenses inside a dewdrop.</p>
     </a>
   </div>
   <footer>Curated with care. Each exhibit loads live WordPress instances through <a href="https://playground.wordpress.net">WordPress Playground</a>.</footer>

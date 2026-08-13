@@ -1,0 +1,3020 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v21 · Everyone's Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   everyone's archive — the optimistic white social web, 2004-09
+   flickr-blue #0063dc · flickr-pink #ff0084 · arial, of course
+   ============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0063dc;
+  --pink:#ff0084;
+  --ink:#333;
+  --gray:#666;
+  --lite:#999;
+  --faint:#bbb;
+  --hair:#e4e4e4;
+  --hair2:#d8d8d8;
+  --logo:"Baloo 2","Trebuchet MS","Lucida Grande",Arial,sans-serif;
+  --ui:Arial,Helvetica,"Liberation Sans",sans-serif;
+  --mono:"Courier New",Courier,monospace;
+}
+html{background:#fff}
+body{
+  font:12px/1.6 var(--ui);
+  color:var(--ink);
+  background:#fff;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:2px dotted var(--blue);outline-offset:2px;border-radius:2px;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{width:950px;max-width:calc(100vw - 36px);margin:0 auto}
+.skip{position:absolute;left:-9999px;top:0;background:#fff;color:var(--blue);padding:8px 14px;z-index:400;border:1px solid var(--hair)}
+.skip:focus{left:12px;top:12px}
+.lower{text-transform:lowercase}
+.small{font-size:11px;color:var(--gray)}
+.tiny{font-size:10px;color:var(--lite)}
+.hair-top{border-top:1px solid var(--hair)}
+.hair-bot{border-bottom:1px solid var(--hair)}
+mark.hl{background:#fff3b8;padding:0 2px}
+
+/* ---------- splash ------------------------------------------------ */
+#splash{
+  position:fixed;inset:0;z-index:200;background:#fff;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:opacity .55s ease;
+}
+#splash.gone{opacity:0;pointer-events:none}
+#splash .inner{max-width:560px;padding:24px}
+#splash .dots{display:flex;justify-content:center;gap:14px;margin-bottom:34px}
+#splash .dot{width:34px;height:34px;border-radius:50%}
+#splash .dot.b{background:var(--blue);animation:dotbounce 1.6s ease-in-out infinite}
+#splash .dot.p{background:var(--pink);animation:dotbounce 1.6s ease-in-out .8s infinite}
+@keyframes dotbounce{
+  0%,100%{transform:translateY(0) scale(1)}
+  30%{transform:translateY(-14px) scale(1.06)}
+  55%{transform:translateY(0) scale(.96)}
+  70%{transform:translateY(-4px) scale(1)}
+}
+#splash h1{
+  font:600 30px/1.25 var(--logo);color:#1a1a1a;letter-spacing:-.2px;
+  text-transform:lowercase;margin-bottom:12px;
+}
+#splash h1 .b{color:var(--blue)}
+#splash h1 .p{color:var(--pink)}
+#splash .sub{font-size:13px;color:var(--gray);margin-bottom:30px}
+#splash .sub .mid{color:var(--faint);padding:0 6px}
+#splash .enter{
+  display:inline-block;font:600 15px/1 var(--logo);text-transform:lowercase;
+  color:#fff;background:var(--blue);border-radius:16px;padding:10px 26px 11px;
+  transition:transform .15s ease,background .15s ease;
+}
+#splash .enter:hover{background:var(--pink);transform:translateY(-1px)}
+#splash .enter:active{transform:translateY(0)}
+#splash .loadline{font-size:11px;color:var(--lite);margin-top:26px;min-height:16px}
+#splash .loadline .ell b{animation:ell 1.2s steps(1) infinite;opacity:0;font-weight:400}
+#splash .loadline .ell b:nth-child(2){animation-delay:.2s}
+#splash .loadline .ell b:nth-child(3){animation-delay:.4s}
+@keyframes ell{0%{opacity:0}30%,100%{opacity:1}}
+#splash .corner{position:fixed;left:16px;top:14px;font-size:11px;color:var(--lite)}
+#splash .corner a{color:var(--lite)}
+#splash .corner a:hover{color:var(--blue)}
+#splash.phase-load .inner .ready{visibility:hidden}
+#splash:not(.phase-load) .loadline .ld{display:none}
+
+/* ---------- site chrome ------------------------------------------- */
+#chrome{padding:16px 0 0}
+#chrome .bar{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:10px}
+.logotype{font:600 27px/1 var(--logo);text-transform:lowercase;letter-spacing:-.3px;white-space:nowrap}
+.logotype a{text-decoration:none}
+.logotype a:hover{text-decoration:none}
+.logotype .b{color:var(--blue)}
+.logotype .p{color:var(--pink)}
+.logotype .dotb,.logotype .dotp{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:4px;vertical-align:2px}
+.logotype .dotb{background:var(--blue)}
+.logotype .dotp{background:var(--pink);margin-left:3px}
+.logotype .claim{display:block;font:400 10px/1.4 var(--ui);color:var(--lite);letter-spacing:.3px;margin-top:2px;text-transform:lowercase}
+#chrome form{display:flex;align-items:center;gap:6px;padding-bottom:4px}
+#chrome input[type=search]{
+  font:12px var(--ui);color:var(--ink);width:200px;
+  border:1px solid #c9c9c9;border-radius:3px;padding:5px 8px;background:#fff;
+}
+#chrome input[type=search]::placeholder{color:#aaa}
+#chrome .go{
+  font:bold 11px var(--ui);color:#fff;background:#7a7a7a;border-radius:3px;padding:5px 11px 6px;
+}
+#chrome .go:hover{background:var(--blue)}
+#navrow{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:7px 0;font-size:12px}
+#navrow a{margin-right:18px}
+#navrow .you{color:var(--lite);cursor:help}
+#main{min-height:60vh;padding:24px 0 48px}
+#main:focus{outline:none}
+
+/* loading between rooms */
+#loading{
+  display:none;align-items:center;justify-content:center;gap:10px;
+  padding:120px 0;color:var(--lite);font-size:12px;
+}
+body.is-loading #loading{display:flex}
+body.is-loading #view{display:none}
+#loading .d{width:10px;height:10px;border-radius:50%;animation:loadpulse 1s ease-in-out infinite}
+#loading .d.b{background:var(--blue)}
+#loading .d.p{background:var(--pink);animation-delay:.5s}
+@keyframes loadpulse{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1);opacity:1}}
+
+/* ---------- footer ------------------------------------------------ */
+#footer{border-top:1px solid var(--hair);padding:16px 0 40px;font-size:11px;color:var(--lite)}
+#footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 24px}
+#footer a{color:var(--lite)}
+#footer a:hover{color:var(--blue)}
+#footer .jump a{color:var(--blue)}
+#footer .gpl{margin-top:6px;color:var(--faint)}
+
+/* ---------- the photo object (white border, shadow) ---------------- */
+.snap{
+  background:#fff;padding:4px;border:1px solid #d5d5d5;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);
+  display:inline-block;line-height:0;
+}
+.snap svg{width:100%;height:auto}
+a.snaplink{display:inline-block;line-height:0}
+a.snaplink:focus-visible{outline-offset:4px}
+a.snaplink:hover .snap{border-color:var(--blue)}
+
+/* era color grading — film stocks */
+.era-gold svg{filter:sepia(.28) saturate(.92) contrast(.94) brightness(1.03)}
+.era-digital svg{filter:saturate(1.16) contrast(1.03) hue-rotate(-4deg)}
+.era-neutral svg{filter:saturate(1.02)}
+.era-cool svg{filter:saturate(.9) contrast(1.05) brightness(1.01) hue-rotate(3deg)}
+
+/* ---------- tag chips & clouds ------------------------------------ */
+.tagchip{white-space:nowrap}
+.tagchip .ticon{color:var(--faint);font-size:10px;margin-right:2px}
+.cloud{line-height:2.4;text-align:center;padding:6px 10px}
+.cloud a{margin:0 7px;vertical-align:middle;white-space:nowrap}
+.cloud a:hover{color:var(--pink);text-decoration:none}
+.cloud .w1{font-size:11px}
+.cloud .w2{font-size:14px}
+.cloud .w3{font-size:18px}
+.cloud .w4{font-size:23px}
+.cloud .w5{font-size:29px;font-weight:bold}
+.cloud .w6{font-size:36px;font-weight:bold}
+
+/* ---------- generic view head ------------------------------------- */
+.crumbs{font-size:11px;color:var(--lite);margin-bottom:14px}
+.crumbs a{color:var(--lite)}
+.crumbs a:hover{color:var(--blue)}
+.crumbs .sep{padding:0 5px;color:var(--faint)}
+.tag-head{margin-bottom:18px}
+.tag-head h1{font:bold 18px/1.3 var(--ui);color:#222}
+.tag-head h1 .t{color:var(--pink)}
+.tag-head .meta{font-size:11px;color:var(--gray);margin-top:3px}
+.tag-head .blurb{font-size:12px;color:var(--gray);font-style:italic;margin-top:6px;max-width:560px}
+.tag-head .feed{display:inline-block;width:10px;height:10px;background:#f60;border-radius:2px;margin-left:8px;vertical-align:-1px;cursor:help}
+
+/* entrance stagger (per-item delay set inline) */
+.pop{opacity:0;transform:translateY(10px)}
+.pop.in{opacity:1;transform:none;transition:opacity .45s ease,transform .45s ease}
+.pop.in.spun{transform:rotate(var(--rot,0deg))}
+
+/* ================================================================
+   HOME
+   ================================================================ */
+.v-home .hello{margin:6px 0 4px;font:600 24px/1.3 var(--logo);text-transform:lowercase;color:#1a1a1a}
+.v-home .hello .wave{color:var(--pink)}
+.v-home .intro{max-width:620px;color:var(--gray);font-size:13px;margin-bottom:26px}
+.v-home .sectionhead{font:bold 13px var(--ui);color:#222;margin:30px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--hair)}
+.v-home .sectionhead .note{font-weight:normal;color:var(--lite);font-size:11px;margin-left:10px}
+.v-home .bigcloud{padding:18px 30px 22px;background:#fff}
+.v-home .interest{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;padding:8px 2px 4px}
+.v-home .interest .it{text-align:center;width:150px}
+.v-home .interest .it .cap{font-size:10px;color:var(--gray);margin-top:6px;line-height:1.5}
+.v-home .interest .it .star{color:#e6a700;font-size:10px}
+.v-home .pool{display:flex;gap:14px;flex-wrap:wrap;padding:8px 2px}
+.v-home .pool .it{width:110px;text-align:center}
+.v-home .pool .cap{font-size:10px;color:var(--lite);margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ================================================================
+   PHOTO PAGE
+   ================================================================ */
+.v-photo .cols{display:flex;gap:34px;align-items:flex-start}
+.v-photo .main{flex:1;min-width:0}
+.v-photo .side{width:230px;flex:none}
+.v-photo h1{font:bold 17px/1.35 var(--ui);color:#222;margin-bottom:12px}
+.v-photo .stagebox{position:relative;display:inline-block;max-width:100%}
+.v-photo .stagebox .snap{max-width:100%}
+.v-photo .underline-meta{font-size:11px;color:var(--gray);margin:10px 0 2px}
+.v-photo .underline-meta b{color:#444}
+.v-photo .desc{font-size:12.5px;color:#3d3d3d;max-width:560px;margin:14px 0 6px;line-height:1.7}
+.v-photo .desc p+p{margin-top:8px}
+.v-photo .notehint{font-size:11px;color:var(--lite);margin-top:8px}
+.v-photo .sizesrow{font-size:11px;color:var(--gray);margin-top:14px;padding-top:10px;border-top:1px solid var(--hair)}
+.v-photo .sizesrow .sz{color:var(--faint);margin-right:10px}
+.v-photo .sizesrow .sz.on{color:var(--blue)}
+.v-photo .sizesrow button.sz{cursor:pointer}
+.v-photo .sizesrow button.sz:hover{text-decoration:underline}
+.v-photo .sizesrow .live{color:var(--pink);font-weight:bold}
+
+/* flickr notes */
+.notes-layer{position:absolute;inset:4px;pointer-events:none}
+.note{
+  position:absolute;pointer-events:auto;
+  border:2px solid rgba(255,255,255,.95);
+  box-shadow:0 0 0 1px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,0,0,.55);
+  opacity:0;transition:opacity .25s ease;
+}
+.stagebox:hover .note,.stagebox:focus-within .note,.notes-on .note{opacity:1}
+.note .ntext{
+  position:absolute;left:-2px;top:calc(100% + 6px);min-width:130px;max-width:220px;
+  background:#ffffe1;border:1px solid #b8b28a;color:#333;
+  font-size:11px;line-height:1.5;padding:6px 8px;box-shadow:0 2px 5px rgba(0,0,0,.25);
+  display:none;z-index:30;pointer-events:none;text-align:left;
+}
+.note:hover .ntext,.note:focus .ntext,.note.show .ntext{display:block}
+.note.flip .ntext{top:auto;bottom:calc(100% + 6px)}
+.note.grab{cursor:grab;touch-action:none}
+.note.grab:active{cursor:grabbing}
+
+/* sidebar */
+.sidebox{border-top:1px solid var(--hair);padding:12px 0 16px}
+.sidebox h2{font:bold 12px var(--ui);color:#444;margin-bottom:9px}
+.sidebox .who{display:flex;gap:9px;align-items:center;margin-bottom:6px}
+.avatar{width:24px;height:24px;border-radius:3px;color:#fff;font:bold 12px/24px var(--ui);text-align:center;flex:none}
+.avatar.lg{width:48px;height:48px;font:bold 22px/48px var(--ui)}
+.sidebox ul.taglist{list-style:none}
+.sidebox ul.taglist li{padding:2.5px 0;font-size:12px}
+.sidebox .addl{font-size:11px;color:var(--gray);line-height:1.8}
+.sidebox .addl .cc{color:var(--lite)}
+.sidebox .stat b{color:#444}
+
+/* comments */
+.comments{margin-top:26px;max-width:560px}
+.comments h2{font:bold 13px var(--ui);color:#222;padding-bottom:6px;border-bottom:1px solid var(--hair);margin-bottom:4px}
+.comment{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f0f0f0}
+.comment .body{flex:1}
+.comment .by{font-weight:bold;font-size:12px}
+.comment .txt{margin:3px 0 4px;color:#3d3d3d;line-height:1.65}
+.comment .when{font-size:10px;color:var(--faint)}
+.comment .when a{color:var(--faint)}
+.commentbar{font-size:11px;color:var(--lite);padding:12px 0}
+
+/* ================================================================
+   TAG LAYOUT 1 — #community · the group pool cluster wall
+   ================================================================ */
+.ly-wall{position:relative;height:790px;margin-top:8px}
+.ly-wall .card{
+  position:absolute;background:#fff;padding:6px 6px 8px;
+  border:1px solid #cfcfcf;box-shadow:0 3px 9px rgba(0,0,0,.28);
+  transform:rotate(var(--rot,0deg));
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.ly-wall .card .cap{font-size:10px;color:var(--gray);padding:5px 2px 0;line-height:1.4;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ly-wall .card:hover,.ly-wall .card:focus-within{
+  transform:rotate(0deg) scale(1.05);z-index:60 !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+.ly-wall .poolplate{
+  position:absolute;right:2%;bottom:1%;font-size:11px;color:var(--lite);
+  text-align:right;max-width:200px;line-height:1.7;
+}
+
+/* ================================================================
+   TAG LAYOUT 2 — #editor · before/after slideshow lightbox
+   ================================================================ */
+.ly-slides{background:#111;margin-top:10px;padding:26px 0 18px;border-radius:2px}
+.ly-slides .stagewrap{max-width:760px;margin:0 auto;padding:0 24px}
+.ly-slides .stage{position:relative;min-height:420px;display:flex;align-items:center;justify-content:center}
+.ly-slides .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .6s ease;pointer-events:none}
+.ly-slides .slide.on{opacity:1;pointer-events:auto}
+.ly-slides .slide .snap{border-color:#000;box-shadow:0 4px 30px rgba(0,0,0,.9);max-width:560px}
+.ly-slides .slide .snap svg{max-height:340px;width:auto;max-width:100%}
+.ly-slides .act{font:600 11px var(--ui);letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:12px}
+.ly-slides .ba{display:flex;gap:26px;margin-top:16px;font-size:12px;max-width:600px}
+.ly-slides .ba .b4 i,.ly-slides .ba .af i{font-style:normal;font-weight:bold}
+.ly-slides .ba .b4{color:#9a9a9a}
+.ly-slides .ba .b4 i{color:#c9c9c9}
+.ly-slides .ba .af{color:#cfd8ff}
+.ly-slides .ba .af i{color:#fff}
+.ly-slides .controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:20px}
+.ly-slides .controls button{
+  color:#bbb;font-size:13px;padding:6px 14px;border:1px solid #333;border-radius:3px;background:#1b1b1b;
+}
+.ly-slides .controls button:hover{color:#fff;border-color:#666}
+.ly-slides .controls .count{color:#777;font-size:11px}
+.ly-slides .filmrow{display:flex;justify-content:center;gap:10px;margin-top:20px;padding:12px 0 4px;border-top:1px solid #222}
+.ly-slides .filmrow button{padding:3px;background:#000;border:2px solid #333;line-height:0}
+.ly-slides .filmrow button.on{border-color:var(--pink)}
+.ly-slides .filmrow svg{width:64px;height:auto;opacity:.65}
+.ly-slides .filmrow button.on svg,.ly-slides .filmrow button:hover svg{opacity:1}
+.ly-slides .slidenote{color:#666;text-align:center;font-size:11px;margin-top:14px}
+
+/* ================================================================
+   TAG LAYOUT 3 — #jazz · diagonal contact sheet
+   ================================================================ */
+.ly-sheet{position:relative;height:960px;overflow:hidden;background:
+  radial-gradient(ellipse at 30% 20%,#fdfdfd,#f2f2f2 70%);margin-top:8px}
+.ly-sheet .strip{
+  position:absolute;display:flex;gap:0;background:#181818;
+  padding:20px 26px;transform:rotate(-8deg);
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.ly-sheet .strip::before,.ly-sheet .strip::after{
+  content:"";position:absolute;left:0;right:0;height:12px;
+  background-image:radial-gradient(circle at 8px 6px,#f2f2f2 3.4px,transparent 4px);
+  background-size:22px 12px;background-repeat:repeat-x;
+}
+.ly-sheet .strip::before{top:4px}
+.ly-sheet .strip::after{bottom:4px}
+.ly-sheet .frame{padding:0 8px;text-align:center}
+.ly-sheet .frame a{display:block;line-height:0;border:1px solid #000;outline:1px solid #2c2c2c}
+.ly-sheet .frame svg{width:196px;height:auto;filter:sepia(.32) saturate(.85) contrast(.92) brightness(.98)}
+.ly-sheet .frame a:hover svg,.ly-sheet .frame a:focus svg{filter:none}
+.ly-sheet .frame .pencil{
+  font:italic 12px "Comic Sans MS","Trebuchet MS",cursive;color:#eee;
+  padding-top:7px;letter-spacing:.4px;line-height:1;
+}
+.ly-sheet .frame .pencil small{color:#8f8f8f;font-size:10px}
+.ly-sheet .sheetlabel{
+  position:absolute;left:36px;bottom:26px;color:#8a8a8a;
+  font:italic 12px "Comic Sans MS","Trebuchet MS",cursive;line-height:1.8;
+}
+
+/* ================================================================
+   TAG LAYOUT 4 — #freedom · one giant annotated photo
+   ================================================================ */
+.ly-mural .muralbox{position:relative;display:inline-block;max-width:100%}
+.ly-mural .note{opacity:1}
+.ly-mural .helpline{font-size:11px;color:var(--lite);margin:10px 0 24px}
+.ly-mural .alsorow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}
+.ly-mural .alsorow .it{width:120px;text-align:center}
+.ly-mural .alsorow .cap{font-size:10px;color:var(--gray);margin-top:5px}
+.ly-mural .notelist{margin-top:18px;font-size:11px;color:var(--gray);max-width:600px}
+.ly-mural .notelist li{margin:3px 0 3px 16px}
+
+/* ================================================================
+   TAG LAYOUT 5 — #plugins · tag clusters (bubbles)
+   ================================================================ */
+.ly-clusters{display:flex;flex-wrap:wrap;gap:30px;justify-content:center;padding:16px 0 8px}
+.ly-clusters .cluster{
+  position:relative;width:430px;max-width:100%;min-height:430px;border-radius:50%;
+  background:radial-gradient(circle at 50% 42%,#f4f8fc,#e9eef4 72%,#fff 100%);
+}
+.ly-clusters .cluster .cname{
+  position:absolute;top:26px;left:0;right:0;text-align:center;
+  font:600 13px var(--logo);color:#7d8a99;text-transform:lowercase;letter-spacing:.4px;
+}
+.ly-clusters .bub{
+  position:absolute;border-radius:50%;overflow:hidden;border:4px solid #fff;
+  box-shadow:0 2px 8px rgba(20,60,110,.25);line-height:0;background:#fff;
+  animation:floaty 6s ease-in-out infinite;
+  transition:transform .2s ease;
+}
+.ly-clusters .bub svg{width:100%;height:100%;object-fit:cover}
+.ly-clusters .bub:hover,.ly-clusters .bub:focus-within{transform:scale(1.08);z-index:5}
+.ly-clusters .bub .blabel{
+  position:absolute;left:0;right:0;bottom:0;background:rgba(0,40,90,.62);color:#fff;
+  font:10px/1.4 var(--ui);text-align:center;padding:3px 4px;line-height:1.3;
+}
+.ly-clusters .tbub{
+  position:absolute;background:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  box-shadow:0 1px 5px rgba(20,60,110,.2);font-size:11px;
+  animation:floaty 7s ease-in-out infinite reverse;
+}
+@keyframes floaty{0%,100%{margin-top:0}50%{margin-top:-9px}}
+.ly-clusters .clusternote{width:100%;text-align:center;font-size:11px;color:var(--lite)}
+
+/* ================================================================
+   TAG LAYOUT 6 — #mobile · tiny thumbs on a white expanse
+   ================================================================ */
+.ly-expanse{position:relative;min-height:980px;background:#fff}
+.ly-expanse .speck{position:absolute;text-align:center;width:110px}
+.ly-expanse .speck .snap{padding:2px}
+.ly-expanse .speck svg{width:58px;height:auto}
+.ly-expanse .speck .cap{font-size:9px;color:#aaa;margin-top:5px;line-height:1.5}
+.ly-expanse .breath{
+  position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  font-size:11px;color:#c9c9c9;font-style:italic;text-align:center;line-height:2;
+}
+
+/* ================================================================
+   TAG LAYOUT 7 — #themes · salon wall with wires
+   ================================================================ */
+.ly-salon{
+  position:relative;margin-top:8px;padding:64px 30px 0;min-height:660px;
+  background:linear-gradient(#efe8da,#eae2d1);border-radius:2px;overflow:hidden;
+}
+.ly-salon::before{ /* picture rail */
+  content:"";position:absolute;top:26px;left:0;right:0;height:6px;
+  background:linear-gradient(#d9cfba,#c4b89e);box-shadow:0 1px 2px rgba(0,0,0,.15);
+}
+.ly-salon::after{ /* baseboard */
+  content:"";position:absolute;bottom:0;left:0;right:0;height:26px;
+  background:linear-gradient(#e0d6c2,#cfc3a9);box-shadow:0 -1px 2px rgba(0,0,0,.08);
+}
+.ly-salon .hung{position:absolute;text-align:center}
+.ly-salon .wires{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none}
+.ly-salon .frame{display:inline-block;background:#fff;line-height:0;box-shadow:0 6px 14px rgba(60,45,20,.35);position:relative}
+.ly-salon .frame.gilt{border:10px solid #c9a84c;border-image:linear-gradient(135deg,#e3c878,#a8842f 55%,#d9b95e) 1}
+.ly-salon .frame.oak{border:10px solid #8a6a4a;border-image:linear-gradient(135deg,#a58363,#6d4f33 60%,#96755a) 1}
+.ly-salon .frame.blk{border:10px solid #2d2d2d}
+.ly-salon .frame .mat{display:block;border:12px solid #faf7f0;line-height:0;box-shadow:inset 0 0 4px rgba(0,0,0,.18)}
+.ly-salon .frame svg{width:100%;height:auto}
+.ly-salon .frame:hover,.ly-salon .frame:focus-within{box-shadow:0 10px 24px rgba(60,45,20,.45)}
+.ly-salon .plaque{
+  display:inline-block;margin-top:9px;background:linear-gradient(#e9cf8a,#c9a84c);
+  color:#4d3b12;font:10px/1.2 var(--ui);padding:3px 10px;border-radius:2px;
+  box-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+.ly-salon .hook{position:absolute;top:-3px;left:50%;width:7px;height:7px;margin-left:-3.5px;background:#8f8570;border-radius:50%;box-shadow:0 1px 1px rgba(0,0,0,.4)}
+
+/* ================================================================
+   TAG LAYOUT 8 — #wordcamp · pushpin map
+   ================================================================ */
+.ly-map{position:relative;margin-top:8px}
+.ly-map .mapbox{position:relative;line-height:0;border:1px solid var(--hair2);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.ly-map .mapbox>svg{width:100%;height:auto}
+.ly-map .pin{
+  position:absolute;width:26px;height:34px;margin:-32px 0 0 -13px;
+  line-height:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));
+  transition:transform .15s ease;transform-origin:50% 100%;
+}
+.ly-map .pin:hover,.ly-map .pin:focus{transform:scale(1.18)}
+.ly-map .pin.drop{animation:pindrop .5s cubic-bezier(.2,.9,.3,1.3) backwards}
+@keyframes pindrop{from{transform:translateY(-34px);opacity:0}to{transform:none;opacity:1}}
+.ly-map .pop{
+  position:absolute;z-index:40;width:172px;background:#fff;border:1px solid #c9c9c9;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);padding:7px;text-align:center;
+  transform:translate(-50%,calc(-100% - 42px));pointer-events:none;opacity:0;visibility:hidden;transition:opacity .18s ease;
+}
+.ly-map .pop.show{opacity:1;visibility:visible;pointer-events:auto}
+.ly-map .pop .cap{font-size:10px;color:var(--gray);line-height:1.5;margin-top:5px}
+.ly-map .pop::after{
+  content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;
+  border:7px solid transparent;border-bottom:0;border-top-color:#fff;
+}
+.ly-map .maplegend{font-size:11px;color:var(--lite);margin-top:10px}
+
+/* ================================================================
+   TAG LAYOUT 9 — #design · the light table
+   ================================================================ */
+.ly-table{
+  position:relative;margin-top:8px;height:720px;border-radius:6px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 46%,#ffffff 0%,#f4f2ec 44%,#ddd8cb 100%);
+  box-shadow:inset 0 0 60px rgba(120,110,80,.25);
+}
+.ly-table .slidepic{
+  position:absolute;background:#fdfdfb;padding:10px 10px 12px;
+  box-shadow:0 4px 12px rgba(70,60,30,.3);transform:rotate(var(--rot,0deg));
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.ly-table .slidepic:hover,.ly-table .slidepic:focus-within{transform:rotate(0deg) scale(1.04);z-index:50;box-shadow:0 10px 26px rgba(70,60,30,.4)}
+.ly-table .slidepic .cap{font:italic 10px Georgia,serif;color:#7c7566;padding-top:6px;text-align:center}
+.ly-table .tape{
+  position:absolute;width:58px;height:20px;background:rgba(240,225,160,.6);
+  box-shadow:0 1px 2px rgba(0,0,0,.12);pointer-events:none;
+}
+.ly-table .ring{
+  position:absolute;width:74px;height:74px;border:7px solid rgba(150,95,40,.28);
+  border-radius:50%;pointer-events:none;
+}
+.ly-table .pencilnote{position:absolute;font:italic 12px Georgia,serif;color:#8d8574;pointer-events:none}
+
+/* ================================================================
+   TAG LAYOUT 10 — #beginnings · the classic photostream
+   ================================================================ */
+.ly-stream .row{display:flex;gap:22px;padding:20px 0;border-bottom:1px solid var(--hair)}
+.ly-stream .row .pic{flex:none;width:262px}
+.ly-stream .row .txt{flex:1;min-width:0}
+.ly-stream .row h2{font:bold 14px var(--ui);margin-bottom:5px}
+.ly-stream .row .meta{font-size:11px;color:var(--lite);margin-bottom:8px}
+.ly-stream .row .desc{font-size:12px;color:#484848;max-width:520px;line-height:1.7}
+.ly-stream .row .tags{font-size:11px;margin-top:9px;color:var(--lite)}
+.ly-stream .streamnote{font-size:11px;color:var(--lite);padding:16px 0}
+
+/* ================================================================
+   TAG LAYOUT 11 — #api · the sticky-note board
+   ================================================================ */
+.ly-board{
+  position:relative;margin-top:8px;min-height:640px;border-radius:3px;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 27px,rgba(110,150,190,.13) 27px 28px),
+    repeating-linear-gradient(90deg,transparent 0 27px,rgba(110,150,190,.13) 27px 28px),
+    #f5f8fb;
+  border:1px solid #dfe6ee;
+}
+.ly-board .sticky{
+  position:absolute;padding:12px 12px 14px;transform:rotate(var(--rot,0deg));
+  box-shadow:2px 4px 8px rgba(50,60,90,.22);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.ly-board .sticky.y{background:#fdf3a4}
+.ly-board .sticky.pk{background:#fdd3e3}
+.ly-board .sticky.bl{background:#cfe6fb}
+.ly-board .sticky.gn{background:#d4f2c8}
+.ly-board .sticky::after{ /* folded corner */
+  content:"";position:absolute;right:0;bottom:0;border:10px solid transparent;
+  border-right-color:rgba(255,255,255,.85);border-bottom-color:rgba(0,0,0,.07);
+}
+.ly-board .sticky:hover,.ly-board .sticky:focus-within{transform:rotate(0deg) scale(1.05);z-index:40;box-shadow:4px 8px 18px rgba(50,60,90,.3)}
+.ly-board .sticky .cap{font:600 11px/1.4 var(--logo);color:#4a4a33;padding-top:7px;text-transform:lowercase;text-align:center}
+.ly-board .sticky.text{font:12px/1.5 var(--mono);color:#3c4453;max-width:170px}
+.ly-board .sticky.text b{display:block;font:bold 11px var(--mono);color:#1f4d7d;margin-bottom:2px}
+
+/* ================================================================
+   TAG LAYOUT 12 — #spam · buried alive (hover/akismet to clean)
+   ================================================================ */
+.ly-spam .stage{position:relative;width:560px;max-width:100%;margin:12px auto 0;min-height:480px}
+.ly-spam .target{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%)}
+.ly-spam .slip{
+  position:absolute;background:#fcfcf8;border:1px solid #c9c9bd;color:#8a8a7a;
+  font:9px/1.35 var(--ui);padding:6px 8px;width:150px;
+  box-shadow:0 2px 4px rgba(0,0,0,.18);transform:rotate(var(--rot,0deg));
+  transition:transform .7s cubic-bezier(.5,.05,.7,.4),opacity .7s ease;
+}
+.ly-spam .slip b{color:#a05a2a;font-size:9px}
+.ly-spam.cleaned .slip{transform:translate(var(--fx,300px),var(--fy,-300px)) rotate(220deg);opacity:0;pointer-events:none}
+.ly-spam .akismetbar{text-align:center;margin-top:14px}
+.ly-spam .akismetbar button{
+  font:600 13px var(--logo);text-transform:lowercase;color:#fff;background:#6c9e3f;
+  border-radius:15px;padding:8px 22px 9px;
+}
+.ly-spam .akismetbar button:hover{background:#5a8632}
+.ly-spam .verdict{font-size:11px;color:#6c9e3f;margin-top:10px;opacity:0;transition:opacity .5s ease .5s;text-align:center}
+.ly-spam.cleaned .verdict{opacity:1}
+
+/* ================================================================
+   TAG LAYOUT 13 — #admin · cascading era windows
+   ================================================================ */
+.ly-cascade{position:relative;height:820px;margin-top:8px}
+.ly-cascade .win{
+  position:absolute;background:#ece9d8;border:1px solid #7a96df;
+  box-shadow:2px 3px 0 rgba(0,0,0,.18),0 8px 24px rgba(0,0,0,.18);
+  padding:3px;border-radius:5px 5px 2px 2px;
+}
+.ly-cascade .win .tbar{
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(#3a6ea5,#1e4d8c 45%,#2a5da8);
+  color:#fff;font:bold 11px var(--ui);padding:4px 6px 5px 9px;border-radius:4px 4px 0 0;
+  cursor:pointer;
+}
+.ly-cascade .win .tbar .ttl{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left}
+.ly-cascade .win .tbar .btns{display:flex;gap:2px}
+.ly-cascade .win .tbar .btns i{
+  width:15px;height:14px;background:linear-gradient(#7ba2e0,#3665b3);border:1px solid #fff;
+  border-radius:2px;font:bold 9px/12px var(--ui);color:#fff;text-align:center;font-style:normal;
+}
+.ly-cascade .win .tbar .btns i.x{background:linear-gradient(#e88,#c33)}
+.ly-cascade .win .addr{
+  display:flex;gap:6px;align-items:center;background:#ece9d8;
+  font:10px var(--ui);color:#555;padding:3px 4px;
+}
+.ly-cascade .win .addr .field{flex:1;background:#fff;border:1px solid #9db;border:1px solid #a9a9a9;padding:2px 6px;font:10px var(--mono);color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.ly-cascade .win .body{background:#fff;border:1px solid #aaa;line-height:0}
+.ly-cascade .win .body a{display:block}
+.ly-cascade .win .body svg{width:100%;height:auto}
+.ly-cascade .win.front{box-shadow:2px 3px 0 rgba(0,0,0,.22),0 16px 42px rgba(0,0,0,.3)}
+.ly-cascade .win:not(.front) .tbar{background:linear-gradient(#9aa8bd,#7d8ba0);color:#e8e8e8}
+.ly-cascade .cascadenote{position:absolute;right:8px;bottom:0;font-size:11px;color:var(--lite);max-width:220px;text-align:right;line-height:1.7}
+
+/* ================================================================
+   TAG LAYOUT 14 — #translation · the passport spread
+   ================================================================ */
+.ly-passport{display:flex;justify-content:center;margin-top:10px}
+.ly-passport .book{
+  position:relative;display:flex;width:860px;max-width:100%;min-height:560px;
+  background:#f7f1df;border:1px solid #d8cdb0;border-radius:8px;
+  box-shadow:0 6px 20px rgba(90,70,30,.25);overflow:hidden;
+}
+.ly-passport .page{position:relative;flex:1;padding:26px 22px}
+.ly-passport .page.l{border-right:1px solid rgba(120,100,60,.25);box-shadow:inset -18px 0 22px -18px rgba(90,70,30,.45)}
+.ly-passport .page.r{box-shadow:inset 18px 0 22px -18px rgba(90,70,30,.45)}
+.ly-passport .pagehead{font:600 11px var(--ui);letter-spacing:3px;color:#a2946f;text-transform:uppercase;text-align:center;margin-bottom:14px}
+.ly-passport .stamp{
+  position:absolute;text-align:center;transform:rotate(var(--rot,0deg));
+  transition:transform .18s ease;
+}
+.ly-passport .stamp:hover,.ly-passport .stamp:focus-within{transform:rotate(0deg) scale(1.06);z-index:30}
+.ly-passport .stamp .inkring{
+  display:inline-block;padding:8px 10px 6px;border:2.5px solid currentColor;border-radius:7px;
+  opacity:.88;
+}
+.ly-passport .stamp svg{width:96px;height:auto;filter:saturate(.6) contrast(1.05)}
+.ly-passport .stamp .loc{font:bold 11px var(--mono);letter-spacing:1px;margin-top:5px}
+.ly-passport .stamp .word{font:10px var(--ui);opacity:.85}
+.ly-passport .stamp.c1{color:#3d5c9e}.ly-passport .stamp.c2{color:#9e3d51}
+.ly-passport .stamp.c3{color:#3d7a52}.ly-passport .stamp.c4{color:#6b4a9e}
+.ly-passport .stamp.c5{color:#8a6a2a}.ly-passport .stamp.c6{color:#2a7a8a}
+.ly-passport .passnote{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:10px;color:#a2946f;font-style:italic}
+
+/* ================================================================
+   TAG LAYOUT 15 — #blocks · the block editor document
+   ================================================================ */
+.ly-doc{max-width:680px;margin:14px auto 0;background:#fff;border:1px solid var(--hair);border-radius:3px;padding:0 0 40px}
+.ly-doc .editorbar{
+  display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--hair);
+  padding:9px 14px;font-size:12px;color:var(--gray);
+}
+.ly-doc .editorbar .plus{
+  width:24px;height:24px;border-radius:2px;background:#1e1e1e;color:#fff;
+  font:18px/23px var(--ui);text-align:center;
+}
+.ly-doc .editorbar .crumbtxt{color:var(--lite);font-size:11px}
+.ly-doc .editorbar .save{margin-left:auto;color:var(--blue)}
+.ly-doc .doctitle{font:bold 26px/1.3 Georgia,serif;color:#1e1e1e;padding:34px 56px 6px}
+.ly-doc .blockwrap{position:relative;padding:10px 56px;border:1.5px solid transparent;border-radius:2px}
+.ly-doc .blockwrap:hover,.ly-doc .blockwrap:focus-within{border-color:#4f94d4}
+.ly-doc .btool{
+  position:absolute;top:-16px;left:56px;display:none;gap:0;
+  background:#fff;border:1.5px solid #1e1e1e;border-radius:2px;
+  font:12px/1 var(--ui);color:#1e1e1e;z-index:20;
+}
+.ly-doc .blockwrap:hover .btool,.ly-doc .blockwrap:focus-within .btool{display:flex}
+.ly-doc .btool span{padding:7px 9px;border-right:1px solid #ddd}
+.ly-doc .btool span:last-child{border-right:0}
+.ly-doc .blockcap{font:12px var(--ui);color:#757575;text-align:center;padding-top:8px}
+.ly-doc .inserter{position:relative;height:22px;text-align:center}
+.ly-doc .inserter span{
+  display:none;width:22px;height:22px;border-radius:50%;background:#1e1e1e;color:#fff;
+  font:16px/21px var(--ui);text-align:center;position:absolute;left:50%;margin-left:-11px;top:0;
+}
+.ly-doc .inserter:hover span{display:inline-block}
+.ly-doc .parablock{font:15px/1.7 Georgia,serif;color:#8a8a8a;padding:6px 56px}
+.ly-doc .caret{display:inline-block;width:1.5px;height:17px;background:#1e1e1e;vertical-align:-3px;animation:caretblink 1.05s steps(1) infinite}
+@keyframes caretblink{50%{opacity:0}}
+
+/* ================================================================
+   TAG LAYOUT 16 — #folksonomy · the cloud that tags itself
+   ================================================================ */
+.ly-folk .folkintro{max-width:640px;color:var(--gray);font-size:13px;line-height:1.8;margin-bottom:8px}
+.ly-folk .folkfloat{float:right;margin:6px 0 14px 26px;text-align:center;width:210px}
+.ly-folk .folkfloat .cap{font-size:10px;color:var(--gray);margin-top:6px}
+.ly-folk .megacloud{padding:26px 10px 12px;text-align:center}
+.ly-folk .selfnote{clear:both;font-size:11px;color:var(--lite);font-style:italic;padding-top:18px;text-align:center}
+
+/* ================================================================
+   TAG LAYOUT 17 — #squirrels · one (1) squirrel
+   ================================================================ */
+.ly-empty{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 0}
+.ly-empty .cap{font-size:12px;color:var(--gray);margin-top:16px}
+.ly-empty .fine{font-size:11px;color:var(--lite);margin-top:6px;font-style:italic}
+.ly-empty .back{margin-top:26px;font-size:12px}
+
+/* ================================================================
+   search & about
+   ================================================================ */
+.v-search .zero{padding:40px 0;color:var(--gray);font-size:13px;max-width:520px;line-height:1.8}
+.v-about{max-width:600px;font-size:13px;color:#3d3d3d;line-height:1.9}
+.v-about h1{font:600 22px var(--logo);text-transform:lowercase;color:#1a1a1a;margin-bottom:14px}
+.v-about p{margin-bottom:14px}
+.v-about .sig{color:var(--lite);font-style:italic}
+
+/* ================================================================
+   lightboxes
+   ================================================================ */
+.lb{position:fixed;inset:0;z-index:300;background:rgba(10,10,10,.88);display:none;align-items:center;justify-content:center;padding:20px}
+.lb.open{display:flex}
+.lb .lbwin{background:#fff;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.6);max-width:1040px;width:100%;overflow:hidden}
+.lb .lbbar{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--hair);font-size:12px;color:var(--ink)}
+.lb .lbbar .lbdots{display:flex;gap:5px}
+.lb .lbbar .lbdots i{width:9px;height:9px;border-radius:50%}
+.lb .lbbar .lbdots i.b{background:var(--blue)}
+.lb .lbbar .lbdots i.p{background:var(--pink)}
+.lb .lbbar .ttl{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.lb .lbbar .close{color:var(--gray);font-size:16px;padding:2px 8px}
+.lb .lbbar .close:hover{color:var(--pink)}
+.lb iframe{width:100%;height:min(72vh,640px);border:0;display:block;background:#f6f6f6}
+.lb .lbfoot{font-size:11px;color:var(--lite);padding:8px 14px;border-top:1px solid var(--hair)}
+
+/* ================================================================
+   responsive fallbacks
+   ================================================================ */
+@media (max-width:760px){
+  #chrome .bar{flex-direction:column;align-items:flex-start;gap:10px}
+  #chrome form{width:100%}
+  #chrome input[type=search]{width:auto;min-width:0;flex:1}
+  .v-photo .cols{flex-direction:column}
+  .v-photo .side{width:auto}
+  .ly-wall,.ly-cascade,.ly-table{height:auto;display:flex;flex-wrap:wrap;gap:18px;justify-content:center;padding:10px 0 30px}
+  .ly-wall .card,.ly-cascade .win,.ly-table .slidepic{position:static}
+  .ly-wall .poolplate,.ly-cascade .cascadenote{position:static;max-width:none;text-align:center}
+  .ly-sheet{height:auto;overflow:visible;background:none;padding:10px 0}
+  .ly-sheet .strip{position:static;transform:rotate(-3deg);margin:20px 0;flex-wrap:wrap;justify-content:center;gap:10px}
+  .ly-sheet .sheetlabel{position:static;margin-top:8px}
+  .ly-expanse{min-height:0;display:flex;flex-direction:column;gap:110px;align-items:center;padding:60px 0}
+  .ly-expanse .speck{position:static}
+  .ly-expanse .breath{position:static;transform:none;order:2}
+  .ly-salon{min-height:0;display:flex;flex-wrap:wrap;gap:26px;justify-content:center;padding:50px 16px 40px}
+  .ly-salon .hung{position:static}
+  .ly-salon .wires{display:none}
+  .ly-board{min-height:0;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:24px 10px}
+  .ly-board .sticky{position:static}
+  .ly-passport .book{flex-direction:column}
+  .ly-passport .page{min-height:420px}
+  .ly-clusters .cluster{min-height:400px}
+  .ly-slides .filmrow{flex-wrap:wrap}
+  .ly-map .pop{width:150px;transform:translate(-30px,calc(-100% - 42px))}
+  .ly-map .pop::after{left:30px}
+  .ly-doc .doctitle,.ly-doc .blockwrap,.ly-doc .parablock{padding-left:20px;padding-right:20px}
+  .ly-doc .btool{left:20px}
+}
+
+/* ================================================================
+   reduced motion — the archive holds still
+   ================================================================ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .pop{opacity:1;transform:rotate(var(--rot,0deg))}
+  .ly-clusters .bub,.ly-clusters .tbub{animation:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">skip to the photos</a>
+
+<!-- shared svg machinery: grain, vignette, soft sky — referenced by every drawing -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="grainF" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.6 0.6 0.6 0 0"/>
+    </filter>
+    <radialGradient id="vign" cx="50%" cy="46%" r="72%">
+      <stop offset="62%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#241a10" stop-opacity=".34"/>
+    </radialGradient>
+    <linearGradient id="warmsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3e2b8"/>
+      <stop offset="1" stop-color="#e8cf9e"/>
+    </linearGradient>
+    <linearGradient id="dusksky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f3a55"/>
+      <stop offset="1" stop-color="#4c4a63"/>
+    </linearGradient>
+    <linearGradient id="nightsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d2233"/>
+      <stop offset="1" stop-color="#33304a"/>
+    </linearGradient>
+    <linearGradient id="screenglow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dff0f4"/>
+      <stop offset="1" stop-color="#b9d8de"/>
+    </linearGradient>
+    <linearGradient id="kubblue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#69a8d8"/>
+      <stop offset="1" stop-color="#3475b5"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ======================= splash ======================= -->
+<div id="splash" class="phase-load" role="dialog" aria-modal="true" aria-label="welcome to everyone's archive">
+  <p class="corner"><a href="../">&larr; museum</a></p>
+  <div class="inner">
+    <div class="dots" aria-hidden="true"><span class="dot b"></span><span class="dot p"></span></div>
+    <div class="ready">
+      <h1>hello! this is <span class="b">everyone's</span> <span class="p">archive</span> of wordpress.</h1>
+      <p class="sub">twenty-eight snapshots<span class="mid">&middot;</span>seventeen tags<span class="mid">&middot;</span>no timeline anywhere.<br>pick a word you love and follow it sideways.</p>
+      <button class="enter" id="enterBtn" type="button">come in &rarr;</button>
+    </div>
+    <p class="loadline"><span class="ld">loading the archive<span class="ell" aria-hidden="true"><b>.</b><b>.</b><b>.</b></span></span></p>
+  </div>
+</div>
+
+<!-- ======================= site chrome ======================= -->
+<header id="chrome" inert>
+  <div class="wrap">
+    <div class="bar">
+      <p class="logotype">
+        <a href="#/"><span class="b">everyone's</span> <span class="p">archive</span><span class="dotb" aria-hidden="true"></span><span class="dotp" aria-hidden="true"></span>
+        <span class="claim">wordpress history, uploaded by all of us</span></a>
+      </p>
+      <form id="searchForm" role="search" aria-label="search the archive">
+        <label class="small" for="q">find&nbsp;</label>
+        <input type="search" id="q" name="q" placeholder="everyone's photos&hellip;" autocomplete="off">
+        <button class="go" type="submit">SEARCH</button>
+      </form>
+    </div>
+    <nav id="navrow" aria-label="archive navigation">
+      <a href="#/">home</a>
+      <a href="#/" id="tagsLink">tags</a>
+      <a href="#" id="surpriseLink">surprise me</a>
+      <a href="#/about">about</a>
+      <span class="you" title="you're already signed in. you have been since 2003.">signed in as: everyone</span>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1" inert>
+  <div id="loading" aria-hidden="true"><span class="d b"></span><span class="d p"></span> loading&hellip;</div>
+  <div id="view" aria-live="polite"></div>
+</main>
+
+<footer id="footer" inert>
+  <div class="wrap">
+    <div class="row">
+      <span>copyleft 2003&ndash;&infin; &middot; everyone, together &middot; <a href="../">&larr; museum</a></span>
+      <span class="jump">Jump to: <a href="#/tag/squirrels">squirrels?</a></span>
+    </div>
+    <p class="gpl">licensed gpl v2 &mdash; or, at your option, any later version. drawn entirely from vectors and fondness. typography: arial, of course.</p>
+  </div>
+</footer>
+
+<!-- ======================= playground lightbox ======================= -->
+<div class="lb" id="playLb" role="dialog" aria-modal="true" aria-label="live wordpress via playground" hidden>
+  <div class="lbwin">
+    <div class="lbbar">
+      <span class="lbdots" aria-hidden="true"><i class="b"></i><i class="p"></i></span>
+      <span class="ttl" id="playTtl">original size (live)</span>
+      <button class="close" id="playClose" type="button" aria-label="close the live view">&#10005;</button>
+    </div>
+    <iframe id="playFrame" title="a live WordPress booted in your browser via WordPress Playground"></iframe>
+    <p class="lbfoot">a fresh wordpress booting in your browser via playground.wordpress.net &mdash; the famous five-minute install is now closer to five seconds. nothing leaves this page.</p>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   everyone's archive of wordpress
+   a folksonomy exhibit — tags are the only map
+   ================================================================ */
+'use strict';
+/* ----------------------------------------------------------------
+   the collection — 28 snapshots, hand-drawn, multi-tagged
+   nothing here is chronological. that's the point.
+---------------------------------------------------------------- */
+const PHOTOS = [
+{
+  id:'b2-fork-night',
+  title:'the night we forked b2',
+  by:'photomatt', taken:'January 24, 2003', uploaded:'May 27, 2003',
+  w:480, h:360, era:'gold',
+  tags:['freedom','beginnings'],
+  camera:'taken with a borrowed desk lamp',
+  views:48211, faves:812,
+  desc:`<p>ernie the desk lamp, cup of coffee number three, and a b2 install that hadn't seen an update in months. its developer had disappeared. the software was going to die the way software dies &mdash; quietly, taking everyone's words with it.</p><p>except it was gpl. so it couldn't really die. that was the whole trick.</p>`,
+  notes:[
+    {x:16,y:18,w:34,h:36,t:'the b2 codebase, may it rest. every line of it came along for the ride.'},
+    {x:66,y:56,w:14,h:18,t:'cup #3. decaf was not consulted.'},
+    {x:76,y:12,w:16,h:20,t:'the moon, unaware it was watching a fork.'}
+  ],
+  comments:[
+    {by:'mikelittle', year:2003, txt:`if you're serious about forking b2, i would be interested in contributing. :)`},
+    {by:'photomatt', year:2003, txt:`it's serious. christine even found us a name &mdash; <b>wordpress</b>. it sounds like furniture that publishes.`},
+    {by:'lorelle', year:2005, txt:`imagine scrolling past this photo in 2003 and not faving it. couldn't be me.`}
+  ]
+},
+{
+  id:'five-minute-install',
+  title:'the famous five-minute install',
+  by:'mikelittle', taken:'May 27, 2003', uploaded:'May 27, 2003',
+  w:480, h:360, era:'gold',
+  tags:['beginnings','freedom','admin'],
+  camera:'taken with a kitchen timer',
+  views:102446, faves:2103, boot:'6.8',
+  desc:`<p>we timed it with the egg timer from the kitchen. upload the files, make a database, answer four questions, and you have a website that belongs to you. four minutes fifty-eight seconds, and the last thirty were spent choosing a blog title.</p><p>click <b>original (live)</b> in the sizes row to boot the real thing, right here, right now. bring your own egg timer.</p>`,
+  notes:[
+    {x:8,y:24,w:26,h:34,t:'the egg timer. it never made it back to the kitchen.'},
+    {x:44,y:20,w:42,h:44,t:'step 2 of 5. the hardest question was "what is your blog called?"'}
+  ],
+  comments:[
+    {by:'podz', year:2004, txt:`did the install for my mum yesterday. four minutes twelve. she has a website now and i have questions about my childhood bedtimes.`},
+    {by:'drivelicious', year:2005, txt:`movable type wants me to rebuild. wordpress wants me to <i>write</i>. easiest migration of my life.`},
+    {by:'corememories', year:2024, txt:`kids, we used to ftp. by hand. uphill. both directions.`}
+  ]
+},
+{
+  id:'hello-dolly',
+  title:'hello, dolly (the first plugin)',
+  by:'photomatt', taken:'May 2004', uploaded:'May 22, 2004',
+  w:480, h:360, era:'gold',
+  tags:['plugins','jazz','beginnings'],
+  camera:'taken with a 45rpm single',
+  views:31007, faves:640,
+  desc:`<p>a plugin that does exactly one thing: puts a random line of louis armstrong's "hello, dolly!" in the corner of your admin screen. it ships with wordpress to this day, not because anyone needs it, but to show that eighty lines of php can be a love letter.</p>`,
+  notes:[
+    {x:57,y:10,w:36,h:16,t:'"it’s so nice to have you back where you belong" &mdash; the admin bar, probably to you.'}
+  ],
+  comments:[
+    {by:'kubrick_stan', year:2005, txt:`deactivated it once. felt like unplugging a jukebox mid-song. reactivated.`},
+    {by:'polyglot_ana', year:2016, txt:`translating song lyrics into 68 locales is exactly the kind of problem this project generates.`}
+  ]
+},
+{
+  id:'miles-permalinks',
+  title:'pretty permalinks, corner of 2004 & hello-world',
+  by:'photomatt', taken:'January 3, 2004', uploaded:'January 3, 2004',
+  w:480, h:360, era:'gold',
+  tags:['jazz','beginnings'],
+  camera:'taken in the january cold',
+  views:27554, faves:511,
+  desc:`<p>version 1.0 &mdash; "miles", after miles davis, the first of the jazz codenames. it gave every post a street address a human could read aloud: <span style="font-family:var(--mono)">/2004/01/03/hello-world/</span>. before this, your thoughts lived at ?p=123. after this, they lived somewhere.</p>`,
+  comments:[
+    {by:'drivelicious', year:2004, txt:`read my own url out loud over the phone today. no question marks. felt like a landowner.`},
+    {by:'binarybonsai', year:2004, txt:`the codename thing is going to get out of hand in the best way. calling it now.`}
+  ]
+},
+{
+  id:'mingus-hooks',
+  title:'hooks &amp; filters, fresh off the pier',
+  by:'mikelittle', taken:'May 22, 2004', uploaded:'May 23, 2004',
+  w:480, h:360, era:'gold',
+  tags:['plugins','jazz','api'],
+  camera:'taken with patience and bait',
+  views:19873, faves:402,
+  desc:`<p>1.2 "mingus" and the plugin api: cast a hook into core, and core promises to tug your line at exactly the right moment. no hacking the source, no patches to reapply on every upgrade. this is the day wordpress stopped being a program and became a place to build.</p>`,
+  notes:[
+    {x:52,y:56,w:30,h:22,t:'add_action() &mdash; the catch of the day, every day, for the next two decades.'}
+  ],
+  comments:[
+    {by:'podz', year:2004, txt:`wrote my first plugin tonight. 14 lines. i am now a fisherman.`},
+    {by:'nikolay.b', year:2015, txt:`60,000 plugins later, this photo should hang in a museum. oh wait.`}
+  ]
+},
+{
+  id:'kubrick-sighting',
+  title:'first kubrick in the wild',
+  by:'kubrick_stan', taken:'February 17, 2005', uploaded:'February 18, 2005',
+  w:480, h:360, era:'gold',
+  tags:['themes','jazz','design'],
+  camera:'taken between two lattes',
+  views:88940, faves:1544,
+  desc:`<p>spotted at the caf&eacute; on the corner: that blue gradient header, the rounded white column, the sidebar. 1.5 "strayhorn" shipped themes, and kubrick &mdash; michael heilemann's bedroom project &mdash; became the default. for years, half the internet you loved looked exactly like this.</p>`,
+  notes:[
+    {x:26,y:16,w:48,h:16,t:'that blue gradient. you know the one. you can hum it.'},
+    {x:60,y:36,w:15,h:34,t:'the sidebar: blogroll, archives, meta. a whole society.'}
+  ],
+  comments:[
+    {by:'binarybonsai', year:2005, txt:`it is deeply weird to see your bedroom project on a stranger's screen in a caf&eacute;. weird and wonderful. carry on.`},
+    {by:'lorelle', year:2005, txt:`900,000 downloads this year. the header gradient should get its own passport.`},
+    {by:'corememories', year:2023, txt:`i can smell this photo. it smells like 2005 and possibility and slightly burnt espresso.`}
+  ]
+},
+{
+  id:'duke-typewriter',
+  title:'duke gets a typewriter',
+  by:'drivelicious', taken:'December 31, 2005', uploaded:'January 1, 2006',
+  w:480, h:360, era:'digital',
+  tags:['editor','jazz'],
+  camera:'taken at 23:58, glass in hand',
+  views:22730, faves:387,
+  desc:`<p>new year's eve, 2005. version 2.0 "duke" ships with a wysiwyg editor &mdash; you type, and the words look like words instead of markup. a present from matt with two minutes left on the year. the champagne was for the deploy, mostly.</p>`,
+  comments:[
+    {by:'podz', year:2006, txt:`my aunt bolded something today. by herself. on purpose. this is the future.`},
+    {by:'happycog_fan', year:2006, txt:`the button says B. the button has always said B. the button will always say B.`}
+  ]
+},
+{
+  id:'akismet-flood',
+  title:'the day the spam came',
+  by:'podz', taken:'October 2005', uploaded:'October 25, 2005',
+  w:480, h:360, era:'digital',
+  tags:['spam','plugins','community'],
+  camera:'taken from behind sandbags',
+  views:15602, faves:298,
+  desc:`<p>comment spam arrived like weather. thousands a day, pills and casinos and c-h-e-a-p everything, drowning real people saying real things. then akismet: a small green shield that read everything first and quietly took out the trash. the comment box stayed open. that mattered more than anyone said out loud.</p>`,
+  comments:[
+    {by:'lorelle', year:2005, txt:`58,000 caught on my blog alone. i owe this shield a holiday card.`},
+    {by:'drivelicious', year:2006, txt:`my favorite genre of spam remains "nice post!! also, casino." truly the sonnet of its age.`}
+  ]
+},
+{
+  id:'wordcamp-2006',
+  title:'wordcamp san francisco &mdash; the first group photo',
+  by:'community_pool', taken:'August 5, 2006', uploaded:'August 6, 2006',
+  w:480, h:320, era:'digital',
+  tags:['community','wordcamp'],
+  camera:'taken by a volunteer standing on a chair',
+  views:64118, faves:1290,
+  city:'san francisco',
+  desc:`<p>the first wordcamp. organized in about three weeks, tickets free, schedule half-improvised, and somehow five hundred people showed up to talk about blogging software on a saturday. this is the whole community. all of it. it fit in one photo. it never would again.</p>`,
+  notes:[
+    {x:44,y:52,w:12,h:26,t:'matt (probably). it was hard to tell. everyone had that haircut.'},
+    {x:6,y:50,w:14,h:28,t:'came for the software, stayed for the people. the whole story, one person early.'}
+  ],
+  comments:[
+    {by:'podz', year:2006, txt:`flew 5,000 miles to meet people i talk to every day. would do it again tomorrow.`},
+    {by:'polyglot_ana', year:2016, txt:`ten years later there were 116 wordcamps in one year. this photo is the seed crystal.`}
+  ]
+},
+{
+  id:'plugin-directory-opens',
+  title:'the plugin directory opens its doors',
+  by:'drivelicious', taken:'March 2007', uploaded:'March 6, 2007',
+  w:480, h:360, era:'digital',
+  tags:['plugins','community','freedom'],
+  camera:'taken on opening day, before the queue',
+  views:29981, faves:566,
+  desc:`<p>before this, plugins lived on personal sites, forum threads, zip files attached to blog posts. then wordpress.org opened a directory: every plugin free, every plugin gpl, forever. a corner shop with infinite shelves where everything costs nothing and the owners are everyone.</p>`,
+  notes:[
+    {x:30,y:30,w:40,h:18,t:'the sign says free, forever. it has never once been wrong.'}
+  ],
+  comments:[
+    {by:'nikolay.b', year:2015, txt:`ran the numbers today: over a billion downloads. from a shop with no till.`},
+    {by:'mikelittle', year:2007, txt:`somewhere in here is a 14-line fishing rod i recognize.`}
+  ]
+},
+{
+  id:'widgets-shelf',
+  title:'widgets, arranged lovingly',
+  by:'happycog_fan', taken:'May 16, 2007', uploaded:'May 17, 2007',
+  w:480, h:360, era:'digital',
+  tags:['themes','admin'],
+  camera:'taken with the shelf freshly dusted',
+  views:12873, faves:230,
+  desc:`<p>2.2 "getz" brought widgets: drag a calendar onto your sidebar. drag a search box. drag the tag cloud jar &mdash; careful, it's full. arranging your sidebar became a small domestic pleasure, like organizing a spice rack that the whole internet can see.</p>`,
+  comments:[
+    {by:'kubrick_stan', year:2007, txt:`rearranged my sidebar four times tonight. no posts written. no regrets either.`}
+  ]
+},
+{
+  id:'native-tags',
+  title:'2.3: we can finally tag things',
+  by:'lorelle', taken:'September 24, 2007', uploaded:'September 24, 2007',
+  w:480, h:360, era:'digital',
+  tags:['folksonomy','admin'],
+  camera:'taken with a label maker nearby',
+  views:17705, faves:341,
+  desc:`<p>native tagging lands in 2.3 "dexter". not categories handed down from above &mdash; little paper labels anyone can tie to anything. a folksonomy: messy, human, plural, occasionally misspelled, always honest. the archive you are standing in is built out of exactly this idea.</p>`,
+  comments:[
+    {by:'lorelle', year:2007, txt:`i have written eleven thousand words about taxonomy this month and i am not sorry.`},
+    {by:'corememories', year:2026, txt:`this photo is tagged #folksonomy, which means it describes itself. we checked. it holds.`}
+  ]
+},
+{
+  id:'happycog-whiteboard',
+  title:'the 2.5 redesign whiteboard',
+  by:'happycog_fan', taken:'Autumn 2007', uploaded:'March 29, 2008',
+  w:480, h:360, era:'digital',
+  tags:['design','admin'],
+  camera:'taken before anyone erased anything',
+  views:14229, faves:274,
+  desc:`<p>happy cog came in to redesign the admin, and for a while the future of wordpress lived on this whiteboard: boxes, arrows, a sticky note that just says "less". 2.5 "brecker" was the first time wordpress looked <i>designed</i> rather than merely assembled.</p>`,
+  notes:[
+    {x:64,y:24,w:16,h:16,t:'the sticky note says "less". it took several more years and it was right the whole time.'}
+  ],
+  comments:[
+    {by:'binarybonsai', year:2008, txt:`whiteboards like this are where software goes to dream. good dream, this one.`}
+  ]
+},
+{
+  id:'coltrane-nav',
+  title:`coltrane's left hand`,
+  by:'happycog_fan', taken:'December 10, 2008', uploaded:'December 11, 2008',
+  w:480, h:360, era:'digital',
+  tags:['admin','jazz','design'],
+  camera:'taken at arm’s length from the future',
+  views:20441, faves:399,
+  desc:`<p>2.7 "coltrane" moved the admin navigation to the left-hand side, and there it stayed for longer than some of its users have been alive. dashboard, posts, media, comments &mdash; a love supreme, a love supreme, a love supreme, a love supreme.</p>`,
+  comments:[
+    {by:'podz', year:2008, txt:`they let us vote on the icons. democracy, but for pixels.`},
+    {by:'corememories', year:2025, txt:`interfaces come and go but that left hand column is load-bearing for my muscle memory.`}
+  ]
+},
+{
+  id:'iphone-app-2008',
+  title:'wordpress in your pocket (2008)',
+  by:'drivelicious', taken:'July 2008', uploaded:'July 22, 2008',
+  w:320, h:440, era:'digital',
+  tags:['mobile','community'],
+  camera:'taken with the other hand',
+  views:18320, faves:310,
+  desc:`<p>the app store was three weeks old when wordpress showed up in it &mdash; one of the first hundred apps, free and open source like everything else in the family. suddenly the nearest publish button was in your jacket. blogging from the queue at the post office: achieved.</p>`,
+  comments:[
+    {by:'polyglot_ana', year:2008, txt:`typed a whole post with two thumbs. my thumbs have opinions now.`}
+  ]
+},
+{
+  id:'mu-merge',
+  title:'the day mu came home',
+  by:'corememories', taken:'June 17, 2010', uploaded:'June 17, 2010',
+  w:480, h:360, era:'neutral',
+  tags:['community','freedom'],
+  camera:'taken from the bridge',
+  views:16118, faves:288,
+  desc:`<p>for years wordpress mu &mdash; the multi-site fork that powered wordpress.com &mdash; flowed alongside core like a second river. 3.0 "thelonious" merged them: one codebase, every site. two boats, same water, home by evening.</p>`,
+  comments:[
+    {by:'nikolay.b', year:2010, txt:`one less fork in the world and somehow more freedom. rivers are good at this.`}
+  ]
+},
+{
+  id:'default-themes-hall',
+  title:'one default theme per year, hung in order',
+  by:'corememories', taken:'2010–2019', uploaded:'December 12, 2019',
+  w:480, h:320, era:'neutral',
+  tags:['themes','design'],
+  camera:'taken in the long gallery',
+  views:25644, faves:530,
+  desc:`<p>starting with twenty ten, wordpress hung a new default theme every year: header images, then elegant type, then that gloriously loud twenty thirteen, then minimalism, then video headers. walk the row and you can watch the whole web change its clothes.</p>`,
+  notes:[
+    {x:40,y:34,w:14,h:30,t:'twenty thirteen. the loudest frame in the gallery and proud of it.'}
+  ],
+  comments:[
+    {by:'kubrick_stan', year:2019, txt:`respectfully, the blue gradient one is missing from this wall and i will be writing letters.`}
+  ]
+},
+{
+  id:'bus-blogging',
+  title:'publishing from the 38 geary',
+  by:'polyglot_ana', taken:'November 2013', uploaded:'November 9, 2013',
+  w:480, h:320, era:'neutral',
+  tags:['mobile'],
+  camera:'taken between two stops',
+  views:9451, faves:187,
+  desc:`<p>rain on the window, city going by, a draft that had been sitting for a week. published it somewhere between stops. the toast said <i>post published</i> and the bus said nothing at all. some of the best posts on the internet were shipped exactly like this.</p>`,
+  comments:[
+    {by:'drivelicious', year:2013, txt:`the 38 geary has seen more publishing than most cms conferences.`}
+  ]
+},
+{
+  id:'rest-api-wall',
+  title:'the rest api sticky-note wall',
+  by:'nikolay.b', taken:'October 2015', uploaded:'December 8, 2015',
+  w:480, h:360, era:'neutral',
+  tags:['api','community'],
+  camera:'taken before the stickies fell',
+  views:21873, faves:404,
+  desc:`<p>a contributor day wall, mid-argument: every endpoint on its own sticky note, arrows everywhere, one note that just says "auth??". 4.4 "clifford" merged the infrastructure and wordpress learned to speak json &mdash; apps, clients, and half the modern web now talk to it through what this wall became.</p>`,
+  notes:[
+    {x:60,y:26,w:16,h:16,t:'"auth??" &mdash; a sticky note that aged into a saga.'}
+  ],
+  comments:[
+    {by:'nikolay.b', year:2015, txt:`we argued about routes for six hours and it was the best day of the year.`},
+    {by:'corememories', year:2020, txt:`half the internet's headless whatever traces back to this wall of paper squares.`}
+  ]
+},
+{
+  id:'translation-sprint',
+  title:'polyglots sprint, table 4',
+  by:'polyglot_ana', taken:'June 2016', uploaded:'June 26, 2016',
+  w:480, h:360, era:'neutral',
+  tags:['translation','community','wordcamp'],
+  camera:'taken in six languages at once',
+  views:13007, faves:262,
+  city:'vienna',
+  desc:`<p>wordcamp europe, the polyglots table. six laptops, five time zones of jet lag, and the quiet clatter of wordpress being carried into another dozen languages. "hello world" is easy. "howdy" took three of us twenty minutes and we're still not sure.</p>`,
+  comments:[
+    {by:'polyglot_ana', year:2016, txt:`we shipped sr_RS to 100% at 23:40 and the whole table did a very quiet standing ovation.`},
+    {by:'podz', year:2016, txt:`somewhere out there someone's first-ever website greets them in their own language because of table 4.`}
+  ]
+},
+{
+  id:'gutenberg-napkin',
+  title:'the first block sketch',
+  by:'corememories', taken:'Early 2017', uploaded:'June 8, 2017',
+  w:400, h:400, era:'cool',
+  tags:['blocks','editor','design'],
+  camera:'taken before the coffee ring dried',
+  views:35112, faves:701,
+  desc:`<p>a napkin, a pen, and a heresy: what if <i>everything</i> is a block? paragraphs, images, quotes &mdash; same stuff, one system, moveable. everyone who saw the napkin argued with it. the napkin won. they usually do.</p>`,
+  notes:[
+    {x:22,y:26,w:56,h:14,t:'the paragraph block. patient zero.'},
+    {x:22,y:46,w:26,h:24,t:'img. the drawing of the image is itself an image of a drawing. do not think about this too long.'}
+  ],
+  comments:[
+    {by:'happycog_fan', year:2018, txt:`every big redesign starts as a napkin that someone refused to throw away.`},
+    {by:'kubrick_stan', year:2018, txt:`i argued with this napkin for a full year. napkin: 1, me: 0.`}
+  ]
+},
+{
+  id:'bebo-ship-night',
+  title:'the night bebo shipped',
+  by:'nikolay.b', taken:'December 6, 2018', uploaded:'December 7, 2018',
+  w:480, h:320, era:'cool',
+  tags:['blocks','editor','jazz','community'],
+  camera:'taken by the light of the deploy',
+  views:41230, faves:823,
+  desc:`<p>5.0 "bebo". the block editor &mdash; gutenberg &mdash; goes to everyone, ready or not, and mostly both. the office at midnight: pizza box, forty tabs of the make blog, one enormous publish button. the biggest change to writing in wordpress since the typewriter arrived in 2005.</p>`,
+  comments:[
+    {by:'kubrick_stan', year:2018, txt:`i have Opinions and also, quietly, at 2am, i made three columns with zero shortcodes and gasped.`},
+    {by:'corememories', year:2021, txt:`releases are jazz: you rehearse forever and then the night itself is improvised.`}
+  ]
+},
+{
+  id:'simone-squad',
+  title:'the simone release squad (5.6)',
+  by:'polyglot_ana', taken:'December 8, 2020', uploaded:'December 8, 2020',
+  w:480, h:320, era:'cool',
+  tags:['community'],
+  camera:'taken by whoever pressed record',
+  views:19882, faves:477,
+  desc:`<p>december 2020, so of course it's a video-call grid: the first major release led by an all-women-and-nonbinary squad, named for nina simone, shipped from nine kitchens and home offices across the planet. someone raised a glass. everyone raised a glass. the deploy raised itself.</p>`,
+  comments:[
+    {by:'polyglot_ana', year:2020, txt:`squad call at 6am my time. wouldn't have slept anyway. we were busy making history.`},
+    {by:'lorelle', year:2020, txt:`nina would have approved of the tempo. right on time, entirely on their own terms.`}
+  ]
+},
+{
+  id:'sotw',
+  title:'state of the word, from the cheap seats',
+  by:'corememories', taken:'December 2019', uploaded:'December 14, 2019',
+  w:480, h:320, era:'cool',
+  tags:['community','wordcamp'],
+  camera:'taken over several heads',
+  views:23901, faves:441,
+  city:'new york',
+  desc:`<p>once a year matt stands on a stage and tells the community where the ship is pointed. from the back rows it's mostly silhouettes and one glowing slide, which is honestly the correct way to see it: a lot of people, facing the same direction, in the dark, together.</p>`,
+  comments:[
+    {by:'nikolay.b', year:2019, txt:`the q&amp;a is the real state of the word and everyone knows it.`},
+    {by:'podz', year:2019, txt:`fifteen years since my first meetup and the room still hums the same way.`}
+  ]
+},
+{
+  id:'fse-house',
+  title:'full site editing moves the walls',
+  by:'happycog_fan', taken:'January 25, 2022', uploaded:'January 25, 2022',
+  w:480, h:360, era:'cool',
+  tags:['blocks','themes','editor'],
+  camera:'taken during load-bearing changes',
+  views:17334, faves:329,
+  desc:`<p>5.9 "josephine": the blocks got out of the post and took over the whole house. headers, footers, templates &mdash; walls you could suddenly pick up and move while living inside. twenty twenty-two, the first block theme, is the show home. hard hats optional but recommended.</p>`,
+  comments:[
+    {by:'kubrick_stan', year:2022, txt:`i moved my site footer with a mouse today. in 2005 this would have been sorcery and i would have been burned as a witch.`}
+  ]
+},
+{
+  id:'iphone-admin-2019',
+  title:'wp-admin rides shotgun',
+  by:'drivelicious', taken:'May 2019', uploaded:'May 7, 2019',
+  w:320, h:440, era:'cool',
+  tags:['mobile','admin'],
+  camera:'taken one-handed, plant in shot',
+  views:11209, faves:198,
+  desc:`<p>site health said "good", the update was one thumb-tap, and the whole left-hand column from 2008 was right there, folded into a phone. somewhere between 2003 and this photo, "check on the website" became something you do while watering the plants.</p>`,
+  comments:[
+    {by:'corememories', year:2019, txt:`the admin menu from coltrane, alive and well in your palm. software is a ship of theseus with release notes.`}
+  ]
+},
+{
+  id:'four-freedoms-mural',
+  title:'the four freedoms, painted where we’d see them',
+  by:'community_pool', taken:'Repainted continuously since 2003', uploaded:'April 27, 2010',
+  w:960, h:420, era:'neutral',
+  tags:['freedom','design','community'],
+  camera:'taken with the whole wall in frame',
+  views:57120, faves:1402,
+  desc:`<p>somebody painted the four freedoms of the gpl on the office wall, panel by panel: run, study, change, share. every fork, every plugin, every translated string in this archive is downstream of these four panels. drag the notes around &mdash; annotation is also a freedom.</p>`,
+  comments:[
+    {by:'mikelittle', year:2010, txt:`the fork in 2003 was just panel three, taken personally.`},
+    {by:'lorelle', year:2010, txt:`freedom zero gets the least wall space and does the most work. typical zero.`}
+  ]
+},
+{
+  id:'wc-squirrel',
+  title:'attendee, uncredentialed',
+  by:'community_pool', taken:'September 2014', uploaded:'September 14, 2014',
+  w:480, h:360, era:'neutral',
+  tags:['squirrels','wordcamp','community'],
+  camera:'taken very, very slowly',
+  views:77012, faves:3110,
+  city:'portland',
+  desc:`<p>wordcamp portland, morning break. she took a bagel, sat through half a talk on custom post types, and left before the q&amp;a. honestly? correct conference strategy. the lanyard was the volunteers' idea. she has not returned it.</p>`,
+  comments:[
+    {by:'podz', year:2014, txt:`the only attendee to achieve 100% snack efficiency.`},
+    {by:'drivelicious', year:2014, txt:`her talk feedback form just said "chrk" which we are treating as constructive.`},
+    {by:'corememories', year:2022, txt:`still the most-faved photo in the archive. the people have spoken and the people say squirrel.`}
+  ]
+}
+];
+
+/* ----------------------------------------------------------------
+   the folksonomy — 17 tags, each with its own room
+---------------------------------------------------------------- */
+const TAGS = {
+  community:  {blurb:'the group pool. everyone is in it, which is the point of a group pool.'},
+  editor:     {blurb:'how the writing box became a place to live. best viewed in the dark.'},
+  jazz:       {blurb:'every release named for a musician. the contact sheet from the session.'},
+  freedom:    {blurb:'one wall, four panels, all of it. hover the notes; drag them if you like.'},
+  plugins:    {blurb:'clustered, the way flickr used to cluster things. hooks attract hooks.'},
+  mobile:     {blurb:'very small pictures, very far apart. the phones were small. the world was not.'},
+  themes:     {blurb:'the salon wall. new clothes for the same warm house, hung on wires.'},
+  wordcamp:   {blurb:'pins in a map. wherever three bloggers gather, there shall be lanyards.'},
+  design:     {blurb:'slides on the light table. bring a loupe, mind the coffee ring.'},
+  beginnings: {blurb:'the photostream, the way streams used to look: one thing after another.'},
+  api:        {blurb:'a wall of sticky notes that grew up to be infrastructure.'},
+  spam:       {blurb:'one photo, buried. akismet can dig it out. akismet always digs it out.'},
+  admin:      {blurb:'six eras of wp-admin, cascading like windows used to.'},
+  translation:{blurb:'one afternoon, stamped into a passport, locale by locale.'},
+  blocks:     {blurb:'photos of blocks, displayed as blocks. the toolbar appears when you hover. of course it does.'},
+  folksonomy: {blurb:'the tag about tags. this page is tagged with itself. we checked; it holds.'},
+  squirrels:  {blurb:'exactly one.'}
+};
+
+/* extra weight so the cloud reads like a real archive's cloud */
+const TAG_BOOST = {community:6, plugins:4, themes:4, jazz:3, editor:3, freedom:3, wordcamp:2, design:2, blocks:2, admin:2, beginnings:1, api:1, mobile:1, translation:1, folksonomy:1, spam:0, squirrels:0};
+
+/* map pins for #wordcamp — positions are % of the map svg */
+const CAMP_PINS = [
+  {id:'wordcamp-2006',      x:13.5, y:38, label:'san francisco, 2006'},
+  {id:'wc-squirrel',        x:12.2, y:31, label:'portland, 2014'},
+  {id:'sotw',               x:26.5, y:35, label:'new york, every december'},
+  {id:'translation-sprint', x:51.5, y:31, label:'vienna, 2016'}
+];
+
+/* locale stamps for #translation */
+const LOCALES = [
+  {loc:'pl_PL', word:'przetłumaczono', page:'l', x:6,  y:16, r:-7,  c:'c1'},
+  {loc:'ja',    word:'翻訳済み', page:'l', x:52, y:12, r:5,  c:'c2'},
+  {loc:'es_ES', word:'traducido',   page:'l', x:14, y:52, r:4,  c:'c3'},
+  {loc:'de_DE', word:'übersetzt', page:'l', x:56, y:56, r:-5, c:'c4'},
+  {loc:'ar',    word:'مُترجَم', page:'r', x:10, y:14, r:6, c:'c5'},
+  {loc:'pt_BR', word:'traduzido',   page:'r', x:54, y:18, r:-6, c:'c6'},
+  {loc:'hi_IN', word:'अनुवादित', page:'r', x:16, y:54, r:-4, c:'c2'},
+  {loc:'sr_RS', word:'преведено — 23:40', page:'r', x:58, y:52, r:7, c:'c1'}
+];
+
+/* editor slideshow — four acts, before & after */
+const EDITOR_ACTS = [
+  {id:'duke-typewriter', act:'act i · 2005',
+   before:'you typed html into a bare box and hoped.',
+   after:'duke gave the words a face. bold looked bold.'},
+  {id:'gutenberg-napkin', act:'act ii · 2017',
+   before:'the page was one long field of text.',
+   after:'a napkin asked: what if everything is a block?'},
+  {id:'bebo-ship-night', act:'act iii · 2018',
+   before:'blocks were a plugin, an argument, a maybe.',
+   after:'bebo shipped them to every wordpress on earth.'},
+  {id:'fse-house', act:'act iv · 2022',
+   before:'the editor stopped at the edge of the post.',
+   after:'josephine handed it the keys to the whole house.'}
+];
+
+/* spam slips for the #spam burial */
+const SPAM_LINES = [
+  '<b>C-H-E-A-P</b> meds!! no prescription no problem no really',
+  'nice post!! very informative!! also, casino',
+  '[url=totally-real-watches.example]GENUINE replica[/url]',
+  'i made $4,000/week working from my kayak. ask me how',
+  'FIRST!!!1 (also: pills)',
+  'dear webmaster, we noticed your excellent site about &mdash;ERROR: NICHE NOT FOUND&mdash;',
+  'hot singles in your RSS feed',
+  'your blog is nice. my blog is about concrete. link exchange?',
+  'w0w gr8 content!! click 4 prizes',
+  'this comment is definitely from a human person. regards, human person',
+  'buy followers, buy likes, buy a feeling of accomplishment',
+  'URGENT: your blog has won the lottery of blogs'
+];
+
+/* fresh-from-the-pool greetings, rotated on each visit */
+const GREETINGS = ['howdy!','hello!','hola!','cześć!','bonjour!','ciao!','kaixo!','olá!','servus!','ahoj!'];
+
+/* usernames get stable little avatar colors */
+const AVATAR_COLORS = ['#0063dc','#ff0084','#4e8f83','#c96f4a','#6b4a9e','#d9a441','#2f4858','#9e3d51','#3d7a52','#8a6a2a'];
+/* ================================================================
+   THE CRAFT — every photo is drawn by hand in one warm gouache
+   style: flat shapes, soft offset shadows, round-headed people,
+   film grain and a vignette over everything. era grading is CSS.
+   ================================================================ */
+const P = {
+  paper:'#f2e9d8', cream:'#faf5ea', warmwhite:'#fbf8f1',
+  ink:'#3a3129', ink2:'#57493c',
+  terra:'#c96f4a', rust:'#a04f33', gold:'#d9a441', sun:'#e8c56b',
+  teal:'#4e8f83', deepteal:'#33655c', navy:'#2f4858', sky:'#a9c7c3',
+  rose:'#d98994', olive:'#8a8f5c', brown:'#7d5a44', woodlight:'#a9805c',
+  slate:'#5b6770', night:'#232838', charcoal:'#2c2c34',
+  skin1:'#e8b48c', skin2:'#c98d64', skin3:'#8d5a3b', skin4:'#f0c9a4'
+};
+
+/* deterministic tiny prng — layouts must not reshuffle between visits */
+function seedFrom(str){
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return function(){
+    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    return ((h >>> 0) % 10000) / 10000;
+  };
+}
+
+function grain(w, h){
+  return `<rect width="${w}" height="${h}" filter="url(#grainF)" opacity=".07"/>` +
+         `<rect width="${w}" height="${h}" fill="url(#vign)"/>`;
+}
+
+/* a small round-headed person. yFeet = where they stand. */
+function person(x, yFeet, s, shirt, skin, extra){
+  skin = skin || P.skin1;
+  const head = `<circle cx="${x}" cy="${yFeet - 34*s}" r="${8*s}" fill="${skin}"/>`;
+  const body = `<rect x="${x - 10*s}" y="${yFeet - 27*s}" width="${20*s}" height="${27*s}" rx="${9*s}" fill="${shirt}"/>`;
+  return `<g>${body}${head}${extra || ''}</g>`;
+}
+
+/* soft ground shadow */
+function shadow(cx, cy, rx, ry){
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry||rx*0.22}" fill="#241a10" opacity=".13"/>`;
+}
+
+/* a steaming mug */
+function mug(x, y, s, color){
+  return `<g>${shadow(x, y + 12*s, 12*s)}
+    <rect x="${x-9*s}" y="${y-8*s}" width="${18*s}" height="${20*s}" rx="${4*s}" fill="${color||P.rose}"/>
+    <path d="M ${x+9*s} ${y-3*s} q ${10*s} 0 ${10*s} ${7*s} q 0 ${7*s} -${10*s} ${7*s}" fill="none" stroke="${color||P.rose}" stroke-width="${3.4*s}"/>
+    <path d="M ${x-3*s} ${y-13*s} q ${3*s} -${4*s} 0 -${8*s} M ${x+3*s} ${y-13*s} q ${3*s} -${4*s} 0 -${8*s}" fill="none" stroke="#cbb89a" stroke-width="${1.6*s}" stroke-linecap="round" opacity=".8"/>
+  </g>`;
+}
+
+const ART = {};
+
+/* ---------------------------------------------------------------
+   1 · the night we forked b2 — lamp, CRT, coffee, moon
+--------------------------------------------------------------- */
+ART['b2-fork-night'] = () => `
+  <rect width="480" height="360" fill="url(#nightsky)"/>
+  <circle cx="392" cy="62" r="26" fill="${P.cream}" opacity=".92"/>
+  <circle cx="384" cy="56" r="7" fill="#e4d9bd" opacity=".5"/>
+  <circle cx="399" cy="68" r="5" fill="#e4d9bd" opacity=".45"/>
+  <rect x="330" y="18" width="122" height="128" rx="6" fill="none" stroke="#4a465e" stroke-width="7"/>
+  <line x1="391" y1="22" x2="391" y2="142" stroke="#4a465e" stroke-width="5"/>
+  <line x1="334" y1="82" x2="448" y2="82" stroke="#4a465e" stroke-width="5"/>
+  <ellipse cx="196" cy="196" rx="180" ry="120" fill="${P.sun}" opacity=".1"/>
+  <rect x="0" y="264" width="480" height="96" fill="${P.brown}"/>
+  <rect x="0" y="264" width="480" height="10" fill="${P.woodlight}" opacity=".55"/>
+  ${shadow(180, 268, 92, 12)}
+  <rect x="112" y="120" width="138" height="112" rx="10" fill="#d8cbb2"/>
+  <rect x="126" y="132" width="110" height="82" rx="4" fill="#17211d"/>
+  <rect x="132" y="140" width="64" height="5" rx="2.5" fill="#7dc98f" opacity=".9"/>
+  <rect x="132" y="151" width="86" height="5" rx="2.5" fill="#7dc98f" opacity=".65"/>
+  <rect x="140" y="162" width="52" height="5" rx="2.5" fill="${P.sun}" opacity=".85"/>
+  <rect x="140" y="173" width="72" height="5" rx="2.5" fill="#7dc98f" opacity=".6"/>
+  <rect x="132" y="184" width="40" height="5" rx="2.5" fill="#7dc98f" opacity=".8"/>
+  <rect x="132" y="195" width="78" height="5" rx="2.5" fill="${P.rose}" opacity=".75"/>
+  <rect x="148" y="232" width="66" height="14" rx="4" fill="#b8ab90"/>
+  <rect x="126" y="246" width="110" height="18" rx="6" fill="#c4b79c"/>
+  <ellipse cx="181" cy="200" rx="86" ry="60" fill="${P.sun}" opacity=".08"/>
+  <g>
+    ${shadow(62, 268, 30, 8)}
+    <rect x="54" y="196" width="14" height="70" rx="6" fill="${P.terra}"/>
+    <path d="M 61 200 Q 60 150 108 132" fill="none" stroke="${P.terra}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 100 122 a 26 26 0 0 1 30 22 l -44 12 z" fill="${P.rust}"/>
+    <path d="M 108 146 L 210 240 L 96 240 Z" fill="${P.sun}" opacity=".16"/>
+    <circle cx="112" cy="140" r="7" fill="${P.sun}" opacity=".95"/>
+  </g>
+  ${mug(300, 240, 1.2, P.rose)}
+  <rect x="336" y="238" width="76" height="26" rx="3" fill="#cdbfa2" transform="rotate(-4 374 251)"/>
+  <rect x="344" y="245" width="52" height="3.4" rx="1.7" fill="${P.ink2}" opacity=".5" transform="rotate(-4 374 251)"/>
+  <rect x="344" y="252" width="38" height="3.4" rx="1.7" fill="${P.ink2}" opacity=".4" transform="rotate(-4 374 251)"/>
+  <rect x="255" y="252" width="88" height="14" rx="4" fill="#b8ab90"/>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   2 · the famous five-minute install — laptop, egg timer, 4:58
+--------------------------------------------------------------- */
+ART['five-minute-install'] = () => `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="0" width="480" height="70" fill="url(#warmsky)" opacity=".7"/>
+  <rect x="0" y="238" width="480" height="122" fill="${P.woodlight}"/>
+  <rect x="0" y="238" width="480" height="9" fill="#c39a72" opacity=".7"/>
+  ${shadow(238, 246, 130, 14)}
+  <g>
+    <rect x="128" y="96" width="220" height="140" rx="10" fill="#cfc3a8"/>
+    <rect x="140" y="107" width="196" height="118" rx="4" fill="${P.warmwhite}"/>
+    <rect x="140" y="107" width="196" height="26" rx="4" fill="#3475b5"/>
+    <text x="152" y="125" font-family="Georgia,serif" font-size="14" fill="#fff" font-style="italic">WordPress</text>
+    <text x="152" y="150" font-family="Arial" font-size="9" fill="${P.ink2}">Welcome to the famous five-minute install!</text>
+    <rect x="152" y="160" width="120" height="11" rx="2" fill="#efe7d3" stroke="#c9bfa4" stroke-width="1.5"/>
+    <rect x="152" y="177" width="120" height="11" rx="2" fill="#efe7d3" stroke="#c9bfa4" stroke-width="1.5"/>
+    <rect x="152" y="194" width="120" height="11" rx="2" fill="#efe7d3" stroke="#c9bfa4" stroke-width="1.5"/>
+    <rect x="284" y="160" width="40" height="8" rx="2" fill="#d8cdb2"/>
+    <rect x="284" y="177" width="34" height="8" rx="2" fill="#d8cdb2"/>
+    <rect x="152" y="211" width="74" height="14" rx="4" fill="#3475b5"/>
+    <text x="160" y="221" font-family="Arial" font-size="8.4" fill="#fff">Install WordPress</text>
+    <rect x="108" y="236" width="260" height="12" rx="5" fill="#b9ad91"/>
+  </g>
+  <g transform="rotate(6 400 210)">
+    ${shadow(400, 242, 34, 9)}
+    <path d="M 400 148 a 42 42 0 0 1 42 42 l 0 34 a 10 10 0 0 1 -10 10 l -64 0 a 10 10 0 0 1 -10 -10 l 0 -34 a 42 42 0 0 1 42 -42 z" fill="${P.terra}"/>
+    <circle cx="400" cy="196" r="26" fill="${P.cream}"/>
+    <circle cx="400" cy="196" r="2.6" fill="${P.ink}"/>
+    <line x1="400" y1="196" x2="400" y2="176" stroke="${P.ink}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="400" y1="196" x2="414" y2="204" stroke="${P.rust}" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="393" y="142" width="14" height="9" rx="3" fill="${P.rust}"/>
+    <text x="400" y="238" font-family="Courier New,monospace" font-size="11" font-weight="bold" fill="${P.cream}" text-anchor="middle">4:58</text>
+  </g>
+  <text x="128" y="286" font-family="Courier New,monospace" font-size="10" fill="#6d5a41" opacity=".85">wp-config.php · created by hand · one typo, fixed</text>
+  ${mug(74, 216, 1.05, P.teal)}
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   3 · hello, dolly — the 45 spins forever
+--------------------------------------------------------------- */
+ART['hello-dolly'] = () => `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="278" width="480" height="82" fill="${P.brown}"/>
+  <rect x="0" y="278" width="480" height="8" fill="${P.woodlight}" opacity=".6"/>
+  ${shadow(210, 286, 128, 14)}
+  <rect x="84" y="188" width="252" height="96" rx="10" fill="${P.woodlight}"/>
+  <rect x="84" y="188" width="252" height="10" rx="5" fill="#c39a72"/>
+  <circle cx="188" cy="196" r="74" fill="${P.charcoal}"/>
+  <circle cx="188" cy="196" r="66" fill="#1d1d24"/>
+  <circle cx="188" cy="196" r="60" fill="none" stroke="#3a3a45" stroke-width="1.4"/>
+  <circle cx="188" cy="196" r="48" fill="none" stroke="#3a3a45" stroke-width="1.2"/>
+  <circle cx="188" cy="196" r="36" fill="none" stroke="#3a3a45" stroke-width="1"/>
+  <circle cx="188" cy="196" r="22" fill="${P.gold}"/>
+  <text x="188" y="193" font-family="Georgia,serif" font-size="8.4" font-style="italic" fill="${P.ink}" text-anchor="middle">hello,</text>
+  <text x="188" y="203" font-family="Georgia,serif" font-size="8.4" font-style="italic" fill="${P.ink}" text-anchor="middle">dolly!</text>
+  <circle cx="188" cy="196" r="2.6" fill="${P.ink}"/>
+  <circle cx="306" cy="150" r="8" fill="#b8ab90"/>
+  <line x1="306" y1="150" x2="264" y2="186" stroke="#8f8368" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="262" cy="188" r="5" fill="#6d6450"/>
+  <g fill="${P.deepteal}">
+    <text x="286" y="96" font-family="Georgia,serif" font-size="26">&#9834;</text>
+    <text x="322" y="66" font-family="Georgia,serif" font-size="20" opacity=".8">&#9835;</text>
+    <text x="256" y="60" font-family="Georgia,serif" font-size="16" opacity=".6">&#9834;</text>
+  </g>
+  <g transform="rotate(-2 356 62)">
+    ${shadow(368, 84, 60, 8)}
+    <rect x="272" y="30" width="180" height="34" rx="5" fill="${P.warmwhite}" stroke="#d5c8a9" stroke-width="1.5"/>
+    <circle cx="288" cy="47" r="6" fill="${P.gold}"/>
+    <text x="300" y="45" font-family="Arial" font-size="8.6" fill="${P.ink2}">It's so nice to have you back</text>
+    <text x="300" y="56" font-family="Arial" font-size="8.6" fill="${P.ink2}">where you belong &mdash; wp-admin</text>
+  </g>
+  <rect x="356" y="216" width="58" height="58" rx="3" fill="#efe4c9" stroke="#d5c8a9" stroke-width="1.5" transform="rotate(6 385 245)"/>
+  <circle cx="385" cy="245" r="19" fill="#1d1d24" transform="rotate(6 385 245)"/>
+  <circle cx="385" cy="245" r="6.5" fill="${P.rose}"/>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   4 · pretty permalinks — a street sign in january
+--------------------------------------------------------------- */
+ART['miles-permalinks'] = () => `
+  <rect width="480" height="360" fill="#dfe4dd"/>
+  <rect x="0" y="0" width="480" height="230" fill="#d3dcd8"/>
+  <g fill="${P.slate}" opacity=".55">
+    <rect x="18" y="140" width="76" height="90"/>
+    <path d="M 18 140 l 38 -26 l 38 26 z"/>
+    <rect x="108" y="122" width="64" height="108"/>
+    <rect x="330" y="132" width="82" height="98"/>
+    <path d="M 330 132 l 41 -24 l 41 24 z"/>
+    <rect x="424" y="150" width="46" height="80"/>
+  </g>
+  <g fill="#eef1ea" opacity=".85">
+    <rect x="34" y="156" width="14" height="18"/><rect x="62" y="156" width="14" height="18"/>
+    <rect x="346" y="150" width="14" height="16"/><rect x="376" y="150" width="14" height="16"/>
+  </g>
+  <rect x="0" y="230" width="480" height="130" fill="#f4f2ea"/>
+  <path d="M 0 230 Q 120 220 240 230 T 480 228 L 480 246 L 0 246 Z" fill="#fff" opacity=".8"/>
+  ${shadow(226, 322, 60, 10)}
+  <rect x="220" y="86" width="12" height="238" rx="5" fill="${P.slate}"/>
+  <g transform="rotate(-2 226 96)">
+    <rect x="118" y="74" width="218" height="34" rx="6" fill="#3f7a4f"/>
+    <rect x="122" y="78" width="210" height="26" rx="4" fill="none" stroke="#e9efe2" stroke-width="2"/>
+    <text x="227" y="95" font-family="Courier New,monospace" font-size="12.5" fill="#fff" text-anchor="middle">/2004/01/03/hello-world/</text>
+  </g>
+  <g transform="rotate(3 226 130)">
+    <rect x="164" y="118" width="124" height="24" rx="5" fill="#8a8f5c"/>
+    <text x="226" y="134" font-family="Courier New,monospace" font-size="9.5" fill="#f4f2e2" text-anchor="middle" text-decoration="line-through">?p=123</text>
+  </g>
+  <g transform="rotate(-14 300 300)">
+    ${shadow(300, 322, 40, 7)}
+    <path d="M 258 300 l 64 0 l 0 -8 q 22 -2 26 10 q -4 12 -26 10 l 0 -6 l -64 0 z" fill="${P.gold}"/>
+    <rect x="268" y="292" width="5" height="12" fill="${P.rust}"/>
+    <rect x="278" y="292" width="5" height="12" fill="${P.rust}"/>
+    <rect x="288" y="292" width="5" height="12" fill="${P.rust}"/>
+    <path d="M 258 296 q -12 -2 -14 6 q 2 8 14 6 z" fill="${P.sun}"/>
+  </g>
+  <g fill="#fff" opacity=".9">
+    <circle cx="60" cy="60" r="2.6"/><circle cx="150" cy="40" r="2"/><circle cx="260" cy="30" r="2.4"/>
+    <circle cx="360" cy="52" r="2"/><circle cx="430" cy="34" r="2.6"/><circle cx="90" cy="110" r="2"/>
+    <circle cx="410" cy="100" r="2.2"/><circle cx="310" cy="140" r="2"/><circle cx="40" cy="200" r="2.4"/>
+  </g>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   5 · hooks & filters — fishing off the pier
+--------------------------------------------------------------- */
+ART['mingus-hooks'] = () => `
+  <rect width="480" height="360" fill="url(#warmsky)"/>
+  <circle cx="96" cy="72" r="34" fill="${P.sun}" opacity=".85"/>
+  <rect x="0" y="188" width="480" height="172" fill="${P.teal}"/>
+  <rect x="0" y="188" width="480" height="10" fill="#7fb3a6" opacity=".8"/>
+  <path d="M 0 240 q 60 -8 120 0 t 120 0 t 120 0 t 120 0" stroke="#7fb3a6" stroke-width="4" fill="none" opacity=".5"/>
+  <path d="M 0 292 q 80 -8 160 0 t 160 0 t 160 0" stroke="#33655c" stroke-width="5" fill="none" opacity=".4"/>
+  <g>
+    <rect x="256" y="150" width="224" height="20" rx="4" fill="${P.brown}"/>
+    <rect x="256" y="150" width="224" height="6" fill="${P.woodlight}"/>
+    <rect x="284" y="170" width="12" height="120" fill="${P.brown}"/>
+    <rect x="360" y="170" width="12" height="150" fill="${P.brown}"/>
+    <rect x="436" y="170" width="12" height="100" fill="${P.brown}"/>
+  </g>
+  ${person(330, 152, 1.15, P.rust, P.skin2, `<rect x="316" y="130" width="30" height="8" rx="4" fill="${P.gold}"/>`)}
+  <path d="M 340 128 L 412 92" stroke="${P.brown}" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 412 92 L 414 210" stroke="#5b4a38" stroke-width="1.6"/>
+  <path d="M 414 210 q 10 8 2 16 q -8 4 -10 -4" fill="none" stroke="#57493c" stroke-width="3.4"/>
+  <g transform="rotate(-10 402 246)">
+    ${shadow(402, 272, 42, 7)}
+    <path d="M 352 234 l 84 0 q 12 12 0 24 l -84 0 q 8 -12 0 -24 z" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="2"/>
+    <path d="M 436 234 l 22 -10 l 0 44 l -22 -10 z" fill="${P.rose}"/>
+    <text x="392" y="250" font-family="Courier New,monospace" font-size="9.5" fill="${P.ink2}" text-anchor="middle">add_action()</text>
+  </g>
+  <g opacity=".85">
+    <path d="M 64 246 q 8 -10 16 0 q -8 8 -16 0 z" fill="${P.warmwhite}"/>
+    <path d="M 80 246 l 10 -6 l 0 12 z" fill="${P.warmwhite}"/>
+    <path d="M 140 300 q 7 -9 14 0 q -7 7 -14 0 z" fill="#cfe3d3" opacity=".8"/>
+    <path d="M 154 300 l 9 -5 l 0 10 z" fill="#cfe3d3" opacity=".8"/>
+  </g>
+  <path d="M 30 90 q 10 -10 20 0 q 10 -10 20 0" stroke="#fff" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M 180 62 q 9 -9 18 0 q 9 -9 18 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   6 · first kubrick in the wild — café CRT
+--------------------------------------------------------------- */
+ART['kubrick-sighting'] = () => `
+  <rect width="480" height="360" fill="#e8ddc6"/>
+  <rect x="0" y="0" width="480" height="24" fill="${P.terra}" opacity=".25"/>
+  <rect x="332" y="34" width="118" height="140" rx="8" fill="#cfe0e4"/>
+  <rect x="332" y="34" width="118" height="140" rx="8" fill="none" stroke="${P.brown}" stroke-width="7"/>
+  <line x1="391" y1="38" x2="391" y2="170" stroke="${P.brown}" stroke-width="4"/>
+  <rect x="348" y="120" width="20" height="46" fill="${P.slate}" opacity=".5"/>
+  <rect x="404" y="112" width="26" height="54" fill="${P.slate}" opacity=".4"/>
+  <circle cx="360" cy="66" r="14" fill="${P.sun}" opacity=".8"/>
+  <rect x="0" y="252" width="480" height="108" fill="${P.brown}"/>
+  <rect x="0" y="252" width="480" height="9" fill="${P.woodlight}" opacity=".65"/>
+  ${shadow(196, 258, 118, 13)}
+  <g>
+    <rect x="96" y="86" width="200" height="160" rx="14" fill="#d8cbb2"/>
+    <rect x="110" y="100" width="172" height="126" rx="5" fill="${P.warmwhite}"/>
+    <rect x="118" y="108" width="156" height="30" rx="8" fill="url(#kubblue)"/>
+    <text x="128" y="122" font-family="Georgia,serif" font-size="10" fill="#fff" font-style="italic">my weblog</text>
+    <text x="128" y="133" font-family="Arial" font-size="5.6" fill="#dceafc">just another wordpress weblog</text>
+    <g fill="#c9c0aa">
+      <rect x="118" y="146" width="96" height="4" rx="2" fill="#8a8371"/>
+      <rect x="118" y="156" width="104" height="3.4" rx="1.7"/>
+      <rect x="118" y="163" width="98" height="3.4" rx="1.7"/>
+      <rect x="118" y="170" width="104" height="3.4" rx="1.7"/>
+      <rect x="118" y="177" width="72" height="3.4" rx="1.7"/>
+      <rect x="118" y="190" width="90" height="4" rx="2" fill="#8a8371"/>
+      <rect x="118" y="200" width="104" height="3.4" rx="1.7"/>
+      <rect x="118" y="207" width="86" height="3.4" rx="1.7"/>
+    </g>
+    <g fill="#b9c7d8">
+      <rect x="230" y="146" width="44" height="4" rx="2" fill="#7d95b3"/>
+      <rect x="230" y="155" width="36" height="3.2" rx="1.6"/>
+      <rect x="230" y="162" width="40" height="3.2" rx="1.6"/>
+      <rect x="230" y="169" width="32" height="3.2" rx="1.6"/>
+      <rect x="230" y="182" width="44" height="4" rx="2" fill="#7d95b3"/>
+      <rect x="230" y="191" width="38" height="3.2" rx="1.6"/>
+      <rect x="230" y="198" width="42" height="3.2" rx="1.6"/>
+    </g>
+    <rect x="168" y="246" width="56" height="12" rx="4" fill="#b8ab90"/>
+  </g>
+  ${mug(330, 226, 1.25, P.warmwhite)}
+  <ellipse cx="330" cy="222" rx="10" ry="6" fill="#d9a441" opacity=".85"/>
+  <path d="M 40 252 l 26 0 l -4 -60 q -9 -8 -18 0 z" fill="${P.olive}"/>
+  <path d="M 53 192 q -20 -26 2 -44 q 22 18 2 44" fill="${P.deepteal}"/>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   7 · duke gets a typewriter — new year's eve, 23:58
+--------------------------------------------------------------- */
+ART['duke-typewriter'] = () => `
+  <rect width="480" height="360" fill="url(#nightsky)"/>
+  <g opacity=".9">
+    <circle cx="60" cy="40" r="2" fill="${P.sun}"/><circle cx="130" cy="26" r="1.6" fill="${P.rose}"/>
+    <circle cx="210" cy="44" r="2" fill="${P.sun}"/><circle cx="300" cy="24" r="1.6" fill="#9db8d8"/>
+    <circle cx="380" cy="42" r="2" fill="${P.rose}"/><circle cx="440" cy="28" r="1.8" fill="${P.sun}"/>
+  </g>
+  <path d="M 20 8 Q 240 68 460 8" fill="none" stroke="#4a465e" stroke-width="2"/>
+  <g>
+    <circle cx="90" cy="26" r="4" fill="${P.sun}"/><circle cx="180" cy="42" r="4" fill="${P.rose}"/>
+    <circle cx="270" cy="46" r="4" fill="${P.teal}"/><circle cx="360" cy="36" r="4" fill="${P.sun}"/>
+  </g>
+  <rect x="0" y="256" width="480" height="104" fill="#33304a"/>
+  <rect x="0" y="256" width="480" height="8" fill="#4a4663" opacity=".8"/>
+  <ellipse cx="230" cy="200" rx="150" ry="90" fill="${P.sun}" opacity=".08"/>
+  ${shadow(230, 262, 110, 13)}
+  <g>
+    <rect x="130" y="196" width="200" height="62" rx="12" fill="${P.charcoal}"/>
+    <rect x="146" y="182" width="168" height="22" rx="8" fill="#3a3a45"/>
+    <g fill="#d8cbb2">
+      <circle cx="166" cy="238" r="5"/><circle cx="184" cy="238" r="5"/><circle cx="202" cy="238" r="5"/>
+      <circle cx="220" cy="238" r="5"/><circle cx="238" cy="238" r="5"/><circle cx="256" cy="238" r="5"/>
+      <circle cx="274" cy="238" r="5"/><circle cx="292" cy="238" r="5"/>
+      <circle cx="175" cy="224" r="5"/><circle cx="193" cy="224" r="5"/><circle cx="211" cy="224" r="5"/>
+      <circle cx="229" cy="224" r="5"/><circle cx="247" cy="224" r="5"/><circle cx="265" cy="224" r="5"/>
+      <circle cx="283" cy="224" r="5"/>
+    </g>
+    <rect x="150" y="252" width="160" height="7" rx="3.5" fill="#3a3a45"/>
+    <rect x="164" y="96" width="132" height="92" rx="6" fill="url(#screenglow)"/>
+    <rect x="164" y="96" width="132" height="92" rx="6" fill="none" stroke="#4a4663" stroke-width="3"/>
+    <rect x="176" y="110" width="52" height="7" rx="3.5" fill="${P.navy}"/>
+    <rect x="176" y="124" width="96" height="5" rx="2.5" fill="#6b7f8a"/>
+    <rect x="176" y="134" width="104" height="5" rx="2.5" fill="#6b7f8a"/>
+    <rect x="176" y="144" width="84" height="5" rx="2.5" fill="#6b7f8a"/>
+    <g font-family="Georgia,serif" font-size="11" fill="${P.navy}">
+      <text x="176" y="170" font-weight="bold">B</text>
+      <text x="190" y="170" font-style="italic">I</text>
+      <text x="202" y="170" text-decoration="underline">U</text>
+      <text x="216" y="170">&#128279;</text>
+    </g>
+    <ellipse cx="230" cy="140" rx="110" ry="70" fill="#dff0f4" opacity=".12"/>
+  </g>
+  <g transform="rotate(8 382 214)">
+    ${shadow(382, 258, 20, 6)}
+    <path d="M 374 168 l 16 0 l -4 34 l -8 0 z" fill="#e8e2cf" opacity=".92"/>
+    <path d="M 374 168 q 8 -12 16 0" fill="#e8e2cf" opacity=".92"/>
+    <rect x="379" y="202" width="6" height="40" fill="#e8e2cf" opacity=".92"/>
+    <rect x="370" y="242" width="24" height="6" rx="3" fill="#e8e2cf" opacity=".92"/>
+    <circle cx="378" cy="164" r="2" fill="${P.sun}"/><circle cx="386" cy="160" r="1.6" fill="${P.sun}"/>
+  </g>
+  <g>
+    <circle cx="86" cy="150" r="26" fill="#3a3a45"/>
+    <circle cx="86" cy="150" r="22" fill="#d8cbb2"/>
+    <line x1="86" y1="150" x2="86" y2="134" stroke="${P.ink}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="86" y1="150" x2="80" y2="158" stroke="${P.rust}" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="86" y="186" font-family="Courier New,monospace" font-size="10" fill="#9d97b8" text-anchor="middle">23:58</text>
+  </g>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   8 · the day the spam came — mailbox flood vs the green shield
+--------------------------------------------------------------- */
+ART['akismet-flood'] = () => `
+  <rect width="480" height="360" fill="url(#dusksky)"/>
+  <rect x="0" y="272" width="480" height="88" fill="#57536e"/>
+  <rect x="0" y="272" width="480" height="8" fill="#6b6785" opacity=".7"/>
+  ${shadow(120, 280, 44, 10)}
+  <rect x="112" y="180" width="16" height="98" rx="6" fill="${P.brown}"/>
+  <path d="M 68 180 l 104 0 a 26 26 0 0 0 0 -52 l -104 0 z" fill="${P.terra}"/>
+  <path d="M 68 128 a 26 26 0 0 0 0 52 z" fill="${P.rust}"/>
+  <rect x="160" y="118" width="7" height="26" fill="${P.gold}"/>
+  <path d="M 167 118 l 18 7 l -18 7 z" fill="${P.gold}"/>
+  <g>
+    <path d="M 64 132 Q 20 96 -6 120" stroke="#c9c4bd" stroke-width="0" fill="none"/>
+    ${[
+      [30,96,-18],[66,74,10],[110,60,-8],[152,52,14],[196,60,-12],[238,76,8],
+      [58,120,22],[100,96,-14],[142,88,12],[186,100,-6],[224,116,16],
+      [92,140,-20],[134,130,8],[172,140,-10],[206,152,18],[246,140,-4],
+      [268,102,-16],[288,128,10],[254,170,-8]
+    ].map(([x,y,r]) => `
+      <g transform="rotate(${r} ${x} ${y})">
+        <rect x="${x-17}" y="${y-11}" width="34" height="22" rx="2.5" fill="#e6e1d4" stroke="#b9b2a0" stroke-width="1.4"/>
+        <path d="M ${x-17} ${y-11} l 17 12 l 17 -12" fill="none" stroke="#b9b2a0" stroke-width="1.4"/>
+      </g>`).join('')}
+  </g>
+  <g>
+    ${shadow(352, 292, 52, 10)}
+    <path d="M 352 176 q 44 16 60 12 q 4 66 -60 96 q -64 -30 -60 -96 q 16 4 60 -12 z" fill="#6c9e3f"/>
+    <path d="M 352 186 q 36 13 49 10 q 3 54 -49 78 z" fill="#7fb350" opacity=".85"/>
+    <text x="352" y="248" font-family="Arial" font-size="44" font-weight="bold" fill="${P.warmwhite}" text-anchor="middle">a</text>
+  </g>
+  <g opacity=".92">
+    <g transform="rotate(140 316 150)"><rect x="299" y="139" width="34" height="22" rx="2.5" fill="#e6e1d4" stroke="#b9b2a0" stroke-width="1.4"/></g>
+    <g transform="rotate(200 330 210)"><rect x="313" y="199" width="34" height="22" rx="2.5" fill="#e6e1d4" stroke="#b9b2a0" stroke-width="1.4"/></g>
+    <path d="M 306 142 q 8 -10 4 -18 M 322 214 q 10 6 18 2" stroke="#c9c4bd" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="120" y="318" font-family="Arial" font-size="9.5" fill="#c5c0d4" opacity=".85">incoming: 58,708</text>
+  <text x="352" y="318" font-family="Arial" font-size="9.5" fill="#cfe3b8" text-anchor="middle">delivered to humans: all of it</text>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   9 · wordcamp 2006 — the first group photo
+--------------------------------------------------------------- */
+ART['wordcamp-2006'] = () => {
+  const rnd = seedFrom('wc2006');
+  const shirts = [P.teal, P.rust, P.gold, P.navy, P.rose, P.olive, P.terra, P.deepteal, P.slate];
+  const skins = [P.skin1, P.skin2, P.skin3, P.skin4];
+  let backRow = '', frontRow = '';
+  for (let i = 0; i < 13; i++){
+    const x = 42 + i * 33 + (rnd() - .5) * 8;
+    backRow += person(x, 252 + (rnd() - .5) * 6, 1.02 + rnd() * .1, shirts[(i * 3 + 1) % 9], skins[i % 4]);
+  }
+  for (let i = 0; i < 11; i++){
+    const x = 58 + i * 37 + (rnd() - .5) * 8;
+    const extra = (i === 5) ? `<rect x="${x-13}" y="270" width="26" height="15" rx="2" fill="#d8cbb2"/><rect x="${x-11}" y="272" width="22" height="11" fill="#3f4a56"/>` : '';
+    frontRow += person(x, 296 + (rnd() - .5) * 5, 1.12 + rnd() * .1, shirts[(i * 5 + 3) % 9], skins[(i + 2) % 4], extra);
+  }
+  return `
+  <rect width="480" height="320" fill="url(#warmsky)"/>
+  <g opacity=".5" fill="${P.terra}">
+    <rect x="52" y="60" width="10" height="70"/>
+    <rect x="150" y="60" width="10" height="70"/>
+    <path d="M 0 106 Q 56 64 106 100 Q 156 64 212 106 l 0 8 Q 156 76 106 110 Q 56 76 0 114 z"/>
+    <rect x="30" y="118" width="150" height="5"/>
+  </g>
+  <circle cx="404" cy="54" r="30" fill="${P.sun}" opacity=".8"/>
+  <rect x="0" y="230" width="480" height="90" fill="#cdbf9f"/>
+  <rect x="96" y="128" width="8" height="96" fill="${P.brown}"/>
+  <rect x="378" y="128" width="8" height="96" fill="${P.brown}"/>
+  <path d="M 100 138 q 140 18 282 0 l 0 44 q -142 18 -282 0 z" fill="${P.warmwhite}" stroke="#d5c8a9" stroke-width="2"/>
+  <text x="241" y="166" font-family="Georgia,serif" font-size="21" font-style="italic" fill="#3475b5" text-anchor="middle">wordcamp 2006</text>
+  <text x="241" y="182" font-family="Arial" font-size="8.5" fill="${P.ink2}" text-anchor="middle" letter-spacing="2">SAN FRANCISCO &middot; ADMISSION: ENTHUSIASM</text>
+  ${shadow(240, 312, 210, 10)}
+  ${backRow}
+  ${frontRow}
+  ${grain(480,320)}`;
+};
+
+/* ---------------------------------------------------------------
+   10 · the plugin directory opens its doors
+--------------------------------------------------------------- */
+ART['plugin-directory-opens'] = () => {
+  const boxes = [];
+  const rnd = seedFrom('shelves');
+  const cols = [P.teal, P.gold, P.rose, P.terra, P.olive, P.navy, P.deepteal, P.rust];
+  for (let s = 0; s < 3; s++){
+    for (let i = 0; i < 7; i++){
+      const bw = 16 + rnd() * 8, bh = 15 + rnd() * 9;
+      boxes.push(`<rect x="${152 + i * 26 + rnd() * 4}" y="${168 + s * 34 - bh}" width="${bw}" height="${bh}" rx="2" fill="${cols[(s * 7 + i) % 8]}"/>`);
+    }
+  }
+  return `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="296" width="480" height="64" fill="#cfc7b2"/>
+  <rect x="0" y="296" width="480" height="7" fill="#e0d8c2"/>
+  ${shadow(240, 302, 180, 12)}
+  <rect x="80" y="60" width="320" height="236" fill="#e2d5ba" stroke="${P.brown}" stroke-width="5"/>
+  <rect x="96" y="38" width="288" height="40" rx="6" fill="${P.navy}"/>
+  <text x="240" y="60" font-family="Georgia,serif" font-size="17" fill="${P.warmwhite}" text-anchor="middle" letter-spacing="4">P L U G I N S</text>
+  <text x="240" y="72" font-family="Arial" font-size="8" fill="#b9c7d8" text-anchor="middle" letter-spacing="1">free, forever &middot; est. 2007</text>
+  <path d="M 88 86 l 74 0 l -8 14 l -58 0 z" fill="${P.teal}"/>
+  <path d="M 162 86 l 74 0 l -8 14 l -58 0 z" fill="${P.warmwhite}"/>
+  <path d="M 236 86 l 74 0 l -8 14 l -58 0 z" fill="${P.teal}"/>
+  <path d="M 310 86 l 74 0 l -8 14 l -58 0 z" fill="${P.warmwhite}"/>
+  <rect x="140" y="112" width="200" height="140" fill="#f7f1e2" stroke="${P.brown}" stroke-width="4"/>
+  <rect x="148" y="168" width="184" height="4" fill="${P.woodlight}"/>
+  <rect x="148" y="202" width="184" height="4" fill="${P.woodlight}"/>
+  <rect x="148" y="236" width="184" height="4" fill="${P.woodlight}"/>
+  ${boxes.join('')}
+  <g>
+    <rect x="354" y="112" width="30" height="184" fill="${P.brown}"/>
+    <rect x="358" y="118" width="22" height="172" fill="#e2d5ba"/>
+    <circle cx="376" cy="206" r="3.4" fill="${P.gold}"/>
+    <rect x="358" y="140" width="22" height="16" rx="2" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="1.4"/>
+    <text x="369" y="151" font-family="Arial" font-size="6.6" fill="${P.deepteal}" text-anchor="middle" font-weight="bold">OPEN</text>
+  </g>
+  ${person(112, 296, 1.2, P.rose, P.skin3)}
+  ${person(444, 300, 1.28, P.olive, P.skin1)}
+  <path d="M 60 296 l 20 0 l -3 -42 q -7 -6 -14 0 z" fill="${P.deepteal}"/>
+  ${grain(480,360)}`;
+};
+
+/* ---------------------------------------------------------------
+   11 · widgets, arranged lovingly
+--------------------------------------------------------------- */
+ART['widgets-shelf'] = () => `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="308" width="480" height="52" fill="${P.woodlight}" opacity=".6"/>
+  ${shadow(240, 316, 132, 12)}
+  <rect x="128" y="34" width="224" height="282" rx="8" fill="${P.brown}"/>
+  <rect x="140" y="46" width="200" height="258" fill="#e8dcc2"/>
+  <rect x="140" y="112" width="200" height="8" fill="${P.brown}"/>
+  <rect x="140" y="180" width="200" height="8" fill="${P.brown}"/>
+  <rect x="140" y="248" width="200" height="8" fill="${P.brown}"/>
+  <g>
+    <rect x="156" y="58" width="58" height="46" rx="4" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="2"/>
+    <rect x="156" y="58" width="58" height="12" rx="4" fill="${P.terra}"/>
+    <g stroke="#c9bfa4" stroke-width="1.2">
+      <line x1="162" y1="78" x2="208" y2="78"/><line x1="162" y1="86" x2="208" y2="86"/><line x1="162" y1="94" x2="208" y2="94"/>
+      <line x1="172" y1="72" x2="172" y2="100"/><line x1="186" y1="72" x2="186" y2="100"/><line x1="200" y1="72" x2="200" y2="100"/>
+    </g>
+    <circle cx="193" cy="90" r="4.6" fill="none" stroke="${P.rose}" stroke-width="2"/>
+    <text x="185" y="68.5" font-family="Arial" font-size="7" fill="#fff" text-anchor="middle">May 2007</text>
+  </g>
+  <g>
+    <circle cx="278" cy="80" r="17" fill="none" stroke="${P.navy}" stroke-width="6"/>
+    <line x1="291" y1="93" x2="306" y2="106" stroke="${P.navy}" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <g>
+    <rect x="158" y="136" width="46" height="40" rx="5" fill="#e8842c"/>
+    <circle cx="168" cy="168" r="4" fill="#fff"/>
+    <path d="M 164 156 a 12 12 0 0 1 12 12" fill="none" stroke="#fff" stroke-width="4"/>
+    <path d="M 164 146 a 22 22 0 0 1 22 22" fill="none" stroke="#fff" stroke-width="4"/>
+  </g>
+  <g>
+    <rect x="222" y="128" width="60 " height="50" rx="6" fill="#d8e4e0" stroke="#9db8b0" stroke-width="2"/>
+    <text x="252" y="148" font-family="Arial" font-size="8" fill="${P.deepteal}" text-anchor="middle">archives</text>
+    <rect x="232" y="154" width="40" height="3.4" rx="1.7" fill="#9db8b0"/>
+    <rect x="232" y="161" width="32" height="3.4" rx="1.7" fill="#9db8b0"/>
+    <rect x="232" y="168" width="36" height="3.4" rx="1.7" fill="#9db8b0"/>
+  </g>
+  <g>
+    <path d="M 292 178 l 40 0 l -4 -34 q -16 -8 -32 0 z" fill="#cfe0e4" opacity=".85" stroke="#9db8b0" stroke-width="2"/>
+    <text x="312" y="158" font-family="Arial" font-size="6.4" fill="${P.navy}" text-anchor="middle">meta</text>
+    <text x="312" y="167" font-family="Arial" font-size="8.4" fill="${P.terra}" text-anchor="middle" font-weight="bold">jazz</text>
+    <text x="312" y="175" font-family="Arial" font-size="5.6" fill="${P.deepteal}" text-anchor="middle">links &middot; rss</text>
+  </g>
+  <g>
+    <rect x="158" y="204" width="70" height="42" rx="4" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="2"/>
+    <rect x="164" y="212" width="58" height="8" rx="4" fill="#efe7d3" stroke="#c9bfa4" stroke-width="1.2"/>
+    <rect x="164" y="226" width="34" height="12" rx="3" fill="${P.teal}"/>
+    <text x="181" y="235" font-family="Arial" font-size="7" fill="#fff" text-anchor="middle">Search</text>
+  </g>
+  <g>
+    <rect x="244" y="200" width="82" height="46" rx="6" fill="#f4e6c8" stroke="#c9bfa4" stroke-width="2"/>
+    <text x="256" y="218" font-family="Arial" font-size="10" fill="${P.navy}">blogroll</text>
+    <text x="300" y="216" font-family="Arial" font-size="7" fill="${P.terra}">dooce</text>
+    <text x="254" y="232" font-family="Arial" font-size="7" fill="${P.teal}">kottke</text>
+    <text x="284" y="236" font-family="Arial" font-size="8" fill="${P.rust}">zeldman</text>
+    <text x="258" y="242" font-family="Arial" font-size="6.4" fill="${P.olive}">waxy</text>
+  </g>
+  <g>
+    <rect x="170" y="272" width="140" height="30" rx="15" fill="${P.rose}" opacity=".9"/>
+    <text x="240" y="291" font-family="Georgia,serif" font-size="11" fill="#fff" text-anchor="middle" font-style="italic">drag me somewhere nice</text>
+  </g>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   12 · 2.3: we can finally tag things — the spilled jar
+--------------------------------------------------------------- */
+ART['native-tags'] = () => {
+  const words = [['jazz',P.teal,-12,196,258],['cats',P.rose,8,262,272],['recipes',P.gold,-6,330,252],
+    ['politics',P.slate,14,388,278],['diy',P.terra,-18,282,308],['poems',P.olive,10,352,312],['me',P.navy,-8,206,312]];
+  const tags = words.map(([w,c,r,x,y]) => `
+    <g transform="rotate(${r} ${x} ${y})">
+      ${shadow(x, y+16, 26, 5)}
+      <path d="M ${x-26} ${y-11} l 38 0 l 12 11 l -12 11 l -38 0 z" fill="${P.warmwhite}" stroke="#cbbc9c" stroke-width="1.6"/>
+      <circle cx="${x+18}" cy="${y}" r="2.6" fill="${P.paper}" stroke="#cbbc9c" stroke-width="1.4"/>
+      <text x="${x-7}" y="${y+3.5}" font-family="Georgia,serif" font-size="9.5" font-style="italic" fill="${c}" text-anchor="middle">${w}</text>
+      <path d="M ${x+20} ${y} q 16 ${r} 26 ${r/2}" fill="none" stroke="#b3a482" stroke-width="1.3"/>
+    </g>`).join('');
+  return `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="228" width="480" height="132" fill="${P.woodlight}"/>
+  <rect x="0" y="228" width="480" height="8" fill="#c39a72" opacity=".7"/>
+  <g transform="rotate(-64 118 200)">
+    ${shadow(118, 246, 40, 8)}
+    <rect x="86" y="152" width="64" height="88" rx="14" fill="#dce8e6" opacity=".7" stroke="#a9c2bd" stroke-width="3"/>
+    <rect x="82" y="140" width="72" height="16" rx="6" fill="${P.teal}"/>
+  </g>
+  <path d="M 130 228 q 60 -18 96 6" fill="none" stroke="#cbbc9c" stroke-width="2" opacity=".7"/>
+  ${tags}
+  <text x="122" y="86" font-family="Georgia,serif" font-size="15" font-style="italic" fill="${P.ink2}">what's a taxonomy,</text>
+  <text x="140" y="106" font-family="Georgia,serif" font-size="15" font-style="italic" fill="${P.ink2}">if not agreed-upon love?</text>
+  <path d="M 176 116 q 30 24 44 66" fill="none" stroke="#b3a482" stroke-width="1.6" stroke-dasharray="4 5"/>
+  ${grain(480,360)}`;
+};
+
+/* ---------------------------------------------------------------
+   13 · the 2.5 redesign whiteboard
+--------------------------------------------------------------- */
+ART['happycog-whiteboard'] = () => `
+  <rect width="480" height="360" fill="#c9cdd4"/>
+  <rect x="0" y="316" width="480" height="44" fill="#8f95a0"/>
+  ${shadow(240, 322, 190, 10)}
+  <rect x="42" y="30" width="396" height="272" rx="8" fill="#fdfdfa" stroke="#9aa0ab" stroke-width="7"/>
+  <g stroke="#3f68a8" stroke-width="2.4" fill="none" stroke-linecap="round">
+    <rect x="72" y="62" width="150" height="26" rx="3"/>
+    <rect x="72" y="102" width="70" height="54" rx="3"/>
+    <rect x="152" y="102" width="70" height="54" rx="3"/>
+    <rect x="72" y="170" width="150" height="40" rx="3"/>
+    <path d="M 230 90 q 30 -14 54 4"/>
+    <path d="M 279 90 l 6 6 l -9 3 z" fill="#3f68a8" stroke="none"/>
+  </g>
+  <g stroke="#c2452f" stroke-width="2.4" fill="none" stroke-linecap="round">
+    <rect x="298" y="66" width="110" height="70" rx="4"/>
+    <path d="M 306 128 q 20 -34 44 -6 q 18 22 40 -10"/>
+    <circle cx="330" cy="92" r="13"/>
+    <path d="M 330 79 l 0 13 l 11 6"/>
+    <path d="M 236 190 q 40 10 64 -18"/>
+    <path d="M 296 168 l 8 1 l -4 8 z" fill="#c2452f" stroke="none"/>
+  </g>
+  <g font-family="Georgia,serif" font-style="italic" fill="#2d4a7a">
+    <text x="80" y="80" font-size="11">dashboard</text>
+    <text x="80" y="126" font-size="9">write</text>
+    <text x="160" y="126" font-size="9">manage</text>
+    <text x="80" y="192" font-size="9">one screen, fewer clicks</text>
+  </g>
+  <text x="318" y="160" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#a03a28">where does the chrome go?</text>
+  <g transform="rotate(-5 330 232)">
+    ${shadow(330, 256, 24, 5)}
+    <rect x="306" y="208" width="48" height="48" fill="${P.gold}"/>
+    <text x="330" y="236" font-family="Georgia,serif" font-size="13" font-style="italic" fill="${P.ink}" text-anchor="middle">less</text>
+  </g>
+  <g transform="rotate(4 390 240)">
+    <rect x="366" y="216" width="48" height="48" fill="${P.rose}"/>
+    <text x="390" y="238" font-family="Georgia,serif" font-size="8.4" font-style="italic" fill="#fff" text-anchor="middle">ship in</text>
+    <text x="390" y="250" font-family="Georgia,serif" font-size="8.4" font-style="italic" fill="#fff" text-anchor="middle">march?</text>
+  </g>
+  <rect x="120" y="296" width="240" height="12" rx="4" fill="#b9bfc9"/>
+  <rect x="150" y="290" width="34" height="8" rx="4" fill="#3f68a8"/>
+  <rect x="196" y="290" width="34" height="8" rx="4" fill="#c2452f"/>
+  <rect x="242" y="290" width="34" height="8" rx="4" fill="#2d7a4f"/>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   14 · coltrane's left hand — the 2.7 admin
+--------------------------------------------------------------- */
+ART['coltrane-nav'] = () => `
+  <rect width="480" height="360" fill="#e4e0d5"/>
+  ${shadow(240, 330, 190, 12)}
+  <rect x="48" y="28" width="384" height="296" rx="6" fill="#f6f3ea" stroke="#b9b2a0" stroke-width="2"/>
+  <rect x="48" y="28" width="384" height="24" rx="6" fill="#464646"/>
+  <circle cx="62" cy="40" r="4" fill="${P.rose}"/><circle cx="76" cy="40" r="4" fill="${P.gold}"/><circle cx="90" cy="40" r="4" fill="${P.teal}"/>
+  <text x="240" y="44" font-family="Arial" font-size="9" fill="#d8d4c9" text-anchor="middle">my weblog &rsaquo; wp-admin</text>
+  <rect x="48" y="52" width="104" height="272" fill="#2e3438"/>
+  ${['dashboard','posts','media','links','pages','comments','appearance','plugins','users','tools','settings'].map((item, i) => `
+    <g>
+      ${i === 1 ? `<rect x="48" y="${66 + i * 23 - 12}" width="104" height="22" fill="#0063dc" opacity=".85"/>` : ''}
+      <circle cx="64" cy="${66 + i * 23}" r="4" fill="${i === 1 ? '#fff' : '#7d878f'}"/>
+      <text x="76" y="${69.5 + i * 23}" font-family="Arial" font-size="9" fill="${i === 1 ? '#fff' : '#aab4bb'}">${item}</text>
+    </g>`).join('')}
+  <text x="170" y="86" font-family="Georgia,serif" font-size="17" fill="#464646">Edit Post</text>
+  <rect x="170" y="98" width="200" height="16" rx="3" fill="#fff" stroke="#c9c2b0" stroke-width="1.4"/>
+  <rect x="170" y="122" width="200" height="120" rx="3" fill="#fff" stroke="#c9c2b0" stroke-width="1.4"/>
+  <g fill="#cfc9ba">
+    <rect x="180" y="134" width="170" height="5" rx="2.5"/><rect x="180" y="146" width="180" height="5" rx="2.5"/>
+    <rect x="180" y="158" width="150" height="5" rx="2.5"/><rect x="180" y="170" width="176" height="5" rx="2.5"/>
+    <rect x="180" y="182" width="120" height="5" rx="2.5"/>
+  </g>
+  <rect x="382" y="98" width="42" height="70" rx="3" fill="#fff" stroke="#c9c2b0" stroke-width="1.4"/>
+  <rect x="388" y="106" width="30" height="12" rx="3" fill="#0063dc"/>
+  <text x="403" y="115" font-family="Arial" font-size="7" fill="#fff" text-anchor="middle">Publish</text>
+  <g transform="rotate(-8 300 250)">
+    <path d="M 300 226 l 0 34 l 9 -8 l 6 13 l 7 -3 l -6 -13 l 12 -1 z" fill="#2e3438" stroke="#fff" stroke-width="2"/>
+  </g>
+  <text x="240" y="344" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#8a8371" text-anchor="middle">a love supreme, a love supreme, a love supreme, a love supreme</text>
+  ${grain(480,360)}`;
+/* ---------------------------------------------------------------
+   15 · wordpress in your pocket (2008) — first-gen iphone
+--------------------------------------------------------------- */
+ART['iphone-app-2008'] = () => `
+  <rect width="320" height="440" fill="${P.paper}"/>
+  <rect x="0" y="330" width="320" height="110" fill="${P.woodlight}"/>
+  <rect x="0" y="330" width="320" height="9" fill="#c39a72" opacity=".7"/>
+  ${mug(58, 380, 1.3, P.rose)}
+  <ellipse cx="252" cy="392" rx="34" ry="12" fill="#e8dcc2"/>
+  <ellipse cx="252" cy="388" rx="30" ry="10" fill="${P.warmwhite}"/>
+  <circle cx="252" cy="386" r="12" fill="${P.gold}" opacity=".85"/>
+  ${shadow(160, 402, 74, 12)}
+  <path d="M 108 402 q -18 -30 6 -44 l 12 -8 l 74 0 l 12 8 q 24 14 6 44 z" fill="${P.skin1}"/>
+  <g>
+    <rect x="98" y="60" width="124" height="252" rx="20" fill="#b9bcc2"/>
+    <rect x="103" y="65" width="114" height="242" rx="16" fill="#17181c"/>
+    <rect x="110" y="92" width="100" height="180" fill="#f4f6f8"/>
+    <rect x="110" y="92" width="100" height="24" fill="#21759b"/>
+    <circle cx="122" cy="104" r="7" fill="#fff"/>
+    <text x="122" y="108" font-family="Georgia,serif" font-size="10" fill="#21759b" text-anchor="middle" font-weight="bold">W</text>
+    <text x="134" y="107.5" font-family="Arial" font-size="8.4" fill="#fff">WordPress</text>
+    ${[0,1,2,3].map(i => `
+      <rect x="110" y="${116 + i * 30}" width="100" height="30" fill="${i % 2 ? '#eef2f4' : '#fff'}"/>
+      <rect x="118" y="${125 + i * 30}" width="${58 - i * 6}" height="5" rx="2.5" fill="#5b6770"/>
+      <rect x="118" y="${134 + i * 30}" width="${72 - i * 4}" height="3.6" rx="1.8" fill="#b3bcc2"/>
+      <text x="200" y="${134 + i * 30}" font-family="Arial" font-size="9" fill="#b3bcc2" text-anchor="middle">&rsaquo;</text>`).join('')}
+    <rect x="110" y="236" width="100" height="36" fill="#e4e9ec"/>
+    <rect x="122" y="246" width="76 " height="16" rx="8" fill="#21759b"/>
+    <text x="160" y="257" font-family="Arial" font-size="8.4" fill="#fff" text-anchor="middle">Write a post</text>
+    <rect x="146" y="74" width="28" height="6" rx="3" fill="#2c2e35"/>
+    <circle cx="160" cy="290" r="11" fill="none" stroke="#3a3d45" stroke-width="2.4"/>
+    <rect x="155" y="285" width="10" height="10" rx="2.4" fill="none" stroke="#3a3d45" stroke-width="1.8"/>
+  </g>
+  <path d="M 118 320 q -10 26 -2 46 M 202 320 q 10 26 2 46" stroke="${P.skin1}" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <text x="160" y="38" font-family="Georgia,serif" font-size="12" font-style="italic" fill="${P.ink2}" text-anchor="middle">the nearest publish button, 2008 edition</text>
+  ${grain(320,440)}`;
+
+/* ---------------------------------------------------------------
+   16 · the day mu came home — two rivers, one water
+--------------------------------------------------------------- */
+ART['mu-merge'] = () => `
+  <rect width="480" height="360" fill="#dbe3cf"/>
+  <path d="M 92 0 Q 120 90 190 150 Q 240 190 240 230 L 240 360 L 168 360 Q 176 240 120 170 Q 60 96 40 0 Z" fill="${P.teal}"/>
+  <path d="M 388 0 Q 360 90 290 150 Q 240 190 240 230 L 240 360 L 312 360 Q 304 240 360 170 Q 420 96 440 0 Z" fill="#5b9e8f"/>
+  <path d="M 240 232 L 240 360 L 312 360 Q 306 250 240 232 Z" fill="${P.teal}" opacity=".65"/>
+  <path d="M 96 60 q 14 -6 24 4 M 130 130 q 14 -6 22 6 M 352 66 q -14 -6 -24 4 M 344 140 q -12 -8 -22 2 M 226 260 q 14 -6 26 4 M 238 310 q 14 -6 26 4" stroke="#eef4ea" stroke-width="3.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <g opacity=".95">
+    <circle cx="30" cy="140" r="16" fill="${P.olive}"/><rect x="27" y="150" width="6" height="16" fill="${P.brown}"/>
+    <circle cx="66" cy="210" r="20" fill="${P.deepteal}"/><rect x="63" y="224" width="6" height="18" fill="${P.brown}"/>
+    <circle cx="430" cy="120" r="18" fill="${P.olive}"/><rect x="427" y="132" width="6" height="16" fill="${P.brown}"/>
+    <circle cx="404" cy="230" r="15" fill="${P.deepteal}"/><rect x="401" y="240" width="6" height="16" fill="${P.brown}"/>
+    <circle cx="120" cy="300" r="17" fill="${P.olive}"/><rect x="117" y="312" width="6" height="16" fill="${P.brown}"/>
+    <circle cx="368" cy="308" r="19" fill="${P.deepteal}"/><rect x="365" y="322" width="6" height="16" fill="${P.brown}"/>
+  </g>
+  <g transform="rotate(24 150 120)">
+    ${shadow(150, 136, 30, 6)}
+    <path d="M 118 120 l 64 0 l -10 16 l -44 0 z" fill="${P.terra}"/>
+    <rect x="146" y="94" width="4" height="26" fill="${P.brown}"/>
+    <path d="M 150 96 l 22 10 l -22 8 z" fill="${P.warmwhite}"/>
+    <text x="150" y="132" font-family="Arial" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">wp</text>
+  </g>
+  <g transform="rotate(-24 330 120)">
+    ${shadow(330, 136, 30, 6)}
+    <path d="M 298 120 l 64 0 l -10 16 l -44 0 z" fill="${P.navy}"/>
+    <rect x="326" y="94" width="4" height="26" fill="${P.brown}"/>
+    <path d="M 330 96 l 22 10 l -22 8 z" fill="${P.warmwhite}"/>
+    <text x="330" y="132" font-family="Arial" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">mu</text>
+  </g>
+  <path d="M 208 20 a 46 46 0 1 0 64 0" fill="none" stroke="#eef4ea" stroke-width="0"/>
+  <text x="240" y="348" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#57604a" text-anchor="middle">same water all along</text>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   17 · one default theme per year, hung in order
+--------------------------------------------------------------- */
+ART['default-themes-hall'] = () => {
+  const frames = [
+    {x:36,  inner:`<rect width="52" height="20" y="0" x="0" fill="#3a5a40"/><rect y="20" width="52" height="16" fill="#fdfdf8"/><rect x="6" y="24" width="40" height="2.4" fill="#b9b2a0"/><rect x="6" y="29" width="34" height="2.4" fill="#b9b2a0"/>`, name:'ten'},
+    {x:100, inner:`<rect width="52" height="36" fill="#f4f4f0"/><rect x="4" y="4" width="44" height="10" fill="#3f4a56"/><rect x="4" y="18" width="28" height="2.4" fill="#b9b2a0"/><rect x="4" y="23" width="34" height="2.4" fill="#b9b2a0"/><rect x="36" y="18" width="12" height="14" fill="#d8d4c9"/>`, name:'eleven'},
+    {x:164, inner:`<rect width="52" height="36" fill="#fff"/><text x="26" y="16" font-family="Georgia,serif" font-size="8" text-anchor="middle" fill="#3a3129" font-style="italic">Twelve</text><rect x="10" y="22" width="32" height="2.2" fill="#c9c2b0"/><rect x="10" y="27" width="26" height="2.2" fill="#c9c2b0"/>`, name:'twelve'},
+    {x:228, inner:`<rect width="52" height="12" fill="#e8842c"/><rect y="12" width="52" height="8" fill="#d9a441"/><rect y="20" width="52" height="8" fill="#4e8f83"/><rect y="28" width="52" height="8" fill="#2f4858"/>`, name:'thirteen'},
+    {x:292, inner:`<rect width="52" height="36" fill="#1d1d24"/><rect x="4" y="4" width="20" height="13" fill="#4e8f83"/><rect x="28" y="4" width="20" height="13" fill="#c96f4a"/><rect x="4" y="21" width="20" height="11" fill="#d9a441"/><rect x="28" y="21" width="20" height="11" fill="#5b6770"/>`, name:'fourteen'},
+    {x:356, inner:`<rect width="52" height="36" fill="#fdfdfa"/><rect x="18" y="8" width="24" height="2.6" fill="#3a3129"/><rect x="18" y="15" width="20" height="2" fill="#b9b2a0"/><rect x="18" y="20" width="22" height="2" fill="#b9b2a0"/><rect x="4" y="6" width="10" height="24" fill="#e8e4d8"/>`, name:'fifteen'},
+    {x:420, inner:`<rect width="52" height="36" fill="#2c3338"/><path d="M 21 12 l 12 6 l -12 6 z" fill="#fff"/><rect x="8" y="28" width="36" height="2.2" fill="#7d878f"/>`, name:'seventeen'}
+  ];
+  return `
+  <rect width="480" height="320" fill="#e9e0cd"/>
+  <rect x="0" y="0" width="480" height="10" fill="#cfc3a9"/>
+  <rect x="0" y="284" width="480" height="36" fill="#cfc3a9"/>
+  <rect x="0" y="284" width="480" height="5" fill="#e0d6c2"/>
+  ${frames.map((f, i) => `
+    <g>
+      <line x1="${f.x + 26}" y1="10" x2="${f.x + 26}" y2="${104 + (i % 2) * 26}" stroke="#8f8570" stroke-width="1.6"/>
+      ${shadow(f.x + 26, 176 + (i % 2) * 26, 34, 6)}
+      <rect x="${f.x - 8}" y="${96 + (i % 2) * 26}" width="68" height="52" fill="${i % 3 === 0 ? '#c9a84c' : (i % 3 === 1 ? '#8a6a4a' : '#2d2d2d')}"/>
+      <rect x="${f.x - 3}" y="${101 + (i % 2) * 26}" width="58" height="42" fill="#faf7f0"/>
+      <g transform="translate(${f.x}, ${104 + (i % 2) * 26})">${f.inner}</g>
+      <rect x="${f.x + 6}" y="${154 + (i % 2) * 26}" width="40" height="9" rx="1.5" fill="#c9a84c"/>
+      <text x="${f.x + 26}" y="${160.5 + (i % 2) * 26}" font-family="Arial" font-size="5.4" fill="#4d3b12" text-anchor="middle">twenty ${f.name}</text>
+    </g>`).join('')}
+  ${shadow(240, 296, 90, 9)}
+  <rect x="160" y="252" width="160" height="12" rx="6" fill="${P.brown}"/>
+  <rect x="172" y="264" width="10" height="26" fill="${P.brown}"/>
+  <rect x="298" y="264" width="10" height="26" fill="${P.brown}"/>
+  ${person(120, 292, 1.15, P.rose, P.skin2)}
+  <text x="120" y="308" font-family="Georgia,serif" font-size="8.4" font-style="italic" fill="#8a8371" text-anchor="middle">visitor, moved</text>
+  ${grain(480,320)}`;
+};
+
+/* ---------------------------------------------------------------
+   18 · publishing from the 38 geary
+--------------------------------------------------------------- */
+ART['bus-blogging'] = () => `
+  <rect width="480" height="320" fill="#3f4456"/>
+  <rect x="0" y="36" width="480" height="120" rx="8" fill="#232838"/>
+  <g opacity=".85">
+    <rect x="30" y="96" width="30" height="60" fill="#2f3448"/>
+    <rect x="70" y="76" width="44" height="80" fill="#343a52"/>
+    <rect x="126" y="90" width="26" height="66" fill="#2f3448"/>
+    <rect x="164" y="66" width="52" height="90" fill="#3a4160"/>
+    <rect x="228" y="86" width="34" height="70" fill="#2f3448"/>
+    <rect x="274" y="72" width="48" height="84" fill="#343a52"/>
+    <rect x="334" y="92" width="28" height="64" fill="#2f3448"/>
+    <rect x="374" y="64" width="56" height="92" fill="#3a4160"/>
+    <g fill="${P.sun}">
+      <rect x="76" y="84" width="5" height="5"/><rect x="88" y="96" width="5" height="5"/><rect x="100" y="84" width="5" height="5"/>
+      <rect x="172" y="76" width="5" height="5"/><rect x="184" y="90" width="5" height="5"/><rect x="200" y="76" width="5" height="5"/>
+      <rect x="282" y="82" width="5" height="5"/><rect x="296" y="96" width="5" height="5"/>
+      <rect x="382" y="74" width="5" height="5"/><rect x="396" y="88" width="5" height="5"/><rect x="410" y="100" width="5" height="5"/>
+    </g>
+    <circle cx="440" cy="58" r="12" fill="${P.cream}" opacity=".8"/>
+  </g>
+  <g stroke="#8d97b8" stroke-width="1.6" opacity=".55" stroke-linecap="round">
+    <line x1="60" y1="40" x2="48" y2="70"/><line x1="140" y1="44" x2="128" y2="80"/>
+    <line x1="250" y1="38" x2="238" y2="72"/><line x1="330" y1="46" x2="318" y2="84"/>
+    <line x1="420" y1="40" x2="408" y2="76"/>
+  </g>
+  <rect x="0" y="156" width="480" height="10" fill="#565c72"/>
+  <rect x="0" y="256" width="480" height="64" fill="#333849"/>
+  <g>
+    <rect x="120" y="196" width="120 " height="90" rx="10" fill="#4a5068"/>
+    <rect x="132" y="166" width="96" height="60" rx="8" fill="#565c78"/>
+  </g>
+  ${shadow(196, 306, 60, 9)}
+  ${person(196, 300, 1.7, P.deepteal, P.skin3, `
+    <rect x="176" y="216" width="40" height="26" rx="8" fill="#3f4456"/>
+  `)}
+  <g transform="rotate(-12 236 236)">
+    <rect x="222" y="216" width="30" height="52" rx="6" fill="#17181c"/>
+    <rect x="225" y="221" width="24" height="42" rx="3" fill="#e8f0f4"/>
+    <rect x="227" y="224" width="20" height="4" rx="2" fill="#21759b"/>
+    <rect x="227" y="232" width="16" height="2.6" rx="1.3" fill="#8d97a3"/>
+    <rect x="227" y="237" width="18" height="2.6" rx="1.3" fill="#8d97a3"/>
+    <rect x="227" y="242" width="13" height="2.6" rx="1.3" fill="#8d97a3"/>
+    <ellipse cx="237" cy="242" rx="34" ry="26" fill="#dff0f4" opacity=".14"/>
+  </g>
+  <g transform="rotate(-4 320 196)">
+    ${shadow(320, 216, 48, 6)}
+    <rect x="262" y="180" width="116" height="26" rx="13" fill="#2d7a4f"/>
+    <circle cx="278" cy="193" r="7" fill="#fff"/>
+    <path d="M 274.5 193 l 2.6 2.8 l 4.6 -5.6" stroke="#2d7a4f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <text x="290" y="197" font-family="Arial" font-size="9.5" fill="#fff">Post published.</text>
+  </g>
+  ${grain(480,320)}`;
+
+/* ---------------------------------------------------------------
+   19 · the rest api sticky-note wall
+--------------------------------------------------------------- */
+ART['rest-api-wall'] = () => {
+  const rnd = seedFrom('stickywall');
+  const colors = ['#f2e28a', '#f2b8cb', '#a9d4f0', '#b8e2a4', '#f2e28a', '#e8c9f0'];
+  const labels = ['GET /posts','POST /media','/wp/v2/','auth??','GET /users/me','DELETE?','oembed','/comments','schema!','PUT /posts/7','menus, later','_embed'];
+  let notes = '';
+  for (let i = 0; i < 12; i++){
+    const x = 66 + (i % 4) * 96 + (rnd() - .5) * 16;
+    const y = 66 + Math.floor(i / 4) * 74 + (rnd() - .5) * 12;
+    const r = (rnd() - .5) * 14;
+    notes += `
+    <g transform="rotate(${r.toFixed(1)} ${x} ${y})">
+      ${shadow(x, y + 26, 22, 4)}
+      <rect x="${x - 24}" y="${y - 24}" width="48" height="48" fill="${colors[i % 6]}"/>
+      <path d="M ${x + 24} ${y + 24} l -12 0 l 12 -12 z" fill="#00000012"/>
+      <text x="${x}" y="${y + 2}" font-family="Courier New,monospace" font-size="${labels[i].length > 9 ? 6.4 : 7.6}" fill="#3c4453" text-anchor="middle">${labels[i]}</text>
+    </g>`;
+  }
+  return `
+  <rect width="480" height="360" fill="#e8e4da"/>
+  <rect x="24" y="24" width="432" height="248" fill="#f4f1e8" stroke="#c9c2b0" stroke-width="3"/>
+  ${notes}
+  <path d="M 158 90 q 30 -20 60 -4 M 258 140 q 36 10 60 -18 M 160 214 q 40 18 88 2" stroke="#c2452f" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1 6"/>
+  <rect x="0" y="300" width="480" height="60" fill="#d4cfc2"/>
+  ${shadow(120, 316, 30, 8)}
+  ${person(120, 312, 1.5, P.navy, P.skin4, `<path d="M 138 250 L 172 216" stroke="${P.skin4}" stroke-width="9" stroke-linecap="round"/>`)}
+  ${shadow(360, 316, 30, 8)}
+  ${person(360, 312, 1.5, P.terra, P.skin3, `<path d="M 342 250 L 306 224" stroke="${P.skin3}" stroke-width="9" stroke-linecap="round"/>`)}
+  <text x="240" y="292" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#8a8371" text-anchor="middle">six hours of arguing about routes. best day of the year.</text>
+  ${grain(480,360)}`;
+};
+
+/* ---------------------------------------------------------------
+   20 · polyglots sprint, table 4
+--------------------------------------------------------------- */
+ART['translation-sprint'] = () => {
+  const bubbles = [
+    [96, 64, 'cześć!', P.teal], [196, 44, 'hola!', P.rose], [296, 60, 'こんにちは', P.navy],
+    [392, 46, 'مرحبا', P.terra], [148, 108, 'hallo!', P.olive], [344, 104, 'oi!', P.deepteal]
+  ].map(([x, y, w, c]) => `
+    <g>
+      <rect x="${x - 34}" y="${y - 15}" width="68" height="26" rx="13" fill="${P.warmwhite}" stroke="${c}" stroke-width="2"/>
+      <path d="M ${x - 6} ${y + 11} l 6 10 l 6 -10 z" fill="${P.warmwhite}" stroke="${c}" stroke-width="2"/>
+      <text x="${x}" y="${y + 3}" font-family="Arial" font-size="10.5" fill="${c}" text-anchor="middle">${w}</text>
+    </g>`).join('');
+  const laptops = [110, 190, 270, 350].map(x => `
+    <rect x="${x - 24}" y="196" width="48" height="30" rx="3" fill="#3f4a56"/>
+    <rect x="${x - 21}" y="199" width="42" height="24" rx="2" fill="#c8dde4"/>
+    <rect x="${x - 28}" y="226" width="56" height="6" rx="3" fill="#5b6770"/>
+    <ellipse cx="${x}" cy="214" rx="30" ry="16" fill="#dff0f4" opacity=".22"/>`).join('');
+  return `
+  <rect width="480" height="360" fill="${P.paper}"/>
+  <rect x="0" y="150" width="480" height="14" fill="#d5c8a9" opacity=".6"/>
+  ${bubbles}
+  ${shadow(240, 322, 200, 14)}
+  <path d="M 36 232 L 444 232 L 470 320 L 10 320 Z" fill="${P.woodlight}"/>
+  <path d="M 36 232 L 444 232 L 448 244 L 32 244 Z" fill="#c39a72"/>
+  ${laptops}
+  ${person(70, 232, 1.25, P.rose, P.skin3)}
+  ${person(152, 228, 1.2, P.navy, P.skin1)}
+  ${person(232, 230, 1.25, P.gold, P.skin4)}
+  ${person(312, 228, 1.2, P.deepteal, P.skin2)}
+  ${person(396, 232, 1.25, P.terra, P.skin1)}
+  ${mug(438, 268, 1.1, P.teal)}
+  <g transform="rotate(-3 80 292)">
+    <rect x="46" y="278" width="68" height="24" rx="4" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="1.6"/>
+    <text x="80" y="289" font-family="Arial" font-size="7" fill="${P.ink2}" text-anchor="middle">sr_RS &middot; 100%</text>
+    <text x="80" y="297" font-family="Arial" font-size="6.4" fill="${P.teal}" text-anchor="middle">at 23:40 &#127881;</text>
+  </g>
+  <text x="240" y="344" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#8a8371" text-anchor="middle">"hello world" is easy. "howdy" took three of us.</text>
+  ${grain(480,360)}`;
+};
+
+/* ---------------------------------------------------------------
+   21 · the first block sketch — a napkin, a pen, a heresy
+--------------------------------------------------------------- */
+ART['gutenberg-napkin'] = () => `
+  <rect width="400" height="400" fill="${P.woodlight}"/>
+  <rect x="0" y="0" width="400" height="400" fill="#c39a72" opacity=".25"/>
+  <circle cx="330" cy="86" r="34" fill="none" stroke="#8a5a30" stroke-width="7" opacity=".3"/>
+  ${shadow(196, 342, 150, 14)}
+  <g transform="rotate(-3 196 210)">
+    <path d="M 60 88 q 60 -10 136 0 q 76 -8 140 4 q 8 110 -4 224 q -70 10 -136 0 q -66 8 -132 -4 q -10 -110 -4 -224 z" fill="#fdfcf7"/>
+    <path d="M 60 88 q 60 -10 136 0 q 76 -8 140 4 l -2 22 q -136 -12 -272 -2 z" fill="#f4f1e6"/>
+    <g stroke="#3f4a68" stroke-width="2.6" fill="none" stroke-linecap="round">
+      <rect x="106" y="130" width="184" height="34" rx="4"/>
+      <rect x="106" y="178" width="88" height="66" rx="4"/>
+      <rect x="210" y="178" width="80" height="30" rx="4"/>
+      <rect x="210" y="222" width="80" height="22" rx="4"/>
+      <rect x="106" y="258" width="184" height="30" rx="4"/>
+    </g>
+    <g font-family="Georgia,serif" font-style="italic" fill="#3f4a68">
+      <text x="118" y="152" font-size="15">&para; paragraph</text>
+      <text x="216" y="196" font-size="11">quote</text>
+      <text x="216" y="238" font-size="10">button?</text>
+      <text x="118" y="278" font-size="12">&para; another paragraph&hellip;</text>
+    </g>
+    <g stroke="#3f4a68" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M 120 196 q 16 -8 30 2 q 12 10 28 0"/>
+      <circle cx="172" cy="192" r="6"/>
+      <path d="M 116 226 l 66 0"/>
+      <path d="M 116 234 l 48 0"/>
+    </g>
+    <path d="M 296 148 q 26 6 22 34" stroke="#a03a28" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M 316 176 l 4 8 l -9 0 z" fill="#a03a28"/>
+    <text x="252" y="120" font-family="Georgia,serif" font-size="14" font-style="italic" fill="#a03a28" transform="rotate(-2 252 120)">everything</text>
+    <text x="252" y="136" font-family="Georgia,serif" font-size="14" font-style="italic" fill="#a03a28" transform="rotate(-2 252 136)">is a block?</text>
+    <text x="112" y="318" font-family="Georgia,serif" font-size="10" font-style="italic" fill="#8a8371">(don't lose this napkin — m.)</text>
+  </g>
+  <g transform="rotate(28 320 330)">
+    ${shadow(320, 352, 40, 6)}
+    <rect x="270" y="322" width="96" height="9" rx="4.5" fill="${P.navy}"/>
+    <path d="M 366 322 l 16 4.5 l -16 4.5 z" fill="#d8cbb2"/>
+    <path d="M 380 325 l 6 1.5 l -6 1.5 z" fill="${P.ink}"/>
+    <rect x="262" y="322" width="10" height="9" rx="4" fill="${P.gold}"/>
+  </g>
+  ${grain(400,400)}`;
+
+/* ---------------------------------------------------------------
+   22 · the night bebo shipped
+--------------------------------------------------------------- */
+ART['bebo-ship-night'] = () => `
+  <rect width="480" height="320" fill="#1d2233"/>
+  <rect x="0" y="252" width="480" height="68" fill="#232838"/>
+  <g opacity=".9">
+    ${[[70,120],[180,100],[300,116],[404,104]].map(([x, y]) => `
+      <rect x="${x - 34}" y="${y}" width="68" height="46" rx="4" fill="#2c3145"/>
+      <rect x="${x - 30}" y="${y + 4}" width="60" height="38" rx="2" fill="#101322"/>
+      <g fill="#7d9ec9" opacity=".8">
+        <rect x="${x - 24}" y="${y + 10}" width="34" height="3.4" rx="1.7"/>
+        <rect x="${x - 24}" y="${y + 17}" width="46" height="3.4" rx="1.7"/>
+        <rect x="${x - 24}" y="${y + 24}" width="28" height="3.4" rx="1.7"/>
+        <rect x="${x - 24}" y="${y + 31}" width="40" height="3.4" rx="1.7"/>
+      </g>
+      <rect x="${x - 5}" y="${y + 46}" width="10" height="12" fill="#2c3145"/>
+      <rect x="${x - 20}" y="${y + 58}" width="40" height="5" rx="2.5" fill="#2c3145"/>
+      <ellipse cx="${x}" cy="${y + 30}" rx="52" ry="34" fill="#7d9ec9" opacity=".07"/>`).join('')}
+  </g>
+  ${shadow(240, 250, 70, 10)}
+  <rect x="176" y="60" width="128" height="96" rx="6" fill="#2c3145"/>
+  <rect x="182" y="66" width="116" height="84" rx="3" fill="#f4f6f8"/>
+  <rect x="192" y="76" width="66" height="7" rx="3.5" fill="#1e1e1e"/>
+  <rect x="192" y="90" width="96" height="4.4" rx="2.2" fill="#b3bcc2"/>
+  <rect x="192" y="99" width="86" height="4.4" rx="2.2" fill="#b3bcc2"/>
+  <rect x="192" y="108" width="92" height="4.4" rx="2.2" fill="#b3bcc2"/>
+  <rect x="214" y="124" width="52" height="17" rx="3" fill="#0073aa"/>
+  <text x="240" y="136" font-family="Arial" font-size="9.5" fill="#fff" text-anchor="middle">Publish</text>
+  <rect x="234" y="156" width="12" height="14" fill="#2c3145"/>
+  <rect x="212" y="170" width="56" height="6" rx="3" fill="#2c3145"/>
+  <ellipse cx="240" cy="110" rx="90" ry="60" fill="#9db8d8" opacity=".1"/>
+  ${person(120, 252, 1.3, P.deepteal, P.skin2)}
+  ${person(240, 254, 1.35, P.rust, P.skin4)}
+  ${person(352, 252, 1.3, P.navy, P.skin3)}
+  <g>
+    ${shadow(430, 282, 30, 6)}
+    <path d="M 402 268 l 56 0 l -6 14 l -44 0 z" fill="#d8cbb2"/>
+    <path d="M 402 268 l 28 -10 l 28 10 z" fill="#c4b79c"/>
+    <circle cx="430" cy="264" r="3" fill="${P.terra}"/>
+  </g>
+  <g>
+    <rect x="60" y="30" width="7" height="7" fill="${P.rose}" transform="rotate(24 63 33)"/>
+    <rect x="140" y="18" width="6" height="6" fill="${P.sun}" transform="rotate(-18 143 21)"/>
+    <rect x="330" y="24" width="7" height="7" fill="${P.teal}" transform="rotate(40 333 27)"/>
+    <rect x="410" y="40" width="6" height="6" fill="${P.rose}" transform="rotate(-30 413 43)"/>
+    <rect x="260" y="16" width="6" height="6" fill="#9db8d8" transform="rotate(12 263 19)"/>
+  </g>
+  <text x="240" y="304" font-family="Courier New,monospace" font-size="9.5" fill="#6b7694" text-anchor="middle">40 tabs of make/core open &middot; all of them cautiously optimistic</text>
+  ${grain(480,320)}`;
+
+/* ---------------------------------------------------------------
+   23 · the simone release squad (5.6) — nine kitchens, one deploy
+--------------------------------------------------------------- */
+ART['simone-squad'] = () => {
+  const rooms = ['#4a4063','#3d5c53','#5c4a3d','#3f4a68','#5c3d4e','#44584a','#4e4658','#3d4a5c','#584a3d'];
+  const shirts = [P.rose, P.gold, P.teal, P.warmwhite, P.terra, P.sky, P.olive, P.rose, P.gold];
+  const skins = [P.skin3, P.skin1, P.skin4, P.skin2, P.skin1, P.skin3, P.skin4, P.skin2, P.skin1];
+  const cells = [];
+  for (let i = 0; i < 9; i++){
+    const cx = 96 + (i % 3) * 100, cy = 60 + Math.floor(i / 3) * 74;
+    const wave = (i === 4)
+      ? `<path d="M ${cx + 12} ${cy + 26} l 5 -14 m 0 0 l -4 -3 m 4 3 l 5 1" stroke="${skins[i]}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M ${cx + 16} ${cy + 4} l 0 -8 m -3 8 l 6 0" stroke="#e8d48a" stroke-width="2.4" stroke-linecap="round"/><path d="M ${cx + 13} ${cy - 4} q 3 -6 6 0 l -1 8 l -4 0 z" fill="#e8d48a" opacity=".9"/>`
+      : `<path d="M ${cx + 13} ${cy + 24} q 8 -8 6 -18" stroke="${skins[i]}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    cells.push(`
+      <g>
+        <rect x="${cx - 44}" y="${cy - 26}" width="92" height="68" rx="3" fill="${rooms[i]}"/>
+        <rect x="${cx - 36}" y="${cy - 20}" width="18" height="12" rx="2" fill="#ffffff22"/>
+        ${person(cx, cy + 42, 1.05, shirts[i], skins[i])}
+        ${wave}
+        <circle cx="${cx - 38}" cy="${cy + 34}" r="3.4" fill="${i === 2 ? P.rose : '#7fb350'}"/>
+      </g>`);
+  }
+  return `
+  <rect width="480" height="320" fill="#14161f"/>
+  <rect x="30" y="16" width="420" height="266" rx="8" fill="#1f2230"/>
+  ${cells.join('')}
+  <rect x="30" y="256" width="420" height="26" rx="4" fill="#171a26"/>
+  <circle cx="222" cy="269" r="7" fill="#c2452f"/>
+  <rect x="240" y="263" width="14" height="12" rx="2.5" fill="#3a4160"/>
+  <text x="360" y="273" font-family="Arial" font-size="8.4" fill="#8d97b8">recording &middot; 02:14:56</text>
+  <text x="96" y="273" font-family="Arial" font-size="8.4" fill="#8d97b8">squad: 9 &middot; timezone math: ongoing</text>
+  <text x="240" y="306" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#6b7694" text-anchor="middle">5.6 &ldquo;simone&rdquo; &mdash; shipped from nine kitchens, december 2020</text>
+  ${grain(480,320)}`;
+};
+
+/* ---------------------------------------------------------------
+   24 · state of the word, from the cheap seats
+--------------------------------------------------------------- */
+ART['sotw'] = () => {
+  const rnd = seedFrom('cheapseats');
+  let heads = '';
+  for (let row = 0; row < 3; row++){
+    for (let i = 0; i < 14; i++){
+      const x = 12 + i * 35 + (rnd() - .5) * 14 + row * 9;
+      const y = 250 + row * 26 + (rnd() - .5) * 6;
+      const r = 12 + rnd() * 4 + row * 2;
+      heads += `<circle cx="${x}" cy="${y}" r="${r}" fill="#12141d"/>`;
+    }
+  }
+  return `
+  <rect width="480" height="320" fill="#1a1d2a"/>
+  <ellipse cx="240" cy="140" rx="230" ry="130" fill="${P.sun}" opacity=".1"/>
+  <rect x="60" y="196" width="360" height="14" fill="#2c2418"/>
+  <rect x="60" y="210" width="360" height="30" fill="#231d12"/>
+  <ellipse cx="240" cy="200" rx="180" ry="26" fill="${P.sun}" opacity=".14"/>
+  <g>
+    <rect x="140" y="62" width="200" height="118" rx="4" fill="#f4f1e6"/>
+    <circle cx="216" cy="112" r="30" fill="none" stroke="#21759b" stroke-width="5"/>
+    <text x="216" y="124" font-family="Georgia,serif" font-size="34" fill="#21759b" text-anchor="middle" font-weight="bold">W</text>
+    <path d="M 262 138 l 22 -18 l 16 8 l 24 -26" stroke="${P.terra}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 318 100 l 8 -2 l 0 9 z" fill="${P.terra}"/>
+    <rect x="262" y="148" width="58" height="4" rx="2" fill="#b9b2a0"/>
+    <rect x="262" y="156" width="44" height="4" rx="2" fill="#b9b2a0"/>
+  </g>
+  ${shadow(122, 198, 16, 4)}
+  ${person(122, 196, 1.05, P.charcoal, P.skin2)}
+  <ellipse cx="122" cy="170" rx="30" ry="42" fill="${P.sun}" opacity=".12"/>
+  <g opacity=".8">
+    <path d="M 20 30 L 90 68" stroke="${P.sun}" stroke-width="2" opacity=".25"/>
+    <path d="M 460 30 L 390 68" stroke="${P.sun}" stroke-width="2" opacity=".25"/>
+    <circle cx="20" cy="28" r="5" fill="#2c3145"/>
+    <circle cx="460" cy="28" r="5" fill="#2c3145"/>
+  </g>
+  ${heads}
+  <g>
+    <circle cx="404" cy="252" r="13" fill="#12141d"/>
+    <rect x="396" y="236" width="17" height="11" rx="2" fill="#3a4160"/>
+    <rect x="398" y="238" width="13" height="7" rx="1.5" fill="#9db8d8" opacity=".9"/>
+  </g>
+  ${grain(480,320)}`;
+};
+
+/* ---------------------------------------------------------------
+   25 · full site editing moves the walls
+--------------------------------------------------------------- */
+ART['fse-house'] = () => `
+  <rect width="480" height="360" fill="#d8e4e6"/>
+  <circle cx="404" cy="64" r="30" fill="${P.sun}" opacity=".8"/>
+  <path d="M 40 84 q 18 -14 38 0 q 20 -14 34 2 l 0 8 l -72 0 z" fill="#fff" opacity=".8"/>
+  <path d="M 300 40 q 14 -12 30 0 q 16 -10 26 2 l 0 7 l -56 0 z" fill="#fff" opacity=".7"/>
+  <rect x="0" y="296" width="480" height="64" fill="#a4b08a"/>
+  <rect x="0" y="296" width="480" height="8" fill="#b8c49a"/>
+  ${shadow(220, 306, 130, 12)}
+  <g>
+    <rect x="120" y="238" width="200" height="58" fill="${P.warmwhite}" stroke="${P.navy}" stroke-width="3"/>
+    <rect x="196" y="256" width="42" height="40" fill="${P.navy}"/>
+    <circle cx="230" cy="277" r="2.6" fill="${P.gold}"/>
+    <rect x="138" y="252" width="34" height="26" fill="#c8dde4" stroke="${P.navy}" stroke-width="2.4"/>
+    <rect x="264" y="252" width="34" height="26" fill="#c8dde4" stroke="${P.navy}" stroke-width="2.4"/>
+    <rect x="120" y="196" width="200" height="38" fill="${P.teal}" stroke="${P.deepteal}" stroke-width="3"/>
+    <text x="220" y="220" font-family="Arial" font-size="11" fill="#fff" text-anchor="middle">header template part</text>
+  </g>
+  <g transform="rotate(5 220 156)">
+    <rect x="140" y="140" width="160" height="34" fill="${P.terra}" stroke="${P.rust}" stroke-width="3" stroke-dasharray="7 5"/>
+    <text x="220" y="161" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle">navigation block</text>
+  </g>
+  <g transform="rotate(-7 356 170)">
+    <rect x="316" y="150" width="80" height="40" fill="${P.rose}" stroke="#b06a74" stroke-width="3" stroke-dasharray="7 5"/>
+    <text x="356" y="174" font-family="Arial" font-size="9.5" fill="#fff" text-anchor="middle">footer</text>
+  </g>
+  <g transform="rotate(4 84 208)">
+    <rect x="48" y="188" width="72" height="40" fill="${P.gold}" stroke="#b0862a" stroke-width="3" stroke-dasharray="7 5"/>
+    <text x="84" y="212" font-family="Arial" font-size="9.5" fill="#fff" text-anchor="middle">sidebar??</text>
+  </g>
+  <g>
+    <path d="M 388 300 L 388 96 L 260 96" stroke="#5b6770" stroke-width="7" fill="none"/>
+    <path d="M 260 96 L 260 128" stroke="#5b6770" stroke-width="2.6" stroke-dasharray="5 5"/>
+    <path d="M 252 128 l 0 22 l 6 -5 l 4 9 l 5 -2 l -4 -9 l 8 -1 z" fill="#fff" stroke="#2f4858" stroke-width="2"/>
+    <rect x="378" y="290" width="20" height="14" fill="#3f4a56"/>
+  </g>
+  ${person(60, 300, 1.3, P.navy, P.skin4, `<path d="M 44 288 a 18 18 0 0 1 32 0 z" fill="${P.gold}"/>`)}
+  ${person(444, 302, 1.3, P.teal, P.skin2, `<path d="M 428 290 a 18 18 0 0 1 32 0 z" fill="${P.gold}"/>`)}
+  <text x="240" y="340" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#57604a" text-anchor="middle">load-bearing walls, now with drag handles</text>
+  ${grain(480,360)}`;
+
+/* ---------------------------------------------------------------
+   26 · wp-admin rides shotgun — 2019, one thumb, one plant
+--------------------------------------------------------------- */
+ART['iphone-admin-2019'] = () => `
+  <rect width="320" height="440" fill="#e4e8e2"/>
+  <g opacity=".95">
+    <path d="M 36 0 q -20 90 18 150 q 30 -66 -18 -150" fill="${P.deepteal}"/>
+    <path d="M 300 20 q 26 80 -12 148 q -34 -62 12 -148" fill="${P.olive}"/>
+    <path d="M 288 180 q 30 40 6 96 q -36 -40 -6 -96" fill="${P.teal}"/>
+    <path d="M 30 210 q -24 50 8 104 q 30 -48 -8 -104" fill="${P.olive}"/>
+  </g>
+  ${shadow(160, 408, 76, 12)}
+  <path d="M 104 408 q -16 -28 8 -42 l 10 -6 l 76 0 l 10 6 q 24 14 8 42 z" fill="${P.skin2}"/>
+  <g>
+    <rect x="94" y="52" width="132" height="266" rx="24" fill="#1d1f26"/>
+    <rect x="100" y="58" width="120" height="254" rx="19" fill="#f0f0f1"/>
+    <path d="M 136 58 l 48 0 l 0 6 q -8 8 -24 8 q -16 0 -24 -8 z" fill="#1d1f26"/>
+    <rect x="100" y="58" width="120" height="22" rx="19" fill="#1d2327"/>
+    <rect x="100" y="72" width="120" height="8" fill="#1d2327"/>
+    <text x="160" y="74" font-family="Arial" font-size="7.4" fill="#fff" text-anchor="middle">My Site &middot; wp-admin</text>
+    <rect x="100" y="80" width="26" height="200" fill="#1d2327"/>
+    ${[0,1,2,3,4,5,6].map(i => `<circle cx="113" cy="${94 + i * 26}" r="4.4" fill="${i === 0 ? '#72aee6' : '#646970'}"/>`).join('')}
+    <rect x="132" y="88" width="82" height="30" rx="3" fill="#fff" stroke="#dcdcde" stroke-width="1.4"/>
+    <circle cx="146" cy="103" r="7" fill="#00a32a"/>
+    <path d="M 142.5 103 l 2.6 2.8 l 4.6 -5.6" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <text x="158" y="100" font-family="Arial" font-size="6.8" fill="#1d2327">Site Health</text>
+    <text x="158" y="110" font-family="Arial" font-size="6.2" fill="#00a32a">Good</text>
+    <rect x="132" y="124" width="82" height="42" rx="3" fill="#fff" stroke="#dcdcde" stroke-width="1.4"/>
+    <text x="138" y="136" font-family="Arial" font-size="6.4" fill="#646970">At a Glance</text>
+    <rect x="138" y="142" width="56" height="3.6" rx="1.8" fill="#c3c4c7"/>
+    <rect x="138" y="150" width="44" height="3.6" rx="1.8" fill="#c3c4c7"/>
+    <rect x="138" y="158" width="50" height="3.6" rx="1.8" fill="#c3c4c7"/>
+    <rect x="132" y="172" width="82" height="36" rx="3" fill="#fff" stroke="#dcdcde" stroke-width="1.4"/>
+    <text x="138" y="184" font-family="Arial" font-size="6.4" fill="#646970">Activity</text>
+    <rect x="138" y="190" width="60" height="3.6" rx="1.8" fill="#c3c4c7"/>
+    <rect x="138" y="198" width="48" height="3.6" rx="1.8" fill="#c3c4c7"/>
+    <rect x="132" y="214" width="82 " height="18" rx="3" fill="#2271b1"/>
+    <text x="173" y="226" font-family="Arial" font-size="7" fill="#fff" text-anchor="middle">Update now</text>
+    <rect x="140" y="298" width="40" height="4" rx="2" fill="#9ba0a6"/>
+  </g>
+  <path d="M 226 260 q 26 10 18 44 q -6 22 -28 24" stroke="${P.skin2}" stroke-width="17" fill="none" stroke-linecap="round"/>
+  <text x="160" y="32" font-family="Georgia,serif" font-size="11.5" font-style="italic" fill="#57604a" text-anchor="middle">checking on the website (watering the plants)</text>
+  ${grain(320,440)}`;
+
+/* ---------------------------------------------------------------
+   27 · the four freedoms mural — the giant annotated photo
+--------------------------------------------------------------- */
+ART['four-freedoms-mural'] = () => `
+  <rect width="960" height="420" fill="#ded4c0"/>
+  <g opacity=".26" fill="#b9ab8f">
+    ${[0,1,2,3,4,5,6].map(r => [0,1,2,3,4,5,6,7,8,9].map(c =>
+      `<rect x="${c * 100 + (r % 2) * 50 - 40}" y="${r * 62}" width="92" height="54" rx="2"/>`).join('')).join('')}
+  </g>
+  <rect x="30" y="26" width="900" height="330" rx="6" fill="#f2ead8" stroke="#c9bda0" stroke-width="4"/>
+  <text x="480" y="66" font-family="Georgia,serif" font-size="25" font-style="italic" fill="${P.ink2}" text-anchor="middle">the four freedoms</text>
+  <text x="480" y="86" font-family="Arial" font-size="10.5" letter-spacing="3" fill="#a2946f" text-anchor="middle">GPL v2 &middot; OR, AT YOUR OPTION, ANY LATER VERSION</text>
+  <g>
+    <rect x="62" y="104" width="196" height="200" rx="5" fill="#e8f0e2" stroke="${P.olive}" stroke-width="3"/>
+    ${person(140, 268, 1.6, P.teal, P.skin1, `
+      <path d="M 156 216 L 196 168" stroke="${P.skin1}" stroke-width="8" stroke-linecap="round"/>`)}
+    <path d="M 196 168 L 216 130" stroke="#8a8371" stroke-width="1.6"/>
+    <g transform="rotate(9 216 122)">
+      <rect x="192" y="106" width="48" height="34" rx="4" fill="${P.warmwhite}" stroke="${P.navy}" stroke-width="2.4"/>
+      <rect x="192" y="106" width="48" height="9" rx="4" fill="${P.navy}"/>
+      <circle cx="198" cy="110.5" r="1.6" fill="${P.rose}"/><circle cx="204" cy="110.5" r="1.6" fill="${P.gold}"/>
+      <rect x="198" y="120" width="30" height="3" rx="1.5" fill="#b9b2a0"/>
+      <rect x="198" y="127" width="36" height="3" rx="1.5" fill="#b9b2a0"/>
+    </g>
+    <path d="M 96 240 q 20 -14 36 0" stroke="${P.olive}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <text x="160" y="298" font-family="Georgia,serif" font-size="15" font-style="italic" fill="${P.deepteal}" text-anchor="middle">0 &middot; run it, for anything</text>
+  </g>
+  <g>
+    <rect x="286" y="104" width="196" height="200" rx="5" fill="#f0ece0" stroke="${P.gold}" stroke-width="3"/>
+    ${person(348, 272, 1.55, P.rust, P.skin3)}
+    <circle cx="404" cy="180" r="42" fill="none" stroke="${P.navy}" stroke-width="7"/>
+    <line x1="432" y1="212" x2="452" y2="236" stroke="${P.navy}" stroke-width="9" stroke-linecap="round"/>
+    <text x="404" y="176" font-family="Courier New,monospace" font-size="15" fill="${P.navy}" text-anchor="middle">&lt;?php</text>
+    <text x="404" y="194" font-family="Courier New,monospace" font-size="10" fill="${P.terra}" text-anchor="middle">the_loop()</text>
+    <text x="384" y="298" font-family="Georgia,serif" font-size="15" font-style="italic" fill="#8a6a2a" text-anchor="middle">1 &middot; study how it works</text>
+  </g>
+  <g>
+    <rect x="510" y="104" width="196" height="200" rx="5" fill="#f2e4dc" stroke="${P.terra}" stroke-width="3"/>
+    ${person(568, 272, 1.55, P.navy, P.skin4, `
+      <path d="M 584 224 L 616 196" stroke="${P.skin4}" stroke-width="8" stroke-linecap="round"/>`)}
+    <g transform="rotate(-14 630 178)">
+      <path d="M 614 196 l 22 -30 m -22 0 l 22 30 m -11 -15 l 0 -34" stroke="${P.rust}" stroke-width="7" stroke-linecap="round" fill="none"/>
+    </g>
+    <path d="M 630 236 q 26 10 44 -6" stroke="${P.terra}" stroke-width="2.4" fill="none" stroke-dasharray="5 4"/>
+    <rect x="646" y="126" width="34" height="26" rx="3" fill="${P.warmwhite}" stroke="${P.rust}" stroke-width="2.2" transform="rotate(8 663 139)"/>
+    <text x="663" y="143" font-family="Courier New,monospace" font-size="9" fill="${P.rust}" text-anchor="middle" transform="rotate(8 663 139)">fork</text>
+    <text x="608" y="298" font-family="Georgia,serif" font-size="15" font-style="italic" fill="${P.rust}" text-anchor="middle">2 &middot; change it, improve it</text>
+  </g>
+  <g>
+    <rect x="734" y="104" width="164" height="200" rx="5" fill="#e2ecf0" stroke="${P.teal}" stroke-width="3"/>
+    ${person(776, 272, 1.5, P.rose, P.skin2, `<path d="M 790 226 L 812 210" stroke="${P.skin2}" stroke-width="7" stroke-linecap="round"/>`)}
+    ${person(862, 272, 1.5, P.gold, P.skin1, `<path d="M 848 226 L 826 210" stroke="${P.skin1}" stroke-width="7" stroke-linecap="round"/>`)}
+    <g transform="rotate(-4 819 198)">
+      <path d="M 819 186 q -10 -12 -20 -2 q -8 9 20 28 q 28 -19 20 -28 q -10 -10 -20 2 z" fill="${P.rose}"/>
+    </g>
+    <text x="816" y="298" font-family="Georgia,serif" font-size="15" font-style="italic" fill="${P.deepteal}" text-anchor="middle">3 &middot; share it onward</text>
+  </g>
+  <text x="480" y="338" font-family="Georgia,serif" font-size="12" font-style="italic" fill="#a2946f" text-anchor="middle">repainted continuously since 2003 &mdash; touch-ups welcome, brushes by the door</text>
+  <g>
+    ${shadow(80, 392, 40, 8)}
+    <path d="M 56 356 l 10 0 l 12 40 l -8 0 z M 104 356 l -10 0 l -12 40 l 8 0 z" fill="${P.woodlight}"/>
+    <rect x="60" y="366" width="40" height="5" fill="${P.woodlight}"/>
+    <rect x="62" y="380" width="36" height="5" fill="${P.woodlight}"/>
+  </g>
+  <g>
+    ${shadow(886, 396, 34, 7)}
+    <rect x="856" y="368" width="26" height="28" rx="3" fill="${P.teal}"/>
+    <rect x="888" y="374" width="22" height="22" rx="3" fill="${P.rose}"/>
+    <path d="M 862 368 q 8 -10 14 0" stroke="#8a8371" stroke-width="2.4" fill="none"/>
+    <rect x="902" y="352" width="5" height="26" fill="${P.brown}" transform="rotate(18 904 365)"/>
+  </g>
+  ${grain(960,420)}`;
+
+/* ---------------------------------------------------------------
+   28 · attendee, uncredentialed — the wordcamp squirrel
+--------------------------------------------------------------- */
+ART['wc-squirrel'] = () => `
+  <rect width="480" height="360" fill="#e2ddd2"/>
+  <rect x="0" y="0" width="480" height="150" fill="#d5cfc2"/>
+  <g opacity=".5">
+    <rect x="60" y="40" width="150" height="90" rx="4" fill="#c4bcab"/>
+    <rect x="250" y="52" width="120" height="70" rx="4" fill="#c4bcab"/>
+    <circle cx="310" cy="86" r="22" fill="none" stroke="#a89e8a" stroke-width="4"/>
+    <text x="310" y="94" font-family="Georgia,serif" font-size="22" fill="#a89e8a" text-anchor="middle">W</text>
+  </g>
+  <rect x="0" y="290" width="480" height="70" fill="#b3aa96"/>
+  <g>
+    ${[76, 240, 404].map(x => `
+      ${shadow(x, 306, 62, 9)}
+      <rect x="${x - 58}" y="200" width="116" height="16" rx="6" fill="${P.navy}"/>
+      <rect x="${x - 58}" y="150" width="116" height="54" rx="8" fill="#3d5470"/>
+      <rect x="${x - 52}" y="216" width="10" height="86" rx="4" fill="#5b6770"/>
+      <rect x="${x + 42}" y="216" width="10" height="86" rx="4" fill="#5b6770"/>`).join('')}
+  </g>
+  <g>
+    ${shadow(240, 214, 48, 8)}
+    <path d="M 286 178 q 26 -44 -4 -74 q -20 -18 -34 2 q 24 4 22 34 q -2 24 16 38 z" fill="${P.rust}"/>
+    <ellipse cx="240" cy="182" rx="34" ry="26" fill="${P.terra}"/>
+    <circle cx="212" cy="158" r="19" fill="${P.terra}"/>
+    <path d="M 202 144 l -4 -12 l 10 6 z" fill="${P.rust}"/>
+    <path d="M 220 142 l 2 -13 l 7 10 z" fill="${P.rust}"/>
+    <circle cx="206" cy="156" r="2.6" fill="#241a10"/>
+    <circle cx="199" cy="164" r="1.8" fill="#241a10"/>
+    <ellipse cx="228" cy="188" rx="12" ry="16" fill="#e8cba4"/>
+    <path d="M 216 172 q -10 6 -6 14" stroke="${P.rust}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 210 186 q -3 8 4 10" stroke="${P.rust}" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M 212 170 l 0 20" stroke="#d9a441" stroke-width="2.6"/>
+    <g transform="rotate(6 212 204)">
+      <rect x="198" y="194" width="28" height="20" rx="2.5" fill="${P.warmwhite}" stroke="#c9bfa4" stroke-width="1.6"/>
+      <text x="212" y="202.5" font-family="Arial" font-size="5.6" fill="${P.ink2}" text-anchor="middle" font-weight="bold">SQUIRREL</text>
+      <text x="212" y="209.5" font-family="Arial" font-size="4.6" fill="${P.teal}" text-anchor="middle">volunteer &middot; day 1</text>
+    </g>
+    <ellipse cx="252" cy="199" rx="9" ry="7" fill="#e8cba4"/>
+    <circle cx="262" cy="196" r="8" fill="#d9b06a"/>
+    <circle cx="262" cy="196" r="3.4" fill="#e2ddd2"/>
+  </g>
+  <text x="240" y="336" font-family="Georgia,serif" font-size="10.5" font-style="italic" fill="#6d6450" text-anchor="middle">seat 4C &middot; morning break &middot; bagel: acquired</text>
+  ${grain(480,360)}`;
+
+/* ================================================================
+   rendering helpers
+   ================================================================ */
+const view = document.getElementById('view');
+const main = document.getElementById('main');
+const splash = document.getElementById('splash');
+const playLb = document.getElementById('playLb');
+const playFrame = document.getElementById('playFrame');
+const enterBtn = document.getElementById('enterBtn');
+const pageRegions = [document.getElementById('chrome'),main,document.getElementById('footer')];
+pageRegions.forEach(region=>region.setAttribute('inert',''));
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lastDialogFocus = null;
+
+function textOnly(value){
+  const box = document.createElement('div');
+  box.innerHTML = String(value || '');
+  return box.textContent || '';
+}
+function attr(value){
+  return textOnly(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function getPhoto(id){ return PHOTOS.find(item => item.id === id); }
+function tagged(tag){ return PHOTOS.filter(item => item.tags.includes(tag)); }
+function initials(name){
+  return name.split(/[_\s-]+/).map(bit => bit[0] || '').join('').slice(0,2).toUpperCase();
+}
+function avatar(name, large){
+  const sum = [...name].reduce((n,ch) => n + ch.charCodeAt(0), 0);
+  return `<span class="avatar${large ? ' lg' : ''}" style="background:${AVATAR_COLORS[sum % AVATAR_COLORS.length]}">${attr(initials(name))}</span>`;
+}
+function art(photo, label){
+  return `<svg viewBox="0 0 ${photo.w} ${photo.h}" role="img" aria-label="${attr(label || textOnly(photo.title))}" xmlns="http://www.w3.org/2000/svg">${ART[photo.id]()}</svg>`;
+}
+function photoLink(photo, width, label){
+  return `<a class="snaplink" href="#/photo/${photo.id}" aria-label="open photo: ${attr(textOnly(photo.title))}"><span class="snap era-${photo.era}" style="width:${width}px;max-width:100%">${art(photo,label)}</span></a>`;
+}
+function tagLink(tag){
+  return `<a class="tagchip" href="#/tag/${encodeURIComponent(tag)}"><span class="ticon">●</span>${attr(tag)}</a>`;
+}
+function tagCloud(extraClass){
+  const counts = Object.fromEntries(Object.keys(TAGS).map(tag => [tag, tagged(tag).length + (TAG_BOOST[tag] || 0)]));
+  const values = Object.values(counts), lo = Math.min(...values), hi = Math.max(...values);
+  const links = Object.keys(TAGS).sort().map(tag => {
+    const weight = 1 + Math.round(((counts[tag] - lo) / Math.max(1, hi - lo)) * 5);
+    return `<a class="w${weight}" href="#/tag/${encodeURIComponent(tag)}" title="${counts[tag]} connections">${attr(tag)}</a>`;
+  }).join(' ');
+  return `<div class="cloud ${extraClass || ''}" id="tagCloud" tabindex="-1" aria-label="weighted tag cloud">${links}</div>`;
+}
+function crumbs(label){
+  return `<p class="crumbs"><a href="#/">everyone's archive</a><span class="sep">/</span>${label}</p>`;
+}
+function tagHeading(tag, count){
+  return `${crumbs('photos tagged ' + attr(tag))}<header class="tag-head"><h1>photos tagged <span class="t">${attr(tag)}</span><span class="feed" title="this tiny orange square remembers feeds"></span></h1><p class="meta">${count} photo${count === 1 ? '' : 's'} in everyone's archive</p><p class="blurb">${TAGS[tag].blurb}</p></header>`;
+}
+function excerpt(photo, max){
+  const copy = textOnly(photo.desc).replace(/\s+/g,' ').trim();
+  return copy.length > max ? copy.slice(0,max).replace(/\s+\S*$/,'') + '&hellip;' : attr(copy);
+}
+function entrance(){
+  const items = [...view.querySelectorAll('.pop')].filter(item => !item.closest('.ly-map'));
+  if (reduceMotion){ items.forEach(item => item.classList.add('in')); return; }
+  items.forEach((item,index) => setTimeout(() => item.classList.add('in'), Math.min(index * 55, 600)));
+}
+
+/* ================================================================
+   home and photo detail
+   ================================================================ */
+function renderHome(){
+  const interesting = [...PHOTOS].sort((a,b) => (b.faves || 0) - (a.faves || 0)).slice(0,5);
+  const poolIds = ['b2-fork-night','wordcamp-2006','kubrick-sighting','translation-sprint','gutenberg-napkin','wc-squirrel'];
+  view.className = 'v-home';
+  view.innerHTML = `
+    <h1 class="hello"><span class="wave">hello!</span> welcome to the archive.</h1>
+    <p class="intro">WordPress history was not uploaded in order. It arrived with tags, comments, accidental duplicates, late-night snapshots, and people pointing at the interesting bits. Start with a word, then follow the tags sideways.</p>
+    <h2 class="sectionhead">explore by tag <span class="note">seventeen human-made paths through twenty-eight photos</span></h2>
+    ${tagCloud('bigcloud')}
+    <h2 class="sectionhead">interestingness <span class="note">a mysterious blend of faves, views, and fondness</span></h2>
+    <div class="interest">${interesting.map((photo,index) => `<article class="it pop" style="transition-delay:${index*.04}s">${photoLink(photo,150)}<p class="cap"><a href="#/photo/${photo.id}">${photo.title}</a><br><span class="star">★</span> ${photo.faves.toLocaleString()} faves</p></article>`).join('')}</div>
+    <h2 class="sectionhead">fresh from everyone's pool</h2>
+    <div class="pool">${poolIds.map((id,index) => { const photo=getPhoto(id); return `<article class="it pop" style="transition-delay:${index*.04}s">${photoLink(photo,110)}<p class="cap">${photo.title}</p></article>`; }).join('')}</div>`;
+}
+
+function noteMarkup(note,index){
+  return `<button class="note grab" type="button" data-note="${index}" style="left:${note.x}%;top:${note.y}%;width:${note.w}%;height:${note.h}%" aria-label="photo note ${index+1}: ${attr(note.t)}"><span class="ntext">${note.t}<br><small>drag this note</small></span></button>`;
+}
+function renderPhoto(id){
+  const photo = getPhoto(id);
+  if (!photo){ renderNotFound(); return; }
+  const notes = photo.notes || [];
+  const related = PHOTOS.filter(item => item.id !== id && item.tags.some(tag => photo.tags.includes(tag))).slice(0,4);
+  view.className = 'v-photo';
+  view.innerHTML = `${crumbs('photo / ' + photo.title)}
+    <div class="cols">
+      <section class="main">
+        <h1>${photo.title}</h1>
+        <div class="stagebox${notes.length ? ' has-notes' : ''}" tabindex="0" aria-label="photo${notes.length ? ' with draggable notes' : ''}">
+          <span class="snap era-${photo.era}" style="width:${Math.min(photo.w,700)}px;max-width:100%">${art(photo)}</span>
+          ${notes.length ? `<span class="notes-layer">${notes.map(noteMarkup).join('')}</span>` : ''}
+        </div>
+        <p class="underline-meta"><b>${photo.title}</b> by <a href="#/search/${encodeURIComponent(photo.by)}">${attr(photo.by)}</a></p>
+        <div class="desc">${photo.desc}</div>
+        ${notes.length ? '<p class="notehint">hover the photo to see notes · drag a note, or focus it and use the arrow keys</p>' : ''}
+        <p class="sizesrow"><span>view all sizes:</span> <span class="sz">square</span><span class="sz">small</span><span class="sz on">medium</span><span class="sz">large</span>${photo.boot ? ` <button class="sz live" type="button" data-play-version="${attr(photo.boot)}" data-play-title="${attr(textOnly(photo.title))}">original (live) ↗</button>` : ''}</p>
+        <section class="comments"><h2>${photo.comments.length} comments</h2>${photo.comments.map(comment => `<article class="comment">${avatar(comment.by)}<div class="body"><p class="by"><a href="#/search/${encodeURIComponent(comment.by)}">${attr(comment.by)}</a> says:</p><p class="txt">${comment.txt}</p><p class="when">posted in ${comment.year} · <a href="#/photo/${photo.id}">permalink</a></p></div></article>`).join('')}<p class="commentbar">leave a comment? everyone already did. <a href="#/tag/community">join the group pool instead.</a></p></section>
+      </section>
+      <aside class="side">
+        <section class="sidebox"><div class="who">${avatar(photo.by,true)}<p><b><a href="#/search/${encodeURIComponent(photo.by)}">${attr(photo.by)}</a></b><br><span class="tiny">archive member since forever</span></p></div></section>
+        <section class="sidebox"><h2>tags</h2><ul class="taglist">${photo.tags.map(tag => `<li>${tagLink(tag)}</li>`).join('')}</ul><p class="addl"><span class="cc">additional tags:</span> open-source, remembered, everybody-was-there</p></section>
+        <section class="sidebox stat"><h2>photo information</h2><p>Uploaded on <b>${photo.uploaded}</b></p><p>Taken on ${photo.taken}</p><p>${attr(photo.camera || 'taken with whatever was nearby')}</p><p><b>${(photo.views || 0).toLocaleString()}</b> views</p><p><b>${(photo.faves || 0).toLocaleString()}</b> people call this a favorite</p></section>
+        <section class="sidebox"><h2>nearby in the pool</h2><div class="pool">${related.map(item => `<span style="display:inline-block;margin:0 5px 7px 0">${photoLink(item,64)}</span>`).join('')}</div></section>
+      </aside>
+    </div>`;
+  setupNotes();
+}
+
+/* ================================================================
+   seventeen tag rooms — the collection changes composition, not tint
+   ================================================================ */
+function renderCommunity(items){
+  const spots = [[2,26,-4],[20,2,3],[42,34,-2],[65,5,4],[78,39,-3],[8,265,5],[31,230,-5],[54,278,2],[72,235,-1],[2,500,-3],[27,515,4],[56,500,-4]];
+  return `<div class="ly-wall">${items.map((photo,index) => { const [left,top,rot]=spots[index%spots.length]; return `<article class="card" style="left:${left}%;top:${top}px;--rot:${rot}deg;z-index:${10+index}">${photoLink(photo,index%3===0?184:155)}<p class="cap">${photo.title} · by ${attr(photo.by)}</p></article>`; }).join('')}<p class="poolplate"><b>everyone's group pool</b><br>membership: open<br>moderation: gentle<br>photos arranged by who stood next to whom</p></div>`;
+}
+function renderEditor(){
+  return `<div class="ly-slides"><div class="stagewrap"><div class="stage">${EDITOR_ACTS.map((act,index) => { const photo=getPhoto(act.id); return `<article class="slide${index===0?' on':''}" data-slide="${index}" aria-hidden="${index!==0}"${index===0?'':' inert'}><p class="act">${act.act}</p>${photoLink(photo,560)}<div class="ba"><p class="b4"><i>before:</i> ${act.before}</p><p class="af"><i>after:</i> ${act.after}</p></div></article>`; }).join('')}</div><div class="controls"><button type="button" data-slide-dir="-1">← earlier</button><span class="count"><b id="slideNow">1</b> / ${EDITOR_ACTS.length}</span><button type="button" data-slide-dir="1">later →</button></div><div class="filmrow">${EDITOR_ACTS.map((act,index) => { const photo=getPhoto(act.id); return `<button type="button" data-slide-to="${index}" class="${index===0?'on':''}" aria-label="show ${attr(textOnly(photo.title))}">${art(photo)}</button>`; }).join('')}</div><p class="slidenote">use the buttons or left and right arrow keys · no chronology rail, just four cuts in the dark</p></div></div>`;
+}
+function renderJazz(items){
+  const first=items.slice(0,4), second=items.slice(4);
+  const strip=(set,style) => `<div class="strip" style="${style}">${set.map(photo => `<figure class="frame"><a href="#/photo/${photo.id}" aria-label="open ${attr(textOnly(photo.title))}">${art(photo)}</a><figcaption class="pencil">${photo.title}<br><small>${photo.taken}</small></figcaption></figure>`).join('')}</div>`;
+  return `<div class="ly-sheet">${strip(first,'top:90px;left:-80px')}${strip(second,'top:500px;left:75px;transform:rotate(7deg)')}<p class="sheetlabel">contact sheets from the naming session<br>grease pencil: probably matt's<br>sound: imagined</p></div>`;
+}
+function renderFreedom(items){
+  const mural=getPhoto('four-freedoms-mural');
+  const muralNotes=[
+    {x:2,y:5,w:22,h:78,t:'freedom 0: run the program for any purpose.'},
+    {x:26,y:5,w:22,h:78,t:'freedom 1: study how the program works.'},
+    {x:51,y:5,w:22,h:78,t:'freedom 2: share copies with your neighbor.'},
+    {x:76,y:5,w:22,h:78,t:'freedom 3: share your changed version, too.'}
+  ];
+  return `<div class="ly-mural"><div class="muralbox notes-on stagebox" tabindex="0"><span class="snap era-${mural.era}" style="width:100%;max-width:950px">${art(mural)}</span><span class="notes-layer">${muralNotes.map(noteMarkup).join('')}</span></div><p class="helpline">Four notes are pinned to the mural. Drag them around, or focus one and use the arrow keys. The freedoms stay put even when the labels move.</p><h2 class="sectionhead">also tagged freedom</h2><div class="alsorow">${items.filter(item=>item.id!==mural.id).map(photo=>`<article class="it">${photoLink(photo,120)}<p class="cap">${photo.title}</p></article>`).join('')}</div><ol class="notelist">${muralNotes.map(note=>`<li>${note.t}</li>`).join('')}</ol></div>`;
+}
+function renderPlugins(items){
+  const positions=[[12,85,122],[52,115,102],[30,225,138],[62,280,88]];
+  const cluster=(name,photos,offset) => `<section class="cluster"><h2 class="cname">${name}</h2>${photos.map((photo,index)=>{const [left,top,size]=positions[(index+offset)%positions.length];return `<a class="bub" href="#/photo/${photo.id}" style="left:${left}%;top:${top}px;width:${size}px;height:${size}px;animation-delay:-${index*1.3}s" aria-label="${attr(textOnly(photo.title))}">${art(photo)}<span class="blabel">${photo.title}</span></a>`;}).join('')}<a class="tbub" href="#/tag/api" style="left:8%;top:260px;width:78px;height:78px">hooks<br>+ filters</a><a class="tbub" href="#/tag/community" style="right:9%;top:64px;width:70px;height:70px;animation-delay:-2s">made by<br>people</a></section>`;
+  return `<div class="ly-clusters">${cluster('things people plugged in',items.slice(0,2),0)}${cluster('doors core left open',items.slice(2),2)}<p class="clusternote">The bubbles drift toward related tags. Flickr called these clusters. WordPress called the same instinct extensibility.</p></div>`;
+}
+function renderMobile(items){
+  const spots=[[8,85],[72,215],[34,650]];
+  return `<div class="ly-expanse">${items.map((photo,index)=>`<article class="speck" style="left:${spots[index][0]}%;top:${spots[index][1]}px">${photoLink(photo,64)}<p class="cap">${photo.title}</p></article>`).join('')}<p class="breath">the publish button got smaller<br>the distance between an idea and the web did too</p></div>`;
+}
+function renderThemes(items){
+  const spots=[[5,95,185,'gilt'],[37,150,160,'oak'],[66,75,205,'blk'],[29,390,220,'gilt']];
+  return `<div class="ly-salon">${items.map((photo,index)=>{const [left,top,width,kind]=spots[index]; return `<article class="hung" style="left:${left}%;top:${top}px"><svg class="wires" width="${width+24}" height="80" viewBox="0 0 ${width+24} 80" aria-hidden="true" style="top:-64px"><line x1="${(width+24)/2}" y1="0" x2="12" y2="80" stroke="#a89c85"/><line x1="${(width+24)/2}" y1="0" x2="${width+12}" y2="80" stroke="#a89c85"/></svg><span class="hook"></span><a class="frame ${kind}" href="#/photo/${photo.id}" style="width:${width}px"><span class="mat">${art(photo)}</span></a><p class="plaque">${photo.title}</p></article>`;}).join('')}</div>`;
+}
+function worldMap(){
+  return `<svg viewBox="0 0 900 450" role="img" aria-label="a hand-drawn world map with WordCamp pins"><rect width="900" height="450" fill="#dcecf2"/><g fill="#e7dfc8" stroke="#b8aa87" stroke-width="2"><path d="M74 92l96-45 112 22 55 62-39 42-52-12-26 48-55 20-24-55-63-22z"/><path d="M265 235l52 27 22 80-41 77-26-51-15-84z"/><path d="M420 80l64-36 89 16 34 45 115-12 112 57-35 44-105 5-47 34-40-18-35-76-66 3-38-28z"/><path d="M524 222l75 16 38 65-44 103-49-31-24-89z"/><path d="M735 305l74-13 54 45-23 48-82-4-31-35z"/></g><g fill="#fff" opacity=".55">${Array.from({length:32},(_,i)=>`<circle cx="${(i*83)%880+10}" cy="${(i*47)%430+10}" r="${2+(i%3)}"/>`).join('')}</g><text x="24" y="425" font-family="Arial" font-size="10" fill="#789">wherever three bloggers gather, someone makes a lanyard</text></svg>`;
+}
+function pinIcon(){ return `<svg viewBox="0 0 26 34" aria-hidden="true"><path d="M13 1a11 11 0 0 1 11 11c0 8-11 21-11 21S2 20 2 12A11 11 0 0 1 13 1z" fill="#ff0084" stroke="#fff" stroke-width="2"/><circle cx="13" cy="12" r="4" fill="#fff"/></svg>`; }
+function renderWordcamp(){
+  return `<div class="ly-map"><div class="mapbox">${worldMap()}${CAMP_PINS.map((pin,index)=>{const photo=getPhoto(pin.id);return `<button class="pin drop" type="button" data-map-pin="${index}" style="left:${pin.x}%;top:${pin.y}%;animation-delay:${index*.12}s" aria-label="show ${attr(pin.label)}" aria-expanded="false" aria-controls="map-pop-${index}">${pinIcon()}</button><article class="pop" id="map-pop-${index}" data-map-pop="${index}" style="left:${pin.x}%;top:${pin.y}%" aria-hidden="true" inert>${photoLink(photo,150)}<p class="cap"><b>${attr(pin.label)}</b><br>${photo.title}</p></article>`;}).join('')}</div><p class="maplegend">pink pins are clickable · the map is approximate · the group photos are exact in spirit</p></div>`;
+}
+function renderDesign(items){
+  const spots=[[4,35,230,-5],[39,24,205,3],[67,73,190,-3],[13,330,190,4],[42,360,230,-2],[71,370,170,5]];
+  return `<div class="ly-table">${items.map((photo,index)=>{const [left,top,width,rot]=spots[index];return `<article class="slidepic" style="left:${left}%;top:${top}px;--rot:${rot}deg">${photoLink(photo,width)}<p class="cap">${photo.title}</p><span class="tape" style="left:${index%2?8:55}%;top:-8px;transform:rotate(${index%2?-7:8}deg)"></span></article>`;}).join('')}<span class="ring" style="right:7%;bottom:8%"></span><p class="pencilnote" style="left:39%;bottom:7%;transform:rotate(-3deg)">keep the useful weird bit →</p></div>`;
+}
+function renderBeginnings(items){
+  return `<div class="ly-stream">${items.map(photo=>`<article class="row"><div class="pic">${photoLink(photo,260)}</div><div class="txt"><h2><a href="#/photo/${photo.id}">${photo.title}</a></h2><p class="meta">uploaded ${photo.uploaded} by <a href="#/search/${encodeURIComponent(photo.by)}">${attr(photo.by)}</a></p><p class="desc">${excerpt(photo,260)}</p><p class="tags">tags: ${photo.tags.map(tagLink).join(' · ')}</p></div></article>`).join('')}<p class="streamnote">This is the closest the archive gets to a stream. It still refuses to call itself a timeline.</p></div>`;
+}
+function renderApi(items){
+  const cards=[
+    {photo:items[0],x:8,y:64,w:210,r:-3,c:'y'},
+    {text:'GET /wp/v2/posts',sub:'words leave the admin and become portable',x:45,y:52,w:170,r:4,c:'bl'},
+    {photo:items[1],x:62,y:190,w:220,r:2,c:'pk'},
+    {text:'do_action( "the_web" )',sub:'the oldest API was a good place to leave a hook',x:18,y:350,w:185,r:-5,c:'gn'},
+    {text:'JSON + people',sub:'infrastructure begins as a note somebody refuses to throw away',x:49,y:430,w:200,r:3,c:'y'}
+  ];
+  return `<div class="ly-board">${cards.map(card=>card.photo?`<article class="sticky ${card.c}" style="left:${card.x}%;top:${card.y}px;width:${card.w}px;--rot:${card.r}deg">${photoLink(card.photo,card.w-24)}<p class="cap">${card.photo.title}</p></article>`:`<article class="sticky text ${card.c}" style="left:${card.x}%;top:${card.y}px;width:${card.w}px;--rot:${card.r}deg"><b>${attr(card.text)}</b>${attr(card.sub)}</article>`).join('')}</div>`;
+}
+function renderSpam(items){
+  const photo=items[0];
+  return `<div class="ly-spam"><div class="stage"><div class="target">${photoLink(photo,340)}</div>${SPAM_LINES.concat(SPAM_LINES.slice(0,4)).map((line,index)=>{const rnd=seedFrom('spam'+index);const left=Math.round(rnd()*75),top=Math.round(rnd()*390),rot=Math.round(rnd()*34-17),fx=Math.round(rnd()*700-350),fy=Math.round(-180-rnd()*440);return `<span class="slip" style="left:${left}%;top:${top}px;--rot:${rot}deg;--fx:${fx}px;--fy:${fy}px">${line}</span>`;}).join('')}</div><div class="akismetbar"><button type="button" id="cleanSpam">ask akismet to look at this</button><p class="verdict">16 comments moved aside. the photo was here all along.</p></div></div>`;
+}
+function renderAdmin(items){
+  const spots=[[0,30,430],[12,150,460],[25,270,490],[36,390,470],[18,510,520],[39,620,470]];
+  return `<div class="ly-cascade">${items.map((photo,index)=>{const [left,top,width]=spots[index];return `<article class="win${index===items.length-1?' front':''}" data-window style="left:${left}%;top:${top}px;width:${width}px;max-width:84%;z-index:${index+1}"><button class="tbar" type="button" aria-label="bring ${attr(textOnly(photo.title))} to front"><span class="ttl">${photo.title} — wp-admin</span><span class="btns" aria-hidden="true"><i>—</i><i>□</i><i class="x">×</i></span></button><div class="addr"><span>Address</span><span class="field">http://localhost/wp-admin/${index?'index.php':'install.php'}</span></div><div class="body"><a href="#/photo/${photo.id}" aria-label="open ${attr(textOnly(photo.title))}">${art(photo)}</a></div></article>`;}).join('')}<p class="cascadenote">Click a title bar to bring an era forward. Interfaces overlap; habits do too.</p></div>`;
+}
+function renderTranslation(){
+  const photo=getPhoto('translation-sprint');
+  const page=side=>`<section class="page ${side}"><h2 class="pagehead">${side==='l'?'community translations':'words carried home'}</h2>${LOCALES.filter(locale=>locale.page===side).map((locale,index)=>`<a class="stamp ${locale.c}" href="#/photo/${photo.id}" style="left:${locale.x}%;top:${locale.y}%;--rot:${locale.r}deg"><span class="inkring">${art(photo)}<span class="loc">${attr(locale.loc)}</span><span class="word">${attr(locale.word)}</span></span></a>`).join('')}<p class="passnote">one release · many mother tongues · no border control</p></section>`;
+  return `<div class="ly-passport"><div class="book">${page('l')}${page('r')}</div></div>`;
+}
+function renderBlocks(items){
+  return `<div class="ly-doc"><div class="editorbar"><span class="plus">+</span><span>Everyone's Archive</span><span class="crumbtxt">Photo / Block</span><span class="save">saved</span></div><h2 class="doctitle">Three sketches of a page becoming pieces</h2>${items.map((photo,index)=>`<div class="blockwrap" tabindex="0"><span class="btool" aria-hidden="true"><span>↕</span><span>≡</span><span>◐</span><span>⋮</span></span>${photoLink(photo,index===1?540:430)}<p class="blockcap">${photo.title} · tagged ${photo.tags.map(tagLink).join(', ')}</p></div>${index<items.length-1?'<div class="inserter"><span>+</span></div>':''}`).join('')}<p class="parablock">The page was once a single field. Then every piece gained a handle.<span class="caret" aria-hidden="true"></span></p></div>`;
+}
+function renderFolksonomy(items){
+  const photo=items[0];
+  return `<div class="ly-folk"><figure class="folkfloat">${photoLink(photo,210)}<figcaption class="cap">the day WordPress learned the word “tag”</figcaption></figure><p class="folkintro">A category says where the librarian put something. A tag says what somebody noticed. In 2007, native tags arrived in WordPress. On this page, the archive describes itself with the very tool it is remembering.</p><p class="folkintro">There is no official route through these photos. <a href="#/tag/jazz">jazz</a> crosses <a href="#/tag/plugins">plugins</a>; <a href="#/tag/community">community</a> wanders into <a href="#/tag/translation">translation</a>; <a href="#/tag/design">design</a> collides with <a href="#/tag/blocks">blocks</a>. The mess is the map.</p>${tagCloud('megacloud')}<p class="selfnote">This page is tagged <a href="#/tag/folksonomy">folksonomy</a>. The loop appears stable.</p></div>`;
+}
+function renderSquirrel(items){
+  const photo=items[0];
+  return `<div class="ly-empty">${photoLink(photo,300)}<p class="cap"><b>${photo.title}</b><br>WordCamp Portland · morning break · bagel acquired</p><p class="fine">There really was only one photo tagged squirrels. Restraint is a curatorial tool.</p><p class="back"><a href="#/">← back to less specific tags</a></p></div>`;
+}
+function renderTag(tag){
+  if (!TAGS[tag]){ renderNotFound(); return; }
+  const items=tagged(tag);
+  const renderers={community:()=>renderCommunity(items),editor:renderEditor,jazz:()=>renderJazz(items),freedom:()=>renderFreedom(items),plugins:()=>renderPlugins(items),mobile:()=>renderMobile(items),themes:()=>renderThemes(items),wordcamp:renderWordcamp,design:()=>renderDesign(items),beginnings:()=>renderBeginnings(items),api:()=>renderApi(items),spam:()=>renderSpam(items),admin:()=>renderAdmin(items),translation:renderTranslation,blocks:()=>renderBlocks(items),folksonomy:()=>renderFolksonomy(items),squirrels:()=>renderSquirrel(items)};
+  view.className = `v-tag tag-${tag}`;
+  view.innerHTML = tagHeading(tag,items.length) + renderers[tag]();
+  if (tag==='editor') setupSlideshow();
+  if (tag==='freedom') setupNotes();
+  if (tag==='wordcamp') setupMap();
+  if (tag==='spam') document.getElementById('cleanSpam').addEventListener('click',()=>view.querySelector('.ly-spam').classList.add('cleaned'));
+  if (tag==='admin') setupWindows();
+}
+
+/* ================================================================
+   search, about, and missing routes
+   ================================================================ */
+function renderSearch(query){
+  const needle=query.toLowerCase().trim();
+  const hits=PHOTOS.filter(photo=>[photo.title,photo.by,photo.tags.join(' '),textOnly(photo.desc)].join(' ').toLowerCase().includes(needle));
+  view.className='v-search';
+  view.innerHTML=`${crumbs('search')}<header class="tag-head"><h1>search results for <span class="t">${attr(query)}</span></h1><p class="meta">${hits.length} photo${hits.length===1?'':'s'} found</p></header>${hits.length?renderBeginnings(hits):'<p class="zero">No photos matched that phrase. Try a tag from the <a href="#/">cloud</a>, or search for “coffee,” “matt,” “editor,” or “bagel.” The archive is small enough to know when it has nothing.</p>'}`;
+}
+function renderAbout(){
+  view.className='v-about';
+  view.innerHTML=`${crumbs('about')}<h1>about everyone's archive<span style="color:var(--blue)">.</span><span style="color:var(--pink)">.</span></h1><p>This is a deliberately non-chronological WordPress museum. Twenty-eight drawn snapshots are connected by the words people might have used when uploading them: <a href="#/tag/themes">themes</a>, <a href="#/tag/plugins">plugins</a>, <a href="#/tag/community">community</a>, <a href="#/tag/freedom">freedom</a>, and thirteen more.</p><p>The interface remembers Flickr's optimistic social-web years: little blue links, pink and blue dots, human tags, photo notes, group pools, interestingness, and a conviction that the web gets better when ordinary people can add to it.</p><p>Every drawing is inline SVG. The “five-minute install” photo can open a live WordPress through Playground, but only after you ask it to. Nothing is fetched before then except the friendly display face used in the wordmark.</p><p class="sig">uploaded by everyone · arranged with fondness · still accepting tags</p>`;
+}
+function renderNotFound(){
+  view.className='v-about';
+  view.innerHTML=`${crumbs('not found')}<h1>that photo fell behind the desk.</h1><p>The archive could not find this route. Try the <a href="#/">tag cloud</a>, where everything has at least one way home.</p>`;
+}
+
+/* ================================================================
+   interaction setup
+   ================================================================ */
+function setupSlideshow(){
+  let activeSlide=0;
+  const show=index=>{
+    const slides=[...view.querySelectorAll('.slide')], buttons=[...view.querySelectorAll('[data-slide-to]')];
+    activeSlide=(index+slides.length)%slides.length;
+    slides.forEach((slide,i)=>{const active=i===activeSlide;slide.classList.toggle('on',active);slide.setAttribute('aria-hidden',active?'false':'true');slide.toggleAttribute('inert',!active);});
+    buttons.forEach((button,i)=>button.classList.toggle('on',i===activeSlide));
+    document.getElementById('slideNow').textContent=activeSlide+1;
+  };
+  view.querySelectorAll('[data-slide-dir]').forEach(button=>button.addEventListener('click',()=>show(activeSlide+Number(button.dataset.slideDir))));
+  view.querySelectorAll('[data-slide-to]').forEach(button=>button.addEventListener('click',()=>show(Number(button.dataset.slideTo))));
+  view.querySelector('.ly-slides').addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();show(activeSlide-1)}if(event.key==='ArrowRight'){event.preventDefault();show(activeSlide+1)}});
+}
+function setupMap(){
+  view.querySelectorAll('[data-map-pin]').forEach(pin=>pin.addEventListener('click',()=>{
+    const index=pin.dataset.mapPin;
+    const selected=view.querySelector(`[data-map-pop="${index}"]`),open=!selected.classList.contains('show');
+    view.querySelectorAll('[data-map-pop]').forEach(pop=>{const show=pop===selected&&open;pop.classList.toggle('show',show);pop.setAttribute('aria-hidden',show?'false':'true');pop.toggleAttribute('inert',!show);});
+    view.querySelectorAll('[data-map-pin]').forEach(button=>button.setAttribute('aria-expanded',button===pin&&open?'true':'false'));
+  }));
+}
+function setupWindows(){
+  let top=20;
+  view.querySelectorAll('[data-window]').forEach(win=>win.querySelector('.tbar').addEventListener('click',()=>{
+    view.querySelectorAll('[data-window]').forEach(other=>other.classList.remove('front'));
+    win.classList.add('front');win.style.zIndex=++top;
+  }));
+}
+function setupNotes(){
+  view.querySelectorAll('.note.grab').forEach(note=>{
+    const moveBy=(dx,dy)=>{
+      const left=Math.max(0,Math.min(98-parseFloat(note.style.width),parseFloat(note.style.left)+dx));
+      const top=Math.max(0,Math.min(98-parseFloat(note.style.height),parseFloat(note.style.top)+dy));
+      note.style.left=left+'%';note.style.top=top+'%';note.classList.add('show');
+    };
+    note.addEventListener('keydown',event=>{
+      const step=event.shiftKey?5:1;
+      if(event.key==='ArrowLeft'){event.preventDefault();moveBy(-step,0)}
+      if(event.key==='ArrowRight'){event.preventDefault();moveBy(step,0)}
+      if(event.key==='ArrowUp'){event.preventDefault();moveBy(0,-step)}
+      if(event.key==='ArrowDown'){event.preventDefault();moveBy(0,step)}
+    });
+    note.addEventListener('pointerdown',event=>{
+      if(event.button!==0)return;
+      const layer=note.parentElement,box=layer.getBoundingClientRect();
+      const startX=event.clientX,startY=event.clientY,startL=parseFloat(note.style.left),startT=parseFloat(note.style.top);
+      note.setPointerCapture(event.pointerId);note.classList.add('show');
+      const drag=move=>{note.style.left=Math.max(0,Math.min(98-parseFloat(note.style.width),startL+(move.clientX-startX)/box.width*100))+'%';note.style.top=Math.max(0,Math.min(98-parseFloat(note.style.height),startT+(move.clientY-startY)/box.height*100))+'%';};
+      const stop=()=>{note.removeEventListener('pointermove',drag);note.removeEventListener('pointerup',stop);note.removeEventListener('pointercancel',stop)};
+      note.addEventListener('pointermove',drag);note.addEventListener('pointerup',stop);note.addEventListener('pointercancel',stop);
+    });
+  });
+}
+function openPlayground(version,title){
+  lastDialogFocus=document.activeElement;
+  document.getElementById('playTtl').textContent=`${title} · original size (live)`;
+  pageRegions.forEach(region=>region.setAttribute('inert',''));
+  playLb.hidden=false;playLb.classList.add('open');document.body.style.overflow='hidden';
+  playFrame.src=`https://playground.wordpress.net/?wp=${encodeURIComponent(version)}`;
+  document.getElementById('playClose').focus();
+}
+function closePlayground(){
+  playLb.classList.remove('open');playLb.hidden=true;document.body.style.overflow='';playFrame.removeAttribute('src');
+  pageRegions.forEach(region=>region.removeAttribute('inert'));
+  if(lastDialogFocus && document.contains(lastDialogFocus))lastDialogFocus.focus();
+}
+
+/* ================================================================
+   hash router and boot sequence
+   ================================================================ */
+function route(){
+  const raw=(location.hash || '#/').slice(1);
+  let bits;
+  try{bits=raw.replace(/^\//,'').split('/').map(part=>decodeURIComponent(part));}
+  catch{bits=['not-found'];}
+  const section=bits[0] || '';
+  document.body.classList.add('is-loading');
+  requestAnimationFrame(()=>{
+    if(!section)renderHome();
+    else if(section==='tag')renderTag(bits[1] || '');
+    else if(section==='photo')renderPhoto(bits[1] || '');
+    else if(section==='search')renderSearch(bits.slice(1).join('/'));
+    else if(section==='about')renderAbout();
+    else renderNotFound();
+    document.body.classList.remove('is-loading');
+    entrance();
+    view.querySelectorAll('[data-play-version]').forEach(button=>button.addEventListener('click',()=>openPlayground(button.dataset.playVersion,button.dataset.playTitle)));
+    if(!splash || splash.classList.contains('gone')){window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});main.focus({preventScroll:true});}
+  });
+}
+
+document.getElementById('searchForm').addEventListener('submit',event=>{
+  event.preventDefault();const query=document.getElementById('q').value.trim();if(query)location.hash='#/search/'+encodeURIComponent(query);
+});
+document.getElementById('surpriseLink').addEventListener('click',event=>{
+  event.preventDefault();const photo=PHOTOS[Math.floor(Math.random()*PHOTOS.length)];location.hash='#/photo/'+photo.id;
+});
+document.getElementById('tagsLink').addEventListener('click',()=>setTimeout(()=>document.getElementById('tagCloud')?.focus(),50));
+document.getElementById('playClose').addEventListener('click',closePlayground);
+playLb.addEventListener('click',event=>{if(event.target===playLb)closePlayground()});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && playLb.classList.contains('open'))closePlayground();
+  const dialog=playLb.classList.contains('open')?playLb:(!splash.hidden?splash:null);
+  if(event.key!=='Tab'||!dialog)return;
+  const focusable=[...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),iframe,[tabindex]:not([tabindex="-1"])')].filter(element=>!element.closest('[hidden],[inert]')&&getComputedStyle(element).display!=='none'&&getComputedStyle(element).visibility!=='hidden');
+  if(!focusable.length){event.preventDefault();dialog.focus();return;}
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(!dialog.contains(document.activeElement)){event.preventDefault();first.focus();}
+  else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+});
+window.addEventListener('hashchange',route);
+
+setTimeout(()=>{splash.classList.remove('phase-load');enterBtn.focus();},reduceMotion?0:520);
+enterBtn.addEventListener('click',()=>{
+  splash.classList.add('gone');splash.setAttribute('aria-hidden','true');
+  setTimeout(()=>{splash.hidden=true;pageRegions.forEach(region=>region.removeAttribute('inert'));main.focus()},reduceMotion?0:580);
+});
+route();
+</script>
+</body>
+</html>

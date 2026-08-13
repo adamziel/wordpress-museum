@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v18 · The Codename Sessions</title>
+<meta name="description" content="A kinetic silhouette poster film for WordPress's jazz codenames — eight cuts, eight musicians, one white thread.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   THE CODENAME SESSIONS
+   A silhouette poster film in eight cuts.
+   System (translated from the 2003–2008 iPod campaign):
+     · full-bleed flat saturated single-color grounds
+     · pure black dancing silhouettes
+     · ONE white element per frame — the publishing thread,
+       a white wire that leaves the musician's hands and ends
+       in a white W roundel (where the ads had the white cable)
+     · giant simple wordmark, nothing else
+     · hard rhythmic cuts, varied tempo
+   ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --hg:"Hanken Grotesk",-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --black:#000;
+  --white:#fff;
+  --c-miles:#ff2d83;      /* hot pink   · Miles 1.0       */
+  --c-mingus:#a9d500;     /* lime       · Mingus 1.2      */
+  --c-strayhorn:#00b6e8;  /* cyan       · Strayhorn 1.5   */
+  --c-duke:#ff7a00;       /* tangerine  · Duke 2.0        */
+  --c-ella:#ffd200;       /* yellow     · Ella 2.1        */
+  --c-coltrane:#4433ee;   /* electric   · Coltrane 2.7    */
+  --c-simone:#a02fe8;     /* purple     · Simone 5.6      */
+  --c-bebo:#00c46a;       /* green      · Bebo 5.0        */
+}
+html,body{height:100%;background:#000;overflow:hidden}
+body{
+  font-family:var(--hg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  color:#fff;
+  user-select:none;
+  -webkit-user-select:none;
+}
+svg{display:block}
+button{font-family:var(--hg);background:none;border:0;color:inherit;cursor:pointer}
+
+/* ---------------------------------------------------------
+   HUD — museum link, sound toggle, pause glyph, cut ticks
+   --------------------------------------------------------- */
+#hud{position:fixed;inset:0;z-index:60;pointer-events:none}
+#backlink{
+  position:absolute;top:18px;left:20px;pointer-events:auto;
+  font:600 11px/1 var(--hg);letter-spacing:.14em;text-transform:lowercase;
+  color:currentColor;text-decoration:none;opacity:.42;
+  padding:8px 10px;border-radius:4px;
+  transition:opacity .25s;
+  mix-blend-mode:difference;color:#fff;
+}
+#backlink:hover,#backlink:focus-visible{opacity:.95}
+#sound{
+  position:absolute;top:14px;right:16px;pointer-events:auto;
+  width:38px;height:38px;border-radius:50%;
+  font:700 15px/38px var(--hg);text-align:center;
+  opacity:.42;transition:opacity .25s, transform .2s;
+  mix-blend-mode:difference;color:#fff;
+}
+#sound:hover,#sound:focus-visible{opacity:.95;transform:scale(1.08)}
+#sound.on{opacity:.95}
+#sound.on::after{
+  content:"";position:absolute;left:8px;right:8px;bottom:3px;height:2px;
+  background:currentColor;border-radius:2px;
+}
+#pauseGlyph{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:none;gap:14px;opacity:.9;mix-blend-mode:difference;color:#fff;
+}
+body.paused #pauseGlyph{display:flex}
+#pauseGlyph i{display:block;width:14px;height:56px;background:currentColor}
+#ticks{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  display:flex;gap:9px;pointer-events:none;
+  mix-blend-mode:difference;color:#fff;
+  opacity:0;transition:opacity .4s;
+}
+body.film-running #ticks{opacity:.5}
+#ticks i{display:block;width:16px;height:3px;background:currentColor;opacity:.35;transition:opacity .2s}
+#ticks i.on{opacity:1}
+#hint{
+  position:absolute;right:20px;bottom:16px;
+  font:600 10px/1.6 var(--hg);letter-spacing:.12em;text-transform:uppercase;
+  opacity:0;transition:opacity .5s;text-align:right;
+  mix-blend-mode:difference;color:#fff;pointer-events:none;
+}
+body.show-hint #hint{opacity:.35}
+
+/* ---------------------------------------------------------
+   SPLASH — title card
+   --------------------------------------------------------- */
+#splash{
+  position:fixed;inset:0;z-index:50;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .05s;
+}
+#splash.gone{opacity:0;pointer-events:none}
+#splash .inner{text-align:center;max-width:900px;padding:0 30px}
+#splash .roundel{
+  width:74px;height:74px;margin:0 auto 34px;border:5px solid #fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font:900 34px/1 var(--hg);color:#fff;
+  animation:splashRoundel 1.1s cubic-bezier(.2,1.4,.3,1) both;
+}
+#splash h1{
+  font:900 clamp(42px,7.4vw,108px)/0.95 var(--hg);
+  letter-spacing:-.02em;text-transform:uppercase;color:#fff;
+}
+#splash h1 span{display:block;animation:splashLine .7s cubic-bezier(.16,1,.3,1) both}
+#splash h1 span:nth-child(2){animation-delay:.14s}
+#splash .strip{
+  display:inline-flex;height:8px;margin:30px 0 24px;overflow:hidden;
+  animation:stripGrow .8s .5s cubic-bezier(.16,1,.3,1) both;
+}
+#splash .strip i{width:34px;height:8px;display:block}
+#splash .sub{
+  font:600 12px/1.9 var(--hg);letter-spacing:.24em;text-transform:uppercase;color:#888;
+  animation:splashFade .6s .75s both;
+}
+#splash .sub b{color:#ddd;font-weight:700}
+#splash .keys{
+  margin-top:36px;font:600 10px/2 var(--hg);letter-spacing:.16em;text-transform:uppercase;color:#555;
+  animation:splashFade .6s 1.05s both;
+}
+#splash .keys kbd{
+  font-family:var(--hg);border:1px solid #444;border-radius:3px;
+  padding:1px 6px;margin:0 3px;color:#999;
+}
+#splash .start{
+  display:none;margin:34px auto 0;
+  font:800 13px/1 var(--hg);letter-spacing:.22em;text-transform:uppercase;
+  color:#000;background:#fff;padding:15px 30px;border-radius:100px;
+}
+#splash.needs-click .start{display:inline-block}
+@keyframes splashRoundel{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes splashLine{from{transform:translateY(105%);opacity:0}to{transform:none;opacity:1}}
+@keyframes stripGrow{from{transform:scaleX(0);opacity:0}to{transform:none;opacity:1}}
+@keyframes splashFade{from{opacity:0}to{opacity:1}}
+
+/* ---------------------------------------------------------
+   STINGERS — 400ms monochrome flash frames between cuts
+   --------------------------------------------------------- */
+#stinger{
+  position:fixed;inset:0;z-index:40;display:none;
+  align-items:center;justify-content:center;text-align:center;
+}
+#stinger.live{display:flex}
+#stinger .word{
+  font:900 clamp(54px,11vw,180px)/0.92 var(--hg);
+  letter-spacing:-.02em;text-transform:uppercase;
+  animation:stingerPunch .4s steps(2,jump-none) both;
+  padding:0 4vw;
+}
+#stinger .tag{
+  position:absolute;bottom:9vh;left:0;right:0;
+  font:700 12px/1 var(--hg);letter-spacing:.3em;text-transform:uppercase;opacity:.55;
+}
+@keyframes stingerPunch{0%{transform:scale(1.14)}100%{transform:scale(1)}}
+
+/* ---------------------------------------------------------
+   CUTS — full-bleed poster frames
+   --------------------------------------------------------- */
+#stage{position:fixed;inset:0;z-index:10;background:#000}
+.cut{
+  position:absolute;inset:0;display:none;overflow:hidden;
+}
+.cut.live{display:block}
+.cut svg.scene{
+  position:absolute;inset:0;width:100%;height:100%;
+}
+body.paused .cut *,
+body.paused #stinger .word{animation-play-state:paused !important}
+
+/* Poster wordmark blocks — placement varies per cut (campaign rule:
+   one system, never the same layout twice). */
+.wm{position:absolute;z-index:5;pointer-events:none;color:#000}
+.wm .code{
+  font:900 clamp(64px,11vw,168px)/0.88 var(--hg);
+  letter-spacing:-.03em;text-transform:uppercase;display:block;
+}
+.wm .meta{
+  font:800 clamp(13px,1.5vw,20px)/1.5 var(--hg);
+  letter-spacing:.2em;text-transform:uppercase;display:block;margin-top:10px;
+}
+.wm .wp{
+  font:800 clamp(12px,1.2vw,16px)/1 var(--hg);
+  letter-spacing:.34em;text-transform:uppercase;display:block;margin-bottom:14px;opacity:.85;
+}
+.cut .cap{
+  position:absolute;z-index:5;pointer-events:none;
+  font:700 clamp(11px,1.15vw,15px)/1.6 var(--hg);
+  letter-spacing:.09em;color:#000;opacity:0;max-width:440px;
+}
+.cut.live .cap{animation:capIn .5s .9s both}
+@keyframes capIn{from{opacity:0;transform:translateY(8px)}to{opacity:.72;transform:none}}
+
+/* generic entrance used by several grounds */
+@keyframes groundPop{0%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes wmSlam{
+  0%{transform:translateY(26px);opacity:0}
+  55%{transform:translateY(-4px);opacity:1}
+  100%{transform:none;opacity:1}
+}
+@keyframes threadDraw{to{stroke-dashoffset:0}}
+@keyframes roundelPop{
+  0%{transform:scale(0);opacity:0}
+  70%{transform:scale(1.18);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+.thread{stroke:#fff;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.wmark{opacity:0}
+.cut.live .wmark{animation:roundelPop .45s cubic-bezier(.2,1.5,.4,1) both}
+/* ---------------------------------------------------------
+   CUT 1 · MILES · 1.0 · hot pink
+   Choreography: staccato full-body pose swaps on the beat.
+   The figure never tweens — it JUMPS between four poses,
+   hard like an edit. Blast marks pop at the bell.
+   --------------------------------------------------------- */
+.cut-miles{background:var(--c-miles)}
+.cut-miles.live .ground{animation:groundPop .35s both}
+.fig-miles .joint{transition:none}
+.fig-miles{transform-origin:770px 780px}
+/* pose table — root + spine + head + arms + legs + horn.
+   Set from JS via data-pose on the .fig-miles group. */
+.fig-miles .j-spine{transform-origin:770px 560px}
+.fig-miles .j-head{transform-origin:806px 402px}
+.fig-miles .j-horn{transform-origin:836px 388px}
+.fig-miles .j-armb-u{transform-origin:788px 438px}
+.fig-miles .j-armb-f{transform-origin:872px 486px}
+.fig-miles .j-armf-u{transform-origin:780px 444px}
+.fig-miles .j-armf-f{transform-origin:856px 508px}
+.fig-miles .j-legf-t{transform-origin:762px 566px}
+.fig-miles .j-legf-s{transform-origin:748px 674px}
+.fig-miles .j-legb-t{transform-origin:782px 566px}
+.fig-miles .j-legb-s{transform-origin:816px 672px}
+.fig-miles[data-pose="0"]{transform:translate(0,0)}
+.fig-miles[data-pose="0"] .j-spine{transform:rotate(-6deg)}
+.fig-miles[data-pose="0"] .j-head{transform:rotate(-8deg)}
+.fig-miles[data-pose="0"] .j-horn{transform:rotate(-18deg)}
+.fig-miles[data-pose="0"] .j-armb-f{transform:rotate(-14deg)}
+.fig-miles[data-pose="0"] .j-legf-t{transform:rotate(18deg)}
+.fig-miles[data-pose="0"] .j-legf-s{transform:rotate(-30deg)}
+.fig-miles[data-pose="0"] .j-legb-t{transform:rotate(-6deg)}
+.fig-miles[data-pose="1"]{transform:translate(-26px,34px) scale(.97)}
+.fig-miles[data-pose="1"] .j-spine{transform:rotate(14deg)}
+.fig-miles[data-pose="1"] .j-head{transform:rotate(12deg)}
+.fig-miles[data-pose="1"] .j-horn{transform:rotate(26deg)}
+.fig-miles[data-pose="1"] .j-armb-u{transform:rotate(16deg)}
+.fig-miles[data-pose="1"] .j-armf-f{transform:rotate(18deg)}
+.fig-miles[data-pose="1"] .j-legf-t{transform:rotate(-34deg)}
+.fig-miles[data-pose="1"] .j-legf-s{transform:rotate(52deg)}
+.fig-miles[data-pose="1"] .j-legb-t{transform:rotate(26deg)}
+.fig-miles[data-pose="1"] .j-legb-s{transform:rotate(-44deg)}
+.fig-miles[data-pose="2"]{transform:translate(20px,-8px) rotate(-3deg)}
+.fig-miles[data-pose="2"] .j-spine{transform:rotate(-16deg)}
+.fig-miles[data-pose="2"] .j-head{transform:rotate(-14deg)}
+.fig-miles[data-pose="2"] .j-horn{transform:rotate(-42deg)}
+.fig-miles[data-pose="2"] .j-armb-u{transform:rotate(-24deg)}
+.fig-miles[data-pose="2"] .j-armf-u{transform:rotate(-18deg)}
+.fig-miles[data-pose="2"] .j-legf-t{transform:rotate(44deg)}
+.fig-miles[data-pose="2"] .j-legf-s{transform:rotate(-64deg)}
+.fig-miles[data-pose="2"] .j-legb-t{transform:rotate(-10deg)}
+.fig-miles[data-pose="3"]{transform:translate(-8px,10px) rotate(2deg)}
+.fig-miles[data-pose="3"] .j-spine{transform:rotate(4deg)}
+.fig-miles[data-pose="3"] .j-head{transform:rotate(6deg)}
+.fig-miles[data-pose="3"] .j-horn{transform:rotate(6deg)}
+.fig-miles[data-pose="3"] .j-armb-f{transform:rotate(10deg)}
+.fig-miles[data-pose="3"] .j-armf-f{transform:rotate(-8deg)}
+.fig-miles[data-pose="3"] .j-legf-t{transform:rotate(-8deg)}
+.fig-miles[data-pose="3"] .j-legb-t{transform:rotate(14deg)}
+.fig-miles[data-pose="3"] .j-legb-s{transform:rotate(-18deg)}
+/* blast marks — three white shards at the bell, re-popped per beat */
+.miles-blast line{stroke:#fff;stroke-width:9;stroke-linecap:round;opacity:0}
+.miles-blast.hit line{animation:milesBlast .17s both}
+.miles-blast.hit line:nth-child(2){animation-delay:.02s}
+.miles-blast.hit line:nth-child(3){animation-delay:.04s}
+@keyframes milesBlast{0%{opacity:0;transform:scale(.4)}30%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+.miles-blast line{transform-origin:1052px 330px}
+.cut-miles .wm{left:5.4vw;bottom:7.4vh}
+.cut-miles.live .wm{animation:wmSlam .4s .15s both}
+.cut-miles .cap{left:5.6vw;top:9vh}
+.cut-miles .thread{stroke-width:8;stroke-dasharray:760;stroke-dashoffset:760}
+.cut-miles.live .thread{animation:threadDraw .8s .35s cubic-bezier(.6,0,.2,1) both}
+.cut-miles .wmark{animation-delay:1.05s !important}
+
+/* ---------------------------------------------------------
+   CUT 2 · MINGUS · 1.2 · lime
+   Choreography: nothing snaps. One long unbroken sway —
+   player and upright bass rock in counterphase, the plucking
+   forearm loops, the camera drifts in slow. Legato cut.
+   --------------------------------------------------------- */
+.cut-mingus{background:var(--c-mingus)}
+.cut-mingus svg.scene{animation:mingusDolly 6.5s cubic-bezier(.3,0,.6,1) both}
+@keyframes mingusDolly{from{transform:scale(1)}to{transform:scale(1.11) translateY(-14px)}}
+.fig-mingus-man{transform-origin:640px 800px;animation:mingusSway 2.4s ease-in-out infinite}
+@keyframes mingusSway{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(2.2deg)}}
+.fig-mingus-bass{transform-origin:880px 812px;animation:mingusBassRock 2.4s ease-in-out infinite}
+@keyframes mingusBassRock{0%,100%{transform:rotate(1.8deg)}50%{transform:rotate(-1.6deg)}}
+.mingus-head{transform-origin:664px 322px;animation:mingusNod 1.2s ease-in-out infinite}
+@keyframes mingusNod{0%,100%{transform:rotate(3deg)}50%{transform:rotate(-4deg)}}
+.mingus-pluck{transform-origin:806px 442px;animation:mingusPluck .6s cubic-bezier(.4,0,.3,1) infinite}
+@keyframes mingusPluck{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-16deg)}55%{transform:rotate(4deg)}}
+.mingus-neckhand{transform-origin:756px 350px;animation:mingusShift 2.4s ease-in-out infinite}
+@keyframes mingusShift{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,26px)}}
+.mingus-strings line{stroke:#fff;stroke-width:4}
+.cut-mingus .thread{stroke-width:6;stroke-dasharray:900;stroke-dashoffset:900}
+.cut-mingus.live .thread{animation:threadDraw 1.6s .5s ease-out both}
+.cut-mingus .wm{right:5vw;top:8.5vh;text-align:right}
+.cut-mingus.live .wm{animation:wmSlam .5s .25s both}
+.cut-mingus .cap{right:5.2vw;bottom:8vh;text-align:right}
+.cut-mingus .wmark{animation-delay:1.9s !important}
+
+/* ---------------------------------------------------------
+   CUT 3 · STRAYHORN · 1.5 · cyan
+   Choreography: wide shot, pianist in profile at the grand.
+   Hands hammer alternating; WHITE KEYS fly off the keyboard
+   in staggered arcs — themes leaving the workshop.
+   --------------------------------------------------------- */
+.cut-strayhorn{background:var(--c-strayhorn)}
+.cut-strayhorn.live .ground{animation:groundPop .35s both}
+.stray-armf{transform-origin:596px 470px;animation:strayHitF .36s cubic-bezier(.5,0,.5,1) infinite}
+@keyframes strayHitF{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(7deg)}}
+.stray-armb{transform-origin:588px 460px;animation:strayHitB .36s cubic-bezier(.5,0,.5,1) infinite;animation-delay:.18s}
+@keyframes strayHitB{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
+.stray-head{transform-origin:560px 356px;animation:strayNod .72s ease-in-out infinite}
+@keyframes strayNod{0%,100%{transform:rotate(2.5deg)}50%{transform:rotate(-5deg)}}
+.stray-body{transform-origin:540px 640px;animation:strayLean 1.44s ease-in-out infinite}
+@keyframes strayLean{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.8deg)}}
+.stray-keys rect{fill:#fff}
+.stray-fly .k{opacity:0;transform-origin:center;animation:strayFly 1.9s cubic-bezier(.2,.5,.3,1) infinite}
+@keyframes strayFly{
+  0%{opacity:0;transform:translate(0,0) rotate(0deg)}
+  8%{opacity:1}
+  80%{opacity:1}
+  100%{opacity:0;transform:translate(var(--fx,-320px),var(--fy,-420px)) rotate(var(--fr,-38deg))}
+}
+.cut-strayhorn .thread{stroke-width:6;stroke-dasharray:850;stroke-dashoffset:850}
+.cut-strayhorn.live .thread{animation:threadDraw 1.3s .45s ease-out both}
+.cut-strayhorn .wm{left:5vw;top:8vh}
+.cut-strayhorn.live .wm{animation:wmSlam .45s .2s both}
+.cut-strayhorn .cap{left:5.2vw;bottom:8vh}
+.cut-strayhorn .wmark{animation-delay:1.6s !important}
+
+/* ---------------------------------------------------------
+   CUT 4 · DUKE · 2.0 · tangerine
+   Choreography: pure typography. Four letters SLAM in like
+   New Year's fireworks, frame shakes on each impact, then a
+   white rule draws under the name. A tiny conductor keeps
+   time in the corner — the only figure, tiny for scale.
+   --------------------------------------------------------- */
+.cut-duke{background:var(--c-duke);color:#000}
+.duke-type{
+  position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+  display:flex;gap:.02em;color:#000;
+  font:900 clamp(120px,24vw,380px)/0.9 var(--hg);letter-spacing:-.04em;
+}
+.duke-type b{display:block;opacity:0}
+.cut-duke.live .duke-type b{animation:dukeSlam .34s cubic-bezier(.16,1.2,.3,1) both}
+.cut-duke.live .duke-type b:nth-child(1){animation-delay:.10s}
+.cut-duke.live .duke-type b:nth-child(2){animation-delay:.42s}
+.cut-duke.live .duke-type b:nth-child(3){animation-delay:.74s}
+.cut-duke.live .duke-type b:nth-child(4){animation-delay:1.06s}
+@keyframes dukeSlam{
+  0%{opacity:0;transform:scale(5.2)}
+  60%{opacity:1;transform:scale(.94)}
+  100%{opacity:1;transform:scale(1)}
+}
+.cut-duke.live{animation:dukeShake 1.5s steps(1) both}
+@keyframes dukeShake{
+  0%,9%{transform:translate(0,0)}
+  10%{transform:translate(-7px,5px)}12%{transform:translate(4px,-3px)}14%{transform:translate(0,0)}
+  42%{transform:translate(6px,4px)}44%{transform:translate(-4px,-2px)}46%{transform:translate(0,0)}
+  74%{transform:translate(-6px,-5px)}76%{transform:translate(3px,3px)}78%{transform:translate(0,0)}
+  100%{transform:translate(0,0)}
+}
+.duke-sub{
+  position:absolute;left:50%;top:63.5%;transform:translateX(-50%);
+  font:800 clamp(15px,2.1vw,28px)/1 var(--hg);letter-spacing:.42em;text-transform:uppercase;
+  color:#000;white-space:nowrap;opacity:0;
+}
+.cut-duke.live .duke-sub{animation:wmSlam .4s 1.5s both}
+.duke-rule{position:absolute;left:50%;top:57.5%;width:min(58vw,900px);height:9px;transform:translateX(-50%)}
+.duke-rule .bar{position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left center}
+.cut-duke.live .duke-rule .bar{animation:dukeRule .55s 1.42s cubic-bezier(.6,0,.2,1) both}
+@keyframes dukeRule{to{transform:scaleX(1)}}
+.cut-duke .wmark-html{
+  position:absolute;left:calc(50% + min(29vw,450px) + 26px);top:57.5%;
+  width:52px;height:52px;margin-top:-22px;border:5px solid #fff;border-radius:50%;
+  color:#fff;font:900 24px/44px var(--hg);text-align:center;opacity:0;
+}
+.cut-duke.live .wmark-html{animation:roundelPop .4s 1.95s cubic-bezier(.2,1.5,.4,1) both}
+.duke-conductor{position:absolute;right:6vw;bottom:7vh;width:120px}
+.duke-baton{transform-origin:74px 84px;animation:dukeBaton .32s ease-in-out infinite alternate}
+@keyframes dukeBaton{from{transform:rotate(-26deg)}to{transform:rotate(14deg)}}
+.cut-duke .cap{left:50%;bottom:7.5vh;transform:translateX(-50%);text-align:center;max-width:560px}
+
+/* ---------------------------------------------------------
+   CUT 5 · ELLA · 2.1 · yellow
+   Choreography: CLOSE-UP. One giant hand holding the mic
+   fills the right of frame, barely moving — just breath.
+   The white cable is the whole dance: it draws itself across
+   the frame while scat marks pop along it like syllables.
+   --------------------------------------------------------- */
+.cut-ella{background:var(--c-ella)}
+.ella-hand{transform-origin:1240px 640px;animation:ellaBreath 2.6s ease-in-out infinite}
+@keyframes ellaBreath{0%,100%{transform:rotate(-1.4deg) translateY(0)}50%{transform:rotate(1deg) translateY(-12px)}}
+.cut-ella .thread{stroke-width:9;stroke-dasharray:1750;stroke-dashoffset:1750}
+.cut-ella.live .thread{animation:threadDraw 2.1s .35s cubic-bezier(.5,0,.3,1) both}
+.ella-scat text{
+  font:900 84px/1 var(--hg);fill:#fff;opacity:0;transform-origin:center;transform-box:fill-box;
+}
+.cut-ella.live .ella-scat text{animation:scatPop .55s both}
+.cut-ella.live .ella-scat text:nth-child(1){animation-delay:.75s}
+.cut-ella.live .ella-scat text:nth-child(2){animation-delay:1.05s}
+.cut-ella.live .ella-scat text:nth-child(3){animation-delay:1.35s}
+.cut-ella.live .ella-scat text:nth-child(4){animation-delay:1.65s}
+.cut-ella.live .ella-scat text:nth-child(5){animation-delay:1.95s}
+@keyframes scatPop{
+  0%{opacity:0;transform:scale(.3) rotate(-10deg)}
+  45%{opacity:1;transform:scale(1.25) rotate(3deg)}
+  100%{opacity:1;transform:scale(1) rotate(0deg)}
+}
+.cut-ella .wm{left:5.4vw;top:10vh}
+.cut-ella.live .wm{animation:wmSlam .45s .18s both}
+.cut-ella .cap{left:5.6vw;bottom:8.4vh}
+.cut-ella .wmark{animation-delay:2.35s !important}
+
+/* ---------------------------------------------------------
+   CUT 6 · COLTRANE · 2.7 · electric blue
+   Choreography: sheets of sound. The name is a giant black
+   wall of type BEHIND the figure; the player rocks fast and
+   hard while translucent echo-selves trail him and white
+   arcs sweep out of the bell. Densest frame of the film.
+   --------------------------------------------------------- */
+.cut-coltrane{background:var(--c-coltrane)}
+.trane-wall{
+  position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);
+  font:900 clamp(110px,21vw,330px)/0.86 var(--hg);letter-spacing:-.045em;
+  color:#000;white-space:nowrap;opacity:0;
+}
+.cut-coltrane.live .trane-wall{animation:traneWall .3s .05s both}
+@keyframes traneWall{from{opacity:0;transform:translate(-50%,-50%) scale(1.06)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.trane-fig{transform-origin:800px 810px;animation:traneRock .46s cubic-bezier(.5,0,.5,1) infinite alternate}
+@keyframes traneRock{from{transform:rotate(-5deg) translateY(0)}to{transform:rotate(4deg) translateY(-14px)}}
+.trane-echo1{opacity:.26;transform-origin:800px 810px;animation:traneRock .46s cubic-bezier(.5,0,.5,1) infinite alternate;animation-delay:-.12s}
+.trane-echo2{opacity:.13;transform-origin:800px 810px;animation:traneRock .46s cubic-bezier(.5,0,.5,1) infinite alternate;animation-delay:-.24s}
+.trane-sax{transform-origin:836px 470px;animation:traneSax .92s ease-in-out infinite}
+@keyframes traneSax{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
+.trane-sheets path{stroke:#fff;fill:none;stroke-linecap:round;opacity:0}
+.cut-coltrane.live .trane-sheets path{animation:traneSheet 1.15s cubic-bezier(.3,0,.4,1) infinite}
+.cut-coltrane.live .trane-sheets path:nth-child(1){animation-delay:.15s}
+.cut-coltrane.live .trane-sheets path:nth-child(2){animation-delay:.42s}
+.cut-coltrane.live .trane-sheets path:nth-child(3){animation-delay:.69s}
+@keyframes traneSheet{
+  0%{opacity:0;transform:scale(.62);transform-origin:930px 420px}
+  22%{opacity:.95}
+  100%{opacity:0;transform:scale(1.34);transform-origin:930px 420px}
+}
+.cut-coltrane .thread{stroke-width:7;stroke-dasharray:980;stroke-dashoffset:980}
+.cut-coltrane.live .thread{animation:threadDraw 1s .5s cubic-bezier(.5,0,.3,1) both}
+.cut-coltrane .wm{left:50%;bottom:6.8vh;transform:translateX(-50%);text-align:center}
+.cut-coltrane .wm .code{display:none}
+.cut-coltrane.live .wm{animation:capIn .5s .8s both;opacity:1}
+.cut-coltrane .wm .meta{color:#fff;letter-spacing:.3em}
+.cut-coltrane .wmark{animation-delay:1.45s !important}
+
+/* ---------------------------------------------------------
+   CUT 7 · BEBO · 5.0 · green
+   Choreography: two dancers trade modular black blocks. The
+   white thread zigzags through the blocks like a score.
+   --------------------------------------------------------- */
+.cut-bebo{background:var(--c-bebo)}
+.bebo-a{transform-origin:520px 760px;animation:beboStepA .72s steps(2,end) infinite}
+.bebo-b{transform-origin:1120px 760px;animation:beboStepB .72s steps(2,end) infinite}
+.bebo-blocks rect{fill:#000;transform-box:fill-box;transform-origin:center;animation:beboBlock 1.44s cubic-bezier(.2,.8,.3,1) infinite}
+.bebo-blocks rect:nth-child(2){animation-delay:.18s}.bebo-blocks rect:nth-child(3){animation-delay:.36s}.bebo-blocks rect:nth-child(4){animation-delay:.54s}
+@keyframes beboStepA{0%{transform:rotate(-5deg) translateX(-12px)}100%{transform:rotate(5deg) translateX(12px)}}
+@keyframes beboStepB{0%{transform:rotate(5deg) translateX(12px)}100%{transform:rotate(-5deg) translateX(-12px)}}
+@keyframes beboBlock{0%,15%{transform:scale(.35) rotate(-18deg);opacity:0}35%,76%{transform:scale(1);opacity:1}100%{transform:translateY(-90px) rotate(16deg);opacity:0}}
+.cut-bebo .thread{stroke-width:7;stroke-dasharray:1250;stroke-dashoffset:1250}
+.cut-bebo.live .thread{animation:threadDraw 1.45s .3s ease-out both}
+.cut-bebo .wm{right:5vw;bottom:7vh;text-align:right}
+.cut-bebo.live .wm{animation:wmSlam .45s .16s both}
+.cut-bebo .cap{left:5.5vw;top:8vh}
+.cut-bebo .wmark{animation-delay:1.7s!important}
+
+/* ---------------------------------------------------------
+   CUT 8 · SIMONE · 5.6 · purple
+   Choreography: a four-panel ensemble. Each panel enters from
+   another edge and plays a different pose; one thread crosses
+   every seam before the panels collapse into the poster wall.
+   --------------------------------------------------------- */
+.cut-simone{background:var(--c-simone)}
+.sim-panels{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.sim-panel{position:relative;overflow:hidden;border:4px solid #000;opacity:0;background:var(--pc)}
+.cut-simone.live .sim-panel{animation:simPanel .5s cubic-bezier(.16,1,.3,1) both}
+.cut-simone.live .sim-panel:nth-child(1){animation-delay:.05s}.cut-simone.live .sim-panel:nth-child(2){animation-delay:.17s}.cut-simone.live .sim-panel:nth-child(3){animation-delay:.29s}.cut-simone.live .sim-panel:nth-child(4){animation-delay:.41s}
+@keyframes simPanel{from{opacity:0;transform:translate(var(--ix,0),var(--iy,0)) scale(.8)}to{opacity:1;transform:none}}
+.sim-panel svg{width:100%;height:100%}.sim-dancer{transform-origin:200px 210px;animation:simDance .62s ease-in-out infinite alternate}
+.sim-panel:nth-child(2) .sim-dancer{animation-delay:-.15s}.sim-panel:nth-child(3) .sim-dancer{animation-delay:-.3s}.sim-panel:nth-child(4) .sim-dancer{animation-delay:-.45s}
+@keyframes simDance{from{transform:rotate(-6deg) translateY(7px)}to{transform:rotate(7deg) translateY(-8px)}}
+.cut-simone .thread{stroke-width:8;stroke-dasharray:2050;stroke-dashoffset:2050}
+.cut-simone.live .thread{animation:threadDraw 1.8s .48s ease-out both}
+.cut-simone .wm{left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:#fff;text-shadow:0 3px 0 #000}
+.cut-simone .wm .code{font-size:clamp(72px,14vw,210px)}
+.cut-simone.live .wm{animation:simName .62s 1.1s both}
+@keyframes simName{from{opacity:0;letter-spacing:.25em}to{opacity:1;letter-spacing:0}}
+.cut-simone .cap{right:4vw;bottom:5vh;text-align:right;color:#fff;max-width:360px}
+.cut-simone .wmark{animation-delay:2.25s!important}
+
+/* ---------------------------------------------------------
+   FINALE · the campaign gathers into one poster wall
+   --------------------------------------------------------- */
+#posterWall{position:fixed;inset:0;z-index:32;background:#090909;display:none;padding:7vh 6vw 9vh}
+#posterWall.live{display:block}
+#posterWall h2{position:absolute;left:6vw;top:2.4vh;font:800 12px/1 var(--hg);letter-spacing:.28em;text-transform:uppercase;color:#aaa}
+#wallGrid{height:100%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:10px}
+.poster{position:relative;overflow:hidden;border:0;background:var(--pc);color:#000;text-align:left;cursor:pointer;opacity:0;transform:translateY(70px) rotate(var(--tilt,0deg));box-shadow:0 12px 30px rgba(0,0,0,.35)}
+#posterWall.live .poster{animation:posterGather .7s cubic-bezier(.16,1,.3,1) both}
+#posterWall.live .poster:nth-child(2){animation-delay:.07s}#posterWall.live .poster:nth-child(3){animation-delay:.14s}#posterWall.live .poster:nth-child(4){animation-delay:.21s}#posterWall.live .poster:nth-child(5){animation-delay:.28s}#posterWall.live .poster:nth-child(6){animation-delay:.35s}#posterWall.live .poster:nth-child(7){animation-delay:.42s}#posterWall.live .poster:nth-child(8){animation-delay:.49s}
+@keyframes posterGather{to{opacity:1;transform:none}}
+.poster:hover,.poster:focus-visible{z-index:2;transform:scale(1.035)!important;outline:5px solid #fff;outline-offset:-5px}
+.poster b{position:absolute;left:8%;bottom:6%;font:900 clamp(26px,4vw,68px)/.85 var(--hg);letter-spacing:-.04em;text-transform:uppercase}
+.poster small{position:absolute;left:9%;top:8%;font:800 10px/1.4 var(--hg);letter-spacing:.18em;text-transform:uppercase}
+.poster .mini-fig{position:absolute;right:8%;top:18%;width:32%;height:62%;background:#000;border-radius:48% 52% 38% 46%;transform:rotate(var(--fr,-8deg))}
+.poster .mini-wire{position:absolute;left:12%;right:8%;top:48%;height:4px;background:#fff;transform:rotate(var(--wr,-14deg));transform-origin:left}
+.poster .mini-w{position:absolute;right:7%;top:39%;width:34px;height:34px;border:4px solid #fff;border-radius:50%;color:#fff;font:900 16px/26px var(--hg);text-align:center}
+.poster-play{position:absolute;right:7%;bottom:6%;z-index:3;background:#fff;color:#000;border:0;border-radius:999px;padding:9px 13px;font:800 9px/1 var(--hg);letter-spacing:.13em;text-transform:uppercase;cursor:pointer}
+#wallHelp{position:absolute;right:6vw;bottom:3vh;font:600 10px/1 var(--hg);letter-spacing:.18em;text-transform:uppercase;color:#777}
+
+/* Playground projector — empty until Play Miles is pressed. */
+#pgModal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);padding:4vw}
+#pgModal.open{display:flex}
+#pgWindow{position:relative;width:min(1180px,94vw);height:min(760px,88vh);background:#111;border:5px solid #fff;box-shadow:0 0 0 10px #000,0 30px 90px #000;display:flex;flex-direction:column}
+#pgBar{height:48px;flex:none;display:flex;align-items:center;padding:0 14px 0 18px;background:#fff;color:#000;font:800 12px/1 var(--hg);letter-spacing:.12em;text-transform:uppercase}
+#pgBar span{flex:1}#pgClose{width:34px;height:34px;border:3px solid #000;border-radius:50%;font:900 17px/24px var(--hg);cursor:pointer;background:#fff;color:#000}
+#pgHolder{position:relative;flex:1;background:#161616;display:flex;align-items:center;justify-content:center;color:#bbb;font:700 13px/1.7 var(--hg);letter-spacing:.12em;text-align:center;text-transform:uppercase}
+#pgHolder iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+
+@media (max-width:700px){
+  #wallGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr)}
+  #posterWall{padding:7vh 4vw 8vh}.poster b{font-size:7vw}.poster small{font-size:7px}.poster-play{padding:7px;font-size:7px}
+  #splash .keys{display:none}.cut .cap{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .cut *{animation:none!important}
+  #posterWall.live .poster{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="splash" class="needs-click">
+  <div class="inner">
+    <div class="roundel" aria-hidden="true">W</div>
+    <h1><span>The Codename</span><span>Sessions</span></h1>
+    <div class="strip" aria-hidden="true"><i style="background:var(--c-miles)"></i><i style="background:var(--c-mingus)"></i><i style="background:var(--c-strayhorn)"></i><i style="background:var(--c-duke)"></i><i style="background:var(--c-ella)"></i><i style="background:var(--c-coltrane)"></i><i style="background:var(--c-bebo)"></i><i style="background:var(--c-simone)"></i></div>
+    <div class="sub">eight jazz names · one publishing thread · <b>WordPress, 2004–2020</b></div>
+    <button class="start" id="startFilm">start the film</button>
+    <div class="keys"><kbd>space</kbd> pause · <kbd>←</kbd><kbd>→</kbd> jump cuts · <kbd>s</kbd> sound</div>
+  </div>
+</div>
+
+<div id="stage" aria-live="off">
+  <section class="cut cut-miles" data-name="Miles" aria-label="Miles, WordPress 1.0, 2004">
+    <svg class="scene ground" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="fig-miles" data-pose="0" fill="#000">
+        <g class="joint j-spine"><path d="M735 438 Q760 380 817 398 Q842 455 818 578 L742 574 Q716 510 735 438Z"/><g class="joint j-head"><circle cx="801" cy="355" r="50"/><path d="M772 322 Q820 286 850 333 L832 344 Q805 323 772 345Z"/></g>
+        <g class="joint j-armb-u"><path d="M786 430 Q842 430 890 474 L870 502 Q820 474 773 466Z"/><g class="joint j-armb-f"><path d="M870 477 Q925 439 980 387 L996 408 Q951 476 888 510Z"/></g></g>
+        <g class="joint j-armf-u"><path d="M770 438 Q822 460 870 501 L849 526 Q797 497 748 473Z"/><g class="joint j-armf-f"><path d="M850 502 Q906 463 963 407 L982 426 Q938 492 869 535Z"/></g></g></g>
+        <g class="joint j-legf-t"><path d="M746 555 Q783 554 794 581 L760 704 L718 696Z"/><g class="joint j-legf-s"><path d="M721 682 L765 693 L748 828 L696 828Z"/></g></g>
+        <g class="joint j-legb-t"><path d="M786 552 Q825 548 838 581 L866 696 L823 708Z"/><g class="joint j-legb-s"><path d="M824 690 L868 684 L904 822 L852 830Z"/></g></g>
+        <g class="joint j-horn"><path d="M955 375 L1094 298 L1102 324 L978 410Z"/><rect x="1084" y="292" width="74" height="39" rx="9"/><path d="M1088 318 L1052 350 L1037 331 L1075 298Z"/></g>
+      </g>
+      <g class="miles-blast" stroke="#fff"><line x1="1165" y1="290" x2="1215" y2="262"/><line x1="1172" y1="319" x2="1235" y2="319"/><line x1="1163" y1="345" x2="1216" y2="377"/></g>
+      <path class="thread" d="M1148 311 C1260 355 1268 490 1168 539 C1042 603 1125 746 1328 717"/>
+      <g transform="translate(1370 715)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Miles</span><span class="meta">1.0 · 2004</span></div>
+    <p class="cap">The first jazz codename. Permalinks, post preview, and a platform stepping out under its own name.</p>
+  </section>
+
+  <section class="cut cut-mingus" data-name="Mingus" aria-label="Mingus, WordPress 1.2, 2004">
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="fig-mingus-bass" fill="#000"><path d="M865 226 Q1000 324 974 582 Q956 781 842 810 Q730 773 760 584 Q786 423 865 226Z"/><rect x="850" y="95" width="28" height="570" rx="12"/><path d="M864 98 Q920 56 906 18 Q855 43 864 98Z"/><path d="M764 566 Q706 610 745 702 Q774 630 809 603Z"/></g>
+      <g class="mingus-strings" stroke="#fff"><line x1="858" y1="110" x2="824" y2="729"/><line x1="868" y1="110" x2="850" y2="748"/><line x1="878" y1="110" x2="875" y2="729"/></g>
+      <g class="fig-mingus-man" fill="#000"><path d="M520 364 Q565 310 642 333 Q701 394 684 575 L565 601 Q501 506 520 364Z"/><g class="mingus-head"><circle cx="595" cy="277" r="58"/><path d="M530 256 Q590 182 670 248 L658 274 Q590 239 530 282Z"/></g><path d="M561 561 L627 564 L600 833 L532 833Z"/><path d="M625 557 L682 542 L744 820 L676 832Z"/><path class="mingus-neckhand" d="M620 358 Q690 292 817 245 L834 277 Q717 347 654 416Z"/><path class="mingus-pluck" d="M646 404 Q752 424 835 492 L807 530 Q720 479 626 462Z"/></g>
+      <path class="thread" d="M865 112 C960 74 1048 107 1088 196 C1140 313 1247 298 1350 230"/>
+      <g transform="translate(1390 225)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Mingus</span><span class="meta">1.2 · 2004</span></div>
+    <p class="cap">Plugins arrive. The bass line becomes an architecture other people can play through.</p>
+  </section>
+
+  <section class="cut cut-strayhorn" data-name="Strayhorn" aria-label="Strayhorn, WordPress 1.5, 2005">
+    <svg class="scene ground" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="#000"><path d="M705 485 L1450 485 L1510 590 L805 590Z"/><rect x="886" y="580" width="68" height="250"/><rect x="1320" y="580" width="68" height="250"/><path d="M480 391 Q530 325 608 358 Q656 420 632 590 L514 610 Q463 520 480 391Z"/><g class="stray-head"><circle cx="550" cy="310" r="55"/><path d="M495 299 Q544 226 614 286 L607 311 Q550 280 495 322Z"/></g><path d="M526 585 L585 579 L566 830 L496 830Z"/><path class="stray-armb" d="M570 405 Q646 432 735 500 L713 531 Q624 486 548 460Z"/><path class="stray-armf" d="M579 421 Q659 455 776 512 L757 543 Q649 508 553 474Z"/></g>
+      <g class="stray-keys"><rect x="718" y="492" width="55" height="20"/><rect x="782" y="492" width="55" height="20"/><rect x="846" y="492" width="55" height="20"/><rect x="910" y="492" width="55" height="20"/></g>
+      <g class="stray-fly"><rect class="k" x="750" y="470" width="45" height="16" style="--fx:-280px;--fy:-330px;--fr:-31deg"/><rect class="k" x="824" y="468" width="45" height="16" style="--fx:-120px;--fy:-410px;--fr:22deg;animation-delay:.3s"/><rect class="k" x="898" y="470" width="45" height="16" style="--fx:90px;--fy:-350px;--fr:44deg;animation-delay:.6s"/></g>
+      <path class="thread" d="M770 526 C910 421 1030 346 1130 377 C1240 410 1264 302 1352 245"/>
+      <g transform="translate(1390 220)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Strayhorn</span><span class="meta">1.5 · 2005</span></div>
+    <p class="cap">Themes, static pages, and the Dashboard: presentation separates from the instrument beneath it.</p>
+  </section>
+
+  <section class="cut cut-duke" data-name="Duke" aria-label="Duke, WordPress 2.0, 2005">
+    <div class="duke-type" aria-hidden="true"><b>D</b><b>U</b><b>K</b><b>E</b></div>
+    <div class="duke-rule"><i class="bar"></i></div><div class="wmark-html">W</div>
+    <div class="duke-sub">WordPress 2.0 · 2005 · the richer writing desk</div>
+    <svg class="duke-conductor" viewBox="0 0 120 210" aria-hidden="true"><g fill="#000"><circle cx="55" cy="42" r="26"/><path d="M31 70 Q56 53 80 74 L87 142 L30 146Z"/><path d="M38 136 L60 138 L45 205 L19 205Z"/><path d="M65 137 L83 132 L108 198 L82 205Z"/><path d="M35 80 L6 127 L21 137 L53 99Z"/><path d="M74 79 L102 111 L91 124 L59 99Z"/></g><g class="duke-baton"><line x1="92" y1="112" x2="113" y2="28" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g></svg>
+    <p class="cap">Visual editing, roles, uploads: four letters land like a new year arriving.</p>
+  </section>
+
+  <section class="cut cut-ella" data-name="Ella" aria-label="Ella, WordPress 2.1, 2007">
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="#000"><path d="M990 -40 Q1390 90 1570 410 L1600 900 L1035 900 Q1115 702 957 536 Q820 392 990 -40Z"/><circle cx="1074" cy="322" r="112"/><path class="ella-hand" d="M943 419 Q1030 345 1132 425 L1300 660 Q1323 716 1268 758 Q1210 787 1175 734 L1058 571 L1018 690 Q991 745 931 716 Q889 684 908 632Z"/><rect x="842" y="264" width="110" height="250" rx="52" transform="rotate(-21 897 389)"/></g>
+      <g class="ella-scat"><text x="150" y="500">BA</text><text x="340" y="410">DOO</text><text x="570" y="540">BOP</text><text x="750" y="385">♪</text><text x="395" y="670">HEY</text></g>
+      <path class="thread" d="M885 300 C782 220 681 245 592 344 C502 444 339 382 188 276 C116 225 96 158 142 114"/>
+      <g transform="translate(151 105)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Ella</span><span class="meta">2.1 · 2007</span></div>
+    <p class="cap">Autosave and a new interface: the cable carries every syllable without dropping the phrase.</p>
+  </section>
+
+  <section class="cut cut-coltrane" data-name="Coltrane" aria-label="Coltrane, WordPress 2.7, 2008">
+    <div class="trane-wall" aria-hidden="true">COLTRANE</div>
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="trane-echo2" transform="translate(-70 10)" fill="#000"><path d="M700 316 Q770 266 840 326 L870 590 L706 598Z"/><circle cx="775" cy="238" r="62"/><path d="M730 565 L790 570 L750 840 L680 840Z"/><path d="M800 568 L857 552 L927 821 L858 840Z"/></g>
+      <g class="trane-echo1" transform="translate(-36 4)" fill="#000"><path d="M700 316 Q770 266 840 326 L870 590 L706 598Z"/><circle cx="775" cy="238" r="62"/><path d="M730 565 L790 570 L750 840 L680 840Z"/><path d="M800 568 L857 552 L927 821 L858 840Z"/></g>
+      <g class="trane-fig" fill="#000"><path d="M700 316 Q770 266 840 326 L870 590 L706 598Z"/><circle cx="775" cy="238" r="62"/><path d="M730 565 L790 570 L750 840 L680 840Z"/><path d="M800 568 L857 552 L927 821 L858 840Z"/><path d="M724 346 Q800 363 864 430 L838 465 Q764 418 692 402Z"/><path d="M826 349 Q880 374 921 431 L899 455 Q846 420 801 398Z"/><g class="trane-sax"><path d="M888 385 Q955 443 907 575 Q874 644 952 675 L976 648 Q922 620 951 557 Q1008 422 910 361Z"/><rect x="890" y="333" width="21" height="102" rx="9" transform="rotate(-24 900 384)"/></g></g>
+      <g class="trane-sheets"><path d="M935 402 Q1080 292 1240 348" stroke-width="7"/><path d="M947 424 Q1130 380 1370 461" stroke-width="5"/><path d="M940 447 Q1085 516 1320 590" stroke-width="8"/></g>
+      <path class="thread" d="M920 372 C1048 273 1194 221 1332 257"/>
+      <g transform="translate(1380 265)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Coltrane</span><span class="meta">2.7 · 2008 · redesigned admin</span></div>
+    <p class="cap">A denser dashboard learns to improvise without losing the line.</p>
+  </section>
+
+  <section class="cut cut-bebo" data-name="Bebo" aria-label="Bebo, WordPress 5.0, 2018">
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="bebo-a" fill="#000"><circle cx="470" cy="285" r="56"/><path d="M411 344 Q470 314 528 355 L543 576 L405 584Z"/><path d="M425 553 L481 559 L441 833 L371 833Z"/><path d="M487 557 L534 536 L621 797 L556 828Z"/><path d="M427 374 L307 475 L334 508 L467 426Z"/><path d="M511 369 L660 432 L643 475 L487 427Z"/></g>
+      <g class="bebo-b" fill="#000"><circle cx="1122" cy="275" r="56"/><path d="M1063 337 Q1123 305 1181 347 L1194 575 L1054 579Z"/><path d="M1070 551 L1126 558 L1084 832 L1015 830Z"/><path d="M1133 553 L1180 536 L1273 789 L1211 826Z"/><path d="M1080 370 L934 428 L950 474 L1102 428Z"/><path d="M1167 369 L1287 478 L1257 508 L1130 426Z"/></g>
+      <g class="bebo-blocks"><rect x="724" y="265" width="118" height="78" rx="10"/><rect x="683" y="370" width="196" height="82" rx="10"/><rect x="742" y="476" width="132" height="84" rx="10"/><rect x="698" y="590" width="184" height="76" rx="10"/></g>
+      <path class="thread" d="M321 479 L690 410 L748 300 L822 414 L754 518 L866 627 L1268 485"/>
+      <g transform="translate(1320 475)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g>
+    </svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Bebo</span><span class="meta">5.0 · 2018</span></div>
+    <p class="cap">The block editor turns publishing into a duet of movable parts.</p>
+  </section>
+
+  <section class="cut cut-simone" data-name="Simone" aria-label="Simone, WordPress 5.6, 2020">
+    <div class="sim-panels" aria-hidden="true">
+      <div class="sim-panel" style="--pc:#ff2d83;--ix:-120px"><svg viewBox="0 0 400 220"><g class="sim-dancer" fill="#000"><circle cx="205" cy="56" r="31"/><path d="M170 89 Q207 68 239 95 L243 164 L170 167Z"/><path d="M179 155 L205 160 L183 217 L145 217Z"/><path d="M210 159 L237 151 L270 216 L234 219Z"/><path d="M180 100 L99 66 L90 84 L184 129Z"/><path d="M232 100 L316 57 L327 78 L226 130Z"/></g></svg></div>
+      <div class="sim-panel" style="--pc:#ffd200;--ix:120px"><svg viewBox="0 0 400 220"><g class="sim-dancer" fill="#000"><circle cx="200" cy="56" r="31"/><path d="M166 89 Q203 68 238 95 L244 164 L169 167Z"/><path d="M178 155 L207 160 L162 216 L124 215Z"/><path d="M211 159 L239 151 L306 201 L277 220Z"/><path d="M179 101 L115 145 L128 166 L193 127Z"/><path d="M232 100 L286 143 L273 165 L218 128Z"/></g></svg></div>
+      <div class="sim-panel" style="--pc:#00b6e8;--iy:120px"><svg viewBox="0 0 400 220"><g class="sim-dancer" fill="#000"><circle cx="202" cy="55" r="31"/><path d="M166 90 Q202 67 239 94 L244 165 L168 167Z"/><path d="M179 155 L207 159 L199 220 L161 220Z"/><path d="M211 158 L238 151 L253 220 L216 220Z"/><path d="M180 103 L87 115 L90 139 L190 129Z"/><path d="M231 102 L325 114 L322 138 L218 129Z"/></g></svg></div>
+      <div class="sim-panel" style="--pc:#00c46a;--iy:120px"><svg viewBox="0 0 400 220"><g class="sim-dancer" fill="#000"><circle cx="204" cy="54" r="31"/><path d="M168 88 Q204 67 240 94 L245 164 L169 167Z"/><path d="M181 154 L207 160 L146 211 L113 193Z"/><path d="M212 159 L238 151 L301 210 L268 220Z"/><path d="M181 102 L129 41 L109 57 L192 130Z"/><path d="M232 102 L280 38 L302 54 L219 130Z"/></g></svg></div>
+    </div>
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><path class="thread" d="M90 180 C310 50 425 370 598 248 S875 91 1002 305 S1280 570 1472 397"/><g transform="translate(1505 400)"><g class="wmark"><circle r="46" fill="#fff"/><text y="15" text-anchor="middle" font-family="Hanken Grotesk" font-weight="900" font-size="44" fill="#000">W</text></g></g></svg>
+    <div class="wm"><span class="wp">WordPress</span><span class="code">Simone</span><span class="meta">5.6 · 2020 · all-women release squad</span></div>
+    <p class="cap">Many hands, one release: the ensemble fills every panel.</p>
+  </section>
+</div>
+
+<div id="stinger" aria-hidden="true"><div class="word"></div><div class="tag">WordPress · code is poetry</div></div>
+
+<div id="hud">
+  <a id="backlink" href="../">← museum</a>
+  <button id="sound" type="button" aria-pressed="false" aria-label="Enable rhythm" title="sound (S)">♪</button>
+  <div id="pauseGlyph" aria-hidden="true"><i></i><i></i></div>
+  <div id="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="hint">space · pause<br>← → · jump cuts<br>s · sound</div>
+</div>
+
+<section id="posterWall" aria-label="The Codename Sessions poster wall">
+  <h2>The campaign · select a poster to replay its cut</h2>
+  <div id="wallGrid">
+    <button class="poster" data-replay="0" style="--pc:var(--c-miles);--fr:-12deg;--wr:-18deg"><small>1.0 · 2004</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Miles</b><span class="poster-play" data-playground>Play Miles</span></button>
+    <button class="poster" data-replay="1" style="--pc:var(--c-mingus);--fr:6deg;--wr:12deg"><small>1.2 · 2004</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Mingus</b></button>
+    <button class="poster" data-replay="2" style="--pc:var(--c-strayhorn);--fr:-4deg;--wr:-4deg"><small>1.5 · 2005</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Strayhorn</b></button>
+    <button class="poster" data-replay="3" style="--pc:var(--c-duke);--fr:13deg;--wr:18deg"><small>2.0 · 2005</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Duke</b></button>
+    <button class="poster" data-replay="4" style="--pc:var(--c-ella);--fr:-14deg;--wr:-11deg"><small>2.1 · 2007</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Ella</b></button>
+    <button class="poster" data-replay="5" style="--pc:var(--c-coltrane);--fr:4deg;--wr:7deg"><small>2.7 · 2008</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Coltrane</b></button>
+    <button class="poster" data-replay="6" style="--pc:var(--c-bebo);--fr:-7deg;--wr:14deg"><small>5.0 · 2018</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Bebo</b></button>
+    <button class="poster" data-replay="7" style="--pc:var(--c-simone);--fr:10deg;--wr:-16deg"><small>5.6 · 2020</small><i class="mini-fig"></i><i class="mini-wire"></i><i class="mini-w">W</i><b>Simone</b></button>
+  </div>
+  <div id="wallHelp">← → replay · R restart · Play Miles opens live WordPress</div>
+</section>
+
+<div id="pgModal" role="dialog" aria-modal="true" aria-label="Play Miles in WordPress Playground" hidden>
+  <div id="pgWindow">
+    <div id="pgBar"><span>WordPress 1.0 “Miles” · live in Playground</span><button id="pgClose" type="button" aria-label="Close live WordPress">×</button></div>
+    <div id="pgHolder"><span>Dropping the needle on 2004…<br>first boot can take a minute</span></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var cuts=Array.prototype.slice.call(document.querySelectorAll('.cut'));
+var ticks=Array.prototype.slice.call(document.querySelectorAll('#ticks i'));
+var durations=[3400,6200,4400,3000,5000,4400,5200,5900];
+var stings=['PERMALINK','PLUGIN','THEME','PUBLISH','AUTOSAVE','DASHBOARD','BLOCKS'];
+var colors=['#a9d500','#00b6e8','#ff7a00','#ffd200','#4433ee','#00c46a','#a02fe8'];
+var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var current=-1,started=false,paused=false,inStinger=false;
+var timer=null,deadline=0,remaining=0,nextAction=null;
+var poseTimer=null,audioTimer=null,audioOn=false,audioCtx=null;
+var wall=document.getElementById('posterWall');
+var splash=document.getElementById('splash');
+var stinger=document.getElementById('stinger');
+var hintTimer=null;
+
+function arm(fn,ms){
+  clearTimeout(timer);nextAction=fn;remaining=ms;deadline=performance.now()+ms;
+  if(!paused)timer=setTimeout(fn,ms);
+}
+function clearCut(){
+  clearInterval(poseTimer);poseTimer=null;
+  cuts.forEach(function(c){c.classList.remove('live')});
+}
+function setTicks(i){ticks.forEach(function(t,n){t.classList.toggle('on',n===i)})}
+function milesDance(){
+  var fig=document.querySelector('.fig-miles'),blast=document.querySelector('.miles-blast'),p=0;
+  poseTimer=setInterval(function(){
+    p=(p+1)%4;fig.setAttribute('data-pose',String(p));
+    blast.classList.remove('hit');void blast.getBoundingClientRect();blast.classList.add('hit');
+  },390);
+}
+function showCut(i){
+  clearCut();wall.classList.remove('live');inStinger=false;current=(i+cuts.length)%cuts.length;
+  var cut=cuts[current];void cut.offsetWidth;cut.classList.add('live');setTicks(current);
+  document.body.classList.add('film-running');document.body.classList.remove('paused');paused=false;
+  if(current===0&&!RM)milesDance();
+  rhythmAccent(current);
+  arm(advance,durations[current]);
+}
+function advance(){
+  if(current>=cuts.length-1){showWall();return}
+  clearCut();inStinger=true;
+  stinger.style.background=colors[current];
+  stinger.querySelector('.word').textContent=stings[current];
+  stinger.classList.add('live');
+  rhythmAccent(current+1);
+  arm(function(){stinger.classList.remove('live');showCut(current+1)},400);
+}
+function showWall(){
+  clearTimeout(timer);nextAction=null;clearCut();stinger.classList.remove('live');inStinger=false;
+  document.body.classList.remove('film-running','paused');paused=false;wall.classList.add('live');current=cuts.length;
+  setTicks(-1);stopRhythm();
+  var first=wall.querySelector('.poster');if(first)first.focus({preventScroll:true});
+}
+function startAt(i){
+  started=true;splash.classList.add('gone');
+  if(RM){showWall();return}
+  showCut(i||0);
+  document.body.classList.add('show-hint');clearTimeout(hintTimer);
+  hintTimer=setTimeout(function(){document.body.classList.remove('show-hint')},6500);
+  if(audioOn)startRhythm();
+}
+function jump(dir){
+  if(!started){startAt(dir<0?cuts.length-1:0);return}
+  if(wall.classList.contains('live')){showCut(dir<0?cuts.length-1:0);return}
+  stinger.classList.remove('live');showCut((current+dir+cuts.length)%cuts.length);
+}
+function togglePause(){
+  if(!started||wall.classList.contains('live'))return;
+  paused=!paused;document.body.classList.toggle('paused',paused);
+  if(paused){remaining=Math.max(0,deadline-performance.now());clearTimeout(timer);stopRhythm()}
+  else{deadline=performance.now()+remaining;timer=setTimeout(nextAction,remaining);if(audioOn)startRhythm()}
+}
+
+function ensureAudio(){
+  if(audioCtx)return audioCtx;
+  var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+  audioCtx=new AC();return audioCtx;
+}
+function note(freq,when,dur,gain,type){
+  var ac=ensureAudio();if(!ac)return;
+  var o=ac.createOscillator(),g=ac.createGain();o.type=type||'triangle';o.frequency.value=freq;
+  g.gain.setValueAtTime(.0001,when);g.gain.linearRampToValueAtTime(gain,when+.01);g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+  o.connect(g);g.connect(ac.destination);o.start(when);o.stop(when+dur+.03);
+}
+function rhythmAccent(i){
+  if(!audioOn)return;var ac=ensureAudio();if(!ac)return;
+  if(ac.state==='suspended')ac.resume();var roots=[146.8,98,164.8,174.6,130.8,110,196,220];
+  note(roots[i%roots.length]*2,ac.currentTime+.01,.12,.045,'square');
+}
+function startRhythm(){
+  stopRhythm();if(!audioOn||paused||wall.classList.contains('live'))return;
+  var beat=0;audioTimer=setInterval(function(){
+    var ac=ensureAudio();if(!ac)return;var roots=[73.4,49,82.4,87.3,65.4,55,98,110],r=roots[Math.max(0,current)%roots.length];
+    note(r*(beat%4===3?1.5:1),ac.currentTime+.01,.18,.035,'triangle');
+    if(beat%2)note(900,ac.currentTime+.01,.035,.009,'square');beat++;
+  },360);
+}
+function stopRhythm(){clearInterval(audioTimer);audioTimer=null}
+function toggleSound(){
+  audioOn=!audioOn;var b=document.getElementById('sound');b.classList.toggle('on',audioOn);b.setAttribute('aria-pressed',String(audioOn));b.setAttribute('aria-label',audioOn?'Disable rhythm':'Enable rhythm');
+  if(audioOn){var ac=ensureAudio();if(ac&&ac.state==='suspended')ac.resume();rhythmAccent(Math.max(current,0));startRhythm()}else stopRhythm();
+}
+
+var pg=document.getElementById('pgModal'),holder=document.getElementById('pgHolder'),pgOpener=null;
+function openPG(opener){
+  pgOpener=opener;var frame=document.createElement('iframe');frame.title='WordPress 1.0 Miles running live in WordPress Playground';frame.allow='clipboard-read; clipboard-write';frame.src='https://playground.wordpress.net/?wp=1.0';
+  holder.appendChild(frame);pg.hidden=false;pg.classList.add('open');document.getElementById('pgClose').focus();
+}
+function closePG(){
+  holder.querySelectorAll('iframe').forEach(function(f){f.remove()});pg.hidden=true;pg.classList.remove('open');if(pgOpener)pgOpener.focus();pgOpener=null;
+}
+
+document.getElementById('startFilm').addEventListener('click',function(){startAt(0)});
+document.getElementById('sound').addEventListener('click',toggleSound);
+document.getElementById('pgClose').addEventListener('click',closePG);
+pg.addEventListener('click',function(e){if(e.target===pg)closePG()});
+wall.querySelectorAll('.poster').forEach(function(p){
+  p.addEventListener('click',function(e){
+    if(e.target.closest('[data-playground]')){openPG(p);return}
+    startAt(parseInt(p.dataset.replay,10)||0);
+  });
+});
+document.addEventListener('keydown',function(e){
+  if(!pg.hidden){if(e.key==='Escape'){e.preventDefault();closePG()}return}
+  if(e.target.closest&&e.target.closest('button,a')&&e.key!=='s'&&e.key!=='S')return;
+  if(e.key===' '){e.preventDefault();togglePause()}
+  else if(e.key==='ArrowRight'){e.preventDefault();jump(1)}
+  else if(e.key==='ArrowLeft'){e.preventDefault();jump(-1)}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();startAt(0)}
+  else if(e.key==='s'||e.key==='S'){e.preventDefault();toggleSound()}
+});
+})();
+</script>
+</body>
+</html>

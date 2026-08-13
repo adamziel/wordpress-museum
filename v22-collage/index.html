@@ -1,0 +1,2513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Paste-Up — a loud zine about WordPress 5.0 'Bebo' and the moment the page became a pile of pieces. Part of the WordPress Museum.">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v22 · Paste-Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Caveat:wght@400;700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;family=Ultra&amp;display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PASTE-UP · WordPress Museum v22
+   One moment: Gutenberg, December 2018.
+   The argument: assembling a page from blocks IS collage.
+   Direction: 2017–2019 expressive tech collage — clashing type,
+   torn paper, tape, misregistered ink, electric color pairs.
+   Every spread is its own composition. No template repeats.
+   ============================================================ */
+
+:root{
+  /* warm paper + electric pairs */
+  --paper:      #f2e7d3;
+  --paper-2:    #ece0cb;
+  --paper-cool: #eee8dc;
+  --core:       #fffdf4;   /* white paper core exposed at torn edges */
+  --kraft:      #b1885a;
+  --kraft-2:    #a37c4e;
+  --ink:        #191410;
+  --ink-soft:   #35291f;
+  --cobalt:     #1f2ce8;
+  --cobalt-dk:  #1520a8;
+  --canary:     #ffd41f;
+  --coral:      #ff4b33;
+  --coral-dk:   #d92c16;
+  --forest:     #0d5c38;
+  --lilac:      #cdb4ff;
+  --lilac-dk:   #a583ec;
+  --tangerine:  #ff8a00;
+  --redpencil:  #cf2f1e;
+  --tapeglow:   rgba(252,238,164,.55);
+
+  /* type */
+  --serif: 'Ultra', 'Georgia', serif;          /* fat display slab */
+  --grot:  'Archivo Black', 'Arial Black', sans-serif; /* brutal grotesk */
+  --mono:  'Space Mono', 'Courier New', monospace;
+  --hand:  'Caveat', cursive;
+
+  /* torn-edge clip paths (outer white core / inner colour, out of phase) */
+  --jag-a: polygon(0% 7%, 5% 1%, 13% 6%, 23% 0%, 34% 5%, 45% 1%, 57% 6%, 68% 0%, 79% 5%, 90% 1%, 100% 7%, 98% 27%, 100% 49%, 97% 71%, 100% 93%, 92% 100%, 80% 94%, 66% 100%, 52% 95%, 38% 100%, 24% 94%, 11% 100%, 0% 93%, 2% 70%, 0% 48%, 3% 26%);
+  --jag-b: polygon(2% 10%, 10% 3%, 19% 9%, 29% 3%, 40% 8%, 51% 4%, 62% 9%, 73% 3%, 83% 8%, 92% 4%, 98% 11%, 96% 30%, 98% 50%, 95% 70%, 98% 90%, 90% 97%, 78% 91%, 65% 97%, 51% 92%, 37% 97%, 24% 91%, 12% 97%, 2% 90%, 4% 68%, 2% 48%, 5% 28%);
+  --jag-strip: polygon(0% 32%, 3% 8%, 8% 26%, 14% 4%, 21% 30%, 28% 8%, 36% 28%, 44% 2%, 52% 26%, 60% 6%, 68% 30%, 76% 4%, 84% 26%, 92% 8%, 100% 28%, 100% 74%, 96% 94%, 90% 72%, 83% 96%, 75% 74%, 67% 98%, 58% 72%, 50% 96%, 41% 74%, 33% 98%, 25% 72%, 17% 96%, 10% 72%, 4% 94%, 0% 76%);
+
+  /* 28-point pair used by the assembly scraps: torn → flat interpolates */
+  --scrap-torn: polygon(1% 7%, 9% 2%, 18% 6%, 28% 1%, 38% 5%, 50% 2%, 61% 6%, 72% 1%, 83% 5%, 93% 2%, 99% 8%, 97% 28%, 100% 46%, 97% 66%, 99% 86%, 93% 97%, 82% 93%, 70% 98%, 57% 94%, 44% 99%, 31% 95%, 18% 99%, 8% 94%, 2% 98%, 0% 78%, 2% 58%, 0% 38%, 3% 20%);
+  --scrap-flat: polygon(0% 0%, 9% 0%, 18% 0%, 28% 0%, 38% 0%, 50% 0%, 61% 0%, 72% 0%, 83% 0%, 93% 0%, 100% 0%, 100% 28%, 100% 46%, 100% 66%, 100% 86%, 100% 100%, 82% 100%, 70% 100%, 57% 100%, 44% 100%, 31% 100%, 18% 100%, 8% 100%, 0% 100%, 0% 78%, 0% 58%, 0% 38%, 0% 20%);
+  --scrapfill-torn: polygon(4% 11%, 11% 6%, 20% 10%, 30% 5%, 40% 9%, 51% 6%, 62% 10%, 72% 5%, 82% 9%, 91% 6%, 96% 12%, 94% 30%, 97% 47%, 94% 66%, 96% 84%, 90% 93%, 81% 89%, 70% 94%, 58% 90%, 45% 95%, 32% 91%, 20% 95%, 10% 90%, 5% 94%, 3% 77%, 5% 58%, 3% 39%, 6% 23%);
+  --scrapfill-flat: polygon(2.5% 3%, 11% 3%, 20% 3%, 30% 3%, 40% 3%, 51% 3%, 62% 3%, 72% 3%, 82% 3%, 91% 3%, 97.5% 3%, 97.5% 30%, 97.5% 47%, 97.5% 66%, 97.5% 84%, 97.5% 97%, 81% 97%, 70% 97%, 58% 97%, 45% 97%, 32% 97%, 20% 97%, 10% 97%, 2.5% 97%, 2.5% 77%, 2.5% 58%, 2.5% 39%, 2.5% 23%);
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+*, *::before, *::after{ box-sizing:border-box; }
+html, body{ margin:0; padding:0; height:100%; }
+body{
+  background:var(--ink);
+  color:var(--ink);
+  font-family:var(--mono);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background:var(--canary); color:var(--ink); }
+
+/* ---- the zine: one scroll container, hard spread breaks ---- */
+#zine{
+  height:100svh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+  outline:none;
+}
+#zine::-webkit-scrollbar{ display:none; }
+.spread{
+  position:relative;
+  height:100svh;
+  min-height:540px;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  overflow:hidden;
+}
+/* grain over every spread */
+.spread::after{
+  content:"";
+  position:absolute; inset:0;
+  background:var(--grain);
+  mix-blend-mode:multiply;
+  opacity:.5;
+  pointer-events:none;
+  z-index:60;
+}
+
+/* ---- global chrome: lobby link + folio (zine page number) ---- */
+.lobby{
+  position:fixed; top:14px; left:14px; z-index:200;
+  font:700 12px/1 var(--mono);
+  letter-spacing:.04em;
+  color:var(--ink);
+  background:var(--core);
+  text-decoration:none;
+  padding:7px 11px 6px;
+  transform:rotate(-2deg);
+  clip-path:var(--jag-b);
+  box-shadow:2px 3px 0 rgba(0,0,0,.28);
+}
+.lobby:hover, .lobby:focus-visible{ background:var(--canary); }
+.lobby:focus-visible{ outline:3px solid var(--cobalt); outline-offset:2px; }
+.folio{
+  position:fixed; right:16px; bottom:14px; z-index:200;
+  font:400 11px/1 var(--mono);
+  letter-spacing:.08em;
+  color:var(--ink);
+  background:var(--core);
+  padding:6px 10px 5px;
+  transform:rotate(1.5deg);
+  box-shadow:2px 2px 0 rgba(0,0,0,.25);
+  pointer-events:none;
+}
+.folio b{ font-weight:700; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* ---- shared paste-up atoms ---- */
+.tape{
+  position:absolute;
+  width:88px; height:26px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.14) 0 3px, rgba(255,255,255,0) 3px 6px),
+    linear-gradient(180deg, var(--tapeglow), rgba(244,226,148,.42));
+  box-shadow:0 1px 2px rgba(0,0,0,.18);
+  clip-path:polygon(2% 0%, 98% 4%, 100% 22%, 97% 100%, 3% 96%, 0% 78%);
+  z-index:5;
+  pointer-events:none;
+}
+.tape.short{ width:58px; height:22px; }
+.tape.long{ width:128px; }
+
+.scribble{
+  font-family:var(--hand);
+  font-weight:700;
+  color:var(--ink-soft);
+  line-height:.95;
+}
+.scribble.red{ color:var(--redpencil); }
+
+.misreg{
+  text-shadow:
+    .05em .045em 0 rgba(255,75,51,.85),
+    -.04em -.035em 0 rgba(31,44,232,.6);
+}
+.misreg-soft{
+  text-shadow:
+    .035em .03em 0 rgba(255,75,51,.55),
+    -.028em -.024em 0 rgba(31,44,232,.4);
+}
+
+/* torn two-layer construction: white core + colour fill out of phase */
+.torn{ position:relative; clip-path:var(--jag-a); background:var(--core); }
+.torn > .torn-fill{
+  position:absolute; inset:0;
+  clip-path:var(--jag-b);
+}
+.torn > .torn-body{ position:relative; z-index:2; }
+
+/* ============================================================
+   CHOREOGRAPHY — paper physics, never fade-ins.
+   Pieces are opaque while flying; spreads clip them until they
+   land. Verbs: drop (from above), slam (from a side), stamp
+   (slapped down), tear (scaleY rip), write (clip-path wipe).
+   ============================================================ */
+.piece{
+  --r:0deg; --d:0s; --spin:26deg;
+  transition:transform .72s cubic-bezier(.22,.82,.26,1.12);
+  transition-delay:var(--d);
+  transform:rotate(var(--r));
+  will-change:transform;
+}
+.scene:not(.on) .piece.drop{ transform:translateY(-120vh) rotate(calc(var(--r) + var(--spin))); }
+.scene:not(.on) .piece.drop-far{ transform:translateY(-170vh) rotate(calc(var(--r) - var(--spin))); }
+.scene:not(.on) .piece.slam-l{ transform:translateX(-120vw) rotate(calc(var(--r) - 18deg)); }
+.scene:not(.on) .piece.slam-r{ transform:translateX(120vw) rotate(calc(var(--r) + 18deg)); }
+.scene:not(.on) .piece.rise{ transform:translateY(120vh) rotate(calc(var(--r) + 10deg)); }
+.piece.stamp{ transition:transform .34s cubic-bezier(.2,1.4,.4,1), opacity .12s linear; transition-delay:var(--d); }
+.scene:not(.on) .piece.stamp{ transform:scale(2.4) rotate(calc(var(--r) - 14deg)); opacity:0; }
+.piece.tear{ transform-origin:top center; transition:transform .6s cubic-bezier(.6,.02,.3,1); transition-delay:var(--d); transform:rotate(var(--r)) scaleY(1); }
+.scene:not(.on) .piece.tear{ transform:rotate(var(--r)) scaleY(0); }
+.piece.write{ transition:clip-path .9s cubic-bezier(.4,.05,.3,1), transform .72s cubic-bezier(.22,.82,.26,1.12); transition-delay:var(--d); clip-path:inset(-8% -4% -12% -4%); }
+.scene:not(.on) .piece.write{ clip-path:inset(-8% 104% -12% -4%); }
+
+/* ============================================================
+   SPREAD 1 · COVER — explosive title collage
+   ============================================================ */
+.s-cover{ background:var(--paper); }
+.s-cover .frame{ position:absolute; inset:0; }
+
+.cover-masthead{
+  position:absolute; top:18px; left:50%; translate:-50% 0;
+  font:400 11px/1.5 var(--mono);
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  white-space:nowrap;
+  padding:6px 18px;
+  border-top:1px solid var(--ink-soft);
+  border-bottom:1px solid var(--ink-soft);
+}
+.cover-masthead b{ font-weight:700; color:var(--coral-dk); }
+
+.cover-strip{
+  position:absolute;
+  top:34%; left:-6%;
+  width:114%; height:19vh; min-height:110px;
+  clip-path:var(--jag-strip);
+  background:var(--core);
+  z-index:1;
+}
+.cover-strip .torn-fill{
+  position:absolute; inset:3% 0.4%;
+  clip-path:var(--jag-strip);
+  background:
+    radial-gradient(circle at 18% 30%, rgba(255,255,255,.2) 0 2%, transparent 2.5%),
+    var(--cobalt);
+}
+.cover-strip .strip-type{
+  position:absolute; inset:0;
+  display:flex; align-items:center;
+  font:700 clamp(13px, 1.6vw, 21px)/1 var(--mono);
+  letter-spacing:.32em;
+  color:var(--canary);
+  white-space:nowrap;
+  overflow:hidden;
+  z-index:2;
+  transform:translateY(2%);
+}
+
+.cover-word{ position:absolute; z-index:3; }
+.w-the-page{
+  top:9%; left:5.5%;
+  font:400 clamp(64px, 12.5vw, 178px)/0.86 var(--serif);
+  color:var(--ink);
+  letter-spacing:-.015em;
+}
+.w-is-a{
+  top:31.5%; left:47%;
+  font:700 clamp(15px, 1.9vw, 27px)/1 var(--mono);
+  letter-spacing:.5em;
+  color:var(--core);
+  background:var(--ink);
+  padding:10px 8px 9px 18px;
+  z-index:4;
+}
+.w-pile{
+  top:39%; left:12%;
+  z-index:4;
+  padding:12px 10px;
+  background:var(--core);
+  clip-path:var(--jag-a);
+}
+.w-pile i{
+  display:block; font-style:normal;
+  font:400 clamp(64px, 12vw, 172px)/.9 var(--grot);
+  color:var(--ink);
+  background:var(--canary);
+  padding:.02em .12em .06em;
+  clip-path:var(--jag-b);
+}
+.w-of{ top:43.5%; left:66%; z-index:5; }
+.w-pieces{
+  top:62%; left:26%;
+  z-index:4;
+  padding:11px 12px;
+  background:var(--core);
+  clip-path:var(--jag-b);
+}
+.w-pieces i{
+  display:block; font-style:normal;
+  font:400 clamp(58px, 10.5vw, 152px)/.9 var(--serif);
+  color:var(--core);
+  background:var(--coral);
+  padding:.04em .14em .1em;
+  clip-path:var(--jag-a);
+}
+
+/* ransom-note letters */
+.ransom{ display:inline-flex; gap:.12em; align-items:flex-end; }
+.ransom span{
+  display:inline-block;
+  padding:.1em .22em .14em;
+  line-height:1;
+  box-shadow:2px 3px 0 rgba(0,0,0,.28);
+}
+.ransom span:nth-child(3n+1){ font-family:var(--serif); background:var(--ink); color:var(--canary); transform:rotate(-6deg); }
+.ransom span:nth-child(3n+2){ font-family:var(--grot); background:var(--coral); color:var(--core); transform:rotate(4deg) translateY(-.12em); }
+.ransom span:nth-child(3n){ font-family:var(--mono); font-weight:700; background:var(--core); color:var(--cobalt); transform:rotate(-3deg); }
+.w-of .ransom span{ font-size:clamp(34px, 4.6vw, 66px); }
+
+/* WordPress W cut-out */
+.w-cutout{
+  position:absolute;
+  top:12%; right:7%;
+  width:clamp(110px, 13vw, 190px); aspect-ratio:1;
+  z-index:5;
+}
+.w-cutout .disc{
+  width:100%; height:100%;
+  background:var(--core);
+  clip-path:var(--jag-a);
+  display:grid; place-items:center;
+}
+.w-cutout svg{ width:82%; height:82%; display:block; }
+.w-cutout .tape{ top:-10px; left:50%; translate:-50% 0; rotate:-8deg; }
+
+/* the hand-drawn cursor mascot */
+.mascot{
+  position:absolute;
+  right:9%; bottom:7%;
+  width:clamp(120px, 12vw, 175px);
+  z-index:6;
+}
+.mascot svg{ width:100%; height:auto; display:block; overflow:visible; }
+.mascot .say{
+  position:absolute; right:92%; bottom:64%;
+  width:180px;
+  font:700 19px/1.05 var(--hand);
+  color:var(--ink-soft);
+  transform:rotate(-4deg);
+  text-align:right;
+}
+@keyframes mascot-bob{
+  0%,100%{ transform:rotate(-4deg) translateY(0); }
+  50%{ transform:rotate(-1deg) translateY(-7px); }
+}
+.on .mascot .bob{ animation:mascot-bob 3.4s ease-in-out infinite; animation-delay:1.4s; }
+
+/* barcode scrap */
+.barcode{
+  position:absolute; left:5%; bottom:6%;
+  background:var(--core);
+  padding:10px 12px 7px;
+  transform:rotate(2.5deg);
+  box-shadow:3px 3px 0 rgba(0,0,0,.22);
+  z-index:4;
+}
+.barcode .bars{
+  width:120px; height:34px;
+  background:repeating-linear-gradient(90deg,
+    var(--ink) 0 2px, transparent 2px 4px,
+    var(--ink) 4px 7px, transparent 7px 8px,
+    var(--ink) 8px 9px, transparent 9px 13px,
+    var(--ink) 13px 15px, transparent 15px 17px);
+}
+.barcode .num{ font:400 10px/1 var(--mono); letter-spacing:.28em; margin-top:5px; color:var(--ink-soft); }
+
+/* turn-the-page scribble (a note, not a nav bar) */
+.turn{
+  position:absolute; left:50%; bottom:3.5%;
+  translate:-50% 0;
+  z-index:7;
+  background:none; border:0; cursor:pointer;
+  font:700 clamp(19px, 2vw, 26px)/1 var(--hand);
+  color:var(--ink-soft);
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  transform:rotate(-2deg);
+  padding:6px 10px;
+}
+.turn svg{ width:30px; height:34px; overflow:visible; }
+.turn:hover, .turn:focus-visible{ color:var(--coral-dk); }
+.turn:focus-visible{ outline:3px solid var(--cobalt); outline-offset:2px; }
+@keyframes turn-nudge{ 0%,100%{ translate:-50% 0; } 50%{ translate:-50% 6px; } }
+.on .turn{ animation:turn-nudge 2.2s ease-in-out infinite; animation-delay:2.4s; }
+
+/* little cover confetti bits */
+.confetti{ position:absolute; z-index:2; pointer-events:none; }
+.confetti.sq{ width:20px; height:26px; }
+.confetti.sq.c1{ background:var(--coral); }
+.confetti.sq.c2{ background:var(--cobalt); }
+.confetti.sq.c3{ background:var(--forest); }
+.confetti.sq.c4{ background:var(--tangerine); }
+
+/* ============================================================
+   SPREAD 2 · BEFORE — the classic editor, taped in and eulogized.
+   Quiet composition: one artifact, acres of paper, margin notes.
+   ============================================================ */
+.s-before{ background:var(--paper-cool); }
+.memoriam{
+  position:absolute; top:5.5%; left:50%; translate:-50% 0;
+  display:flex; align-items:center; gap:18px;
+  font:700 13px/1 var(--mono);
+  letter-spacing:.5em;
+  color:var(--ink-soft);
+  white-space:nowrap;
+}
+.memoriam::before, .memoriam::after{
+  content:""; width:clamp(40px, 8vw, 130px); height:1px; background:var(--ink-soft);
+}
+.memoriam-dates{
+  position:absolute; top:9.8%; left:50%; translate:-50% 0;
+  font:italic 400 13px/1 var(--mono);
+  letter-spacing:.14em;
+  color:var(--ink-soft);
+}
+
+.specimen{
+  position:absolute;
+  top:17%; left:9%;
+  width:min(52vw, 640px);
+  background:#fbf9f2;
+  border:1px solid #d9d2c0;
+  box-shadow:4px 6px 0 rgba(35,25,12,.16), 0 18px 40px rgba(35,25,12,.12);
+  padding:22px 24px 18px;
+  z-index:2;
+}
+.specimen .tape.tl{ top:-13px; left:-26px; rotate:-42deg; }
+.specimen .tape.tr{ top:-13px; right:-26px; rotate:42deg; }
+.specimen .tape.bl{ bottom:-13px; left:-24px; rotate:38deg; }
+.specimen .tape.br{ bottom:-13px; right:-24px; rotate:-38deg; }
+
+.ce-title{
+  font:400 21px/1.2 Georgia, serif;
+  color:#9a938a;
+  border:1px solid #dcd6c8;
+  background:#fff;
+  padding:8px 12px;
+  margin-bottom:10px;
+}
+.ce-toolbar{
+  display:flex; flex-wrap:wrap; gap:3px;
+  padding:6px;
+  background:#f4f1e8;
+  border:1px solid #dcd6c8;
+  border-bottom:0;
+}
+.ce-toolbar span{
+  font:400 11px/1 var(--mono);
+  color:#555;
+  background:linear-gradient(#fefefe, #e9e6dd);
+  border:1px solid #c9c4b6;
+  border-radius:2px;
+  padding:4px 7px;
+}
+.ce-toolbar span.bb{ font-weight:700; }
+.ce-toolbar span.ii{ font-style:italic; }
+.ce-body{
+  font:400 12.5px/1.62 var(--mono);
+  color:#3c362c;
+  background:#fff;
+  border:1px solid #dcd6c8;
+  padding:14px 16px 20px;
+  min-height:180px;
+  white-space:pre-wrap;
+}
+.ce-body .tag{ color:#8a63c9; }
+.ce-body .caret{
+  display:inline-block; width:8px; height:15px;
+  background:#3c362c;
+  vertical-align:-2px;
+}
+@keyframes caret-blink{ 0%,49%{ opacity:1; } 50%,100%{ opacity:0; } }
+.on .ce-body .caret{ animation:caret-blink 1.1s steps(1) infinite; }
+.ce-status{
+  display:flex; justify-content:space-between; align-items:center;
+  border:1px solid #dcd6c8; border-top:0;
+  background:#f4f1e8;
+  padding:6px 10px;
+  font:400 11px/1 var(--mono);
+  color:#777;
+}
+.ce-publish{
+  font:700 12px/1 var(--mono);
+  color:#fff;
+  background:#0085ba;
+  border:1px solid #006799;
+  border-radius:3px;
+  padding:6px 14px;
+  box-shadow:0 1px 0 #006799;
+}
+
+.coffee-ring{
+  position:absolute;
+  top:12%; left:47%;
+  width:150px; aspect-ratio:1;
+  border-radius:50%;
+  border:11px solid rgba(112,68,30,.26);
+  filter:blur(.4px);
+  z-index:3;
+  pointer-events:none;
+}
+.coffee-ring::after{
+  content:"";
+  position:absolute; inset:-18px -14px auto auto;
+  width:70px; height:70px;
+  border-radius:50%;
+  border:7px solid rgba(112,68,30,.14);
+}
+
+.note-a{
+  position:absolute; top:26%; right:8%;
+  width:min(24vw, 300px);
+  font-size:clamp(24px, 2.6vw, 36px);
+  transform:rotate(3deg);
+  z-index:4;
+}
+.note-a svg{ width:120px; height:64px; display:block; margin-top:2px; overflow:visible; }
+.note-b{
+  position:absolute; bottom:23%; right:13%;
+  font-size:clamp(21px, 2.2vw, 30px);
+  transform:rotate(-4deg);
+  z-index:4;
+}
+.note-c{
+  position:absolute; top:53%; left:4%;
+  font-size:clamp(17px, 1.7vw, 24px);
+  transform:rotate(-7deg);
+  width:150px;
+  z-index:4;
+}
+.toolbar-circle{
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  overflow:visible; pointer-events:none; z-index:5;
+}
+.toolbar-circle path{
+  fill:none; stroke:var(--redpencil); stroke-width:3.2;
+  stroke-linecap:round;
+  opacity:.85;
+}
+.on .toolbar-circle path{
+  stroke-dasharray:1100;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.1s ease-out 1.6s;
+}
+.scene:not(.on) .toolbar-circle path{ stroke-dashoffset:1100; stroke-dasharray:1100; }
+
+.spec-label{
+  position:absolute; bottom:9%; left:34%;
+  width:min(34vw, 400px);
+  background:var(--core);
+  border:1px solid #c9c0aa;
+  padding:14px 16px 12px;
+  font:400 11.5px/1.65 var(--mono);
+  color:var(--ink-soft);
+  transform:rotate(-1.4deg);
+  box-shadow:3px 4px 0 rgba(35,25,12,.16);
+  z-index:6;
+}
+.spec-label b{ display:block; font-size:12.5px; letter-spacing:.12em; margin-bottom:6px; color:var(--ink); }
+.spec-label .pin{
+  position:absolute; top:-9px; left:50%; translate:-50% 0;
+  width:16px; height:16px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ff8d7e, var(--coral-dk) 65%);
+  box-shadow:0 2px 3px rgba(0,0,0,.3);
+}
+.before-coda{
+  position:absolute; bottom:3.5%; left:50%; translate:-50% 0;
+  font:italic 400 clamp(12px, 1.25vw, 15px)/1.5 var(--mono);
+  color:var(--ink-soft);
+  white-space:nowrap;
+}
+
+/* ============================================================
+   SPREAD 3 · THE ARGUMENT — manifesto typography wall on ink.
+   Dense, dark, type-only. Nothing like the spreads around it.
+   ============================================================ */
+.s-argument{ background:var(--ink); color:var(--core); }
+.s-argument::after{ opacity:.4; }
+.arg-kicker{
+  position:absolute; top:4.5%; left:6%;
+  font:400 12px/1.6 var(--mono);
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--lilac);
+  z-index:3;
+}
+.arg-learn{
+  position:absolute; top:9.5%; left:5.5%;
+  z-index:3;
+  line-height:.88;
+}
+.arg-learn .l1{
+  display:block;
+  font:400 clamp(48px, 8.4vw, 122px)/.9 var(--grot);
+  color:var(--core);
+  letter-spacing:-.01em;
+}
+.arg-learn .l2{
+  display:block;
+  font:400 clamp(56px, 10vw, 148px)/.86 var(--serif);
+  color:var(--canary);
+  margin-left:.9em;
+  letter-spacing:-.015em;
+}
+.arg-learn .l3{
+  display:block;
+  font:400 clamp(48px, 8.4vw, 122px)/.9 var(--grot);
+  color:var(--coral);
+  margin-left:.28em;
+}
+.arg-attrib{
+  position:absolute; top:46%; left:38%;
+  font:700 clamp(20px, 2.1vw, 29px)/1 var(--hand);
+  color:var(--lilac);
+  transform:rotate(-3deg);
+  z-index:4;
+}
+.arg-strip{
+  position:absolute; top:52.5%; left:-4%;
+  width:110%;
+  transform:rotate(-2.2deg);
+  background:var(--canary);
+  clip-path:var(--jag-strip);
+  padding:2.4vh 0;
+  z-index:2;
+  white-space:nowrap; overflow:hidden;
+  font:700 clamp(14px, 1.7vw, 22px)/1.5 var(--mono);
+  letter-spacing:.3em;
+  color:var(--ink);
+}
+.arg-everything{
+  position:absolute; top:60.5%; left:50%;
+  translate:-50% 0;
+  z-index:4;
+  white-space:nowrap;
+}
+.arg-everything .ransom span{ font-size:clamp(26px, 4.5vw, 64px); }
+.arg-everything .ransom{ gap:.1em; }
+.arg-everything .ransom .sp{ background:none; box-shadow:none; width:.5em; padding:0; }
+.arg-vertical{
+  position:absolute; top:8%; right:2.5%;
+  writing-mode:vertical-rl;
+  font:700 clamp(13px, 1.5vw, 19px)/1 var(--mono);
+  letter-spacing:.3em;
+  color:var(--core);
+  background:var(--cobalt);
+  padding:18px 10px;
+  clip-path:polygon(24% 0%, 78% 1%, 100% 4%, 98% 96%, 74% 100%, 22% 98%, 0% 95%, 3% 5%);
+  z-index:3;
+}
+.arg-blob{
+  position:absolute; bottom:5%; left:6%;
+  width:min(52vw, 700px);
+  font:400 clamp(22px, 3vw, 42px)/1.18 var(--serif);
+  color:var(--core);
+  z-index:4;
+}
+.arg-blob .strike{ position:relative; color:#8d8478; white-space:nowrap; }
+.arg-blob .strike::after{
+  content:"";
+  position:absolute; left:-3%; right:-3%; top:52%;
+  height:.12em;
+  background:var(--coral);
+  transform:rotate(-2.4deg);
+}
+.arg-blob .under{ position:relative; color:var(--canary); white-space:nowrap; }
+.arg-blob .under::after{
+  content:"";
+  position:absolute; left:0; right:-2%; bottom:-.06em;
+  height:.09em;
+  background:var(--coral);
+  transform:rotate(1.2deg);
+  border-radius:40% 60% 50% 50%;
+}
+.arg-foot{
+  position:absolute; bottom:6%; right:5%;
+  width:min(26vw, 330px);
+  font:italic 400 12px/1.7 var(--mono);
+  color:#b9ae9d;
+  border-left:2px solid var(--tangerine);
+  padding-left:12px;
+  z-index:3;
+}
+.arg-callout{
+  position:absolute; top:11%; right:13%;
+  width:min(23vw, 295px);
+  background:#f6f5f2;
+  color:#32373c;
+  padding:16px 16px 14px;
+  transform:rotate(3.4deg);
+  box-shadow:5px 6px 0 rgba(0,0,0,.45);
+  z-index:5;
+}
+.arg-callout h3{
+  margin:0 0 6px;
+  font:700 13.5px/1.35 var(--mono);
+  letter-spacing:0;
+}
+.arg-callout p{ margin:0 0 10px; font:400 11px/1.55 var(--mono); color:#555d66; }
+.arg-callout .btn{
+  display:inline-block;
+  font:700 11px/1 var(--mono);
+  color:#fff; background:#0085ba;
+  border:1px solid #006799;
+  border-radius:3px;
+  padding:7px 12px;
+}
+.arg-callout .cap{
+  margin:10px -4px -4px;
+  font:700 15px/1.1 var(--hand);
+  color:var(--redpencil);
+  transform:rotate(-1.6deg);
+}
+
+/* ============================================================
+   SPREAD 4 · THE ASSEMBLY — the workbench. Drag scraps onto the
+   page; on snap the torn edge straightens into a clean block.
+   ============================================================ */
+.s-assembly{ background:
+  repeating-linear-gradient(0deg, rgba(35,20,5,.05) 0 1px, transparent 1px 46px),
+  repeating-linear-gradient(90deg, rgba(35,20,5,.05) 0 1px, transparent 1px 46px),
+  linear-gradient(160deg, var(--kraft), var(--kraft-2));
+}
+.bench{ position:absolute; inset:0; }
+
+.bench-head{
+  position:absolute; top:4%; left:4.5%;
+  z-index:3;
+  max-width:44vw;
+}
+.bench-head h2{
+  margin:0;
+  font:400 clamp(30px, 4.6vw, 64px)/.95 var(--serif);
+  color:var(--core);
+  text-shadow:3px 3px 0 rgba(40,20,0,.35);
+}
+.bench-head h2 i{ font-style:normal; color:var(--canary); }
+.bench-head .sub{
+  margin-top:8px;
+  font:700 clamp(19px, 2vw, 27px)/1.05 var(--hand);
+  color:#fff2d8;
+  transform:rotate(-1.6deg);
+  display:inline-block;
+}
+.bench-count{
+  position:absolute; top:5%; right:41.5%;
+  z-index:8;
+  font:700 13px/1 var(--mono);
+  letter-spacing:.14em;
+  color:var(--core);
+  background:var(--ink);
+  padding:9px 12px 8px;
+  transform:rotate(2deg);
+  box-shadow:3px 3px 0 rgba(40,20,0,.35);
+}
+
+/* the empty page (right side) */
+.bench-page{
+  position:absolute;
+  top:11%; right:3.5%;
+  width:36.5%;
+  height:82%;
+  background:#fffdf6;
+  box-shadow:6px 8px 0 rgba(40,20,0,.3), 0 24px 50px rgba(30,15,0,.25);
+  transform:rotate(.6deg);
+  padding:1.2% 1.4%;
+  display:flex; flex-direction:column; gap:1.6%;
+  z-index:2;
+}
+.bench-page .page-topbar{
+  display:none;
+  align-items:center; gap:8px;
+  padding:5px 8px 7px;
+  border-bottom:1px solid #e2e4e7;
+  font:700 12px/1 var(--mono);
+  color:#1e1e1e;
+}
+.bench-page.editor .page-topbar{ display:flex; }
+.page-topbar .plus{
+  display:inline-grid; place-items:center;
+  width:22px; height:22px;
+  background:#1e1e1e; color:#fff;
+  border-radius:2px;
+  font:700 15px/1 var(--mono);
+}
+.page-topbar .crumbs{ color:#757575; font-weight:400; font-size:10.5px; letter-spacing:.06em; }
+.page-topbar .save{ margin-left:auto; color:#0085ba; font-size:10.5px; }
+.bench-page .page-title{
+  font:400 clamp(14px, 1.5vw, 22px)/1.2 Georgia, serif;
+  color:#c0baa9;
+  padding:2px 6px 6px;
+  flex:0 0 auto;
+}
+.slot{
+  position:relative;
+  border:2px dashed #cfc8b4;
+  border-radius:3px;
+  display:grid; place-items:center;
+  font:400 10.5px/1.4 var(--mono);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:#b9b19c;
+  text-align:center;
+  transition:border-color .25s, background .25s;
+}
+.slot.near{ border-color:var(--cobalt); background:rgba(31,44,232,.06); color:var(--cobalt); }
+.slot.filled{ border-color:transparent; color:transparent; }
+.slot-photo{ flex:0 0 30%; }
+.slot-para{ flex:1 1 auto; }
+.slot-quote{ flex:0 0 17%; }
+.slot-illo{ flex:0 0 16%; }
+.slot-btn{ flex:0 0 9.5%; }
+
+/* scraps */
+.scrap{
+  position:absolute; left:0; top:0;
+  z-index:10;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  clip-path:var(--scrap-torn);
+  background:var(--core);
+  transition:clip-path .5s cubic-bezier(.3,.1,.25,1), width .5s cubic-bezier(.3,.1,.25,1), height .5s cubic-bezier(.3,.1,.25,1), box-shadow .3s;
+  filter:drop-shadow(3px 5px 0 rgba(40,20,0,.3));
+}
+.scrap:focus-visible{ outline:none; filter:drop-shadow(0 0 0 var(--cobalt)) drop-shadow(3px 3px 0 var(--cobalt)) drop-shadow(-3px -3px 0 var(--canary)); }
+.scrap .fill{
+  position:absolute; inset:0;
+  clip-path:var(--scrapfill-torn);
+  transition:clip-path .5s cubic-bezier(.3,.1,.25,1);
+}
+.scrap .content{ position:relative; z-index:2; }
+.scrap.lift{ cursor:grabbing; filter:drop-shadow(9px 16px 2px rgba(30,15,0,.38)); z-index:40; }
+.scrap.snapping{ transition:transform .55s cubic-bezier(.2,.85,.3,1.08), clip-path .5s cubic-bezier(.3,.1,.25,1) .18s, width .55s cubic-bezier(.2,.85,.3,1.08), height .55s cubic-bezier(.2,.85,.3,1.08), box-shadow .3s; }
+.scrap.snapped{
+  clip-path:var(--scrap-flat);
+  cursor:default;
+  filter:drop-shadow(0 2px 0 rgba(40,20,0,.18));
+  z-index:6;
+}
+.scrap.snapped .fill{ clip-path:var(--scrapfill-flat); }
+/* Gutenberg block chrome appears once a scrap becomes a block */
+.scrap .blocktab{
+  position:absolute; top:5px; left:5px;
+  z-index:3;
+  font:700 9.5px/1 var(--mono);
+  letter-spacing:.1em;
+  color:#fff;
+  background:var(--cobalt);
+  padding:5px 8px 4px;
+  border-radius:2px;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .25s .4s, transform .3s .4s;
+  pointer-events:none;
+}
+.scrap.snapped .blocktab{ opacity:1; transform:translateY(0); }
+.scrap.snapped::after{
+  content:"";
+  position:absolute; inset:1px;
+  border:1.5px solid var(--cobalt);
+  pointer-events:none;
+  z-index:3;
+}
+
+/* individual scrap looks */
+.scrap-para{ width:min(21vw, 265px); padding:14px 15px 16px; }
+.scrap-para .fill{ background:#fffef9; }
+.scrap-para .content{
+  font:400 10.5px/1.6 var(--mono);
+  color:#33291d;
+}
+.scrap-para .content b{ font-family:var(--serif); font-weight:400; font-size:12px; }
+
+.scrap-photo{ width:min(19vw, 240px); aspect-ratio:4/3.1; }
+.scrap-photo .fill{
+  background:
+    radial-gradient(circle at 70% 84%, var(--coral) 0 13%, transparent 13.5%),
+    radial-gradient(circle at 70% 84%, rgba(255,212,31,.75) 0 19%, transparent 20%),
+    linear-gradient(180deg, var(--cobalt) 0%, var(--lilac-dk) 46%, var(--lilac) 58%, var(--forest) 58.5%, #0a4a2d 100%);
+}
+.scrap-photo .content{
+  position:absolute; inset:auto 0 0;
+  text-align:center;
+  font:italic 400 9.5px/1 var(--mono);
+  color:rgba(255,253,244,.9);
+  padding:0 0 9%;
+  letter-spacing:.12em;
+}
+
+.scrap-quote{ width:min(20vw, 250px); padding:16px 16px 18px; }
+.scrap-quote .fill{ background:var(--canary); }
+.scrap-quote .content{
+  font:400 clamp(15px, 1.4vw, 20px)/1.14 var(--serif);
+  color:var(--ink);
+  text-align:center;
+}
+.scrap-quote .content small{
+  display:block; margin-top:7px;
+  font:700 9.5px/1 var(--mono);
+  letter-spacing:.2em;
+}
+
+.scrap-illo{ width:min(13vw, 160px); aspect-ratio:1/.94; }
+.scrap-illo .fill{ background:#fdf8ec; }
+.scrap-illo svg{
+  position:absolute; inset:9%;
+  width:82%; height:82%;
+  z-index:2;
+}
+
+.scrap-btn{ width:min(15vw, 185px); padding:13px 14px 15px; }
+.scrap-btn .fill{ background:#fffef9; }
+.scrap-btn .content{ display:grid; place-items:center; }
+.scrap-btn .content span{
+  font:700 12px/1 var(--mono);
+  letter-spacing:.1em;
+  color:#fff;
+  background:var(--cobalt);
+  border-radius:99px;
+  padding:9px 18px 8px;
+  box-shadow:2px 3px 0 rgba(0,0,0,.3);
+}
+
+/* completion stamp + shuffle */
+.done-stamp{
+  position:absolute; left:11%; bottom:13%;
+  z-index:20;
+  transform:rotate(-7deg) scale(2.6);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.2,1.5,.4,1), opacity .1s linear;
+  border:5px solid var(--coral-dk);
+  color:var(--coral-dk);
+  padding:14px 20px 12px;
+  text-align:center;
+  font:400 clamp(18px, 2.2vw, 31px)/1.1 var(--grot);
+  letter-spacing:.02em;
+  background:rgba(255,253,244,.7);
+  pointer-events:none;
+}
+.done-stamp small{
+  display:block; margin-top:6px;
+  font:700 11px/1.4 var(--mono);
+  letter-spacing:.16em;
+}
+.done-stamp.show{ transform:rotate(-7deg) scale(1); opacity:1; }
+
+.shuffle{
+  position:absolute; left:4.5%; bottom:5%;
+  z-index:22;
+  border:0; cursor:pointer;
+  background:var(--core);
+  clip-path:var(--jag-a);
+  padding:15px 20px 16px;
+  font:700 13px/1 var(--mono);
+  letter-spacing:.14em;
+  color:var(--ink);
+  transform:rotate(-2deg);
+  filter:drop-shadow(3px 4px 0 rgba(40,20,0,.32));
+}
+.shuffle b{ color:var(--coral-dk); }
+.shuffle:hover{ transform:rotate(-2deg) translateY(-2px); }
+.shuffle:focus-visible{ outline:3px solid var(--canary); outline-offset:3px; }
+.bench-hint{
+  position:absolute; left:4.5%; bottom:14.5%;
+  font:700 clamp(16px, 1.7vw, 22px)/1.15 var(--hand);
+  color:#ffe9bd;
+  transform:rotate(-2.5deg);
+  z-index:3;
+  max-width:24vw;
+}
+
+/* ============================================================
+   SPREAD 5 · THE FIGHT — December 2018, quote vs quote.
+   Diagonal collision: coral weather vs forest weather,
+   a torn seam between them, a mediator pasted across it.
+   ============================================================ */
+.s-fight{ background:var(--paper); }
+.fight-side{ position:absolute; inset:0; z-index:1; }
+.fight-side.left{
+  background:linear-gradient(115deg, rgba(255,75,51,.16) 0 55%, transparent 55%);
+}
+.fight-side.right{
+  background:linear-gradient(115deg, transparent 0 55%, rgba(13,92,56,.15) 55%);
+}
+.fight-seam{
+  position:absolute;
+  top:-4%; left:53.5%;
+  width:46px; height:108%;
+  transform:rotate(9deg);
+  z-index:2;
+  background:var(--core);
+  clip-path:polygon(30% 0%, 70% 0%, 52% 5%, 74% 11%, 48% 17%, 70% 24%, 44% 30%, 68% 37%, 46% 44%, 72% 50%, 48% 57%, 70% 63%, 44% 70%, 66% 77%, 46% 84%, 70% 90%, 50% 96%, 68% 100%, 32% 100%, 46% 94%, 26% 88%, 50% 81%, 28% 74%, 52% 67%, 30% 60%, 54% 53%, 30% 47%, 54% 40%, 32% 33%, 52% 27%, 28% 20%, 50% 13%, 30% 7%);
+}
+.fight-head{
+  position:absolute; top:4.5%; left:50%; translate:-50% 0;
+  z-index:6;
+  text-align:center;
+  white-space:nowrap;
+}
+.fight-head .addr{
+  display:inline-block;
+  font:400 11.5px/1 var(--mono);
+  letter-spacing:.08em;
+  color:var(--ink-soft);
+  background:var(--core);
+  border:1px solid #cbc2ac;
+  border-radius:99px;
+  padding:8px 16px;
+  box-shadow:2px 3px 0 rgba(35,25,12,.18);
+}
+.fight-head h2{
+  margin:10px 0 0;
+  font:400 clamp(28px, 4.4vw, 62px)/1 var(--serif);
+  color:var(--ink);
+  letter-spacing:.01em;
+}
+.fight-head h2 .one{ color:var(--coral-dk); }
+.fight-head h2 .five{ color:var(--forest); }
+.fight-head h2 .vs{
+  font:400 .42em/1 var(--grot);
+  vertical-align:.5em;
+  background:var(--ink); color:var(--canary);
+  padding:.22em .5em .28em;
+  margin:0 .3em;
+  border-radius:99px;
+}
+
+.starrow{
+  display:inline-block;
+  font-size:15px; letter-spacing:.22em;
+  padding:5px 9px 4px;
+}
+.starrow.bad{ color:var(--core); background:var(--coral-dk); }
+.starrow.good{ color:var(--core); background:var(--forest); }
+
+.rev{
+  position:absolute;
+  z-index:4;
+  padding:15px 17px 15px;
+  width:min(27vw, 340px);
+}
+.rev .torn-fill{ background:#fffef8; }
+.rev blockquote{
+  margin:9px 0 0;
+  font:400 12.5px/1.62 var(--mono);
+  color:#31281c;
+}
+.rev cite{
+  display:block; margin-top:8px;
+  font:italic 400 10.5px/1.4 var(--mono);
+  color:#8b7f6b;
+}
+.rev-1{ top:19%; left:4%; transform:rotate(-3.2deg); }
+.rev-2{ top:56%; left:9.5%; transform:rotate(2.4deg); }
+.rev-3{ top:19.5%; right:4.5%; transform:rotate(2.8deg); }
+.rev-4{ top:56.5%; right:8.5%; transform:rotate(-2.2deg); }
+
+.sticker-49{
+  position:absolute; top:41%; left:29.5%;
+  width:clamp(120px, 12.5vw, 185px); aspect-ratio:1;
+  z-index:7;
+  border-radius:50%;
+  background:var(--coral-dk);
+  border:6px solid var(--core);
+  box-shadow:3px 5px 0 rgba(35,25,12,.25);
+  display:grid; place-items:center;
+  text-align:center;
+  transform:rotate(-11deg);
+  color:var(--core);
+}
+.sticker-49 .in{
+  width:78%; aspect-ratio:1; border-radius:50%;
+  border:2px dashed rgba(255,253,244,.75);
+  display:grid; place-content:center; gap:1px;
+}
+.sticker-49 .big{ font:400 clamp(22px, 2.4vw, 34px)/1 var(--grot); }
+.sticker-49 .small{ font:700 9px/1.3 var(--mono); letter-spacing:.2em; }
+.sticker-49::after{ /* peeling corner */
+  content:"";
+  position:absolute; right:4%; bottom:2%;
+  width:26%; height:26%;
+  border-radius:50% 0 40% 0;
+  background:linear-gradient(315deg, var(--paper) 0 46%, #d8d2c2 47% 58%, #fff 59% 100%);
+  transform:rotate(8deg);
+  box-shadow:-3px -3px 6px rgba(0,0,0,.18);
+}
+.sticker-blocks{
+  position:absolute; top:40%; right:28%;
+  width:clamp(130px, 13.5vw, 200px); aspect-ratio:1;
+  z-index:7;
+  transform:rotate(9deg);
+  display:grid; place-items:center;
+  text-align:center;
+  color:var(--canary);
+  background:var(--cobalt);
+  clip-path:polygon(50% 0%, 60% 12%, 76% 5%, 78% 21%, 95% 20%, 88% 35%, 100% 44%, 89% 55%, 97% 69%, 81% 72%, 82% 89%, 66% 84%, 59% 100%, 48% 88%, 34% 97%, 31% 81%, 14% 84%, 19% 68%, 3% 62%, 13% 50%, 2% 38%, 17% 32%, 12% 16%, 29% 18%, 30% 2%, 42% 10%);
+  filter:drop-shadow(3px 5px 0 rgba(35,25,12,.25));
+}
+.sticker-blocks .in{ width:62%; font:400 clamp(15px, 1.6vw, 23px)/1.06 var(--grot); }
+.sticker-blocks .in small{
+  display:block; margin-top:5px;
+  font:700 8.5px/1.3 var(--mono); letter-spacing:.16em;
+  color:#dfe4ff;
+}
+.mediator{
+  position:absolute; bottom:5%; left:50%;
+  translate:-50% 0;
+  z-index:8;
+  width:min(46vw, 560px);
+  padding:16px 20px 14px;
+  transform:rotate(-1.2deg);
+}
+.mediator .torn-fill{ background:var(--core); }
+.mediator p{
+  margin:0;
+  font:400 13px/1.6 var(--mono);
+  color:var(--ink-soft);
+  text-align:center;
+}
+.mediator p b{ color:var(--ink); }
+.mediator .ps{
+  display:block; margin-top:5px;
+  font:700 17px/1 var(--hand);
+  color:var(--redpencil);
+  transform:rotate(-1deg);
+}
+.mini-star{
+  position:absolute; z-index:3;
+  font-size:clamp(16px, 2vw, 28px);
+  pointer-events:none;
+}
+.mini-star.bad{ color:var(--coral-dk); }
+.mini-star.good{ color:var(--forest); }
+
+/* ============================================================
+   SPREAD 6 · STICKER SHEET — die-cut block stickers; peel one
+   and it becomes a real block on the growing page.
+   ============================================================ */
+.s-stickers{ background:linear-gradient(150deg, var(--lilac), #bfa2fa); }
+.sheet-head{
+  position:absolute; top:4.5%; left:5%;
+  z-index:3;
+}
+.sheet-head h2{
+  margin:0;
+  font:400 clamp(30px, 4.4vw, 60px)/.95 var(--serif);
+  color:var(--ink);
+}
+.sheet-head h2 i{
+  font-style:normal;
+  color:var(--core);
+  background:var(--tangerine);
+  padding:0 .14em .05em;
+  clip-path:var(--jag-b);
+}
+.sheet-head .sub{
+  margin-top:6px;
+  font:700 12px/1.5 var(--mono);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#4c3a76;
+}
+
+.sticker-sheet{
+  position:absolute;
+  top:19%; left:5%;
+  width:50%;
+  height:73%;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,0) 0 38%, rgba(255,255,255,.55) 47%, rgba(255,255,255,0) 56%),
+    radial-gradient(rgba(90,70,140,.12) 1px, transparent 1.4px) 0 0/14px 14px,
+    #fdfcf8;
+  border-radius:12px;
+  box-shadow:5px 8px 0 rgba(50,30,90,.28), 0 24px 50px rgba(50,30,90,.25);
+  transform:rotate(-1.1deg);
+  padding:2% 2.2%;
+  z-index:2;
+  display:flex; flex-direction:column;
+}
+.sticker-sheet .sheet-print{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font:700 10px/1.4 var(--mono);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:#8f86a8;
+  padding:2px 4px 8px;
+  border-bottom:1px dashed #d8d2e8;
+  margin-bottom:2%;
+}
+.sticker-sheet .sheet-print .collect{
+  font:700 15px/1 var(--hand);
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--redpencil);
+  transform:rotate(-2deg);
+}
+.sticker-grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  grid-auto-rows:1fr;
+  gap:4%;
+  align-items:stretch;
+}
+.die{
+  position:relative;
+  border:0;
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 2px 0 rgba(50,30,90,.18), inset 0 0 0 1.5px #e4def2;
+  cursor:pointer;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:6%;
+  padding:5% 4%;
+  font:700 10px/1.2 var(--mono);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink);
+  transition:transform .18s cubic-bezier(.3,1.4,.5,1), box-shadow .18s;
+  transform-origin:50% 80%;
+}
+.die:hover:not(:disabled){ transform:rotate(-2deg) translateY(-3px); box-shadow:0 7px 0 rgba(50,30,90,.2), inset 0 0 0 1.5px #e4def2; }
+.die:focus-visible{ outline:3px solid var(--cobalt); outline-offset:3px; }
+.die:disabled{ cursor:default; }
+.die .art{
+  width:56%; aspect-ratio:1.35;
+  border-radius:10px;
+  display:grid; place-items:center;
+  overflow:hidden;
+  position:relative;
+}
+.die.peeled{
+  background:repeating-linear-gradient(45deg, #f4f1fa 0 6px, #eceaf4 6px 12px);
+  box-shadow:inset 0 0 0 1.5px #ddd6ee;
+  color:#a49bc0;
+}
+.die.peeled .art{ visibility:hidden; }
+.die.peeled::after{
+  content:"peeled!";
+  position:absolute;
+  font:700 15px/1 var(--hand);
+  color:#a49bc0;
+  text-transform:none;
+  letter-spacing:0;
+  transform:rotate(-6deg);
+}
+@keyframes peel-off{
+  0%{ transform:rotate(0) scale(1); }
+  38%{ transform:rotate(-9deg) scale(1.12) translateY(-6px); }
+  100%{ transform:rotate(10deg) scale(.2) translate(30vw, -4vh); opacity:0; }
+}
+.die.peeling .lift-wrap{ animation:peel-off .62s cubic-bezier(.5,.05,.6,1) forwards; }
+.die .lift-wrap{ display:flex; flex-direction:column; align-items:center; gap:6px; width:100%; }
+
+/* sticker art, all CSS/SVG */
+.art-para{ background:var(--canary); font:400 26px/1 var(--serif); color:var(--ink); }
+.art-image{ background:var(--cobalt); }
+.art-image .mtn{
+  position:absolute; inset:auto 0 0;
+  height:52%;
+  background:linear-gradient(135deg, transparent 0 18%, #cdb4ff 18% 50%, transparent 50%),
+             linear-gradient(225deg, transparent 0 22%, #8f6ae0 22% 60%, transparent 60%);
+}
+.art-image .sun{
+  position:absolute; top:12%; right:14%;
+  width:22%; aspect-ratio:1;
+  border-radius:50%;
+  background:var(--canary);
+}
+.art-gallery{ background:var(--forest); display:grid; grid-template-columns:1fr 1fr 1fr; gap:6%; padding:9%; place-items:stretch; }
+.art-gallery i{ background:#bfe8cf; border-radius:2px; }
+.art-gallery i:nth-child(2){ background:var(--canary); }
+.art-quote{ background:var(--coral); font:400 34px/0.6 var(--serif); color:var(--core); padding-top:14%; }
+.art-cover{ background:linear-gradient(160deg, var(--cobalt), var(--lilac-dk)); font:400 9px/1.2 var(--grot); color:#fff; letter-spacing:.06em; }
+.art-embed{ background:#fff; box-shadow:inset 0 0 0 2px var(--cobalt); }
+.art-embed i{
+  width:0; height:0;
+  border-left:14px solid var(--cobalt);
+  border-top:9px solid transparent;
+  border-bottom:9px solid transparent;
+  margin-left:3px;
+}
+.art-list{ background:var(--tangerine); display:grid; gap:9%; padding:12% 16%; align-content:center; }
+.art-list i{ display:flex; align-items:center; gap:10%; }
+.art-list i::before{ content:""; width:5px; height:5px; border-radius:50%; background:var(--ink); flex:0 0 auto; }
+.art-list i::after{ content:""; height:3px; flex:1; background:rgba(25,20,16,.8); border-radius:2px; }
+.art-button{ background:#efeaf8; }
+.art-button i{
+  width:70%; height:38%;
+  border-radius:99px;
+  background:var(--cobalt);
+  box-shadow:2px 2px 0 rgba(0,0,0,.25);
+}
+.die .free-plus{
+  font:400 34px/1 var(--grot);
+  color:#b9aed6;
+}
+.die.free{
+  background:transparent;
+  box-shadow:inset 0 0 0 1.5px transparent;
+  cursor:default;
+  color:#8f86a8;
+  border:2px dashed #c9c0e2;
+  border-radius:18px;
+}
+
+/* the growing page (right) */
+.made-page{
+  position:absolute;
+  top:12%; right:4.5%;
+  width:34%;
+  height:81%;
+  z-index:3;
+  transform:rotate(1.2deg);
+}
+.made-page .made-note{
+  font:700 clamp(17px, 1.8vw, 24px)/1.1 var(--hand);
+  color:#3b2a63;
+  margin:0 0 8px 4px;
+  transform:rotate(-1.4deg);
+}
+.made-sheet{
+  background:#fffdf6;
+  height:calc(100% - 40px);
+  box-shadow:5px 7px 0 rgba(50,30,90,.28);
+  padding:4.5% 5%;
+  overflow:hidden;
+  display:flex; flex-direction:column; gap:9px;
+}
+.made-sheet .empty-note{
+  margin:auto;
+  text-align:center;
+  font:400 11px/1.7 var(--mono);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#b9b19c;
+  border:2px dashed #ddd6c2;
+  padding:18px 20px;
+}
+.made-sheet .empty-note b{ display:block; font-family:var(--hand); font-size:19px; letter-spacing:0; text-transform:none; color:#8f86a8; }
+.mblock{
+  flex:0 0 auto;
+  transform-origin:top center;
+  transition:transform .45s cubic-bezier(.2,.9,.3,1.2);
+}
+.mblock.landing{ transform:translateY(-24px) rotate(-2deg) scale(1.04); }
+.mblock-para{ font:400 11.5px/1.55 var(--mono); color:#33291d; }
+.mblock-image .ph{
+  height:64px;
+  background:
+    radial-gradient(circle at 74% 78%, var(--canary) 0 12%, transparent 13%),
+    linear-gradient(180deg, var(--cobalt) 0 55%, var(--forest) 55.5%);
+}
+.mblock-image figcaption, .mblock .cap{
+  font:italic 400 9.5px/1.5 var(--mono);
+  color:#8b7f6b;
+  text-align:center;
+  margin-top:3px;
+}
+.mblock-image{ margin:0; }
+.mblock-gallery{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; }
+.mblock-gallery i{ height:38px; }
+.mblock-gallery i:nth-child(1){ background:linear-gradient(150deg, var(--coral), var(--tangerine)); }
+.mblock-gallery i:nth-child(2){ background:linear-gradient(150deg, var(--cobalt), var(--lilac)); }
+.mblock-gallery i:nth-child(3){ background:linear-gradient(150deg, var(--forest), #4fae7e); }
+.mblock-quote{
+  border-left:4px solid var(--ink);
+  padding:2px 0 2px 10px;
+  font:400 13px/1.35 var(--serif);
+  color:var(--ink);
+}
+.mblock-quote cite{ display:block; font:italic 400 9.5px/1.4 var(--mono); color:#8b7f6b; margin-top:3px; }
+.mblock-cover{
+  height:74px;
+  background:linear-gradient(160deg, var(--cobalt), var(--lilac-dk));
+  display:grid; place-items:center;
+  text-align:center;
+  color:#fff;
+  font:400 13px/1.15 var(--grot);
+  letter-spacing:.04em;
+  padding:6px;
+}
+.mblock-embed{
+  border:1.5px solid #ddd6c2;
+  border-radius:8px;
+  padding:8px 10px;
+  font:400 10px/1.5 var(--mono);
+  color:#33291d;
+  display:flex; gap:8px; align-items:flex-start;
+}
+.mblock-embed .ava{
+  flex:0 0 auto;
+  width:22px; height:22px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--lilac), var(--cobalt));
+}
+.mblock-embed b{ display:block; }
+.mblock-list{ margin:0; padding-left:16px; font:400 11px/1.6 var(--mono); color:#33291d; }
+.mblock-button{ text-align:left; }
+.mblock-button button{
+  font:700 11px/1 var(--mono);
+  letter-spacing:.08em;
+  color:#fff; background:var(--cobalt);
+  border:0; border-radius:99px;
+  padding:9px 16px 8px;
+  cursor:pointer;
+}
+.mblock-button button:focus-visible{ outline:3px solid var(--tangerine); outline-offset:2px; }
+.resheet{
+  position:absolute; right:0; bottom:-34px;
+  background:none; border:0;
+  font:700 16px/1 var(--hand);
+  color:#3b2a63;
+  cursor:pointer;
+  transform:rotate(-2deg);
+  padding:4px 6px;
+}
+.resheet:hover{ color:var(--redpencil); }
+.resheet:focus-visible{ outline:3px solid var(--cobalt); outline-offset:2px; }
+
+/* ============================================================
+   SPREAD 7 · FINALE — a collaged browser cut-out that boots the
+   real WordPress 5.0 in Playground, on click only.
+   ============================================================ */
+.s-finale{ background:var(--cobalt-dk); }
+.s-finale::after{ opacity:.35; }
+.s-finale.booted::after{ display:none; } /* lift the paper grain off the live software */
+.finale-kicker{
+  position:absolute; top:5%; left:50%; translate:-50% 0;
+  z-index:3;
+  font:400 12px/1 var(--mono);
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--lilac);
+  white-space:nowrap;
+}
+.browser-cut{
+  position:absolute;
+  top:11%; left:50%;
+  translate:-50% 0;
+  width:min(78vw, 1060px);
+  height:72%;
+  z-index:4;
+  background:var(--core);
+  clip-path:polygon(.6% 1.8%, 26% .4%, 55% 1.6%, 78% 0%, 99.5% 1.2%, 100% 30%, 99% 62%, 100% 98.3%, 71% 99.6%, 44% 98.6%, 18% 100%, .2% 98.8%, 1% 66%, 0% 34%);
+  padding:10px 12px 12px;
+  display:flex; flex-direction:column;
+  filter:drop-shadow(6px 9px 0 rgba(0,0,0,.35));
+}
+.browser-bar{
+  display:flex; align-items:center; gap:12px;
+  padding:6px 6px 12px;
+}
+.browser-bar svg{ width:52px; height:18px; flex:0 0 auto; overflow:visible; }
+.browser-addr{
+  flex:1;
+  font:400 clamp(10px, 1.2vw, 13.5px)/1 var(--mono);
+  color:var(--ink);
+  background:var(--paper);
+  border:1.5px solid var(--ink);
+  border-radius:99px;
+  padding:8px 16px 7px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  transform:rotate(-.3deg);
+}
+.browser-addr b{ color:var(--cobalt); }
+.browser-bar .tape{ position:static; flex:0 0 auto; rotate:4deg; margin-right:-4px; }
+.browser-body{
+  position:relative;
+  flex:1;
+  background:
+    radial-gradient(circle at 80% 16%, rgba(255,212,31,.2) 0 12%, transparent 13%),
+    linear-gradient(150deg, var(--cobalt) 0 60%, var(--cobalt-dk));
+  overflow:hidden;
+}
+.browser-body iframe{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  border:0;
+  background:#fff;
+}
+.boot-collage{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:18px;
+  z-index:2;
+  text-align:center;
+}
+.boot-collage .strap{
+  font:400 clamp(20px, 2.6vw, 36px)/1.1 var(--serif);
+  color:var(--core);
+  max-width:70%;
+}
+.boot-collage .strap i{ font-style:normal; color:var(--canary); }
+.boot-btn{
+  border:0; cursor:pointer;
+  background:var(--core);
+  clip-path:var(--jag-a);
+  padding:12px;
+  transform:rotate(-1.6deg);
+  filter:drop-shadow(4px 6px 0 rgba(0,0,0,.35));
+  transition:transform .18s cubic-bezier(.3,1.4,.5,1);
+}
+.boot-btn:hover{ transform:rotate(.6deg) scale(1.04); }
+.boot-btn:focus-visible{ outline:4px solid var(--canary); outline-offset:4px; }
+.boot-btn span{
+  display:block;
+  font:400 clamp(17px, 2vw, 27px)/1 var(--grot);
+  color:var(--ink);
+  background:var(--canary);
+  clip-path:var(--jag-b);
+  padding:.55em .8em .6em;
+}
+.boot-note{
+  font:700 clamp(16px, 1.7vw, 22px)/1.25 var(--hand);
+  color:#cdd4ff;
+  transform:rotate(-1.2deg);
+  max-width:60%;
+}
+.boot-note small{ display:block; font:400 10.5px/1.6 var(--mono); letter-spacing:.14em; color:#98a4f0; margin-top:6px; transform:none; }
+.booting{
+  position:absolute; inset:0;
+  display:none;
+  place-items:center;
+  z-index:3;
+  pointer-events:none;
+}
+.booting.show{ display:grid; }
+.booting .stamp-box{
+  font:400 clamp(18px, 2.4vw, 32px)/1 var(--grot);
+  color:var(--canary);
+  border:5px solid var(--canary);
+  padding:16px 22px 14px;
+  transform:rotate(-5deg);
+  background:rgba(21,32,168,.85);
+  letter-spacing:.04em;
+}
+@keyframes boot-tick{ 0%,100%{ transform:rotate(-5deg) scale(1); } 50%{ transform:rotate(-4deg) scale(1.03); } }
+.booting.show .stamp-box{ animation:boot-tick 1.2s ease-in-out infinite; }
+
+.colophon{
+  position:absolute; bottom:3.2%; left:5%;
+  z-index:5;
+  width:min(30vw, 380px);
+  padding:13px 16px 12px;
+  transform:rotate(-1.8deg);
+}
+.colophon .torn-fill{ background:var(--core); }
+.colophon p{
+  margin:0;
+  font:400 10.5px/1.65 var(--mono);
+  color:var(--ink-soft);
+}
+.colophon p b{ color:var(--ink); }
+.finale-scribble{
+  position:absolute; bottom:4.5%; right:6%;
+  z-index:5;
+  font:700 clamp(21px, 2.4vw, 32px)/1.05 var(--hand);
+  color:var(--canary);
+  transform:rotate(-3deg);
+  text-align:right;
+}
+.finale-scribble small{
+  display:block;
+  font:400 10px/1.6 var(--mono);
+  letter-spacing:.2em;
+  color:#98a4f0;
+  margin-top:4px;
+}
+.finale-scribble a{ color:inherit; }
+
+/* ============================================================
+   RESPONSIVE — the zine folds down; spreads may scroll inside.
+   ============================================================ */
+@media (max-width:880px){
+  .spread{ height:auto; min-height:100svh; }
+  #zine{ scroll-snap-type:y proximity; }
+  .cover-masthead{ font-size:8.5px; letter-spacing:.12em; white-space:normal; text-align:center; width:92%; }
+  .w-the-page{ left:4%; top:11%; }
+  .w-cutout{ top:6%; right:4%; }
+  .mascot{ right:4%; bottom:9%; }
+  .specimen{ width:88vw; left:4%; top:15%; }
+  .note-a{ top:auto; bottom:34%; right:4%; width:44vw; }
+  .spec-label{ left:8%; bottom:6%; width:80vw; }
+  .before-coda{ display:none; }
+  .arg-callout{ display:none; }
+  .arg-blob{ width:88vw; }
+  .arg-foot{ display:none; }
+  .s-assembly{ min-height:170svh; }
+  .bench-head{ max-width:88vw; }
+  .bench-count{ right:5%; top:2.5%; }
+  .bench-page{ top:auto; bottom:2%; right:4%; width:92%; height:52%; }
+  .bench-hint{ max-width:52vw; bottom:56%; }
+  .shuffle{ bottom:auto; top:13%; left:auto; right:5%; }
+  .done-stamp{ left:6%; bottom:44%; }
+  .rev{ width:72vw; }
+  .rev-2{ top:47%; }
+  .rev-3{ top:30%; }
+  .rev-4{ top:70%; }
+  .mediator{ width:88vw; }
+  .s-stickers{ min-height:185svh; }
+  .sticker-sheet{ width:90%; height:44%; }
+  .made-page{ top:auto; bottom:3%; right:5%; width:88%; height:44%; }
+  .browser-cut{ width:94vw; }
+  .colophon{ display:none; }
+  .fight-head h2{ font-size:clamp(20px, 6.6vw, 30px); }
+}
+
+/* ============================================================
+   REDUCED MOTION — everything arrives already pasted down.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001s !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001s !important;
+    transition-delay:0s !important;
+  }
+  .scene:not(.on) .piece.drop,
+  .scene:not(.on) .piece.drop-far,
+  .scene:not(.on) .piece.slam-l,
+  .scene:not(.on) .piece.slam-r,
+  .scene:not(.on) .piece.rise{ transform:rotate(var(--r)); }
+  .scene:not(.on) .piece.stamp{ transform:scale(1) rotate(var(--r)); opacity:1; }
+  .scene:not(.on) .piece.tear{ transform:rotate(var(--r)) scaleY(1); }
+  .scene:not(.on) .piece.write{ clip-path:inset(-8% -4% -12% -4%); }
+  .on .turn, .on .mascot .bob, .booting.show .stamp-box{ animation:none !important; }
+  .on .ce-body .caret{ animation:none; }
+}
+</style>
+</head>
+<body>
+
+<a class="lobby" href="../">&larr; museum</a>
+<div class="folio" aria-hidden="true"><b id="folioNum">p.1</b>&thinsp;/&thinsp;7</div>
+<div class="sr-only" role="status" aria-live="polite" id="live"></div>
+
+<main id="zine" tabindex="0" aria-label="Paste-Up, a seven-spread zine about WordPress 5.0 and the block editor. Use Page Down and Page Up to turn spreads.">
+
+<!-- ========================================================
+     SPREAD 1 · COVER
+     ======================================================== -->
+<section class="spread s-cover scene" id="sp1" aria-label="Cover: The page is a pile of pieces">
+  <div class="frame">
+
+    <div class="cover-masthead piece drop" style="--r:0deg; --d:.05s">
+      WordPress&nbsp;Museum &nbsp;&middot;&nbsp; issue&nbsp;n&ordm;&nbsp;<b>5.0&nbsp;&ldquo;BEBO&rdquo;</b> &nbsp;&middot;&nbsp; December&nbsp;6,&nbsp;2018 &nbsp;&middot;&nbsp; paste-up&nbsp;edition &nbsp;&middot;&nbsp; price:&nbsp;free&nbsp;forever
+    </div>
+
+    <div class="cover-strip piece slam-l" style="--r:-8deg; --d:.15s" aria-hidden="true">
+      <div class="torn-fill"></div>
+      <div class="strip-type">GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG&nbsp;&middot;&nbsp;GUTENBERG</div>
+    </div>
+
+    <h1 class="sr-only">The page is a pile of pieces &mdash; WordPress 5.0 and the block editor, 2018</h1>
+
+    <div class="cover-word w-the-page piece drop misreg" aria-hidden="true" style="--r:-2.2deg; --d:.3s">THE&nbsp;PAGE</div>
+    <div class="cover-word w-is-a piece stamp" aria-hidden="true" style="--r:4deg; --d:.85s">IS&nbsp;A</div>
+    <div class="cover-word w-pile piece drop-far" aria-hidden="true" style="--r:2.6deg; --d:.5s"><i>PILE</i></div>
+    <div class="cover-word w-of piece stamp" aria-hidden="true" style="--r:0deg; --d:1.05s">
+      <span class="ransom"><span>O</span><span>F</span></span>
+    </div>
+    <div class="cover-word w-pieces piece drop-far" aria-hidden="true" style="--r:-3.4deg; --d:.68s"><i>PIECES</i></div>
+
+    <div class="w-cutout piece drop" style="--r:5deg; --d:.95s">
+      <div class="disc" role="img" aria-label="WordPress W, cut out and taped to the cover">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="#191410" stroke-width="6.5"/>
+          <text x="50" y="66" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="bold" fill="#191410">W</text>
+        </svg>
+      </div>
+      <span class="tape short"></span>
+    </div>
+
+    <div class="mascot piece rise" style="--r:0deg; --d:1.2s" role="img" aria-label="A wonky hand-drawn mouse cursor with a smiling face">
+      <div class="bob">
+        <svg viewBox="0 0 120 140" aria-hidden="true">
+          <!-- rough double-stroked cursor arrow -->
+          <path d="M22 8 L26 104 L46 84 L60 122 L74 116 L60 79 L88 77 Z"
+                fill="#fffdf4" stroke="#191410" stroke-width="4.5" stroke-linejoin="round"/>
+          <path d="M25 12 L28 96 L46 79 L61 116 M63 75 L83 74"
+                fill="none" stroke="#191410" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+          <!-- face -->
+          <circle cx="42" cy="44" r="3.4" fill="#191410"/>
+          <circle cx="56" cy="42" r="3.4" fill="#191410"/>
+          <path d="M41 56 Q50 64 59 54" fill="none" stroke="#191410" stroke-width="3.4" stroke-linecap="round"/>
+          <!-- blush -->
+          <circle cx="37" cy="52" r="3" fill="#ff4b33" opacity=".55"/>
+          <circle cx="61" cy="49" r="3" fill="#ff4b33" opacity=".55"/>
+          <!-- motion scribbles -->
+          <path d="M96 30 q8 -6 4 -14 M100 46 q10 -2 9 -12 M14 124 q-8 4 -12 -2"
+                fill="none" stroke="#1f2ce8" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="say">hi, i&rsquo;m the cursor. i used to live in one big box.</span>
+    </div>
+
+    <div class="barcode piece drop" style="--r:2.5deg; --d:1.1s" aria-hidden="true">
+      <div class="bars"></div>
+      <div class="num">ISSN&nbsp;5&middot;0&middot;2018&middot;12&middot;06</div>
+    </div>
+
+    <span class="confetti sq c1 piece drop" style="top:20%; left:44%; --r:24deg; --d:1.15s" aria-hidden="true"></span>
+    <span class="confetti sq c2 piece drop" style="top:75%; left:12%; --r:-18deg; --d:1.25s" aria-hidden="true"></span>
+    <span class="confetti sq c3 piece drop" style="top:58%; left:82%; --r:40deg; --d:1.2s" aria-hidden="true"></span>
+    <span class="confetti sq c4 piece drop" style="top:30%; left:88%; --r:-30deg; --d:1.3s" aria-hidden="true"></span>
+    <span class="confetti sq c1 piece drop" style="top:84%; left:56%; --r:14deg; --d:1.35s" aria-hidden="true"></span>
+
+    <button class="turn piece rise" style="--r:-2deg; --d:1.5s" data-goto="1" type="button" aria-label="Turn to the next spread">
+      turn the page
+      <svg viewBox="0 0 30 34" aria-hidden="true">
+        <path d="M15 2 q-4 12 0 26 M7 20 q5 6 8 10 q4 -5 9 -9"
+              fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- ========================================================
+     SPREAD 2 · BEFORE — the classic editor, eulogized
+     ======================================================== -->
+<section class="spread s-before scene" id="sp2" aria-label="Before: the classic editor, in memoriam">
+  <div class="memoriam piece stamp" style="--r:0deg; --d:.1s">IN&nbsp;MEMORIAM</div>
+  <div class="memoriam-dates piece stamp" style="--r:0deg; --d:.3s">the&nbsp;editor&nbsp;field&nbsp;&middot;&nbsp;b.&nbsp;2003&nbsp;&mdash;&nbsp;ret.&nbsp;2018</div>
+
+  <figure class="specimen piece drop" style="--r:1.4deg; --d:.35s; margin:0">
+    <span class="tape tl"></span><span class="tape tr"></span>
+    <span class="tape bl"></span><span class="tape br"></span>
+    <div class="ce-title">Enter title here</div>
+    <div class="ce-toolbar" id="ceToolbar" aria-hidden="true">
+      <span class="bb">b</span><span class="ii">i</span><span>link</span><span>b-quote</span><span>del</span><span>ins</span><span>img</span><span>ul</span><span>ol</span><span>li</span><span>code</span><span>more</span><span>close&nbsp;tags</span>
+    </div>
+    <div class="ce-body">Dear reader,
+
+Everything you are about to scroll through used to happen right here, in this one box. Headlines, paragraphs, galleries, hope &mdash; all of it typed into a single field, shoulder to shoulder with its own HTML.
+
+<span class="tag">&lt;img src="my-vacation-photo.jpg" align="left" /&gt;</span>
+We aligned images by guessing. We previewed by praying.
+
+<span class="tag">&lt;!--more--&gt;</span>
+It was one big field. And honestly? We loved it anyway.<span class="caret"></span></div>
+    <div class="ce-status">
+      <span>Word count: 247 &nbsp;&middot;&nbsp; Draft saved at 4:52:19 pm.</span>
+      <span class="ce-publish">Publish</span>
+    </div>
+    <svg class="toolbar-circle" viewBox="0 0 640 420" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M18 92 C 60 62, 480 58, 560 84 C 640 110, 520 140, 300 134 C 140 130, 10 128, 24 96"/>
+    </svg>
+  </figure>
+
+  <div class="coffee-ring piece stamp" style="--r:0deg; --d:.9s" aria-hidden="true"></div>
+
+  <div class="note-a scribble piece write" style="--r:3deg; --d:1s">
+    everything was one big field.
+    <svg viewBox="0 0 120 64" aria-hidden="true">
+      <path d="M104 8 C 70 26, 40 30, 12 44 M26 36 l-16 9 l18 4"
+            fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="note-b scribble piece write" style="--r:-4deg; --d:1.25s">one box. all of it.</div>
+  <div class="note-c scribble red piece write" style="--r:-7deg; --d:1.9s">13 buttons. that&rsquo;s all you got.</div>
+
+  <div class="spec-label piece drop" style="--r:-1.4deg; --d:.7s">
+    <span class="pin" aria-hidden="true"></span>
+    <b>SPECIMEN N&ordm; 01 &mdash; &ldquo;THE CLASSIC EDITOR&rdquo;</b>
+    TinyMCE + Quicktags, active 2003&ndash;2018. One
+    <span style="font-style:italic">&lt;textarea&gt;</span> for every kind of page.
+    Cause of retirement: replaced by blocks (WP&nbsp;5.0, &ldquo;Bebo&rdquo;).
+    Survived by the Classic Editor plugin &mdash; 5,000,000+ active installs.
+  </div>
+
+  <p class="before-coda piece rise" style="--r:0deg; --d:1.6s; margin:0">It never asked what you were making. A post was a post was a field.</p>
+</section>
+
+<!-- ========================================================
+     SPREAD 3 · THE ARGUMENT — manifesto wall
+     ======================================================== -->
+<section class="spread s-argument scene" id="sp3" aria-label="The argument: a manifesto wall of Gutenberg-era slogans">
+  <div class="arg-kicker piece stamp" style="--r:0deg; --d:.05s">state of the word, december 2015 &mdash; three words lit the fuse:</div>
+
+  <div class="arg-learn" aria-label="Learn JavaScript, deeply">
+    <span class="l1 piece slam-l" style="--r:0deg; --d:.15s">LEARN</span>
+    <span class="l2 piece slam-r misreg-soft" style="--r:0deg; --d:.32s">JavaScript,</span>
+    <span class="l3 piece slam-l" style="--r:0deg; --d:.5s">DEEPLY.</span>
+  </div>
+  <div class="arg-attrib piece write" style="--r:-3deg; --d:.9s">&mdash; m. mullenweg, to a room that gasped</div>
+
+  <div class="arg-callout piece drop" style="--r:3.4deg; --d:1.1s">
+    <h3>A new, modern publishing experience is coming.</h3>
+    <p>Take your content creation to the next level with our new block editor. Try it today.</p>
+    <span class="btn">Install Gutenberg</span>
+    <div class="cap">&uarr; the dashboard callout that launched 2,000 comment threads (WP 4.9.8, aug 2018)</div>
+  </div>
+
+  <div class="arg-strip piece slam-r" style="--r:-2.2deg; --d:.6s" aria-hidden="true">
+    &nbsp;GUTENBERG IS COMING &middot; 36 PLUGIN RELEASES BEFORE 5.0 &middot; GUTENBERG IS COMING &middot; NAMED FOR THE MOVABLE-TYPE GUY &middot; GUTENBERG IS COMING &middot;
+  </div>
+
+  <div class="arg-everything piece stamp" style="--r:0deg; --d:.85s" aria-label="Everything is a block">
+    <span class="ransom" aria-hidden="true"><span>E</span><span>V</span><span>E</span><span>R</span><span>Y</span><span>T</span><span>H</span><span>I</span><span>N</span><span>G</span><span class="sp"></span><span>I</span><span>S</span><span class="sp"></span><span>A</span><span class="sp"></span><span>B</span><span>L</span><span>O</span><span>C</span><span>K</span></span>
+  </div>
+
+  <div class="arg-vertical piece drop" style="--r:0deg; --d:1.25s">THE BLOCK IS THE UNIT OF COMPOSITION</div>
+
+  <div class="arg-blob piece rise" style="--r:0deg; --d:1.4s">
+    content is not a <span class="strike">blob</span>&nbsp;<span class="under">stack&nbsp;of&nbsp;decisions</span> &mdash; a paragraph knows it&rsquo;s a paragraph. an image knows it&rsquo;s an image. at last, the page knows what it&rsquo;s made of.
+  </div>
+
+  <div class="arg-foot piece rise" style="--r:0deg; --d:1.6s">
+    * the printing press had movable type. the web finally got movable paragraphs. that&rsquo;s the whole manifesto.
+  </div>
+</section>
+
+<!-- ========================================================
+     SPREAD 4 · THE ASSEMBLY — the interactive workbench
+     ======================================================== -->
+<section class="spread s-assembly scene" id="sp4" aria-label="The assembly: drag paper scraps onto the page and watch them become blocks">
+  <div class="bench" id="bench">
+
+    <header class="bench-head piece slam-l" style="--r:0deg; --d:.1s">
+      <h2>NOW <i>YOU</i> PASTE.</h2>
+      <span class="sub">drag every scrap onto the page &rarr; watch the torn edges go crisp.</span>
+    </header>
+
+    <div class="bench-count piece stamp" style="--r:2deg; --d:.5s"><span id="pasteCount">0</span>/5 PASTED</div>
+
+    <div class="bench-page piece drop" id="benchPage" style="--r:.6deg; --d:.25s">
+      <div class="page-topbar" aria-hidden="true">
+        <span class="plus">+</span>
+        <span class="crumbs">Document &rsaquo; assembled from scraps</span>
+        <span class="save">Saved</span>
+      </div>
+      <div class="page-title">Add title&hellip; (how about &ldquo;my first collage&rdquo;)</div>
+      <div class="slot slot-photo" data-slot="photo">image block<br>goes here</div>
+      <div class="slot slot-para" data-slot="para">paragraph block<br>goes here</div>
+      <div class="slot slot-quote" data-slot="quote">pull-quote<br>goes here</div>
+      <div class="slot slot-illo" data-slot="illo">illustration<br>goes here</div>
+      <div class="slot slot-btn" data-slot="btn">button</div>
+    </div>
+
+    <!-- the five scraps; JS scatters them on the bench -->
+    <div class="scrap scrap-photo piece" id="scrapPhoto" data-scrap="photo" tabindex="0" role="button"
+         aria-label="Photo scrap, torn from a magazine. Press Enter to paste it into the page as an Image block.">
+      <span class="blocktab" aria-hidden="true">&#9635; IMAGE</span>
+      <div class="fill" aria-hidden="true"></div>
+      <div class="content" aria-hidden="true">sunset, cropped to fit</div>
+    </div>
+
+    <div class="scrap scrap-para piece" id="scrapPara" data-scrap="para" tabindex="0" role="button"
+         aria-label="Torn paragraph scrap. Press Enter to paste it into the page as a Paragraph block.">
+      <span class="blocktab" aria-hidden="true">&para; PARAGRAPH</span>
+      <div class="fill" aria-hidden="true"></div>
+      <div class="content" aria-hidden="true"><b>It was the best of blocks,</b> it was the worst of blocks. We tore our pages apart in December 2018 and pasted them back together one piece at a time &mdash; and the pieces finally had names.</div>
+    </div>
+
+    <div class="scrap scrap-quote piece" id="scrapQuote" data-scrap="quote" tabindex="0" role="button"
+         aria-label="Pull-quote clipping. Press Enter to paste it into the page as a Quote block.">
+      <span class="blocktab" aria-hidden="true">&#10077; QUOTE</span>
+      <div class="fill" aria-hidden="true"></div>
+      <div class="content" aria-hidden="true">&ldquo;type less,<br>build more.&rdquo;<small>&mdash; every gutenberg demo, 2018</small></div>
+    </div>
+
+    <div class="scrap scrap-illo piece" id="scrapIllo" data-scrap="illo" tabindex="0" role="button"
+         aria-label="Wonky hand-drawn flower illustration. Press Enter to paste it into the page as an illustration block.">
+      <span class="blocktab" aria-hidden="true">&#9998; ILLO</span>
+      <div class="fill" aria-hidden="true"></div>
+      <svg viewBox="0 0 100 96" aria-hidden="true">
+        <path d="M50 58 C 44 44, 30 44, 28 52 C 26 60, 40 64, 50 58 C 42 48, 46 32, 54 34 C 62 36, 58 52, 50 58 C 60 50, 74 54, 72 62 C 70 70, 54 66, 50 58 C 56 68, 50 82, 42 78 C 34 74, 42 62, 50 58 Z"
+              fill="#ffd41f" stroke="#191410" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="50" cy="58" r="6" fill="#ff4b33" stroke="#191410" stroke-width="2.5"/>
+        <path d="M50 78 q-2 10 2 14 M40 14 q4 6 1 12 M64 12 q-2 8 2 12"
+              fill="none" stroke="#0d5c38" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="scrap scrap-btn piece" id="scrapBtn" data-scrap="btn" tabindex="0" role="button"
+         aria-label="Hand-cut button scrap reading Read more. Press Enter to paste it into the page as a Button block.">
+      <span class="blocktab" aria-hidden="true">&#9645; BUTTON</span>
+      <div class="fill" aria-hidden="true"></div>
+      <div class="content" aria-hidden="true"><span>READ MORE &rarr;</span></div>
+    </div>
+
+    <div class="bench-hint piece write" style="--r:-2.5deg; --d:1.2s">
+      (psst &mdash; this is exactly what the block editor is. collage, with an undo button.)
+    </div>
+
+    <div class="done-stamp" id="doneStamp" role="status">
+      THAT&rsquo;S THE BLOCK EDITOR.<br>YOU JUST USED IT.
+      <small>collage &rarr; interface &middot; gutenberg, dec 2018</small>
+    </div>
+
+    <button class="shuffle piece rise" id="shuffleBtn" type="button" style="--r:-2deg; --d:.9s">
+      <b>&#9986;</b>&nbsp; RE-SCATTER THE SCRAPS
+    </button>
+  </div>
+</section>
+
+<!-- ========================================================
+     SPREAD 5 · THE FIGHT — quote vs quote, star vs star
+     ======================================================== -->
+<section class="spread s-fight scene" id="sp5" aria-label="The fight: the 2018 controversy, one-star reviews versus five-star reviews">
+  <div class="fight-side left" aria-hidden="true"></div>
+  <div class="fight-side right" aria-hidden="true"></div>
+  <div class="fight-seam piece tear" style="--r:9deg; --d:.35s" aria-hidden="true"></div>
+
+  <header class="fight-head">
+    <span class="addr piece stamp" style="--r:0deg; --d:.1s">wordpress.org/plugins/gutenberg &mdash; &#9733; reviews, winter 2018</span>
+    <h2 class="piece drop" style="--r:0deg; --d:.25s"><span class="one">ONE&nbsp;STAR</span><span class="vs">vs</span><span class="five">FIVE&nbsp;STARS</span></h2>
+  </header>
+
+  <div class="rev rev-1 torn piece slam-l" style="--r:-3.2deg; --d:.5s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <span class="starrow bad" aria-label="one star out of five">&#9733;&#9734;&#9734;&#9734;&#9734;</span>
+      <blockquote>&ldquo;Worst update in a decade. I&rsquo;ve run WordPress since 2006 &mdash; this broke my workflow, my plugins, and my heart. Bring back my one big field.&rdquo;</blockquote>
+      <cite>&mdash; torn from the reviews page, december 2018</cite>
+    </div>
+  </div>
+
+  <div class="rev rev-2 torn piece slam-l" style="--r:2.4deg; --d:.72s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <span class="starrow bad" aria-label="one star out of five">&#9733;&#9734;&#9734;&#9734;&#9734;</span>
+      <blockquote>&ldquo;Nobody asked for this. The Classic Editor plugin went up and 5,000,000 of us installed it. That&rsquo;s not resistance, that&rsquo;s a referendum.&rdquo;</blockquote>
+      <cite>&mdash; the most popular &ldquo;no thanks&rdquo; in software history</cite>
+    </div>
+  </div>
+
+  <div class="rev rev-3 torn piece slam-r" style="--r:2.8deg; --d:.6s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <span class="starrow good" aria-label="five stars out of five">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <blockquote>&ldquo;Took me one weekend to stop fighting it. Now I can&rsquo;t go back. My clients stopped breaking their layouts. My shortcodes rest in peace.&rdquo;</blockquote>
+      <cite>&mdash; also torn from the reviews page, same week</cite>
+    </div>
+  </div>
+
+  <div class="rev rev-4 torn piece slam-r" style="--r:-2.2deg; --d:.82s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <span class="starrow good" aria-label="five stars out of five">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <blockquote>&ldquo;Thirty-six plugin releases before 5.0. Reviews averaging two-ish stars. It shipped anyway &mdash; because sometimes the future has bad Yelp reviews.&rdquo;</blockquote>
+      <cite>&mdash; an optimist, with receipts</cite>
+    </div>
+  </div>
+
+  <div class="sticker-49 piece stamp" style="--r:-11deg; --d:1.05s" role="img" aria-label="Protest sticker: 4.9 forever, keep the classic editor">
+    <div class="in">
+      <span class="big">4.9</span>
+      <span class="small">FOREVER</span>
+      <span class="small">&#9733; KEEP THE CLASSIC &#9733;</span>
+    </div>
+  </div>
+
+  <div class="sticker-blocks piece stamp" style="--r:9deg; --d:1.2s" role="img" aria-label="Starburst sticker: blocks are freedom">
+    <div class="in">BLOCKS ARE FREEDOM<small>PASTE WITHOUT FEAR</small></div>
+  </div>
+
+  <span class="mini-star bad piece drop" style="top:16%; left:22%; --r:14deg; --d:1.3s" aria-hidden="true">&#9733;</span>
+  <span class="mini-star bad piece drop" style="top:80%; left:30%; --r:-20deg; --d:1.38s" aria-hidden="true">&#9734;</span>
+  <span class="mini-star bad piece drop" style="top:47%; left:6%; --r:8deg; --d:1.34s" aria-hidden="true">&#9734;</span>
+  <span class="mini-star good piece drop" style="top:15%; left:72%; --r:-12deg; --d:1.32s" aria-hidden="true">&#9733;</span>
+  <span class="mini-star good piece drop" style="top:82%; left:70%; --r:22deg; --d:1.4s" aria-hidden="true">&#9733;</span>
+  <span class="mini-star good piece drop" style="top:50%; left:93%; --r:-8deg; --d:1.36s" aria-hidden="true">&#9733;</span>
+
+  <div class="mediator torn piece drop" style="--r:-1.2deg; --d:1.55s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <p><b>Both stickers were right about something.</b> The old editor never surprised you. The new one finally could.
+      <span class="ps">(we kept both. that&rsquo;s very WordPress.)</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================
+     SPREAD 6 · STICKER SHEET — peel a block, get a block
+     ======================================================== -->
+<section class="spread s-stickers scene" id="sp6" aria-label="Sticker sheet: peel a block sticker and it becomes a real block on the page">
+  <header class="sheet-head piece slam-l" style="--r:0deg; --d:.1s">
+    <h2>BLOCK <i>STICKERS</i></h2>
+    <div class="sub">sheet n&ordm;1 &middot; die-cut &middot; peel to use &middot; every block a sticker, every sticker a block</div>
+  </header>
+
+  <div class="sticker-sheet piece drop" style="--r:-1.1deg; --d:.3s">
+    <div class="sheet-print">
+      <span>GUTENBERG&trade; BLOCK CO.</span>
+      <span class="collect">collect all 8!</span>
+      <span>EST. 2018</span>
+    </div>
+    <div class="sticker-grid">
+      <button class="die" type="button" data-block="para">
+        <span class="lift-wrap"><span class="art art-para">&para;</span><span>Paragraph</span></span>
+      </button>
+      <button class="die" type="button" data-block="image">
+        <span class="lift-wrap"><span class="art art-image"><i class="mtn"></i><i class="sun"></i></span><span>Image</span></span>
+      </button>
+      <button class="die" type="button" data-block="gallery">
+        <span class="lift-wrap"><span class="art art-gallery"><i></i><i></i><i></i></span><span>Gallery</span></span>
+      </button>
+      <button class="die" type="button" data-block="quote">
+        <span class="lift-wrap"><span class="art art-quote">&#10077;</span><span>Quote</span></span>
+      </button>
+      <div class="die free" aria-hidden="true">
+        <span class="free-plus">+</span>
+        <span>inserter<br>(not a sticker)</span>
+      </div>
+      <button class="die" type="button" data-block="cover">
+        <span class="lift-wrap"><span class="art art-cover">COVER</span><span>Cover</span></span>
+      </button>
+      <button class="die" type="button" data-block="embed">
+        <span class="lift-wrap"><span class="art art-embed"><i></i></span><span>Embed</span></span>
+      </button>
+      <button class="die" type="button" data-block="list">
+        <span class="lift-wrap"><span class="art art-list"><i></i><i></i><i></i></span><span>List</span></span>
+      </button>
+      <button class="die" type="button" data-block="button">
+        <span class="lift-wrap"><span class="art art-button"><i></i></span><span>Button</span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="made-page piece slam-r" style="--r:1.2deg; --d:.55s">
+    <p class="made-note">&hellip;and here&rsquo;s the page you make with them:</p>
+    <div class="made-sheet" id="madeSheet">
+      <div class="empty-note" id="emptyNote">
+        <b>nothing pasted yet</b>
+        peel a sticker &larr; over there
+      </div>
+    </div>
+    <button class="resheet" id="resheetBtn" type="button">re-stick everything (start over)</button>
+  </div>
+</section>
+
+<!-- ========================================================
+     SPREAD 7 · FINALE — boot the real thing
+     ======================================================== -->
+<section class="spread s-finale scene" id="sp7" aria-label="Finale: open the real WordPress 5.0 block editor in your browser">
+  <div class="finale-kicker piece stamp" style="--r:0deg; --d:.1s">the last spread is a door</div>
+
+  <div class="browser-cut piece drop" style="--r:0deg; --d:.3s">
+    <div class="browser-bar">
+      <svg viewBox="0 0 52 18" aria-hidden="true">
+        <circle cx="8" cy="9" r="6" fill="none" stroke="#ff4b33" stroke-width="2.6"/>
+        <circle cx="26" cy="8" r="6" fill="none" stroke="#ffd41f" stroke-width="2.6" transform="rotate(6 26 8)"/>
+        <circle cx="44" cy="10" r="6" fill="none" stroke="#0d5c38" stroke-width="2.6"/>
+      </svg>
+      <span class="browser-addr">https://<b>playground.wordpress.net</b>/?wp=5.0 &nbsp;&middot;&nbsp; a real WordPress, assembled in your browser</span>
+      <span class="tape short" aria-hidden="true"></span>
+    </div>
+    <div class="browser-body">
+      <div class="boot-collage" id="bootCollage">
+        <div class="strap">every spread so far was paper.<br>this one is <i>the actual software.</i></div>
+        <button class="boot-btn" id="bootBtn" type="button">
+          <span>OPEN THE REAL EDITOR &#9986;</span>
+        </button>
+        <div class="boot-note">
+          it boots WordPress 5.0 &mdash; the real one, December 2018&rsquo;s &mdash; right here.
+          <small>POWERED BY WORDPRESS PLAYGROUND &middot; TAKES A MOMENT &middot; WORTH IT</small>
+        </div>
+      </div>
+      <div class="booting" id="bootingBadge" aria-hidden="true">
+        <div class="stamp-box">BOOTING 2018&hellip;</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colophon torn piece rise" style="--r:-1.8deg; --d:.9s">
+    <div class="torn-fill"></div>
+    <div class="torn-body">
+      <p><b>THE END.</b> WordPress 5.0 &ldquo;Bebo&rdquo;, released December&nbsp;6, 2018; named for Cuban pianist Bebo Vald&eacute;s.
+      Twenty Nineteen was the first block-ready default theme. The page has been pieces ever since.
+      This zine was pasted from 100% recycled blocks. No pixels were harmed, only rearranged.</p>
+    </div>
+  </div>
+
+  <div class="finale-scribble piece rise" style="--r:-3deg; --d:1.15s">
+    now go paste something together.
+    <small><a href="../">&larr; BACK TO THE MUSEUM LOBBY</a> &nbsp;&middot;&nbsp; p.7/7 &middot; BACK COVER</small>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+'use strict';
+
+var rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+var zine = document.getElementById('zine');
+var spreads = Array.prototype.slice.call(document.querySelectorAll('.spread'));
+var live = document.getElementById('live');
+var folioNum = document.getElementById('folioNum');
+var current = 0;
+
+function announce(msg){ live.textContent = msg; }
+
+/* ------------------------------------------------------------
+   Scene choreography: a spread assembles once, when it enters.
+   ------------------------------------------------------------ */
+var sceneIO = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting && entry.intersectionRatio >= 0.3){
+      if(!entry.target.classList.contains('on')){
+        entry.target.classList.add('on');
+        if(entry.target.id === 'sp4'){ scatterIn(); }
+      }
+      sceneIO.unobserve(entry.target);
+    }
+  });
+}, { root: zine, threshold: [0.3] });
+spreads.forEach(function(s){ sceneIO.observe(s); });
+
+/* folio + current-spread tracking */
+var folioIO = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting && entry.intersectionRatio >= 0.5){
+      current = spreads.indexOf(entry.target);
+      folioNum.textContent = 'p.' + (current + 1);
+    }
+  });
+}, { root: zine, threshold: [0.5] });
+spreads.forEach(function(s){ folioIO.observe(s); });
+
+/* ------------------------------------------------------------
+   Turning spreads: keys + the hand-written "turn the page" note.
+   ------------------------------------------------------------ */
+function goTo(i){
+  i = Math.max(0, Math.min(spreads.length - 1, i));
+  spreads[i].scrollIntoView({ behavior: rm.matches ? 'auto' : 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('[data-goto]').forEach(function(el){
+  el.addEventListener('click', function(){ goTo(parseInt(el.getAttribute('data-goto'), 10)); });
+});
+
+window.addEventListener('keydown', function(e){
+  if(e.defaultPrevented) return;
+  var t = e.target;
+  if(t && t.closest && t.closest('input, textarea, select, iframe')) return;
+  var onWidget = t && t.closest && !!t.closest('button, a, .scrap');
+  var k = e.key;
+  if(onWidget && (k === 'Enter' || k === ' ' || k === 'Spacebar')) return; /* let widgets activate */
+  if(t && t.closest && t.closest('.scrap')) return; /* don't turn pages mid-assembly */
+  if(k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey) || k === 'Spacebar'){
+    e.preventDefault(); goTo(current + 1);
+  } else if(k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)){
+    e.preventDefault(); goTo(current - 1);
+  } else if(k === 'Home'){
+    e.preventDefault(); goTo(0);
+  } else if(k === 'End'){
+    e.preventDefault(); goTo(spreads.length - 1);
+  }
+});
+
+try{ zine.focus({ preventScroll: true }); }catch(err){ zine.focus(); }
+
+/* ============================================================
+   SPREAD 4 · THE ASSEMBLY — drag scraps, snap them into blocks
+   ============================================================ */
+var bench = document.getElementById('bench');
+var benchPage = document.getElementById('benchPage');
+var doneStamp = document.getElementById('doneStamp');
+var pasteCount = document.getElementById('pasteCount');
+var scraps = Array.prototype.slice.call(bench.querySelectorAll('.scrap'));
+var slots = {};
+Array.prototype.forEach.call(bench.querySelectorAll('.slot'), function(s){
+  slots[s.getAttribute('data-slot')] = s;
+});
+
+/* art-directed scatter zones (fractions of the bench), with jitter */
+var ZONES = {
+  photo: { x: 0.05, y: 0.20 },
+  para:  { x: 0.26, y: 0.17 },
+  quote: { x: 0.07, y: 0.54 },
+  illo:  { x: 0.33, y: 0.50 },
+  btn:   { x: 0.22, y: 0.74 }
+};
+var state = {}; /* per-scrap: fx, fy, r, snapped */
+scraps.forEach(function(sc){
+  state[sc.getAttribute('data-scrap')] = { fx: 0, fy: 0, r: 0, snapped: false };
+});
+
+function jitter(base, amt){ return base + (Math.random() * 2 - 1) * amt; }
+
+function setTransform(sc, x, y, r){
+  sc.style.transform = 'translate(' + x + 'px, ' + y + 'px) rotate(' + r + 'deg)';
+}
+
+function placeScattered(sc, animate){
+  var key = sc.getAttribute('data-scrap');
+  var st = state[key];
+  var b = bench.getBoundingClientRect();
+  var x = st.fx * b.width;
+  var y = st.fy * b.height;
+  if(animate && !rm.matches){
+    sc.classList.add('snapping');
+    setTransform(sc, x, y, st.r);
+    window.setTimeout(function(){ sc.classList.remove('snapping'); }, 620);
+  } else {
+    setTransform(sc, x, y, st.r);
+  }
+}
+
+function rollScatter(key){
+  var st = state[key];
+  st.fx = Math.max(0.02, jitter(ZONES[key].x, 0.035));
+  st.fy = Math.max(0.12, Math.min(0.8, jitter(ZONES[key].y, 0.045)));
+  st.r = jitter(0, 1) >= 0 ? jitter(9, 5) : jitter(-9, 5);
+  st.snapped = false;
+}
+
+/* initial: park scraps above the spread so they can rain in */
+scraps.forEach(function(sc){
+  rollScatter(sc.getAttribute('data-scrap'));
+  var b = bench.getBoundingClientRect();
+  var st = state[sc.getAttribute('data-scrap')];
+  setTransform(sc, st.fx * Math.max(b.width, 320), -(sc.offsetHeight + 640), st.r + 30);
+});
+
+var scatteredOnce = false;
+function scatterIn(){
+  if(scatteredOnce) return;
+  scatteredOnce = true;
+  scraps.forEach(function(sc, i){
+    window.setTimeout(function(){
+      placeScattered(sc, true);
+    }, rm.matches ? 0 : 380 + i * 130);
+  });
+}
+
+function snappedCount(){
+  return scraps.filter(function(sc){ return state[sc.getAttribute('data-scrap')].snapped; }).length;
+}
+
+function refreshCount(){
+  var n = snappedCount();
+  pasteCount.textContent = String(n);
+  if(n === scraps.length){
+    doneStamp.classList.add('show');
+    benchPage.classList.add('editor');
+    announce('All five scraps pasted. The torn edges straightened into blocks — that is the block editor.');
+  } else {
+    doneStamp.classList.remove('show');
+    benchPage.classList.remove('editor');
+  }
+}
+
+function slotRectFor(key){
+  var slot = slots[key];
+  var b = bench.getBoundingClientRect();
+  var r = slot.getBoundingClientRect();
+  return { left: r.left - b.left, top: r.top - b.top, width: r.width, height: r.height };
+}
+
+function snapHome(sc, announceIt){
+  var key = sc.getAttribute('data-scrap');
+  var st = state[key];
+  if(st.snapped) return;
+  var target = slotRectFor(key);
+  st.snapped = true;
+  sc.classList.add('snapping');
+  sc.classList.add('snapped');
+  sc.style.width = target.width + 'px';
+  sc.style.height = target.height + 'px';
+  sc.style.aspectRatio = 'auto';
+  setTransform(sc, target.left, target.top, 0.6);
+  slots[key].classList.add('filled');
+  sc.setAttribute('aria-label', sc.getAttribute('data-scrap') + ' scrap: pasted into the page. It is a block now.');
+  window.setTimeout(function(){ sc.classList.remove('snapping'); }, 620);
+  refreshCount();
+  if(announceIt){
+    announce('Pasted. ' + snappedCount() + ' of ' + scraps.length + ' scraps on the page.');
+  }
+}
+
+function unsnap(sc){
+  var key = sc.getAttribute('data-scrap');
+  sc.classList.remove('snapped');
+  sc.style.width = '';
+  sc.style.height = '';
+  sc.style.aspectRatio = '';
+  slots[key].classList.remove('filled');
+  sc.setAttribute('aria-label', key + ' scrap. Press Enter to paste it into the page.');
+}
+
+/* pointer dragging */
+var drag = null;
+scraps.forEach(function(sc){
+  sc.addEventListener('pointerdown', function(e){
+    var key = sc.getAttribute('data-scrap');
+    var st = state[key];
+    if(st.snapped) return;
+    e.preventDefault();
+    var b = bench.getBoundingClientRect();
+    var r = sc.getBoundingClientRect();
+    drag = {
+      sc: sc, key: key,
+      dx: e.clientX - r.left,
+      dy: e.clientY - r.top,
+      bench: b
+    };
+    sc.classList.add('lift');
+    sc.setPointerCapture(e.pointerId);
+  });
+
+  sc.addEventListener('pointermove', function(e){
+    if(!drag || drag.sc !== sc) return;
+    var x = e.clientX - drag.bench.left - drag.dx;
+    var y = e.clientY - drag.bench.top - drag.dy;
+    var key = drag.key;
+    var st = state[key];
+    st.fx = x / drag.bench.width;
+    st.fy = y / drag.bench.height;
+    setTransform(sc, x, y, st.r * 0.4);
+    var hit = hitTest(sc, key);
+    slots[key].classList.toggle('near', hit);
+  });
+
+  function endDrag(e){
+    if(!drag || drag.sc !== sc) return;
+    var key = drag.key;
+    sc.classList.remove('lift');
+    slots[key].classList.remove('near');
+    if(hitTest(sc, key)){
+      snapHome(sc, true);
+    } else {
+      /* settle where dropped, with a little paper wobble */
+      var st = state[key];
+      var b = bench.getBoundingClientRect();
+      sc.classList.add('snapping');
+      setTransform(sc, st.fx * b.width, st.fy * b.height, st.r);
+      window.setTimeout(function(){ sc.classList.remove('snapping'); }, 620);
+    }
+    drag = null;
+  }
+  sc.addEventListener('pointerup', endDrag);
+  sc.addEventListener('pointercancel', endDrag);
+
+  /* keyboard path: Enter or Space pastes the scrap home */
+  sc.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+      e.preventDefault();
+      snapHome(sc, true);
+    }
+  });
+});
+
+function hitTest(sc, key){
+  var b = bench.getBoundingClientRect();
+  var r = sc.getBoundingClientRect();
+  var cx = r.left - b.left + r.width / 2;
+  var cy = r.top - b.top + r.height / 2;
+  var t = slotRectFor(key);
+  var pad = 64;
+  return cx > t.left - pad && cx < t.left + t.width + pad &&
+         cy > t.top - pad && cy < t.top + t.height + pad;
+}
+
+document.getElementById('shuffleBtn').addEventListener('click', function(){
+  scraps.forEach(function(sc, i){
+    var key = sc.getAttribute('data-scrap');
+    if(state[key].snapped){ unsnap(sc); }
+    state[key].snapped = false;
+    rollScatter(key);
+    window.setTimeout(function(){ placeScattered(sc, true); }, rm.matches ? 0 : i * 90);
+  });
+  refreshCount();
+  announce('Scraps re-scattered across the workbench.');
+});
+
+/* keep pasted scraps glued to their slots when the window resizes */
+var resizeT = null;
+window.addEventListener('resize', function(){
+  window.clearTimeout(resizeT);
+  resizeT = window.setTimeout(function(){
+    scraps.forEach(function(sc){
+      var key = sc.getAttribute('data-scrap');
+      var st = state[key];
+      if(st.snapped){
+        var t = slotRectFor(key);
+        sc.style.width = t.width + 'px';
+        sc.style.height = t.height + 'px';
+        setTransform(sc, t.left, t.top, 0.6);
+      } else if(scatteredOnce){
+        placeScattered(sc, false);
+      }
+    });
+  }, 120);
+});
+
+/* ============================================================
+   SPREAD 6 · STICKER SHEET — peel a sticker, gain a block
+   ============================================================ */
+var madeSheet = document.getElementById('madeSheet');
+var emptyNote = document.getElementById('emptyNote');
+
+var BLOCKS = {
+  para: {
+    label: 'Paragraph',
+    html: '<p class="mblock mblock-para" style="margin:0">The page is a pile of pieces now &mdash; and every piece knows its own name. This paragraph, for instance, is extremely aware that it is a paragraph.</p>'
+  },
+  image: {
+    label: 'Image',
+    html: '<figure class="mblock mblock-image"><div class="ph"></div><figcaption>sunrise over block country, 2018</figcaption></figure>'
+  },
+  gallery: {
+    label: 'Gallery',
+    html: '<div class="mblock mblock-gallery" role="img" aria-label="Gallery of three colour swatches"><i></i><i></i><i></i></div>'
+  },
+  quote: {
+    label: 'Quote',
+    html: '<blockquote class="mblock mblock-quote" style="margin:0">&ldquo;Once it clicks, you can&rsquo;t go back.&rdquo;<cite>&mdash; a five-star review, eventually</cite></blockquote>'
+  },
+  cover: {
+    label: 'Cover',
+    html: '<div class="mblock mblock-cover">EVERY BLOCK<br>A DECISION</div>'
+  },
+  embed: {
+    label: 'Embed',
+    html: '<div class="mblock mblock-embed"><span class="ava"></span><span><b>@wordpress</b> we heard you like blocks, so we put blocks in your blocks. (this embed is also a block.)</span></div>'
+  },
+  list: {
+    label: 'List',
+    html: '<ul class="mblock mblock-list"><li>tear</li><li>arrange</li><li>paste</li><li>publish</li></ul>'
+  },
+  button: {
+    label: 'Button',
+    html: '<div class="mblock mblock-button"><button type="button">Publish &rarr;</button></div>'
+  }
+};
+
+function addBlockToPage(kind){
+  var def = BLOCKS[kind];
+  if(!def) return;
+  emptyNote.style.display = 'none';
+  var wrap = document.createElement('div');
+  wrap.innerHTML = def.html;
+  var el = wrap.firstChild;
+  el.classList.add('landing');
+  madeSheet.appendChild(el);
+  window.requestAnimationFrame(function(){
+    window.requestAnimationFrame(function(){ el.classList.remove('landing'); });
+  });
+  announce(def.label + ' sticker peeled. A real ' + def.label + ' block landed on the page.');
+}
+
+document.querySelectorAll('.die[data-block]').forEach(function(die){
+  die.addEventListener('click', function(){
+    if(die.classList.contains('peeled') || die.classList.contains('peeling')) return;
+    var kind = die.getAttribute('data-block');
+    if(rm.matches){
+      die.classList.add('peeled');
+      die.disabled = true;
+      addBlockToPage(kind);
+      return;
+    }
+    die.classList.add('peeling');
+    window.setTimeout(function(){
+      die.classList.remove('peeling');
+      die.classList.add('peeled');
+      die.disabled = true;
+      addBlockToPage(kind);
+    }, 520);
+  });
+});
+
+document.getElementById('resheetBtn').addEventListener('click', function(){
+  Array.prototype.forEach.call(madeSheet.querySelectorAll('.mblock'), function(el){ el.remove(); });
+  emptyNote.style.display = '';
+  document.querySelectorAll('.die[data-block]').forEach(function(die){
+    die.classList.remove('peeled', 'peeling');
+    die.disabled = false;
+  });
+  announce('All stickers re-stuck to the sheet. The page is empty again.');
+});
+
+/* ============================================================
+   SPREAD 7 · FINALE — boot WordPress 5.0 in Playground on click
+   ============================================================ */
+var bootBtn = document.getElementById('bootBtn');
+var bootCollage = document.getElementById('bootCollage');
+var bootingBadge = document.getElementById('bootingBadge');
+var booted = false;
+
+bootBtn.addEventListener('click', function(){
+  if(booted) return;
+  booted = true;
+  document.getElementById('sp7').classList.add('booted');
+  bootCollage.style.display = 'none';
+  bootingBadge.classList.add('show');
+  bootingBadge.setAttribute('aria-hidden', 'false');
+  var iframe = document.createElement('iframe');
+  iframe.src = 'https://playground.wordpress.net/?wp=5.0&url=%2Fwp-admin%2Fpost-new.php';
+  iframe.title = 'WordPress 5.0 with the block editor, running live in WordPress Playground';
+  iframe.setAttribute('allow', 'clipboard-write');
+  iframe.addEventListener('load', function(){
+    window.setTimeout(function(){
+      bootingBadge.classList.remove('show');
+      bootingBadge.setAttribute('aria-hidden', 'true');
+    }, 900);
+  });
+  bootBtn.closest('.browser-body').appendChild(iframe);
+  iframe.focus();
+  announce('Booting a real WordPress 5.0 in the browser. The block editor will open in a moment.');
+});
+
+})();
+</script>
+</body>
+</html>

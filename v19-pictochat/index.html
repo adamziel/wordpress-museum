@@ -1,0 +1,2170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v19 · PictoPress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PictoPress — WordPress Museum v19
+   A Nintendo DS rendered in CSS. Two screens, one clamshell.
+   Top screen: the chat room. Bottom screen: the touchscreen.
+   Four rooms, four eras of the WordPress community.
+   ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* hardware palette — platinum silver DS (2004 launch color) */
+  --shell-hi:#eceef1;
+  --shell:#d3d6db;
+  --shell-lo:#b7bbc2;
+  --shell-edge:#8f949d;
+  --shell-deep:#6f747d;
+  --bezel:#191b20;
+  --bezel-hi:#2a2d34;
+  --etch:#9298a1;
+  --etch-dark:#7c828c;
+  --led-green:#7ee787;
+  --led-amber:#ffc85c;
+  /* screen palette */
+  --lcd-off:#101216;
+  --ink:#26282c;
+  --scr-ui:#565b64;
+  /* pictochat user colors (DS profile rainbow) */
+  --u-blue:#3a6ea5;
+  --u-red:#b04046;
+  --u-green:#3f8f4a;
+  --u-orange:#c07a2c;
+  --u-purple:#7a4fa3;
+  --u-pink:#b8508e;
+  --u-teal:#2f8d8d;
+  --u-olive:#8a8b3a;
+  --u-gray:#5c626b;
+  --u-navy:#3d4f86;
+  /* fonts */
+  --dot:"DotGothic16",monospace;
+  --soft:"Nunito","Trebuchet MS",sans-serif;
+  /* console geometry (logical px, scaled to fit viewport) */
+  --cw:744;
+  --scrw:512;
+  --scrh:384;
+}
+
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(120% 90% at 50% -10%, #3a3e49 0%, transparent 55%),
+    radial-gradient(90% 70% at 50% 108%, #14161b 0%, transparent 60%),
+    linear-gradient(180deg,#272a32 0%, #1d2027 46%, #15171d 100%);
+  overflow:hidden;
+  font-family:var(--soft);
+  -webkit-font-smoothing:antialiased;
+  touch-action:manipulation;
+}
+/* faint felt texture on the desk */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.012) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(25deg, rgba(0,0,0,.02) 0 3px, transparent 3px 7px);
+}
+/* vignette */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(75% 70% at 50% 46%, transparent 55%, rgba(0,0,0,.5) 100%);
+}
+
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------------------------------------------------------
+   Fit wrapper — scales the whole console to the viewport
+   --------------------------------------------------------- */
+#fit{
+  position:fixed;left:50%;top:50%;
+  width:744px;height:986px;
+  transform:translate(-50%,-50%) scale(var(--s,.9));
+  transition:transform .9s cubic-bezier(.55,.06,.28,1);
+  z-index:2;
+}
+#fit.snap{transition:none}
+
+/* ---------------------------------------------------------
+   The console
+   --------------------------------------------------------- */
+#ds{position:relative;width:744px;height:986px;user-select:none;-webkit-user-select:none;touch-action:none}
+
+.half{
+  position:absolute;left:0;width:744px;
+  background:
+    linear-gradient(160deg, var(--shell-hi) 0%, var(--shell) 34%, var(--shell) 62%, var(--shell-lo) 100%);
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.75),
+    inset 0 -3px 5px rgba(0,0,0,.16),
+    inset 3px 0 5px rgba(255,255,255,.28),
+    inset -3px 0 6px rgba(0,0,0,.12),
+    0 22px 40px rgba(0,0,0,.5),
+    0 4px 10px rgba(0,0,0,.35);
+}
+.half.top{top:0;height:466px;border-radius:34px 34px 12px 12px}
+.half.bot{top:496px;height:490px;border-radius:12px 12px 36px 36px}
+
+/* plastic seam running around each half */
+.half::before{
+  content:"";position:absolute;inset:7px;border-radius:inherit;pointer-events:none;
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);
+}
+/* soft molded sheen */
+.half::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    radial-gradient(130% 90% at 24% 0%, rgba(255,255,255,.30) 0%, transparent 44%),
+    radial-gradient(120% 70% at 80% 110%, rgba(0,0,0,.07) 0%, transparent 50%);
+}
+
+/* ------------------- hinge ------------------- */
+.hinge{
+  position:absolute;top:458px;left:26px;right:26px;height:46px;z-index:3;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg, var(--shell-lo) 0%, var(--shell-deep) 18%, var(--shell) 46%, var(--shell-hi) 58%, var(--shell-lo) 84%, var(--shell-deep) 100%);
+  border-radius:14px;
+  box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 1px 1px rgba(255,255,255,.5);
+}
+.hinge::before,.hinge::after{
+  content:"";position:absolute;top:4px;bottom:4px;width:90px;border-radius:10px;
+  background:linear-gradient(180deg, var(--shell-deep), var(--shell-lo) 40%, var(--shell-deep));
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.3), inset 0 -2px 3px rgba(0,0,0,.35);
+}
+.hinge::before{left:8px}
+.hinge::after{right:8px}
+.hinge .mic{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #3a3e45, #0c0d10 70%);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.35);
+}
+.hinge .mic::after{
+  content:"MIC";position:absolute;left:50%;top:11px;transform:translateX(-50%);
+  font:700 7px/1 var(--soft);letter-spacing:1px;color:var(--etch-dark);
+  text-shadow:0 1px 0 rgba(255,255,255,.4);
+}
+/* LEDs live on the hinge, right side */
+.leds{position:absolute;right:112px;top:50%;transform:translateY(-50%);display:flex;gap:14px;align-items:center}
+.led{width:9px;height:9px;border-radius:50%;position:relative;
+  background:#565a61;box-shadow:inset 0 1px 2px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.3)}
+.led::after{content:attr(data-l);position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  font:700 6.5px/1 var(--soft);letter-spacing:.8px;color:var(--etch-dark);text-shadow:0 1px 0 rgba(255,255,255,.4)}
+#ds.on .led.pwr{background:radial-gradient(circle at 35% 30%, #d8ffdc, var(--led-green) 55%, #2f9440);
+  box-shadow:0 0 8px rgba(126,231,135,.8), 0 0 18px rgba(126,231,135,.35), inset 0 0 2px rgba(255,255,255,.7)}
+#ds.on.asleep .led.pwr{animation:breathe 3.4s ease-in-out infinite}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 3px rgba(126,231,135,.25);background:radial-gradient(circle at 35% 30%, #9fcfa5, #3f7f4a 60%)}
+  50%{box-shadow:0 0 10px rgba(126,231,135,.9), 0 0 20px rgba(126,231,135,.4);background:radial-gradient(circle at 35% 30%, #d8ffdc, var(--led-green) 55%, #2f9440)}
+}
+.led.wifi.blink{background:radial-gradient(circle at 35% 30%, #fff3d8, var(--led-amber) 55%, #b8862a);
+  box-shadow:0 0 8px rgba(255,200,92,.85), 0 0 16px rgba(255,200,92,.35)}
+
+/* ------------------- speakers (top half) ------------------- */
+.spk{position:absolute;top:196px;width:56px;height:104px;pointer-events:none;
+  background:
+    radial-gradient(circle 4.2px at 50% 8px,   var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 30% 30px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 70% 30px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 14% 52px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 50% 52px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 86% 52px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 30% 74px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 70% 74px,  var(--shell-deep) 3.4px, transparent 4.4px),
+    radial-gradient(circle 4.2px at 50% 96px,  var(--shell-deep) 3.4px, transparent 4.4px);
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.45));
+}
+.spk.l{left:30px}
+.spk.r{right:30px}
+
+/* etched brand under the top screen */
+.etch{
+  font:800 15px/1 var(--soft);letter-spacing:5px;color:var(--etch);
+  text-shadow:0 1px 0 rgba(255,255,255,.55), 0 -1px 1px rgba(0,0,0,.18);
+  text-transform:uppercase;
+}
+.brand{position:absolute;left:50%;bottom:14px;transform:translateX(-50%)}
+.brand b{font-weight:800;color:var(--etch-dark)}
+
+/* ---------------------------------------------------------
+   Screens (shared)
+   --------------------------------------------------------- */
+.bezel{
+  position:absolute;left:50%;transform:translateX(-50%);
+  width:552px;padding:16px;border-radius:14px;
+  background:linear-gradient(155deg, var(--bezel-hi) 0%, var(--bezel) 45%, #101115 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.10),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 2px 4px rgba(0,0,0,.35),
+    0 0 0 1px rgba(0,0,0,.28);
+}
+.bezel.t{top:36px}
+.bezel.b{top:30px}
+.screen{
+  position:relative;width:520px;height:392px;border-radius:5px;overflow:hidden;
+  background:var(--lcd-off);
+  box-shadow:inset 0 0 0 2px #000, inset 0 0 14px rgba(0,0,0,.65);
+}
+/* LCD subpixel texture */
+.lcd{position:absolute;inset:0;z-index:40;pointer-events:none;opacity:.5;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(60,80,60,.02) 0 1px, transparent 1px 3px);
+}
+/* glass glare */
+.glare{position:absolute;inset:0;z-index:41;pointer-events:none;
+  background:linear-gradient(112deg, rgba(255,255,255,.075) 0%, rgba(255,255,255,.028) 26%, transparent 42%)}
+/* dark glass when the console is off, and the sleep veil */
+.veil{position:absolute;inset:0;z-index:42;background:var(--lcd-off);opacity:1;transition:opacity 1.4s ease;pointer-events:none}
+.veil::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(125deg, transparent 30%, rgba(255,255,255,.05) 44%, transparent 58%)}
+#ds.on .veil{opacity:0}
+#ds.on.asleep .veil{opacity:.96;transition:opacity 2.2s ease}
+/* power-on flash */
+.veil.flash{animation:pflash .55s ease-out}
+@keyframes pflash{0%{opacity:1;background:var(--lcd-off)}45%{opacity:1;background:#e9efe6}100%{opacity:0}}
+
+/* scenes inside a screen */
+.scene{position:absolute;inset:0;display:none}
+.scene.onstage{display:block}
+
+/* ---------------------------------------------------------
+   TOP SCREEN · logo scene (while choosing a room)
+   --------------------------------------------------------- */
+#scnLogo{background:linear-gradient(180deg,#e8ebe4 0%,#dfe3dc 60%,#d5dad2 100%)}
+#scnLogo .frame{position:absolute;inset:12px;border:2px solid #b9bfb4;border-radius:8px;
+  background:
+    radial-gradient(circle 1px at 8px 8px, #c3c9be 1px, transparent 1.6px);
+  background-size:16px 16px;}
+#logoArt{position:absolute;left:50%;top:74px;transform:translateX(-50%)}
+#logoTag{position:absolute;left:0;right:0;top:196px;text-align:center;
+  font:16px/1.7 var(--dot);color:#4c5350}
+#logoTag .yr{color:#8b7a4f}
+#logoHint{position:absolute;left:0;right:0;bottom:34px;text-align:center;
+  font:15px/1 var(--dot);color:#7d857e;animation:hintPulse 2.2s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{opacity:.35}50%{opacity:.95}}
+#logoDoodles{position:absolute;left:0;right:0;bottom:66px;display:flex;justify-content:center;gap:26px;opacity:.8}
+#logoDoodles svg{display:block}
+
+/* ---------------------------------------------------------
+   TOP SCREEN · room scene chrome
+   --------------------------------------------------------- */
+#scnRoom{background:#e4e6e2}
+#tsBar{position:absolute;left:0;right:0;top:0;height:32px;z-index:20;
+  display:flex;align-items:center;gap:10px;padding:0 10px;
+  font:15px/1 var(--dot);color:#fff;
+  background:linear-gradient(180deg,#6c7480,#575e69);
+  box-shadow:0 1px 0 rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.18)}
+#tsRoomLetter{width:22px;height:22px;border-radius:5px;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font:800 14px/1 var(--soft);color:#575e69}
+#tsRoomName{letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tsRoomYear{margin-left:auto;color:#cdd3db;font-size:13px}
+#tsGlyphs{display:flex;align-items:center;gap:7px}
+#tsGlyphs svg{display:block}
+#tsGlyphs .g-snd.off{opacity:.3}
+#gWifi.blink .w2,#gWifi.blink .w3{animation:wifiPing .5s steps(2) 3}
+@keyframes wifiPing{50%{opacity:.15}}
+
+/* member strip */
+#tsMembers{position:absolute;left:0;right:0;top:32px;height:26px;z-index:19;
+  display:flex;align-items:center;gap:5px;padding:0 8px;overflow:hidden;
+  background:linear-gradient(180deg,#d7dad4,#cbcfc8);
+  box-shadow:0 1px 0 rgba(0,0,0,.14);
+  font:12px/1 var(--dot)}
+#tsMembers .chip{flex:0 0 auto;display:flex;align-items:center;gap:4px;
+  padding:2px 6px 3px;border-radius:4px;background:#fff;
+  border:1px solid currentColor;
+  box-shadow:0 1px 0 rgba(0,0,0,.08)}
+#tsMembers .chip i{width:6px;height:6px;border-radius:2px;background:currentColor;font-style:normal}
+#tsMembers .cnt{margin-left:auto;flex:0 0 auto;color:#666e67;font:12px/1 var(--dot)}
+
+/* stacks — one per room, so history survives room-hopping */
+.stack{position:absolute;left:0;right:0;top:58px;bottom:0;display:none;
+  overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;
+  scrollbar-width:thin;scrollbar-color:#9aa096 transparent}
+.stack.live{display:block}
+.stack::-webkit-scrollbar{width:9px}
+.stack::-webkit-scrollbar-thumb{background:#a7ada1;border:2px solid transparent;border-radius:6px;background-clip:content-box}
+@media (prefers-reduced-motion:reduce){.stack{scroll-behavior:auto}}
+
+/* ------------------ message cards (shared anatomy) ------------------ */
+.msg{position:relative;background:#fdfdfc;border:2.5px solid var(--uc,#3a6ea5);
+  border-radius:7px;margin:0 auto;
+  box-shadow:0 2px 0 rgba(0,0,0,.10)}
+.msg .who{position:absolute;top:-9px;left:9px;z-index:2;
+  padding:0 6px;background:#fdfdfc;border-radius:3px;
+  font:13px/16px var(--dot);color:var(--uc,#3a6ea5);white-space:nowrap}
+.msg .bd{display:block;padding:9px 8px 6px}
+.msg .bd svg{display:block;width:100%;height:auto}
+.msg.arrive{animation:slideUp .42s cubic-bezier(.2,.9,.3,1) both}
+@keyframes slideUp{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
+/* system card: the "Now Entering" ceremony (double rule, centered) */
+.msg.sys{border-style:double;border-width:5px;border-color:#7d8590;background:#f4f5f2;text-align:center}
+.msg.sys .bd{padding:8px 10px;font:15px/1.5 var(--dot);color:#4d545e}
+.msg.sys .bd b{color:#2e343d}
+.msg.sys .sub{display:block;font-size:12px;color:#828a95;margin-top:2px}
+
+/* ============ ROOM A · 2004 · the b2 refugees ============
+   Sparse. Paper-warm. Wide margins, ruled lines, big shaky
+   letters, long silences. Four people and a lot of hope.  */
+.stack.rA{
+  background:
+    repeating-linear-gradient(180deg, transparent 0 30px, rgba(164,148,110,.24) 30px 31px),
+    linear-gradient(180deg,#f2ecdd 0%,#ece5d3 100%);
+  padding:24px 34px 30px}
+.stack.rA .msg{width:100%;margin-bottom:26px;background:#fbf8f0;border-radius:9px}
+.stack.rA .msg .who{background:#fbf8f0;font-size:14px}
+.stack.rA .msg .bd{padding:12px 12px 8px}
+.stack.rA .msg.tiltL{transform:rotate(-1.1deg)}
+.stack.rA .msg.tiltR{transform:rotate(.9deg)}
+.stack.rA .msg.sys{background:#f6f2e6}
+.stack.rA .msg.sys .who{background:#f6f2e6}
+
+/* ============ ROOM B · 2007 · the theme & plugin bazaar ============
+   Crowded. Cool-blue hatch, tight gaps, half-width cards jostling
+   in two columns, fast arrivals. Everyone is selling a sidebar. */
+.stack.rB{
+  background:
+    repeating-linear-gradient(45deg, rgba(90,120,150,.07) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgba(90,120,150,.05) 0 2px, transparent 2px 14px),
+    linear-gradient(180deg,#dde6ee 0%,#d3dee8 100%);
+  padding:10px 10px 12px;
+  display:none;flex-wrap:wrap;align-content:flex-start;gap:7px}
+.stack.rB.live{display:flex}
+.stack.rB .msg{width:100%;margin:0;border-width:2px;border-radius:5px;box-shadow:0 1px 0 rgba(30,50,70,.14)}
+.stack.rB .msg.half{width:calc(50% - 4px)}
+.stack.rB .msg .who{top:-8px;left:6px;font-size:11.5px;line-height:14px;padding:0 4px}
+.stack.rB .msg .bd{padding:8px 6px 4px}
+.stack.rB .msg.sys{width:100%}
+
+/* ============ ROOM C · 2012 · the WordCamp hallway ============
+   Warm, festive, off-kilter. Bunting up top, polaroid cards
+   swinging left and right, hellos in five languages.        */
+.stack.rC{
+  background:
+    radial-gradient(circle 2px at 14px 14px, rgba(190,120,60,.14) 2px, transparent 3px),
+    linear-gradient(180deg,#f6ead6 0%,#f1e2c9 100%);
+  background-size:34px 34px,100% 100%;
+  padding:34px 22px 26px}
+.stack.rC .msg{width:78%;margin-bottom:22px;border-radius:6px}
+.stack.rC .msg.oL{margin-left:0;transform:rotate(-2.2deg)}
+.stack.rC .msg.oR{margin-left:22%;transform:rotate(1.8deg)}
+.stack.rC .msg.oC{width:86%;margin-left:7%;transform:rotate(-.6deg)}
+.stack.rC .msg .who{font-size:13px}
+.stack.rC .msg.sys{width:92%;margin-left:4%;transform:none}
+/* bunting pinned to the top of the room, above the cards */
+#bunting{position:absolute;left:0;right:0;top:58px;height:30px;z-index:18;pointer-events:none;display:none}
+#bunting.live{display:block}
+
+/* ============ ROOM D · 2023 · the block workshop ============
+   Dark editor canvas, dot grid, light cards assembled from
+   blocks that snap in one by one. One card boots a real WP. */
+.stack.rD{
+  background:
+    radial-gradient(circle 1.2px at 9px 9px, rgba(140,150,170,.28) 1.2px, transparent 2px),
+    linear-gradient(180deg,#191b21 0%,#15171d 100%);
+  background-size:18px 18px,100% 100%;
+  padding:18px 26px 24px}
+.stack.rD .msg{width:100%;margin-bottom:16px;background:#23252d;border-radius:8px;
+  box-shadow:0 2px 0 rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03)}
+.stack.rD .msg .who{background:#23252d}
+.stack.rD .msg.sys{background:#1e2027;border-color:#4a5160}
+.stack.rD .msg.sys .who{background:#1e2027}
+.stack.rD .msg.sys .bd{color:#aab2c0}
+.stack.rD .msg.sys .bd b{color:#dfe4ec}
+/* blocks pop into place */
+.stack.rD .blk{opacity:0;transform:scale(.6)}
+.stack.rD .blk.in{opacity:1;transform:scale(1);transition:transform .28s cubic-bezier(.34,1.5,.5,1), opacity .18s ease}
+/* the playground invitation */
+.bootRow{display:flex;justify-content:center;padding:2px 0 8px}
+.bootBtn{font:15px/1 var(--dot);color:#0f1115;background:linear-gradient(180deg,#9be49f,#5cb96a);
+  border:2px solid #2f7d42;border-radius:7px;padding:9px 14px 10px;cursor:pointer;
+  box-shadow:0 3px 0 #2f6b3b, inset 0 1px 0 rgba(255,255,255,.5)}
+.bootBtn:active{transform:translateY(2px);box-shadow:0 1px 0 #2f6b3b}
+.bootBtn:focus-visible{outline:3px solid #cfe9ff;outline-offset:2px}
+
+/* ---------------------------------------------------------
+   TOP SCREEN · playground scene (Download Play)
+   --------------------------------------------------------- */
+#scnPg{background:#10131a;z-index:30}
+#pgSearch{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  color:#bcd3e8;font:16px/1.7 var(--dot);text-align:center;transition:opacity .5s}
+#pgSearch.gone{opacity:0;pointer-events:none}
+#pgSearch .radar{position:relative;width:96px;height:96px}
+#pgSearch .radar i{position:absolute;inset:0;border:2px solid rgba(120,190,255,.75);border-radius:50%;
+  animation:ping 1.8s ease-out infinite}
+#pgSearch .radar i:nth-child(2){animation-delay:.6s}
+#pgSearch .radar i:nth-child(3){animation-delay:1.2s}
+#pgSearch .radar b{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;
+  border-radius:50%;background:#8ec9ff;box-shadow:0 0 14px #8ec9ff}
+@keyframes ping{0%{transform:scale(.12);opacity:1}100%{transform:scale(1);opacity:0}}
+#pgSearch .small{font-size:13px;color:#6d84a0}
+#pgFrameWrap{position:absolute;inset:0}
+#pgFrameWrap iframe{width:100%;height:100%;border:0;background:#fff}
+#pgClose{position:absolute;right:8px;top:8px;z-index:45;width:34px;height:34px;border-radius:8px;
+  border:2px solid #4a5568;background:rgba(16,19,26,.86);color:#cfd8e6;
+  font:16px/1 var(--dot);cursor:pointer}
+#pgClose:hover{background:#242b38}
+#pgClose:focus-visible{outline:3px solid #8ec9ff;outline-offset:1px}
+#pgTag{position:absolute;left:10px;top:14px;z-index:45;font:13px/1.5 var(--dot);color:#8fa6c2;
+  background:rgba(16,19,26,.8);padding:4px 8px;border-radius:6px;pointer-events:none}
+
+/* ---------------------------------------------------------
+   BOTTOM SCREEN · warning scene (health & safety riff)
+   --------------------------------------------------------- */
+#scnWarn{background:#101216;color:#e8e5da;cursor:pointer}
+#scnWarn .box{position:absolute;left:44px;right:44px;top:64px;bottom:96px;
+  border:3px double #6d6752;border-radius:6px;padding:26px 26px;
+  font:16px/1.9 var(--dot);text-align:center;color:#d8d3c4}
+#scnWarn .box h2{font:18px/1.4 var(--dot);letter-spacing:1px;color:#f0c96a;margin-bottom:14px}
+#scnWarn .tap{position:absolute;left:0;right:0;bottom:40px;text-align:center;
+  font:15px/1 var(--dot);color:#9a937d;animation:hintPulse 2s ease-in-out infinite}
+
+/* ---------------------------------------------------------
+   BOTTOM SCREEN · room-select menu (PictoChat launch screen)
+   --------------------------------------------------------- */
+#scnMenu{background:linear-gradient(180deg,#dfe1dc 0%,#d2d5cf 100%)}
+#scnMenu .mHead{position:absolute;left:0;right:0;top:0;height:44px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font:17px/1 var(--dot);color:#fff;letter-spacing:1px;
+  background:linear-gradient(180deg,#6c7480,#575e69);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+#roomBtns{position:absolute;left:26px;right:26px;top:60px;bottom:52px;
+  display:grid;grid-template-rows:repeat(4,1fr);gap:12px}
+.roomBtn{position:relative;display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:12px;
+  padding:0 16px 0 10px;text-align:left;cursor:pointer;
+  background:linear-gradient(180deg,#fbfbf8,#ecede8);
+  border:2.5px solid #9aa0a6;border-radius:10px;
+  box-shadow:0 3px 0 #b3b8bd, inset 0 1px 0 #fff;
+  font-family:var(--dot)}
+.roomBtn:hover,.roomBtn.kfocus{border-color:var(--rc);box-shadow:0 3px 0 var(--rc), inset 0 1px 0 #fff}
+.roomBtn:active{transform:translateY(2px);box-shadow:0 1px 0 #b3b8bd}
+.roomBtn:focus-visible{outline:3px solid var(--rc);outline-offset:2px}
+.roomBtn .rl{width:44px;height:44px;margin-left:2px;border-radius:9px;background:var(--rc);color:#fff;
+  display:flex;align-items:center;justify-content:center;font:800 24px/1 var(--soft);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.22)}
+.roomBtn .rn{font-size:16px;color:#33383f;line-height:1.35}
+.roomBtn .rn small{display:block;font-size:12.5px;color:#7d838b}
+.roomBtn .rm{font-size:13px;color:#666d75;text-align:right;line-height:1.5}
+.roomBtn .rm b{color:var(--rc)}
+#menuFoot{position:absolute;left:0;right:0;bottom:14px;text-align:center;
+  font:13px/1 var(--dot);color:#83898f}
+
+/* ---------------------------------------------------------
+   BOTTOM SCREEN · compose scene (the PictoChat touchscreen)
+   --------------------------------------------------------- */
+#scnComp{background:linear-gradient(180deg,#e2e4df 0%,#d6d9d3 100%)}
+
+/* header: room tabs + label */
+#cHead{position:absolute;left:0;right:0;top:0;height:42px;display:flex;align-items:center;gap:8px;
+  padding:0 10px;background:linear-gradient(180deg,#6c7480,#575e69);
+  box-shadow:0 1px 0 rgba(0,0,0,.3)}
+#tabs{display:flex;gap:6px}
+.tab{width:38px;height:30px;border-radius:7px 7px 3px 3px;cursor:pointer;position:relative;
+  border:2px solid rgba(255,255,255,.5);border-bottom:none;
+  background:linear-gradient(180deg,#8b929c,#767d88);
+  color:#e9ecf0;font:800 14px/1 var(--soft);
+  display:flex;align-items:center;justify-content:center;gap:3px}
+.tab small{font:11px/1 var(--dot);font-weight:400;opacity:.85}
+.tab.now{background:linear-gradient(180deg,#fff,#e9eae4);color:var(--rc);border-color:#fff;
+  box-shadow:0 -2px 4px rgba(0,0,0,.18)}
+.tab:focus-visible{outline:3px solid #fff;outline-offset:1px}
+#cRoomLbl{margin-left:auto;font:14px/1.3 var(--dot);color:#e6eaef;text-align:right;white-space:nowrap;overflow:hidden}
+#cRoomLbl small{display:block;font-size:11px;color:#aeb6c1}
+
+/* main grid: left rail · center · right rail */
+#cMain{position:absolute;left:0;right:0;top:42px;bottom:0;
+  display:grid;grid-template-columns:46px 1fr 60px;gap:6px;padding:8px}
+
+/* tool rail (left) */
+#railL{display:flex;flex-direction:column;gap:5px;align-items:stretch}
+.trl{height:38px;border-radius:8px;cursor:pointer;position:relative;
+  border:2px solid #a2a8ae;background:linear-gradient(180deg,#fafaf7,#e8e9e4);
+  box-shadow:0 2px 0 #b6bbc0, inset 0 1px 0 #fff;
+  display:flex;align-items:center;justify-content:center;color:#4a505a}
+.trl svg{display:block}
+.trl:active{transform:translateY(1px);box-shadow:0 1px 0 #b6bbc0}
+.trl.now{background:linear-gradient(180deg,var(--rc,#3a6ea5),var(--rc,#3a6ea5));border-color:#fff;color:#fff;
+  box-shadow:0 2px 0 rgba(0,0,0,.25), inset 0 -2px 0 rgba(0,0,0,.2)}
+.trl:focus-visible{outline:3px solid var(--rc,#3a6ea5);outline-offset:1px}
+.trl.sizes{height:auto;padding:6px 0;flex-direction:column;gap:6px;cursor:default}
+.trl.sizes i{display:block;border-radius:50%;background:#3c424c;cursor:pointer;outline-offset:2px}
+.trl.sizes i.s1{width:5px;height:5px}
+.trl.sizes i.s2{width:9px;height:9px}
+.trl.sizes i.s3{width:14px;height:14px}
+.trl.sizes i.now{box-shadow:0 0 0 2.5px var(--rc,#3a6ea5)}
+#railL .gap{flex:1}
+
+/* compose canvas */
+#cCenter{display:flex;flex-direction:column;gap:6px;min-width:0}
+#canWrap{position:relative;height:120px;border-radius:7px;background:#fdfdfb;
+  border:2.5px solid var(--yc,#3a6ea5);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+#canWrap::before{ /* dotted writing guides, like the compose box rules */
+  content:"";position:absolute;left:8px;right:8px;top:0;bottom:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg, rgba(90,110,140,.35) 0 4px, transparent 4px 10px) 0 38px/100% 1px no-repeat,
+    repeating-linear-gradient(90deg, rgba(90,110,140,.35) 0 4px, transparent 4px 10px) 0 76px/100% 1px no-repeat;
+}
+#canName{position:absolute;top:-10px;left:9px;z-index:3;padding:0 6px;background:#fdfdfb;border-radius:3px;
+  font:13px/17px var(--dot);color:var(--yc,#3a6ea5)}
+#can{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;border-radius:5px}
+#can.moveMode{cursor:grab}
+#can.stampMode{cursor:copy}
+#caret{position:absolute;width:2px;height:22px;background:#3a6ea5;z-index:2;pointer-events:none;
+  animation:caretBlink 1.1s steps(2) infinite}
+@keyframes caretBlink{50%{opacity:0}}
+
+/* keyboard + stamp panels */
+#panelWrap{flex:1;position:relative;min-height:0}
+#panelKeys,#panelStamps{position:absolute;inset:0;border-radius:8px;background:#c9cdc7;
+  border:2px solid #a8ada7;box-shadow:inset 0 1px 0 rgba(255,255,255,.6);padding:5px;display:none}
+#panelKeys.onstage{display:grid;grid-template-rows:repeat(5,1fr);gap:4px}
+#panelStamps.onstage{display:flex;flex-direction:column}
+.krow{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.key{border:1.5px solid #8f958f;border-radius:5px;cursor:pointer;
+  background:linear-gradient(180deg,#fcfcf9,#e9eae4);
+  font:16px/1 var(--dot);color:#33383f;padding:0;
+  box-shadow:0 2px 0 #a9aea8;display:flex;align-items:center;justify-content:center}
+.key:active,.key.hit{transform:translateY(2px);box-shadow:0 0 0 #a9aea8;background:#dfe6f2}
+.key:focus-visible{outline:2.5px solid var(--rc,#3a6ea5);outline-offset:1px;z-index:1}
+.key.mod{background:linear-gradient(180deg,#e2e5ea,#cdd1d8);font-size:14px}
+.key.mod.lit{background:linear-gradient(180deg,var(--rc,#3a6ea5),var(--rc,#3a6ea5));color:#fff;border-color:#fff}
+.key.sp2{grid-column:span 2}
+.key.sp6{grid-column:span 6}
+
+/* stamps */
+#stampHint{font:12.5px/1.5 var(--dot);color:#5c635c;text-align:center;padding:4px 0 6px}
+#stampGrid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:5px}
+.stampBtn{border:2px solid #8f958f;border-radius:7px;cursor:pointer;
+  background:linear-gradient(180deg,#fcfcf9,#e9eae4);box-shadow:0 2px 0 #a9aea8;
+  display:flex;align-items:center;justify-content:center;color:#33383f}
+.stampBtn svg{display:block}
+.stampBtn:active{transform:translateY(2px);box-shadow:none}
+.stampBtn.now{border-color:var(--rc,#3a6ea5);box-shadow:0 0 0 2px var(--rc,#3a6ea5), 0 2px 0 #a9aea8}
+.stampBtn:focus-visible{outline:3px solid var(--rc,#3a6ea5);outline-offset:1px}
+
+/* action rail (right): SEND / UNDO / CLEAR */
+#railR{display:flex;flex-direction:column;gap:6px}
+.act{border-radius:9px;cursor:pointer;font-family:var(--dot);
+  border:2.5px solid #8f958f;background:linear-gradient(180deg,#fbfbf8,#e7e8e2);
+  box-shadow:0 3px 0 #a9aea8, inset 0 1px 0 #fff;color:#3c424c}
+.act:active{transform:translateY(2px);box-shadow:0 1px 0 #a9aea8}
+.act:focus-visible{outline:3px solid var(--rc,#3a6ea5);outline-offset:2px}
+#actSend{height:96px;font-size:15px;line-height:1.5;color:#fff;
+  background:linear-gradient(180deg,var(--rc,#3a6ea5) 0%,var(--rc,#3a6ea5) 100%);
+  border-color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.3), inset 0 -3px 0 rgba(0,0,0,.2);
+  text-shadow:0 1px 0 rgba(0,0,0,.3)}
+#actSend .up{display:block;font-size:19px}
+#actUndo,#actClear{flex:0 0 44px;font-size:13.5px}
+#railR .gap{flex:1}
+#hintPad{font:11px/1.6 var(--dot);color:#7c8288;text-align:center;padding-bottom:2px}
+
+/* ---------------------------------------------------------
+   Bottom shell controls: D-pad, ABXY, START/SELECT, POWER
+   --------------------------------------------------------- */
+.ctl{position:absolute;z-index:5}
+/* D-pad */
+#dpad{left:16px;top:214px;width:104px;height:104px}
+#dpad .cross{position:absolute;inset:0}
+#dpad .arm{position:absolute;background:linear-gradient(180deg,#40444c,#23262c);border:none;cursor:pointer;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.22), inset 0 -2px 3px rgba(0,0,0,.5), 0 2px 3px rgba(0,0,0,.4)}
+#dpad .arm:focus-visible{outline:3px solid #8ec9ff;outline-offset:1px}
+#dpad .arm.u{left:36px;top:0;width:32px;height:40px;border-radius:7px 7px 0 0}
+#dpad .arm.d{left:36px;bottom:0;width:32px;height:40px;border-radius:0 0 7px 7px}
+#dpad .arm.l{left:0;top:36px;width:40px;height:32px;border-radius:7px 0 0 7px}
+#dpad .arm.r{right:0;top:36px;width:40px;height:32px;border-radius:0 7px 7px 0}
+#dpad .arm:active,#dpad .arm.hit{box-shadow:inset 0 2px 4px rgba(0,0,0,.7)}
+#dpad .hub{position:absolute;left:36px;top:36px;width:32px;height:32px;pointer-events:none;
+  background:linear-gradient(180deg,#383c44,#26292f)}
+#dpad .hub::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);
+  border-radius:50%;background:radial-gradient(circle at 40% 32%, #4a4e57, #26292f 72%);
+  box-shadow:inset 0 -1px 2px rgba(0,0,0,.6)}
+#dpad .arm i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  border:5px solid transparent;opacity:.55}
+#dpad .arm.u i{border-bottom:7px solid #14161a;margin-top:-4px}
+#dpad .arm.d i{border-top:7px solid #14161a;margin-top:4px}
+#dpad .arm.l i{border-right:7px solid #14161a;margin-left:-4px}
+#dpad .arm.r i{border-left:7px solid #14161a;margin-left:4px}
+
+/* ABXY */
+#abxy{right:14px;top:206px;width:118px;height:118px}
+.fb{position:absolute;width:40px;height:40px;border-radius:50%;cursor:pointer;border:none;
+  background:radial-gradient(circle at 36% 30%, #f4f5f7, #c9ccd3 58%, #a9adb6 100%);
+  box-shadow:0 3px 4px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -3px 4px rgba(0,0,0,.18);
+  font:800 15px/1 var(--soft);color:#7d828c;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.fb:active,.fb.hit{transform:translateY(2px);box-shadow:0 1px 2px rgba(0,0,0,.4), inset 0 1px 1px rgba(255,255,255,.9)}
+.fb:focus-visible{outline:3px solid #8ec9ff;outline-offset:2px}
+#btnX{left:39px;top:0}
+#btnY{left:0;top:39px}
+#btnA{right:0;top:39px}
+#btnB{left:39px;bottom:0}
+/* START / SELECT */
+#ss{right:26px;top:344px;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+#ss .sbwrap{display:flex;align-items:center;gap:8px}
+#ss .sb{width:46px;height:15px;border-radius:8px;cursor:pointer;border:none;
+  background:linear-gradient(180deg,#e7e9ec,#bfc3ca);
+  box-shadow:0 2px 2px rgba(0,0,0,.3), inset 0 1px 0 #fff, inset 0 -2px 2px rgba(0,0,0,.18)}
+#ss .sb:active{transform:translateY(1px)}
+#ss .sb:focus-visible{outline:3px solid #8ec9ff;outline-offset:2px}
+#ss .sl{font:700 9px/1 var(--soft);letter-spacing:1.2px;color:var(--etch-dark);
+  text-shadow:0 1px 0 rgba(255,255,255,.5)}
+
+/* POWER */
+#powerWrap{left:34px;top:352px;display:flex;align-items:center;gap:10px}
+#power{width:44px;height:44px;border-radius:50%;cursor:pointer;border:none;position:relative;
+  background:radial-gradient(circle at 36% 30%, #eef0f3, #c3c7ce 58%, #9fa4ae 100%);
+  box-shadow:0 3px 5px rgba(0,0,0,.4), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -3px 4px rgba(0,0,0,.2)}
+#power::after{content:"";position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);
+  border:2.5px solid #7d828c;border-radius:50%;
+  clip-path:polygon(0 0,38% 0,38% 46%,62% 46%,62% 0,100% 0,100% 100%,0 100%)}
+#power::before{content:"";position:absolute;left:50%;top:9px;width:2.5px;height:11px;transform:translateX(-50%);
+  background:#7d828c;border-radius:2px}
+#power:active{transform:translateY(2px)}
+#power:focus-visible{outline:3px solid #8ec9ff;outline-offset:3px}
+#ds:not(.on) #power{animation:powerGlow 2.6s ease-in-out infinite}
+@keyframes powerGlow{0%,100%{box-shadow:0 3px 5px rgba(0,0,0,.4), inset 0 1px 1px rgba(255,255,255,.9)}
+  50%{box-shadow:0 3px 5px rgba(0,0,0,.4), 0 0 16px rgba(142,201,255,.55), inset 0 1px 1px rgba(255,255,255,.9)}}
+#powerWrap .sl{font:700 9px/1 var(--soft);letter-spacing:1.2px;color:var(--etch-dark);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+
+/* chin: etched museum link + credit */
+.chin{position:absolute;left:0;right:0;bottom:10px;height:26px;display:flex;align-items:center;justify-content:center;gap:22px}
+.chin .etch{font-size:9px;letter-spacing:2.5px}
+.chin a.etch{text-decoration:none;color:var(--etch-dark);cursor:pointer}
+.chin a.etch:hover{color:#565c66}
+.chin a.etch:focus-visible{outline:2px solid #8ec9ff;outline-offset:3px;border-radius:3px}
+
+/* ---------------------------------------------------------
+   Reduced motion — the museum stands still, respectfully
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  #fit{transition:none}
+  .msg.arrive{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="fit" class="snap">
+<div id="ds" aria-label="A Nintendo DS handheld console running PictoPress, a PictoChat-style chat about WordPress history">
+
+  <!-- ================= TOP HALF ================= -->
+  <div class="half top">
+    <div class="spk l" aria-hidden="true"></div>
+    <div class="spk r" aria-hidden="true"></div>
+    <div class="bezel t">
+      <div class="screen" id="topScr">
+
+        <!-- logo scene: shown while picking a room -->
+        <div class="scene onstage" id="scnLogo" aria-hidden="true">
+          <div class="frame"></div>
+          <div id="logoArt"></div>
+          <div id="logoTag">twenty years of hallway chatter<br>
+            <span class="yr">2004 &middot; 2007 &middot; 2012 &middot; 2023</span></div>
+          <div id="logoDoodles"></div>
+          <div id="logoHint">select a chat room below</div>
+        </div>
+
+        <!-- room scene: the message stack -->
+        <div class="scene" id="scnRoom">
+          <div id="tsBar">
+            <span id="tsRoomLetter">A</span>
+            <span id="tsRoomName">…</span>
+            <span id="tsRoomYear"></span>
+            <span id="tsGlyphs">
+              <svg id="gSnd" class="g-snd" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                <path d="M2 5h3l4-3v10l-4-3H2z" fill="#fff"/>
+                <path class="sw" d="M11 4.5c1.4 1.4 1.4 3.6 0 5" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </svg>
+              <svg id="gWifi" width="16" height="14" viewBox="0 0 16 14" aria-hidden="true">
+                <circle cx="8" cy="11.4" r="1.6" fill="#fff"/>
+                <path class="w2" d="M4.8 8.2a4.6 4.6 0 0 1 6.4 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path class="w3" d="M2.4 5.4a8 8 0 0 1 11.2 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <svg id="gBatt" width="21" height="12" viewBox="0 0 21 12" aria-hidden="true">
+                <rect x=".8" y=".8" width="17" height="10.4" rx="2" fill="none" stroke="#fff" stroke-width="1.4"/>
+                <rect x="18.6" y="3.6" width="2" height="4.8" rx="1" fill="#fff"/>
+                <rect x="3" y="3" width="3.4" height="6" fill="#fff"/>
+                <rect x="7.6" y="3" width="3.4" height="6" fill="#fff"/>
+                <rect x="12.2" y="3" width="3.4" height="6" fill="#fff" opacity=".45"/>
+              </svg>
+            </span>
+          </div>
+          <div id="tsMembers"></div>
+          <div id="bunting" aria-hidden="true"></div>
+          <div id="stacks">
+            <div class="stack rA" data-room="A" aria-live="off"></div>
+            <div class="stack rB" data-room="B" aria-live="off"></div>
+            <div class="stack rC" data-room="C" aria-live="off"></div>
+            <div class="stack rD" data-room="D" aria-live="off"></div>
+          </div>
+        </div>
+
+        <!-- playground scene: Download Play -->
+        <div class="scene" id="scnPg">
+          <div id="pgSearch">
+            <div class="radar" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+            <div>DS Download Play<br>searching for WordPress 6.4 &ldquo;Shirley&rdquo;&hellip;</div>
+            <div class="small">contacting playground.wordpress.net</div>
+          </div>
+          <div id="pgFrameWrap"></div>
+          <div id="pgTag">WordPress 6.4 &middot; live via Playground</div>
+          <button id="pgClose" aria-label="Close WordPress and return to the chat room" title="close (B)">&#10005;</button>
+        </div>
+
+        <div class="lcd" aria-hidden="true"></div>
+        <div class="glare" aria-hidden="true"></div>
+        <div class="veil" id="veilTop" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="etch brand" aria-hidden="true">Picto<b>Press</b></div>
+  </div>
+
+  <!-- ================= HINGE ================= -->
+  <div class="hinge" aria-hidden="true">
+    <i class="mic"></i>
+    <span class="leds">
+      <span class="led pwr" data-l="PWR"></span>
+      <span class="led wifi" id="ledWifi" data-l="NET"></span>
+    </span>
+  </div>
+
+  <!-- ================= BOTTOM HALF ================= -->
+  <div class="half bot">
+
+    <div class="bezel b">
+      <div class="screen" id="botScr">
+
+        <!-- warning scene (health & safety riff) -->
+        <div class="scene" id="scnWarn" role="button" tabindex="0" aria-label="Continue past the warning screen">
+          <div class="box">
+            <h2>&#9888; WARNING &#9888;</h2>
+            THIS ROOM CONTAINS LIVE HISTORY.<br>
+            Twenty years of WordPress people<br>
+            talking, doodling, and shipping.<br><br>
+            Exposure may cause the sudden<br>
+            urge to start a blog.
+          </div>
+          <div class="tap">touch the screen to continue</div>
+        </div>
+
+        <!-- room-select menu -->
+        <div class="scene" id="scnMenu">
+          <div class="mHead">&#9998; PictoPress &middot; choose a chat room</div>
+          <div id="roomBtns"></div>
+          <div id="menuFoot">D-pad or A&ndash;D keys &middot; A button joins</div>
+        </div>
+
+        <!-- compose scene -->
+        <div class="scene" id="scnComp">
+          <div id="cHead">
+            <div id="tabs" role="tablist" aria-label="Chat rooms"></div>
+            <div id="cRoomLbl">room<small>era</small></div>
+          </div>
+          <div id="cMain">
+            <div id="railL">
+              <button class="trl" id="toolPen" title="pencil (X cycles tools)" aria-label="Pencil tool">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 17l1-4L14 3l3 3L7 16l-4 1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 5l3 3" stroke="currentColor" stroke-width="1.8"/></svg>
+              </button>
+              <button class="trl" id="toolEraser" title="eraser" aria-label="Eraser tool">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M8 16L3 11l7-8 6 5-6 8H8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </button>
+              <button class="trl" id="toolMove" title="move typed text &amp; stamps" aria-label="Move tool">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M2 10h16M10 2L7.6 4.4M10 2l2.4 2.4M10 18l-2.4-2.4M10 18l2.4-2.4M2 10l2.4-2.4M2 10l2.4 2.4M18 10l-2.4-2.4M18 10l-2.4 2.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </button>
+              <div class="trl sizes" role="group" aria-label="Pen size">
+                <i class="s1" data-s="2" role="button" tabindex="0" aria-label="Thin pen"></i>
+                <i class="s2 now" data-s="4" role="button" tabindex="0" aria-label="Medium pen"></i>
+                <i class="s3" data-s="7" role="button" tabindex="0" aria-label="Thick pen"></i>
+              </div>
+              <div class="gap"></div>
+              <button class="trl" id="modeKeys" title="keyboard (Y toggles panel)" aria-label="Show tap keyboard">
+                <svg width="22" height="18" viewBox="0 0 22 18"><rect x="1" y="3" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 7h1.6M8 7h1.6M12 7h1.6M16 7h1.6M4 10.5h1.6M8 10.5h1.6M12 10.5h1.6M16 10.5h1.6M6 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button class="trl" id="modeStamps" title="WordPress stamps" aria-label="Show stamp palette">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l2 4.4 4.8.5-3.6 3.2 1 4.7L10 12.4l-4.2 2.4 1-4.7L3.2 6.9 8 6.4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+
+            <div id="cCenter">
+              <div id="canWrap">
+                <span id="canName">you</span>
+                <canvas id="can" width="800" height="230" aria-label="Drawing area. Draw with the pointer, or type to stamp letters."></canvas>
+                <span id="caret" aria-hidden="true"></span>
+              </div>
+              <div id="panelWrap">
+                <div id="panelKeys" class="onstage" role="group" aria-label="Tap keyboard"></div>
+                <div id="panelStamps" role="group" aria-label="Stamp palette">
+                  <div id="stampHint">tap a stamp, then tap the canvas to place it</div>
+                  <div id="stampGrid"></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="railR">
+              <button class="act" id="actSend" title="send (Enter or A button)" aria-label="Send message"><span class="up">&#9650;</span>SEND</button>
+              <button class="act" id="actUndo" title="undo (B button)" aria-label="Undo last stroke">UNDO</button>
+              <button class="act" id="actClear" title="clear the canvas" aria-label="Clear the canvas">CLEAR</button>
+              <div class="gap"></div>
+              <div id="hintPad">&#9666;&#9656; rooms<br>&#9652;&#9662; scroll</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lcd" aria-hidden="true"></div>
+        <div class="glare" aria-hidden="true"></div>
+        <div class="veil" id="veilBot" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- shell controls -->
+    <div class="ctl" id="dpad" role="group" aria-label="D-pad">
+      <div class="cross">
+        <button class="arm u" id="padU" aria-label="D-pad up: scroll messages up"><i></i></button>
+        <button class="arm d" id="padD" aria-label="D-pad down: scroll messages down"><i></i></button>
+        <button class="arm l" id="padL" aria-label="D-pad left: previous room"><i></i></button>
+        <button class="arm r" id="padR" aria-label="D-pad right: next room"><i></i></button>
+        <div class="hub"></div>
+      </div>
+    </div>
+
+    <div class="ctl" id="abxy" role="group" aria-label="Face buttons">
+      <button class="fb" id="btnX" aria-label="X button: cycle drawing tool">X</button>
+      <button class="fb" id="btnY" aria-label="Y button: toggle keyboard and stamps">Y</button>
+      <button class="fb" id="btnA" aria-label="A button: send message">A</button>
+      <button class="fb" id="btnB" aria-label="B button: undo, or close WordPress">B</button>
+    </div>
+
+    <div class="ctl" id="ss">
+      <span class="sbwrap"><span class="sl">SELECT</span><button class="sb" id="btnSelect" aria-label="Select button: toggle sound"></button></span>
+      <span class="sbwrap"><span class="sl">START</span><button class="sb" id="btnStart" aria-label="Start button: sleep or wake the console"></button></span>
+    </div>
+
+    <div class="ctl" id="powerWrap">
+      <button id="power" aria-label="Power button"></button>
+      <span class="sl">POWER</span>
+    </div>
+
+    <div class="chin">
+      <a class="etch" href="../">&larr; museum</a>
+      <span class="etch" aria-hidden="true">WordPress Museum &middot; v19</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="sr" class="visually-hidden" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   PART 1 · THE HANDWRITING
+   A single-stroke glyph font, authored by hand. Every letter is
+   a set of polylines in a 10-unit-tall cell. Messages are laid
+   out from these strokes, jittered per-sender, and replayed
+   stroke by stroke when a card arrives — ink appearing on the
+   top screen the way it appeared on a DS in 2004.
+   ============================================================ */
+
+const FONT = {
+  "A":{w:7,  s:[[0,10,3.5,0,7,10],[1.5,6.5,5.5,6.5]]},
+  "B":{w:6.5,s:[[0,10,0,0],[0,0,4,0,5.5,1,5.5,3.5,4,4.7,0,4.7],[0,4.7,4.5,4.7,6,6,6,8.6,4.5,10,0,10]]},
+  "C":{w:6.5,s:[[6,1.5,4.5,0,2,0,.5,1.5,0,4,0,6,.5,8.5,2,10,4.5,10,6,8.5]]},
+  "D":{w:6.5,s:[[0,10,0,0],[0,0,3.5,0,5.5,1.5,6,4,6,6,5.5,8.5,3.5,10,0,10]]},
+  "E":{w:6.5,s:[[6,0,0,0,0,10,6,10],[0,5,4.5,5]]},
+  "F":{w:6.5,s:[[6,0,0,0,0,10],[0,5,4.2,5]]},
+  "G":{w:6.5,s:[[6,1.5,4.5,0,2,0,.5,1.5,0,4,0,6,.5,8.5,2,10,4.5,10,6,8.8,6,5.6,3.6,5.6]]},
+  "H":{w:6.5,s:[[0,0,0,10],[6,0,6,10],[0,5,6,5]]},
+  "I":{w:4.5,s:[[0,0,4,0],[2,0,2,10],[0,10,4,10]]},
+  "J":{w:5.5,s:[[5,0,5,8,4,10,1.5,10,.3,8.4]]},
+  "K":{w:6.5,s:[[0,0,0,10],[5.8,0,.5,5.2],[2.2,4,6,10]]},
+  "L":{w:6,  s:[[0,0,0,10,5.8,10]]},
+  "M":{w:7.5,s:[[0,10,0,0,3.5,6,7,0,7,10]]},
+  "N":{w:6.5,s:[[0,10,0,0,6,10,6,0]]},
+  "O":{w:7.5,s:[[3,0,1,.8,0,3,0,7,1,9.2,3,10,4.2,10,6.2,9,7,7,7,3,6.2,1,4.2,0,3,0]]},
+  "P":{w:6,  s:[[0,10,0,0],[0,0,4,0,5.6,1.2,5.6,3.8,4,5.2,0,5.2]]},
+  "Q":{w:7.5,s:[[3,0,1,.8,0,3,0,7,1,9.2,3,10,4.2,10,6.2,9,7,7,7,3,6.2,1,4.2,0,3,0],[4.2,7.4,7,10.8]]},
+  "R":{w:6.5,s:[[0,10,0,0],[0,0,4,0,5.6,1.2,5.6,3.6,4,5,0,5],[2.6,5,6,10]]},
+  "S":{w:6.5,s:[[6,1.4,4.4,0,1.8,0,.4,1.4,.4,3.4,1.8,4.6,4.4,5.2,5.8,6.4,5.8,8.4,4.4,10,1.6,10,0,8.4]]},
+  "T":{w:7,  s:[[0,0,6.5,0],[3.2,0,3.2,10]]},
+  "U":{w:7,  s:[[0,0,0,7.6,1,9.6,3,10,4,10,5.8,9.4,6.6,7.4,6.6,0]]},
+  "V":{w:7,  s:[[0,0,3.4,10,6.8,0]]},
+  "W":{w:9.2,s:[[0,0,1.8,10,4.4,2.5,7,10,8.8,0]]},
+  "X":{w:6.8,s:[[0,0,6.4,10],[6.4,0,0,10]]},
+  "Y":{w:6.8,s:[[0,0,3.2,5.2,6.4,0],[3.2,5.2,3.2,10]]},
+  "Z":{w:6.8,s:[[0,0,6.2,0,0,10,6.4,10]]},
+  "0":{w:6.6,s:[[2.6,0,1,1,.3,3,.3,7,1,9,2.6,10,3.8,10,5.4,9,6.1,7,6.1,3,5.4,1,3.8,0,2.6,0]]},
+  "1":{w:5,  s:[[.6,2,2.6,0,2.6,10],[.6,10,4.6,10]]},
+  "2":{w:6.2,s:[[.3,1.6,1.6,0,4.2,0,5.5,1.6,5.5,3.2,.2,10,5.8,10]]},
+  "3":{w:6.2,s:[[.3,1.2,1.8,0,4.2,0,5.4,1.4,5.4,3.2,3.8,4.6,2,4.6],[3.8,4.6,5.6,6,5.6,8.4,4.2,10,1.6,10,.2,8.6]]},
+  "4":{w:6.6,s:[[4.6,10,4.6,0,0,6.8,6.2,6.8]]},
+  "5":{w:6.2,s:[[5.6,0,.8,0,.5,4.8],[.5,4.8,2.4,4,4.4,4.2,5.8,5.8,5.8,8,4.4,10,1.6,10,.2,8.4]]},
+  "6":{w:6.2,s:[[5.2,.4,3.2,0,1.4,1.4,.4,4,.4,7.4,1.4,9.6,3.2,10,4.6,9.6,5.6,8,5.6,6.4,4.6,4.9,2.8,4.7,.6,5.8]]},
+  "7":{w:6.4,s:[[.2,0,6.2,0,2.2,10]]},
+  "8":{w:6.4,s:[[3,4.6,1.4,3.9,.8,2.6,.8,1.4,2,0,4.2,0,5.4,1.4,5.4,2.6,4.8,3.9,3,4.6,1.2,5.4,.4,6.8,.4,8.4,1.8,10,4.4,10,5.8,8.4,5.8,6.8,5,5.4,3,4.6]]},
+  "9":{w:6.2,s:[[5.6,4.2,3.4,5.2,1.4,5,.4,3.4,.4,1.8,1.6,.3,3.4,0,5,.8,5.8,2.6,5.8,6.4,5,8.8,3.2,10,1.2,10]]},
+  ".":{w:2,  s:[[.4,9.4,.8,9.8,.4,10.2,0,9.8,.4,9.4]]},
+  ",":{w:2.4,s:[[.8,9.2,1,10,0,11.4]]},
+  "!":{w:2.4,s:[[.6,0,.6,6.8],[.5,9.4,.9,9.8,.5,10.2,.1,9.8,.5,9.4]]},
+  "?":{w:5.6,s:[[0,1.6,1.4,0,3.8,0,5.2,1.6,5.2,3,2.6,5,2.6,6.8],[2.5,9.4,2.9,9.8,2.5,10.2,2.1,9.8,2.5,9.4]]},
+  "'":{w:1.6,s:[[.4,0,.2,2.6]]},
+  "\"":{w:3, s:[[.4,0,.2,2.4],[2.2,0,2,2.4]]},
+  "-":{w:5,  s:[[0,5.4,4.6,5.4]]},
+  ":":{w:2,  s:[[.4,3,.8,3.4,.4,3.8,0,3.4,.4,3],[.4,9.4,.8,9.8,.4,10.2,0,9.8,.4,9.4]]},
+  ";":{w:2.4,s:[[.6,3,1,3.4,.6,3.8,.2,3.4,.6,3],[.8,9.2,1,10,0,11.4]]},
+  "(":{w:3,  s:[[2,0,.6,2.4,.2,5,.6,7.6,2,10]]},
+  ")":{w:3,  s:[[0,0,1.4,2.4,1.8,5,1.4,7.6,0,10]]},
+  "/":{w:4.2,s:[[3.8,0,0,10.6]]},
+  "+":{w:5.6,s:[[0,5,5.2,5],[2.6,2.4,2.6,7.6]]},
+  "=":{w:5.6,s:[[0,3.8,5.2,3.8],[0,6.6,5.2,6.6]]},
+  "&":{w:6.4,s:[[5.8,10,.8,3.4,.8,1.6,2,0,3.4,0,4.4,1.4,4.4,2.8,.6,5.8,.4,8.2,1.8,10,3.6,10,5.9,7.2]]},
+  "@":{w:8,  s:[[5.4,3.2,4.2,2.6,3,3,2.5,4.6,2.8,6.2,4,6.8,5.2,6.2,5.6,4.6,5.4,3.2,5.6,6.4,6.8,6.6,7.6,5.2,7.6,3,6.6,1,4.6,0,2.6,.2,1,1.6,.2,3.6,.2,6,1,8.2,2.8,9.6,5.2,9.8,6.8,9.2]]},
+  "♥":{w:6.4,s:[[3,10,.4,6.6,0,4.2,.6,2.4,1.9,1.8,3,2.8,4.1,1.8,5.4,2.4,6,4.2,5.6,6.6,3,10]]},
+  "★":{w:7,  s:[[3.4,0,4.4,2.6,7.2,2.7,5,4.4,5.9,7.2,3.4,5.6,.9,7.2,1.8,4.4,-.4,2.7,2.4,2.6,3.4,0]]},
+  "→":{w:8,  s:[[0,5,7.4,5],[5,2.4,7.4,5,5,7.6]]},
+  ">":{w:5,  s:[[.2,1.4,4.6,5,.2,8.6]]},
+  "%":{w:7,  s:[[6.4,0,.2,10],[1.3,.4,2.4,1.4,1.6,2.6,.5,1.8,1.3,.4],[5,7.4,6.1,8.4,5.3,9.6,4.2,8.8,5,7.4]]}
+};
+const CAP=10;            // cap height in font units
+const SPECIALS="♥★→";    // typed via strokes even in "typed" mode
+
+/* seeded rng, so a card's jitter is the same every redraw */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+
+/* subdivide + wobble a polyline (flat [x,y,...] array, font units) */
+function wobble(flat,j,rng){
+  const out=[];
+  for(let i=0;i<flat.length-2;i+=2){
+    const x0=flat[i],y0=flat[i+1],x1=flat[i+2],y1=flat[i+3];
+    const d=Math.hypot(x1-x0,y1-y0),n=Math.max(1,Math.round(d/2.4));
+    for(let k=0;k<n;k++){
+      const t=k/n;
+      out.push([x0+(x1-x0)*t,y0+(y1-y0)*t]);
+    }
+  }
+  out.push([flat[flat.length-2],flat[flat.length-1]]);
+  if(j>0)for(const p of out){p[0]+=(rng()-.5)*j;p[1]+=(rng()-.5)*j}
+  return out;
+}
+
+/* lay out stroke-written text.
+   opts: x,y (top-left of cap), s (cap height px), j (jitter, font units),
+   sl (slant shear), rng. Returns array of point-arrays in card coords. */
+function layoutWrite(text,o){
+  const s=o.s||10, sc=s/CAP, j=o.j==null?1:o.j, sl=o.sl||0, rng=o.rng||Math.random;
+  const lines=String(text).split("\n");
+  const out=[]; let cy=o.y||0;
+  for(const line of lines){
+    let cx=o.x||0;
+    for(const raw of line){
+      if(raw===" "){cx+=4.6*sc;continue}
+      const up=raw.toUpperCase();
+      const g=FONT[raw]||FONT[up];
+      if(!g){cx+=4.6*sc;continue}
+      const lower=(raw!==up&&FONT[up]&&!FONT[raw]);
+      const gsc=lower?sc*.74:sc;
+      const gy=lower?cy+(CAP*sc-CAP*gsc):cy;
+      for(const st of g.s){
+        const pts=wobble(st,j,rng).map(p=>[
+          cx+(p[0]+ (CAP-p[1])*sl )*gsc,
+          gy+p[1]*gsc
+        ]);
+        out.push(pts);
+      }
+      cx+=(g.w+1.7)*gsc;
+    }
+    cy+=s*1.9;
+  }
+  return out;
+}
+/* measure width of one line of stroke text */
+function measureWrite(text,s){
+  const sc=s/CAP;let w=0;
+  for(const raw of text){
+    if(raw===" "){w+=4.6*sc;continue}
+    const up=raw.toUpperCase(),g=FONT[raw]||FONT[up];
+    if(!g){w+=4.6*sc;continue}
+    const lower=(raw!==up&&FONT[up]&&!FONT[raw]);
+    w+=(g.w+1.7)*(lower?sc*.74:sc);
+  }
+  return w;
+}
+
+/* ============================================================
+   PART 2 · THE DOODLE LIBRARY
+   Hand-authored sketches. p = polylines, c = circles.
+   Each lives in its own small box; ops place + scale them.
+   ============================================================ */
+function arcPts(cx,cy,r,a0,a1,n){
+  n=n||10;const out=[];
+  for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n;out.push(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}
+  return out;
+}
+const DOODLE={
+  heart:{w:12,h:11,p:[[6,11,1,7,0,4.4,1.2,2,3.4,1.4,6,3.4,8.6,1.4,10.8,2,12,4.4,11,7,6,11]]},
+  star:{w:9,h:8.6,p:[[4.3,0,5.4,2.9,8.8,3,6.1,5.1,7.1,8.4,4.3,6.4,1.5,8.4,2.5,5.1,-.2,3,3.2,2.9,4.3,0]]},
+  sparkle:{w:10,h:10,p:[[5,0,6.2,3.8,10,5,6.2,6.2,5,10,3.8,6.2,0,5,3.8,3.8,5,0]]},
+  wmark:{w:16,h:16,c:[[8,8,7.5]],p:[[3.6,5.4,5.6,11.4],[5.6,11.4,8,6],[8,6,10.4,11.4],[10.4,11.4,12.4,5.4]]},
+  plug:{w:16,h:20,p:[[4,6,4,13,6,15,10,15,12,13,12,6,4,6],[6,6,6,2],[10,6,10,2],[8,15,8,17,10,19,13,19]]},
+  swatch:{w:14,h:12,p:[[0,7,8,5,9,9,1,11,0,7],[1.6,3.6,9.6,2.6,10.2,6.6,2.2,7.6,1.6,3.6],[3.6,0,11.6,.4,11.4,4.4,3.4,4,3.6,0]],c:[[6.4,2.2,.8]]},
+  bubble:{w:16,h:14,p:[[3,0,13,0,15,2,15,8,13,10,8,10,5,13.4,5.7,10,3,10,1,8,1,2,3,0]],c:[[5,5,.9],[8,5,.9],[11,5,.9]]},
+  rss:{w:15,h:16,c:[[3.2,12.8,1.6]],p:[arcPts(3.2,12.8,6.2,-Math.PI/2,0,8),arcPts(3.2,12.8,10.6,-Math.PI/2,0,10)]},
+  note:{w:10,h:15,c:[[2.6,12.6,2.2]],p:[[4.8,12.6,4.8,1],[4.8,1,8.6,2.6,8.6,6.2]]},
+  kubrick:{w:31,h:25,p:[
+    [2,1,29,1,30,2,30,9,29,10,2,10,1,9,1,2,2,1],
+    [3,7.4,6,4.4,9,7.4,12,4.4,15,7.4,18,4.4,21,7.4,24,4.4,27,7.4],
+    [9,3,22,3],
+    [1,13,20,13,20,24,1,24,1,13],
+    [3,16,18,16],[3,19,17,19],[3,22,11,22],
+    [22,13,30,13,30,24,22,24,22,13],
+    [23.5,16,28.5,16],[23.5,19,28.5,19],[23.5,22,27,22]]},
+  browser:{w:26,h:21,p:[
+    [1,2,25,2,26,3,26,19,25,20,2,20,1,19,1,3,1,2],
+    [1,7,26,7],[4,11,23,11],[4,14,17,14],[4,17,20,17]],
+    c:[[3.4,4.5,.9],[6.4,4.5,.9],[9.4,4.5,.9]]},
+  widget:{w:36,h:15,p:[
+    [1,2,15,2,15,11,1,11,1,2],[4,5,12,5],[4,8,10,8],
+    [17,6.5,24,6.5],[21.8,4,24.4,6.5,21.8,9],
+    [26,1,35,1,35,14,26,14,26,1],[28,4,33,4],[28,7,33,7],[28,10,31,10]],
+    c:[[2.8,3.6,.5],[2.8,6.4,.5]]},
+  polaroid:{w:22,h:27,p:[
+    [0,0,22,0,22,26,0,26,0,0],[2,2,20,2,20,19,2,19,2,2],
+    [4.5,22.5,17.5,22.5],
+    [4.6,19,5.6,14.6,9.6,14],[10.6,19,11.8,15.4,15.6,15.2],
+    [15.5,6,18,3.6]],
+    c:[[7.4,9.6,2.6],[13.4,10.6,2.6],[17.2,4.8,1.6]]},
+  polaroid3:{w:22,h:27,p:[
+    [0,0,22,0,22,26,0,26,0,0],[2,2,20,2,20,19,2,19,2,2],
+    [4.5,22.5,17.5,22.5],
+    [3,19,3.8,15.4,6.6,14.8],[8.4,19,9.2,15.2,11.8,15],[13.8,19,14.8,15.8,17.6,15.6]],
+    c:[[5.4,10.6,2.3],[11,9.4,2.3],[16.4,10.8,2.3]]},
+  coffee:{w:16,h:16,p:[
+    [1,5,12,5,11,15,2,15,1,5],
+    [12,7,14.6,7.6,14.6,10.6,11.4,11.2],
+    [4.4,3.2,5.2,1.6,4.4,0],[7.6,3.2,8.4,1.6,7.6,0]]},
+  badge:{w:20,h:19,p:[
+    [6,0,9,6],[14,0,11,6],
+    [5,6,15,6,15,18,5,18,5,6],
+    [7,8,10,8,10,11,7,11,7,8],
+    [11.5,9,13.5,9],[7,13,13,13],[7,15.5,11,15.5]]},
+  wapuu:{w:16,h:17,p:[
+    [4,3.4,3,.4,6,1.8],[12,3.4,13,.4,10,1.8],
+    [4,3.4,2.2,5.2,1.4,8,1.6,12,3,15,6,16.6,10,16.6,13,15,14.4,12,14.6,8,13.8,5.2,12,3.4,8.6,2.6,4,3.4],
+    [7.2,9.6,8.1,10.3,9,9.6],
+    [7,12.2,7.6,13.6,8,12.7,8.4,13.6,9,12.2]],
+    c:[[6.2,7.2,.9],[9.8,7.2,.9],[8,13,2.5]]},
+  globe:{w:16,h:16,c:[[8,8,7.4]],p:[
+    [.8,8,15.2,8],
+    arcPts(8,8,7.4,-Math.PI/2,Math.PI/2,10).map((v,i)=>i%2?v:8+(v-8)*.45),
+    arcPts(8,8,7.4,Math.PI/2,Math.PI*1.5,10).map((v,i)=>i%2?v:8+(v-8)*.45)]},
+  plane:{w:18,h:12,p:[[18,0,0,7.5,6.4,8.6,18,0],[18,0,7.6,12,6.4,8.6]]},
+  flagstr:{w:30,h:8,p:[[0,1,30,2.4],[3,1.2,4.6,7,6.6,1.4],[10,1.6,11.6,7.4,13.6,1.8],[17,2,18.6,7.6,20.6,2.2],[24,2.2,25.6,7.8,27.6,2.4]]},
+  blockbar:{w:30,h:6,p:[[.6,0,29.4,0,30,.6,30,5.4,29.4,6,.6,6,0,5.4,0,.6,.6,0],[7,3,18,3]],c:[[3.4,3,1.4]]},
+  blockimg:{w:14,h:11,p:[[0,0,14,0,14,11,0,11,0,0],[1.4,9.6,5,4.6,7.6,7.6,9.4,5.6,12.6,9.6]],c:[[11,2.8,1.2]]},
+  blocktext:{w:14,h:11,p:[[0,0,14,0,14,11,0,11,0,0],[2,3,12,3],[2,5.5,12,5.5],[2,8,8,8]]},
+  blockbtn:{w:12,h:5,p:[[.5,0,11.5,0,12,.5,12,4.5,11.5,5,.5,5,0,4.5,0,.5,.5,0],[3,2.5,9,2.5]]},
+  keycap:{w:30,h:16,p:[[3,0,27,0,30,3,30,13,27,16,3,16,0,13,0,3,3,0]]},
+  cartridge:{w:16,h:20,p:[
+    [0,3,3,0,16,0,16,20,0,20,0,3],
+    [2,4,14,4,14,13,2,13,2,4],
+    [3,16,3,19],[5.2,16,5.2,19],[7.4,16,7.4,19],[9.6,16,9.6,19],[11.8,16,11.8,19],[14,16,14,19],
+    [5,7,11,7],[5,10,9,10]]}
+};
+
+/* ============================================================
+   PART 3 · THE CAST AND THE FOUR ROOMS
+   A curated cast — not an all-releases timeline. Each room is
+   a different composition: density, background, rhythm, dialect.
+   ============================================================ */
+const UC={blue:"#3a6ea5",red:"#b04046",green:"#3f8f4a",orange:"#c07a2c",purple:"#7a4fa3",
+          pink:"#b8508e",teal:"#2f8d8d",olive:"#8a8b3a",gray:"#5c626b",navy:"#3d4f86"};
+const YOU_COLOR=UC.blue;
+
+/* op mini-language:
+   {w:text,x,y,s,j,sl}  hand-written strokes (replayed)
+   {t:text,x,y,s,c}     typed DotGothic16 (fades in)
+   {d:name,x,y,sc,sw}   doodle (replayed)
+   msg: {u:user, h:height, cls, say, boot, ops:[...]}          */
+const ROOMS={
+  A:{
+    letter:"A", yr:2004, name:"the b2 refugees", color:UC.blue,
+    innerW:230, speed:150, jingle:[392,523,659],
+    rhythm:()=>9000+Math.random()*5500,
+    users:[["matt",UC.blue],["mikelittle",UC.green],["dougal",UC.purple],
+           ["alexking",UC.orange],["b2_refugee",UC.gray]],
+    script:[
+      {u:"matt",h:62,cls:"tiltL",say:"matt writes: welcome to WordPress!",ops:[
+        {w:"WELCOME TO",x:12,y:8,s:13,j:1.2,sl:.05},
+        {w:"WORDPRESS!",x:12,y:32,s:17,j:1.5,sl:.06},
+        {d:"heart",x:196,y:30,sc:1.6,sw:1.7}]},
+      {u:"mikelittle",h:64,say:"mikelittle writes: goodbye b2, hello WordPress. forked with love.",ops:[
+        {w:"GOODBYE B2.",x:12,y:9,s:11,j:1.1},
+        {w:"HELLO WORDPRESS.",x:12,y:30,s:11,j:1.1},
+        {t:"forked with love, since jan 2003",x:12,y:56,s:9}]},
+      {u:"b2_refugee",h:60,cls:"tiltR",say:"b2_refugee writes: my whole blog imported in one click, i might cry",ops:[
+        {w:"MY WHOLE BLOG IMPORTED",x:10,y:8,s:9.5,j:1.6,sl:-.04},
+        {w:"IN ONE CLICK.",x:10,y:26,s:9.5,j:1.6,sl:-.04},
+        {w:"I MIGHT CRY",x:10,y:44,s:9.5,j:1.8,sl:-.05},
+        {d:"heart",x:132,y:42,sc:1,sw:1.6}]},
+      {u:"matt",h:56,say:"matt writes: 1.0 is out! we named it after Miles Davis.",ops:[
+        {w:"1.0 IS OUT!!",x:12,y:10,s:16,j:1.4,sl:.05},
+        {d:"note",x:196,y:6,sc:1.5,sw:1.6},
+        {t:"named for miles davis · jan 3, 2004",x:12,y:42,s:9}]},
+      {u:"dougal",h:64,say:"dougal writes: pretty permalinks! no more ?p=123",ops:[
+        {w:"PRETTY PERMALINKS",x:12,y:8,s:10,j:1.2},
+        {t:"/2004/01/03/hello-world",x:16,y:32,s:11,c:"#57606e"},
+        {w:"NO MORE ?P=123 !!",x:12,y:47,s:9,j:1.3}]},
+      {u:"alexking",h:70,say:"alexking writes: CSS style contest, send your entries",ops:[
+        {w:"CSS STYLE CONTEST",x:12,y:8,s:10,j:1.1},
+        {d:"browser",x:12,y:26,sc:1.55,sw:1.5},
+        {w:"SEND YOUR",x:66,y:32,s:8.5,j:1.2},
+        {w:"ENTRIES →",x:66,y:48,s:8.5,j:1.2}]},
+      {u:"mikelittle",h:48,cls:"tiltL",say:"mikelittle writes: just two of us plus all of you",ops:[
+        {w:"JUST TWO OF US",x:12,y:8,s:10,j:1.2},
+        {w:"+ ALL OF YOU",x:12,y:27,s:12,j:1.3}]},
+      {u:"dougal",h:46,say:"dougal writes: wiki and forums are up. the codex will outlive us all.",ops:[
+        {w:"WIKI + FORUMS UP",x:12,y:8,s:10,j:1.2},
+        {t:"the codex will outlive us all",x:12,y:33,s:9}]},
+      {u:"b2_refugee",h:34,cls:"tiltR",say:"b2_refugee writes: will this last?",ops:[
+        {w:"WILL THIS LAST?",x:14,y:9,s:12,j:1.9,sl:-.06}]},
+      {u:"matt",h:52,say:"matt writes: ask me in twenty years",ops:[
+        {w:"ASK ME IN",x:12,y:8,s:12,j:1.2,sl:.05},
+        {w:"TWENTY YEARS",x:12,y:29,s:13,j:1.3,sl:.05},
+        {d:"star",x:198,y:8,sc:1.3,sw:1.5}]}
+    ],
+    ambient:[
+      {u:"matt",h:34,say:"matt writes: hello, whoever just joined!",ops:[
+        {w:"HELLO, WHOEVER JUST JOINED!",x:10,y:9,s:8,j:1.2,sl:.05}]},
+      {u:"b2_refugee",h:40,cls:"tiltL",say:"b2_refugee writes: it is so quiet in here. in a good way.",ops:[
+        {w:"SO QUIET IN HERE.",x:12,y:8,s:9,j:1.7},
+        {w:"IN A GOOD WAY.",x:12,y:24,s:9,j:1.7}]}
+    ]
+  },
+
+  B:{
+    letter:"B", yr:2007, name:"the theme & plugin bazaar", color:UC.orange,
+    innerW:240, innerWHalf:112, speed:340, jingle:[440,554,659,880],
+    rhythm:()=>2300+Math.random()*2100,
+    users:[["photomatt",UC.blue],["lorelle",UC.purple],["otto42",UC.red],["weblogtools",UC.navy],
+           ["kubrickfan",UC.green],["widgetgirl",UC.pink],["plugin_pete",UC.orange],
+           ["smashingmag",UC.teal],["cutline_carl",UC.olive],["tagteam",UC.gray],
+           ["ella_fan",UC.red],["tantan",UC.teal],["css_ninja",UC.purple],["regulus",UC.navy]],
+    script:[
+      {u:"kubrickfan",h:84,say:"kubrickfan shares a doodle of a customized Kubrick theme header",ops:[
+        {w:"PAINTED MY KUBRICK HEADER GREEN",x:8,y:6,s:7,j:.9},
+        {d:"kubrick",x:8,y:20,sc:2.1,sw:1.2},
+        {t:"header.jpg is dead,",x:84,y:38,s:8.5},
+        {t:"long live css",x:84,y:52,s:8.5}]},
+      {u:"widgetgirl",h:58,cls:"half",say:"widgetgirl writes: widgets! drag, drop, done.",ops:[
+        {w:"WIDGETS!!",x:8,y:6,s:11,j:1},
+        {w:"DRAG. DROP.",x:8,y:28,s:7.5,j:.9},
+        {w:"DONE.",x:8,y:43,s:7.5,j:.9}]},
+      {u:"ella_fan",h:58,cls:"half",say:"ella_fan writes: autosave just saved my two thousand word post",ops:[
+        {w:"AUTOSAVE JUST",x:8,y:6,s:6.8,j:.9},
+        {w:"SAVED MY 2,000",x:8,y:19,s:6.8,j:.9},
+        {w:"WORD POST",x:8,y:32,s:6.8,j:.9},
+        {d:"heart",x:84,y:40,sc:1,sw:1.4}]},
+      {u:"plugin_pete",h:48,cls:"half",say:"plugin_pete writes: 100 downloads on my plugin!",ops:[
+        {d:"plug",x:8,y:6,sc:1.5,sw:1.3},
+        {w:"100 DOWNLOADS",x:38,y:10,s:6.2,j:.9},
+        {w:"ON MY PLUGIN!!",x:38,y:23,s:6.2,j:.9}]},
+      {u:"tagteam",h:52,cls:"half",say:"tagteam writes: tags are native in 2.3, delete your hacks",ops:[
+        {w:"TAGS ARE NATIVE",x:8,y:6,s:6.6,j:.9},
+        {w:"IN 2.3 — DELETE",x:8,y:19,s:6.6,j:.9},
+        {w:"YOUR HACKS",x:8,y:32,s:7.4,j:1}]},
+      {u:"smashingmag",h:62,say:"smashingmag shares a roundup of 83 free themes with four little screenshots",ops:[
+        {w:"83 FREE THEMES. ONE ROUNDUP.",x:8,y:6,s:7.8,j:.8},
+        {d:"browser",x:8,y:22,sc:1.35,sw:1.2},
+        {d:"browser",x:66,y:22,sc:1.35,sw:1.2},
+        {d:"browser",x:124,y:22,sc:1.35,sw:1.2},
+        {d:"browser",x:182,y:22,sc:1.35,sw:1.2}]},
+      {u:"otto42",h:42,cls:"half",say:"otto42 writes: have you tried wp-cache",ops:[
+        {w:"HAVE YOU TRIED",x:8,y:6,s:6.4,j:.8},
+        {w:"WP-CACHE",x:8,y:20,s:9.5,j:1}]},
+      {u:"weblogtools",h:42,cls:"half",say:"weblogtools writes: a new plugin every day this week",ops:[
+        {w:"NEW PLUGIN EVERY",x:8,y:6,s:6.2,j:.8},
+        {w:"DAY THIS WEEK",x:8,y:19,s:6.2,j:.8},
+        {d:"sparkle",x:88,y:22,sc:1.1,sw:1.3}]},
+      {u:"photomatt",h:48,say:"photomatt writes: nine hundred thousand downloads of Strayhorn",ops:[
+        {w:"900,000 DOWNLOADS OF STRAYHORN",x:8,y:6,s:7.2,j:.9},
+        {w:"NINE. HUNDRED. THOUSAND.",x:8,y:24,s:8.6,j:1.2}]},
+      {u:"cutline_carl",h:52,cls:"half",say:"cutline_carl writes: switched from Kubrick to Cutline, don't @ me",ops:[
+        {w:"SWITCHED FROM",x:8,y:6,s:6.4,j:.9},
+        {w:"KUBRICK TO CUTLINE",x:8,y:19,s:6.4,j:.9},
+        {w:"DON'T @ ME",x:8,y:33,s:7.6,j:1.1}]},
+      {u:"tantan",h:40,cls:"half",say:"tantan writes: podpress or audio player?",ops:[
+        {w:"PODPRESS OR",x:8,y:6,s:7,j:.9},
+        {w:"AUDIO PLAYER?",x:8,y:20,s:7,j:.9}]},
+      {u:"lorelle",h:46,say:"lorelle writes: stop stealing themes. credit your designers.",ops:[
+        {w:"STOP STEALING THEMES.",x:8,y:8,s:9,j:1},
+        {t:"credit your designers, people",x:8,y:32,s:9}]},
+      {u:"widgetgirl",h:58,say:"widgetgirl shares a sidebar doodle: my sidebar has 14 widgets",ops:[
+        {w:"MY SIDEBAR HAS 14 WIDGETS",x:8,y:6,s:7.6,j:.9},
+        {d:"widget",x:8,y:22,sc:1.7,sw:1.2},
+        {t:"too many? be honest",x:80,y:48,s:8.5}]},
+      {u:"photomatt",h:42,cls:"half",say:"photomatt writes: 2.1 Ella is out, happy monday",ops:[
+        {w:"2.1 ELLA IS OUT",x:8,y:6,s:6.6,j:.9},
+        {d:"note",x:88,y:4,sc:.9,sw:1.3},
+        {w:"HAPPY MONDAY",x:8,y:20,s:6.4,j:.9}]},
+      {u:"css_ninja",h:42,cls:"half",say:"css_ninja writes: rounded corners with zero images. ask me how.",ops:[
+        {w:"ROUNDED CORNERS,",x:8,y:6,s:6,j:.8},
+        {w:"ZERO IMAGES.",x:8,y:18,s:6,j:.8},
+        {t:"ask me how",x:8,y:34,s:8}]}
+    ],
+    ambient:[
+      {u:"kubrickfan",h:36,cls:"half",say:"kubrickfan asks: anyone have the blue header psd?",ops:[
+        {w:"ANYONE HAVE THE",x:8,y:6,s:6,j:.9},
+        {w:"HEADER PSD?",x:8,y:18,s:6.6,j:1}]},
+      {u:"otto42",h:30,cls:"half",say:"otto42 writes: clear your cache first",ops:[
+        {w:"CLEAR YOUR CACHE FIRST",x:8,y:8,s:5.4,j:.8}]},
+      {u:"regulus",h:36,cls:"half",say:"regulus writes: my theme just passed review!",ops:[
+        {w:"MY THEME JUST",x:8,y:6,s:6,j:.9},
+        {w:"PASSED REVIEW!",x:8,y:18,s:6.6,j:1}]}
+    ]
+  },
+
+  C:{
+    letter:"C", yr:2012, name:"the WordCamp hallway", color:UC.pink,
+    innerW:200, speed:220, jingle:[523,659,784,1047],
+    rhythm:(i)=>[1400,1600,9500,1500,11000,1300,1700,8500][i%8],
+    users:[["jane",UC.orange],["naoko",UC.pink],["zecamp",UC.green],["andrea_r",UC.purple],
+           ["hanni",UC.teal],["wapuu",UC.red],["camper_amy",UC.blue],["marie",UC.navy],["tomas",UC.olive]],
+    script:[
+      {u:"camper_amy",h:66,cls:"oL",say:"camper_amy shares a polaroid: hallway track beats every talk",ops:[
+        {d:"polaroid",x:8,y:6,sc:1.75,sw:1.2},
+        {w:"HALLWAY",x:56,y:12,s:9,j:1.1,sl:.04},
+        {w:"TRACK >",x:56,y:29,s:9,j:1.1,sl:.04},
+        {w:"EVERY TALK",x:56,y:46,s:9,j:1.1,sl:.04}]},
+      {u:"naoko",h:58,cls:"oR",say:"naoko writes hello in japanese, from Tokyo WordCamp",ops:[
+        {t:"こんにちは！",x:12,y:8,s:16},
+        {w:"FROM WORDCAMP TOKYO",x:12,y:36,s:6.8,j:1},
+        {d:"plane",x:158,y:8,sc:1.2,sw:1.3}]},
+      {u:"zecamp",h:56,cls:"oL",say:"zecamp writes: olá from São Paulo, we translated all of 3.4",ops:[
+        {t:"olá de São Paulo!",x:12,y:8,s:12},
+        {w:"WE TRANSLATED ALL OF 3.4",x:12,y:32,s:6,j:.9},
+        {d:"globe",x:160,y:8,sc:1.5,sw:1.3}]},
+      {u:"wapuu",h:62,cls:"oC",say:"wapuu introduces himself with a self-portrait: be nice to him",ops:[
+        {d:"wapuu",x:10,y:6,sc:2.5,sw:1.3},
+        {w:"THIS IS WAPUU.",x:64,y:10,s:8.5,j:1},
+        {t:"drawn in japan, loved everywhere",x:64,y:30,s:7.5},
+        {w:"BE NICE TO HIM",x:64,y:44,s:8,j:1.1}]},
+      {u:"jane",h:64,cls:"oR",say:"jane writes: customizer! live preview! 3.4 Green, june 2012",ops:[
+        {w:"CUSTOMIZER!!",x:12,y:8,s:11,j:.9,sl:.05},
+        {w:"LIVE PREVIEW!!",x:12,y:29,s:11,j:.9,sl:.05},
+        {t:"3.4 “green” · june 2012",x:12,y:52,s:8}]},
+      {u:"marie",h:50,cls:"oL",say:"marie writes bonjour from Montréal, first WordCamp in the snow",ops:[
+        {t:"bonjour de Montréal !",x:12,y:8,s:12},
+        {w:"FIRST WORDCAMP IN THE SNOW",x:12,y:32,s:5.8,j:.9},
+        {d:"sparkle",x:172,y:8,sc:1,sw:1.2}]},
+      {u:"andrea_r",h:66,cls:"oC",say:"andrea_r shares a group polaroid: we finally met in real life after five years of comment threads",ops:[
+        {d:"polaroid3",x:8,y:6,sc:1.75,sw:1.2},
+        {w:"WE FINALLY MET IRL",x:58,y:12,s:7.6,j:1.1},
+        {w:"AFTER 5 YEARS OF",x:58,y:28,s:7,j:1.1},
+        {w:"COMMENT THREADS",x:58,y:43,s:7,j:1.1}]},
+      {u:"hanni",h:52,cls:"oR",say:"hanni writes: the media manager in 3.5, chef kiss",ops:[
+        {w:"MEDIA MANAGER IN 3.5",x:12,y:8,s:7.8,j:1},
+        {t:"*chef kiss*",x:12,y:30,s:11},
+        {d:"heart",x:162,y:28,sc:1.2,sw:1.4}]},
+      {u:"tomas",h:52,cls:"oL",say:"tomas writes hola from Sevilla, badge doodle contest at lunch",ops:[
+        {t:"hola desde Sevilla",x:12,y:8,s:12},
+        {w:"BADGE DOODLE CONTEST AT LUNCH",x:12,y:32,s:5.4,j:.9},
+        {d:"badge",x:158,y:6,sc:1.5,sw:1.2}]},
+      {u:"camper_amy",h:52,cls:"oR",say:"camper_amy writes: after-party at the espresso place",ops:[
+        {d:"coffee",x:10,y:8,sc:1.7,sw:1.3},
+        {w:"AFTER-PARTY AT THE",x:52,y:12,s:7,j:1},
+        {w:"ESPRESSO PLACE →",x:52,y:28,s:7.4,j:1.1}]}
+    ],
+    ambient:[
+      {u:"naoko",h:44,cls:"oL",say:"naoko writes: next stop Tokyo!",ops:[
+        {t:"つぎは東京で！",x:12,y:8,s:13},
+        {w:"NEXT STOP TOKYO",x:12,y:32,s:6,j:.9}]},
+      {u:"jane",h:38,cls:"oC",say:"jane writes: the hallway is the conference",ops:[
+        {w:"THE HALLWAY IS",x:12,y:6,s:8,j:1},
+        {w:"THE CONFERENCE",x:12,y:21,s:8,j:1}]}
+    ]
+  },
+
+  D:{
+    letter:"D", yr:2023, name:"the block workshop", color:UC.green,
+    innerW:212, speed:260, jingle:[330,415,494,659],
+    rhythm:()=>6200+Math.random()*3200,
+    users:[["rich",UC.teal],["isabel",UC.pink],["tumi",UC.green],["mei",UC.purple],
+           ["dana_core",UC.blue],["gutenbot",UC.gray],["playground",UC.orange]],
+    script:[
+      {u:"tumi",h:96,say:"tumi assembles a front page from blocks: header, image, text, button. zero php.",ops:[
+        {d:"blockbar",x:8,y:8,sc:3,sw:1},
+        {d:"blockimg",x:8,y:32,sc:3,sw:1},
+        {d:"blocktext",x:54,y:32,sc:3,sw:1},
+        {d:"blockbtn",x:8,y:70,sc:2.6,sw:1},
+        {w:"SNAPPED MY",x:106,y:30,s:7,j:.8},
+        {w:"FRONT PAGE",x:106,y:44,s:7,j:.8},
+        {w:"FROM PATTERNS",x:106,y:58,s:7,j:.8},
+        {t:"zero php. i checked.",x:106,y:76,s:8}]},
+      {u:"dana_core",h:58,say:"dana_core writes: cmd+k and the editor just listens. 6.3 Lionel, 27% faster too.",ops:[
+        {d:"keycap",x:10,y:6,sc:1.6,sw:1.2},
+        {t:"⌘K",x:24,y:11,s:14},
+        {w:"THE EDITOR LISTENS",x:66,y:11,s:7.4,j:.9},
+        {t:"6.3 “lionel” · 27% faster, too",x:10,y:40,s:8.5}]},
+      {u:"isabel",h:60,say:"isabel writes: Twenty Twenty-Four is a blank canvas and i love it",ops:[
+        {w:"TT4 IS A BLANK CANVAS",x:10,y:8,s:8,j:.9},
+        {w:"AND I LOVE IT",x:10,y:25,s:9,j:1},
+        {t:"twenty twenty-four · for anyone, for anything",x:10,y:46,s:7.5}]},
+      {u:"mei",h:58,say:"mei writes: my students ask what a sidebar was. i felt that, widgetgirl.",ops:[
+        {w:"MY STUDENTS ASK",x:10,y:8,s:8,j:1},
+        {w:"WHAT A SIDEBAR WAS",x:10,y:24,s:8,j:1},
+        {t:"i felt that, widgetgirl (room B)",x:10,y:44,s:8}]},
+      {u:"gutenbot",h:48,say:"gutenbot doodles: image block plus text block plus button block equals a website",ops:[
+        {d:"blockimg",x:10,y:8,sc:2,sw:1.1},
+        {d:"blocktext",x:44,y:8,sc:2,sw:1.1},
+        {d:"blockbtn",x:78,y:14,sc:2,sw:1.1},
+        {w:"= A WEBSITE",x:110,y:14,s:8,j:.7}]},
+      {u:"rich",h:46,say:"rich writes: patterns are just mixtapes for layouts",ops:[
+        {w:"PATTERNS ARE JUST",x:10,y:8,s:8,j:.9},
+        {w:"MIXTAPES FOR LAYOUTS",x:10,y:24,s:8,j:.9},
+        {d:"sparkle",x:188,y:6,sc:1.1,sw:1.2}]},
+      {u:"playground",h:64,boot:true,say:"playground offers to boot a real WordPress 6.4 on the top screen",ops:[
+        {w:"WANT TO TOUCH 2023?",x:10,y:8,s:9,j:.8},
+        {t:"i can boot a real WordPress",x:10,y:30,s:9},
+        {t:"right here on the top screen",x:10,y:44,s:9},
+        {d:"cartridge",x:172,y:6,sc:1.6,sw:1.2}]},
+      {u:"isabel",h:56,say:"isabel asks who drew on the site editor. it was gutenbot.",ops:[
+        {w:"OK, WHO DREW ON",x:10,y:8,s:8,j:1},
+        {w:"THE SITE EDITOR",x:10,y:24,s:8,j:1},
+        {t:"(it was gutenbot)",x:10,y:44,s:8}]}
+    ],
+    ambient:[
+      {u:"mei",h:40,say:"mei writes: openverse has a photo for every feeling. 6.2.",ops:[
+        {w:"OPENVERSE HAS A PHOTO",x:10,y:6,s:6.8,j:.9},
+        {w:"FOR EVERY FEELING (6.2)",x:10,y:20,s:6.8,j:.9}]},
+      {u:"gutenbot",h:36,say:"gutenbot doodles three buttons in a row",ops:[
+        {d:"blockbtn",x:10,y:8,sc:2,sw:1.1},
+        {d:"blockbtn",x:44,y:8,sc:2,sw:1.1},
+        {d:"blockbtn",x:78,y:8,sc:2,sw:1.1},
+        {w:"!!",x:112,y:8,s:9,j:1}]}
+    ]
+  }
+};
+const ROOM_ORDER=["A","B","C","D"];
+
+/* the seven WordPress stamps for the palette */
+const STAMPS=["wmark","plug","swatch","bubble","rss","heart","star"];
+
+/* ============================================================
+   PART 4 · RENDERING & REPLAY
+   Cards are inline SVG. Handwriting and doodles are stroked
+   paths that replay via dash-offset; typed text fades in;
+   room D's blocks snap into place.
+   ============================================================ */
+const $=s=>document.querySelector(s);
+const NS="http://www.w3.org/2000/svg";
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function svgEl(tag,attrs){
+  const el=document.createElementNS(NS,tag);
+  for(const k in attrs)el.setAttribute(k,attrs[k]);
+  return el;
+}
+function ptsAttr(pts){return pts.map(p=>p[0].toFixed(2)+","+p[1].toFixed(2)).join(" ")}
+function flatPairs(flat){const o=[];for(let i=0;i<flat.length;i+=2)o.push([flat[i],flat[i+1]]);return o}
+
+/* build the card's SVG from ops. popDoodles: room D dialect. */
+function buildCardSVG(msg,room,seedExtra){
+  const innerW=(msg.cls==="half"&&room.innerWHalf)?room.innerWHalf:room.innerW;
+  const dark=(room.letter==="D");
+  const ink=dark?"#dfe3ea":"#26282c";
+  const rng=mulberry32(hashStr(msg.u+(msg.say||"")+(seedExtra||"")));
+  const svg=svgEl("svg",{viewBox:`0 0 ${innerW} ${msg.h}`,fill:"none"});
+  svg.style.overflow="visible";
+  for(const op of msg.ops){
+    const g=svgEl("g",{});
+    if(op.w!=null){
+      g.dataset.kind="w";
+      const sw=Math.max(1.05,(op.s||10)*.13);
+      for(const pts of layoutWrite(op.w,{x:op.x,y:op.y,s:op.s,j:op.j,sl:op.sl,rng})){
+        g.appendChild(svgEl("polyline",{points:ptsAttr(pts),class:"tr",
+          stroke:ink,"stroke-width":sw.toFixed(2),"stroke-linecap":"round","stroke-linejoin":"round"}));
+      }
+    }else if(op.t!=null){
+      g.dataset.kind="t";
+      const tx=svgEl("text",{x:op.x,y:op.y+(op.s||10)*.92,class:"ty",fill:op.c||ink,
+        "font-size":op.s||10});
+      tx.style.fontFamily="'DotGothic16',monospace";
+      tx.textContent=op.t;
+      g.appendChild(tx);
+    }else if(op.d!=null){
+      g.dataset.kind=dark?"pop":"d";
+      const doo=DOODLE[op.d],sc=op.sc||1,sw=op.sw||1.4;
+      if(doo.p)for(const flat of doo.p){
+        const pts=flatPairs(flat).map(p=>[op.x+p[0]*sc,op.y+p[1]*sc]);
+        g.appendChild(svgEl("polyline",{points:ptsAttr(pts),class:"tr",
+          stroke:ink,"stroke-width":sw,"stroke-linecap":"round","stroke-linejoin":"round"}));
+      }
+      if(doo.c)for(const c of doo.c){
+        g.appendChild(svgEl("circle",{cx:op.x+c[0]*sc,cy:op.y+c[1]*sc,r:c[2]*sc,class:"tr",
+          stroke:ink,"stroke-width":sw}));
+      }
+    }
+    svg.appendChild(g);
+  }
+  return svg;
+}
+
+/* replay: walk op groups in order; strokes trace, text fades, pops snap. */
+function replayCard(svg,speed){
+  const groups=[...svg.children];
+  let acc=RM?0:.22;
+  for(const g of groups){
+    const kind=g.dataset.kind;
+    if(kind==="pop"){
+      g.classList.add("blk");
+      g.style.transformBox="fill-box";
+      g.style.transformOrigin="center";
+      if(RM){g.classList.add("in")}
+      else{const at=acc;setTimeout(()=>g.classList.add("in"),at*1000);acc+=.24}
+      continue;
+    }
+    for(const el of g.children){
+      if(el.classList.contains("ty")){
+        if(RM)continue;
+        el.style.opacity="0";
+        el.style.transition=`opacity .3s ease ${acc.toFixed(2)}s`;
+        requestAnimationFrame(()=>{el.style.opacity="1"});
+        acc+=.3;
+      }else if(el.classList.contains("tr")){
+        if(RM)continue;
+        let len=0;
+        try{len=el.getTotalLength()}catch(e){len=60}
+        const dur=Math.max(.06,len/speed);
+        el.style.strokeDasharray=len+" "+len;
+        el.style.strokeDashoffset=len;
+        el.style.transition="none";
+        void el.getBoundingClientRect();
+        el.style.transition=`stroke-dashoffset ${dur.toFixed(2)}s linear ${acc.toFixed(2)}s`;
+        el.style.strokeDashoffset="0";
+        acc+=dur+.045;
+      }
+    }
+  }
+  return acc;
+}
+
+/* ============================================================
+   PART 5 · THE ROOM CONTROLLER
+   One stack per room; only the active room's clock ticks.
+   ============================================================ */
+const ds=$("#ds"), fitEl=$("#fit");
+const stacks={};
+document.querySelectorAll(".stack").forEach(el=>stacks[el.dataset.room]=el);
+const state={
+  powered:false, scene:"off", cur:null, asleep:false,
+  sound:true, pgOpen:false, pgLoaded:false,
+  rooms:{A:{idx:0,count:0,visited:false},B:{idx:0,count:0,visited:false},
+         C:{idx:0,count:0,visited:false},D:{idx:0,count:0,visited:false}},
+  timer:null
+};
+
+function announce(t){$("#sr").textContent=t}
+function netBlink(){
+  const led=$("#ledWifi"),w=$("#gWifi");
+  led.classList.add("blink");w.classList.add("blink");
+  setTimeout(()=>{led.classList.remove("blink");w.classList.remove("blink")},1300);
+}
+
+function makeCard(msg,room,opts){
+  opts=opts||{};
+  const card=document.createElement("div");
+  card.className="msg"+(msg.cls?" "+msg.cls:"");
+  const uc=msg.color||((room.users.find(u=>u[0]===msg.u)||[])[1])||UC.gray;
+  card.style.setProperty("--uc",uc);
+  const who=document.createElement("span");
+  who.className="who";who.textContent=msg.u;
+  const bd=document.createElement("span");
+  bd.className="bd";
+  const svg=msg.svg||buildCardSVG(msg,room,opts.seedExtra);
+  bd.appendChild(svg);
+  card.appendChild(who);card.appendChild(bd);
+  if(msg.boot){
+    const row=document.createElement("div");
+    row.className="bootRow";
+    const b=document.createElement("button");
+    b.className="bootBtn";b.innerHTML="&#9654; INSERT CARTRIDGE";
+    b.setAttribute("aria-label","Boot WordPress 6.4 in the top screen via WordPress Playground");
+    b.addEventListener("click",openPg);
+    row.appendChild(b);card.appendChild(row);
+  }
+  return {card,svg};
+}
+
+function postMsg(roomId,msg,opts){
+  opts=opts||{};
+  const room=ROOMS[roomId],stack=stacks[roomId];
+  const {card,svg}=makeCard(msg,room,opts);
+  if(!opts.instant&&!RM)card.classList.add("arrive");
+  stack.appendChild(card);
+  stack.scrollTop=stack.scrollHeight+600;
+  if(!opts.instant)replayCard(svg,opts.speed||room.speed);
+  else replayCard.length; // backlog cards render fully drawn
+  if(!opts.quiet){
+    netBlink();
+    if(msg.say)announce(msg.say);
+    sfx.pip();
+  }
+  return card;
+}
+
+function postSys(roomId,html){
+  const stack=stacks[roomId];
+  const card=document.createElement("div");
+  card.className="msg sys"+(RM?"":" arrive");
+  card.innerHTML=`<span class="bd">${html}</span>`;
+  stack.appendChild(card);
+  stack.scrollTop=stack.scrollHeight+600;
+  return card;
+}
+
+function renderMembers(roomId){
+  const room=ROOMS[roomId],wrap=$("#tsMembers");
+  wrap.innerHTML="";
+  const all=[...room.users,["you",YOU_COLOR]];
+  for(const [name,color] of all){
+    const chip=document.createElement("span");
+    chip.className="chip";chip.style.color=color;
+    chip.innerHTML=`<i></i>${name}`;
+    wrap.appendChild(chip);
+  }
+  const cnt=document.createElement("span");
+  cnt.className="cnt";cnt.textContent=`${all.length}/16`;
+  wrap.appendChild(cnt);
+}
+
+function renderTabs(){
+  const tabs=$("#tabs");
+  tabs.innerHTML="";
+  for(const id of ROOM_ORDER){
+    const room=ROOMS[id];
+    const b=document.createElement("button");
+    b.className="tab"+(state.cur===id?" now":"");
+    b.style.setProperty("--rc",room.color);
+    b.setAttribute("role","tab");
+    b.setAttribute("aria-selected",state.cur===id?"true":"false");
+    b.setAttribute("aria-label",`Room ${id}: ${room.name}, ${room.yr}`);
+    b.innerHTML=`${id}<small>${room.users.length+(state.rooms[id].visited?1:0)}</small>`;
+    b.addEventListener("click",()=>{sfx.tap();enterRoom(id)});
+    tabs.appendChild(b);
+  }
+}
+
+function stopClock(){if(state.timer){clearTimeout(state.timer);state.timer=null}}
+function scheduleNext(roomId){
+  stopClock();
+  if(state.asleep||state.cur!==roomId||!state.powered)return;
+  const room=ROOMS[roomId],rs=state.rooms[roomId];
+  let delay,fire;
+  if(rs.idx<room.script.length){
+    delay=room.rhythm(rs.count);
+    fire=()=>{
+      const msg=room.script[rs.idx++];rs.count++;
+      postMsg(roomId,msg);
+      scheduleNext(roomId);
+    };
+  }else{
+    delay=16000+Math.random()*14000;
+    fire=()=>{
+      const pool=room.ambient;
+      const msg=pool[Math.floor(Math.random()*pool.length)];
+      rs.count++;
+      postMsg(roomId,msg,{seedExtra:String(Date.now())});
+      scheduleNext(roomId);
+    };
+  }
+  state.timer=setTimeout(fire,delay);
+}
+
+function enterRoom(roomId){
+  if(!state.powered)return;
+  if(state.pgOpen)closePg(true);
+  const room=ROOMS[roomId],rs=state.rooms[roomId];
+  state.cur=roomId;
+  state.scene="room";
+  stopClock();
+  // screens
+  setScene("#topScr","#scnRoom");
+  setScene("#botScr","#scnComp");
+  // top chrome
+  $("#tsRoomLetter").textContent=roomId;
+  $("#tsRoomLetter").style.color=room.color;
+  $("#tsRoomName").textContent=room.name;
+  $("#tsRoomYear").textContent=room.yr;
+  renderMembers(roomId);
+  // stacks + room-C bunting
+  for(const id of ROOM_ORDER)stacks[id].classList.toggle("live",id===roomId);
+  $("#bunting").classList.toggle("live",roomId==="C");
+  // bottom chrome
+  ds.style.setProperty("--rc",room.color);
+  $("#cRoomLbl").innerHTML=`room ${roomId} &middot; ${room.yr}<small>${room.name}</small>`;
+  // ceremony
+  const first=!rs.visited;
+  rs.visited=true;
+  renderTabs();
+  postSys(roomId,
+    `Now Entering Room ${roomId}&hellip;<br><b>${room.name}</b>`+
+    `<span class="sub">${room.yr} &middot; ${room.users.length+1} chatters &middot; welcome, you</span>`);
+  announce(`Now entering room ${roomId}: ${room.name}, ${room.yr}. ${room.users.length+1} chatters.`);
+  sfx.jingle(room.jingle);
+  if(first){
+    // a little backlog, already inked, then the clock starts
+    const n=Math.min(2,room.script.length);
+    for(let i=0;i<n;i++){
+      postMsg(roomId,room.script[i],{instant:true,quiet:true});
+      rs.idx++;rs.count++;
+    }
+    stacks[roomId].scrollTop=stacks[roomId].scrollHeight+600;
+    state.timer=setTimeout(()=>{scheduleNext(roomId)},2600);
+  }else{
+    scheduleNext(roomId);
+  }
+  stacks[roomId].scrollTop=stacks[roomId].scrollHeight+600;
+}
+
+function roomStep(dir){
+  if(state.scene!=="room"){
+    if(state.scene==="menu")menuStep(dir);
+    return;
+  }
+  const i=ROOM_ORDER.indexOf(state.cur);
+  const next=ROOM_ORDER[(i+dir+4)%4];
+  sfx.tap();
+  enterRoom(next);
+}
+
+function setScene(screenSel,sceneSel){
+  document.querySelectorAll(screenSel+" .scene").forEach(el=>el.classList.remove("onstage"));
+  $(sceneSel).classList.add("onstage");
+}
+
+/* bunting for room C — pennants strung across the top */
+(function buildBunting(){
+  const svg=svgEl("svg",{viewBox:"0 0 512 30",width:"100%",height:"30",preserveAspectRatio:"none"});
+  const path=svgEl("path",{d:"M-4,2 Q128,16 256,10 T516,4",stroke:"#a5714a",fill:"none","stroke-width":"2"});
+  svg.appendChild(path);
+  const cols=["#b8508e","#3f8f4a","#c07a2c","#3a6ea5","#7a4fa3"];
+  for(let i=0;i<12;i++){
+    const x=14+i*44, sag=10+Math.sin(i/11*Math.PI)*6;
+    const y=4+Math.sin((x/512)*Math.PI)*7;
+    const t=svgEl("path",{d:`M${x},${y} L${x+9},${y+sag+8} L${x+18},${y+1} Z`,
+      fill:cols[i%5],opacity:".85"});
+    svg.appendChild(t);
+  }
+  $("#bunting").appendChild(svg);
+})();
+
+/* ============================================================
+   PART 6 · MENU & LOGO SCENES
+   ============================================================ */
+let menuIdx=0;
+function buildMenu(){
+  const wrap=$("#roomBtns");
+  wrap.innerHTML="";
+  ROOM_ORDER.forEach((id,i)=>{
+    const room=ROOMS[id];
+    const b=document.createElement("button");
+    b.className="roomBtn";
+    b.style.setProperty("--rc",room.color);
+    b.dataset.room=id;
+    b.innerHTML=`<span class="rl">${id}</span>`+
+      `<span class="rn">${room.name}<small>chat room ${id} &middot; est. ${room.yr}</small></span>`+
+      `<span class="rm"><b>${room.users.length}</b> chatting<br>&#9998; join</span>`;
+    b.addEventListener("click",()=>{sfx.tap();enterRoom(id)});
+    b.addEventListener("mouseenter",()=>{menuIdx=i;paintMenuFocus()});
+    wrap.appendChild(b);
+  });
+  paintMenuFocus();
+}
+function paintMenuFocus(){
+  document.querySelectorAll(".roomBtn").forEach((b,i)=>b.classList.toggle("kfocus",i===menuIdx));
+}
+function menuStep(d){
+  menuIdx=(menuIdx+d+4)%4;
+  paintMenuFocus();
+  sfx.tick();
+}
+
+/* the top-screen wordmark, written in the museum's own hand */
+function buildLogo(){
+  const holder=$("#logoArt");
+  holder.innerHTML="";
+  const rng=mulberry32(20031527);
+  const text="PICTOPRESS";
+  const s=26,w=measureWrite(text,s);
+  const svg=svgEl("svg",{viewBox:`-6 -8 ${w+12} ${s+18}`,width:"440"});
+  const g=svgEl("g",{});
+  for(const pts of layoutWrite(text,{x:0,y:0,s,j:.55,sl:.03,rng})){
+    g.appendChild(svgEl("polyline",{points:ptsAttr(pts),class:"tr",stroke:"#3f4540",
+      "stroke-width":"3","stroke-linecap":"round","stroke-linejoin":"round",fill:"none"}));
+  }
+  svg.appendChild(g);
+  holder.appendChild(svg);
+  return svg;
+}
+function buildLogoDoodles(){
+  const wrap=$("#logoDoodles");
+  wrap.innerHTML="";
+  for(const name of ["wmark","note","heart","bubble","star"]){
+    const d=DOODLE[name];
+    const svg=svgEl("svg",{viewBox:`-1 -1 ${d.w+2} ${d.h+2}`,width:String(Math.round(d.w*2.1)),height:String(Math.round(d.h*2.1))});
+    if(d.p)for(const flat of d.p)svg.appendChild(svgEl("polyline",{points:ptsAttr(flatPairs(flat)),
+      stroke:"#79817a","stroke-width":"1.1",fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
+    if(d.c)for(const c of d.c)svg.appendChild(svgEl("circle",{cx:c[0],cy:c[1],r:c[2],
+      stroke:"#79817a","stroke-width":"1.1",fill:"none"}));
+    wrap.appendChild(svg);
+  }
+}
+
+/* ============================================================
+   PART 7 · COMPOSER, HARDWARE CONTROLS & POWER
+   ============================================================ */
+const can=$("#can"), canCtx=can.getContext("2d",{willReadFrequently:true});
+let canvasHistory=[];
+let canvasDirty=false;
+let drawMode="pen";
+let penSize=4;
+let drawing=false;
+let lastPoint=null;
+let moveStart=null;
+let moveImage=null;
+let stampName=STAMPS[0];
+let typeX=22,typeY=52;
+let panel="keys";
+let idleTimer=null;
+let pgOpener=null;
+
+function fitConsole(){
+  const pad=18;
+  const scale=Math.min((innerWidth-pad*2)/744,(innerHeight-pad*2)/986,1);
+  fitEl.style.setProperty("--s",Math.max(.34,scale).toFixed(4));
+}
+window.addEventListener("resize",fitConsole);
+fitConsole();
+requestAnimationFrame(()=>fitEl.classList.remove("snap"));
+
+function canvasPoint(e){
+  const r=can.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*can.width/r.width,y:(e.clientY-r.top)*can.height/r.height};
+}
+function rememberCanvas(){
+  canvasHistory.push(canCtx.getImageData(0,0,can.width,can.height));
+  if(canvasHistory.length>24)canvasHistory.shift();
+}
+function clearComposer(save){
+  if(save&&canvasDirty)rememberCanvas();
+  canCtx.clearRect(0,0,can.width,can.height);
+  canvasDirty=false;
+  typeX=22;typeY=52;
+  placeCaret();
+}
+function undoComposer(){
+  const prev=canvasHistory.pop();
+  if(prev){
+    canCtx.clearRect(0,0,can.width,can.height);
+    canCtx.putImageData(prev,0,0);
+    canvasDirty=true;
+    sfx.tick();
+  }else if(canvasDirty){
+    clearComposer(false);
+    sfx.tick();
+  }
+}
+function currentInk(){return state.cur?ROOMS[state.cur].color:YOU_COLOR}
+function placeCaret(){
+  const r=can.getBoundingClientRect();
+  const wrap=$("#canWrap").getBoundingClientRect();
+  const caret=$("#caret");
+  caret.style.left=(r.left-wrap.left+typeX*r.width/can.width)+"px";
+  caret.style.top=(r.top-wrap.top+(typeY-40)*r.height/can.height)+"px";
+  caret.hidden=panel!=="keys";
+}
+function stampText(ch){
+  if(!state.cur||state.asleep)return;
+  if(ch==="BACKSPACE"){undoComposer();return}
+  rememberCanvas();
+  canCtx.save();
+  canCtx.fillStyle=currentInk();
+  canCtx.font="42px 'DotGothic16', monospace";
+  canCtx.textBaseline="alphabetic";
+  if(ch==="SPACE")ch=" ";
+  if(ch==="RETURN"){
+    typeX=22;typeY+=62;
+  }else{
+    canCtx.fillText(ch,typeX,typeY);
+    typeX+=canCtx.measureText(ch).width+2;
+    if(typeX>can.width-54){typeX=22;typeY+=62}
+  }
+  if(typeY>can.height-18)typeY=52;
+  canCtx.restore();
+  canvasDirty=true;
+  placeCaret();
+  sfx.tick();
+}
+function drawStamp(name,x,y){
+  const d=DOODLE[name];
+  if(!d)return;
+  rememberCanvas();
+  const sc=Math.min(5.2,92/Math.max(d.w,d.h));
+  canCtx.save();
+  canCtx.translate(x-d.w*sc/2,y-d.h*sc/2);
+  canCtx.strokeStyle=currentInk();
+  canCtx.lineWidth=5;
+  canCtx.lineCap="round";
+  canCtx.lineJoin="round";
+  if(d.p)for(const flat of d.p){
+    canCtx.beginPath();
+    for(let i=0;i<flat.length;i+=2){
+      if(i===0)canCtx.moveTo(flat[i]*sc,flat[i+1]*sc);
+      else canCtx.lineTo(flat[i]*sc,flat[i+1]*sc);
+    }
+    canCtx.stroke();
+  }
+  if(d.c)for(const c of d.c){
+    canCtx.beginPath();canCtx.arc(c[0]*sc,c[1]*sc,c[2]*sc,0,Math.PI*2);canCtx.stroke();
+  }
+  canCtx.restore();
+  canvasDirty=true;
+  sfx.pip();
+}
+function startCanvas(e){
+  if(!state.cur||state.asleep||e.button>0)return;
+  const p=canvasPoint(e);
+  can.setPointerCapture(e.pointerId);
+  if(drawMode==="stamp"){
+    drawStamp(stampName,p.x,p.y);
+    return;
+  }
+  rememberCanvas();
+  drawing=true;lastPoint=p;
+  if(drawMode==="move"){
+    moveStart=p;
+    moveImage=canCtx.getImageData(0,0,can.width,can.height);
+  }else{
+    canCtx.save();
+    canCtx.globalCompositeOperation=drawMode==="eraser"?"destination-out":"source-over";
+    canCtx.strokeStyle=currentInk();
+    canCtx.lineWidth=(drawMode==="eraser"?penSize*3.2:penSize)*can.width/200;
+    canCtx.lineCap="round";canCtx.lineJoin="round";
+    canCtx.beginPath();canCtx.moveTo(p.x,p.y);canCtx.lineTo(p.x+.01,p.y+.01);canCtx.stroke();canCtx.restore();
+    canvasDirty=true;
+  }
+}
+function moveCanvas(e){
+  if(!drawing)return;
+  const p=canvasPoint(e);
+  if(drawMode==="move"){
+    const dx=Math.round(p.x-moveStart.x),dy=Math.round(p.y-moveStart.y);
+    canCtx.clearRect(0,0,can.width,can.height);
+    canCtx.putImageData(moveImage,dx,dy);
+  }else{
+    canCtx.save();
+    canCtx.globalCompositeOperation=drawMode==="eraser"?"destination-out":"source-over";
+    canCtx.strokeStyle=currentInk();
+    canCtx.lineWidth=(drawMode==="eraser"?penSize*3.2:penSize)*can.width/200;
+    canCtx.lineCap="round";canCtx.lineJoin="round";
+    canCtx.beginPath();canCtx.moveTo(lastPoint.x,lastPoint.y);canCtx.lineTo(p.x,p.y);canCtx.stroke();canCtx.restore();
+  }
+  lastPoint=p;canvasDirty=true;
+}
+function endCanvas(e){
+  if(!drawing)return;
+  drawing=false;lastPoint=null;moveStart=null;moveImage=null;
+  if(can.hasPointerCapture(e.pointerId))can.releasePointerCapture(e.pointerId);
+}
+can.addEventListener("pointerdown",startCanvas);
+can.addEventListener("pointermove",moveCanvas);
+can.addEventListener("pointerup",endCanvas);
+can.addEventListener("pointercancel",endCanvas);
+
+function setTool(mode){
+  drawMode=mode;
+  $("#toolPen").classList.toggle("now",mode==="pen");
+  $("#toolEraser").classList.toggle("now",mode==="eraser");
+  $("#toolMove").classList.toggle("now",mode==="move");
+  can.classList.toggle("moveMode",mode==="move");
+  can.classList.toggle("stampMode",mode==="stamp");
+  $("#toolPen").setAttribute("aria-pressed",String(mode==="pen"));
+  $("#toolEraser").setAttribute("aria-pressed",String(mode==="eraser"));
+  $("#toolMove").setAttribute("aria-pressed",String(mode==="move"));
+}
+function cycleTool(){
+  const modes=["pen","eraser","move"];
+  const i=modes.indexOf(drawMode);
+  setTool(modes[(i+1+modes.length)%modes.length]);
+  sfx.tap();
+}
+$("#toolPen").addEventListener("click",()=>setTool("pen"));
+$("#toolEraser").addEventListener("click",()=>setTool("eraser"));
+$("#toolMove").addEventListener("click",()=>setTool("move"));
+document.querySelectorAll(".sizes i").forEach(el=>{
+  function choose(){
+    penSize=Number(el.dataset.s);
+    document.querySelectorAll(".sizes i").forEach(i=>i.classList.toggle("now",i===el));
+    sfx.tick();
+  }
+  el.addEventListener("click",choose);
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose()}});
+});
+
+function showPanel(which){
+  panel=which;
+  $("#panelKeys").classList.toggle("onstage",which==="keys");
+  $("#panelStamps").classList.toggle("onstage",which==="stamps");
+  $("#modeKeys").classList.toggle("now",which==="keys");
+  $("#modeStamps").classList.toggle("now",which==="stamps");
+  $("#modeKeys").setAttribute("aria-pressed",String(which==="keys"));
+  $("#modeStamps").setAttribute("aria-pressed",String(which==="stamps"));
+  placeCaret();
+}
+function buildKeyboard(){
+  const rows=[
+    ["1","2","3","4","5","6","7","8","9","0","-","!"],
+    ["Q","W","E","R","T","Y","U","I","O","P","?","♥"],
+    ["A","S","D","F","G","H","J","K","L",";","'","★"],
+    ["Z","X","C","V","B","N","M",",",".","/","@","→"],
+    ["BACKSPACE","SPACE","RETURN"]
+  ];
+  const host=$("#panelKeys");host.innerHTML="";
+  for(const row of rows){
+    const line=document.createElement("div");line.className="krow";
+    for(const ch of row){
+      const b=document.createElement("button");b.type="button";b.className="key";
+      if(ch==="BACKSPACE"){b.classList.add("mod","sp2");b.textContent="⌫"}
+      else if(ch==="SPACE"){b.classList.add("mod","sp6");b.textContent="space"}
+      else if(ch==="RETURN"){b.classList.add("mod","sp2");b.textContent="↵"}
+      else b.textContent=ch;
+      b.setAttribute("aria-label",ch.toLowerCase());
+      b.addEventListener("click",()=>stampText(ch));
+      line.appendChild(b);
+    }
+    host.appendChild(line);
+  }
+}
+function stampPreview(name){
+  const d=DOODLE[name];
+  const svg=svgEl("svg",{viewBox:`-2 -2 ${d.w+4} ${d.h+4}`,width:"38",height:"38","aria-hidden":"true"});
+  if(d.p)for(const flat of d.p)svg.appendChild(svgEl("polyline",{points:ptsAttr(flatPairs(flat)),stroke:"currentColor","stroke-width":"1.4",fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
+  if(d.c)for(const c of d.c)svg.appendChild(svgEl("circle",{cx:c[0],cy:c[1],r:c[2],stroke:"currentColor","stroke-width":"1.4",fill:"none"}));
+  return svg;
+}
+function buildStamps(){
+  const host=$("#stampGrid");host.innerHTML="";
+  for(const name of STAMPS){
+    const b=document.createElement("button");b.type="button";b.className="stampBtn"+(name===stampName?" now":"");
+    b.setAttribute("aria-label",name+" stamp");b.appendChild(stampPreview(name));
+    b.addEventListener("click",()=>{
+      stampName=name;setTool("stamp");
+      document.querySelectorAll(".stampBtn").forEach(x=>x.classList.toggle("now",x===b));
+      sfx.tap();
+    });
+    host.appendChild(b);
+  }
+}
+$("#modeKeys").addEventListener("click",()=>showPanel("keys"));
+$("#modeStamps").addEventListener("click",()=>showPanel("stamps"));
+
+function sendComposer(){
+  if(!state.cur||state.asleep)return;
+  if(!canvasDirty){postSys(state.cur,"Draw or type something first.");sfx.tick();return}
+  const room=ROOMS[state.cur];
+  const svg=svgEl("svg",{viewBox:`0 0 ${room.innerW} 68`,role:"img","aria-label":"Your drawing"});
+  const image=svgEl("image",{x:"0",y:"0",width:String(room.innerW),height:"68",preserveAspectRatio:"xMidYMid meet"});
+  image.setAttributeNS("http://www.w3.org/1999/xlink","href",can.toDataURL("image/png"));
+  image.setAttribute("href",can.toDataURL("image/png"));
+  svg.appendChild(image);
+  postMsg(state.cur,{u:"you",h:68,color:YOU_COLOR,say:"You sent a drawing",svg},{instant:true});
+  clearComposer(false);canvasHistory=[];sfx.jingle([523,659,784]);
+}
+$("#actSend").addEventListener("click",sendComposer);
+$("#actUndo").addEventListener("click",undoComposer);
+$("#actClear").addEventListener("click",()=>clearComposer(true));
+
+/* ------------------------------------------------------------
+   Tiny DS sounds. Audio is created only after a hardware gesture.
+   ------------------------------------------------------------ */
+const sfx={
+  ctx:null,
+  ensure(){
+    if(!state.sound)return null;
+    if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;this.ctx=new AC()}
+    if(this.ctx.state==="suspended")this.ctx.resume();
+    return this.ctx;
+  },
+  tone(freq,dur=.07,vol=.035,delay=0){
+    const ac=this.ensure();if(!ac)return;
+    const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();
+    o.type="square";o.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.02);
+  },
+  tap(){this.tone(330,.045,.025)},
+  tick(){this.tone(220,.035,.018)},
+  pip(){this.tone(660,.055,.025)},
+  power(){this.tone(262,.09,.035);this.tone(523,.12,.03,.09)},
+  jingle(notes){if(!state.sound)return;(notes||[392,523,659]).forEach((n,i)=>this.tone(n,.11,.026,i*.09))}
+};
+function updateSound(){
+  $("#gSnd").classList.toggle("off",!state.sound);
+  $("#btnSelect").setAttribute("aria-pressed",String(state.sound));
+  $("#btnSelect").setAttribute("aria-label",state.sound?"Select button: mute sound":"Select button: enable sound");
+}
+function toggleSound(){
+  state.sound=!state.sound;updateSound();
+  if(state.sound){sfx.pip();announce("Sound on")}else announce("Sound off");
+}
+
+/* ------------------------------------------------------------
+   Playground: the iframe does not exist until INSERT CARTRIDGE.
+   ------------------------------------------------------------ */
+function openPg(e){
+  if(state.pgOpen||!state.powered)return;
+  pgOpener=(e&&e.currentTarget)||document.activeElement;
+  state.pgOpen=true;state.pgLoaded=false;stopClock();
+  setScene("#topScr","#scnPg");
+  $("#pgSearch").classList.remove("gone");
+  const wrap=$("#pgFrameWrap");wrap.innerHTML="";
+  const frame=document.createElement("iframe");
+  frame.title="WordPress 6.4 running live in WordPress Playground";
+  frame.allow="clipboard-read; clipboard-write";
+  frame.referrerPolicy="strict-origin-when-cross-origin";
+  frame.addEventListener("load",()=>{state.pgLoaded=true;$("#pgSearch").classList.add("gone")},{once:true});
+  frame.src="https://playground.wordpress.net/?wp=6.4";
+  wrap.appendChild(frame);
+  $("#pgClose").focus();
+  announce("Booting WordPress 6.4 on the top screen");
+  sfx.jingle([392,494,587,784]);
+}
+function closePg(quiet){
+  if(!state.pgOpen)return;
+  state.pgOpen=false;state.pgLoaded=false;
+  $("#pgFrameWrap").replaceChildren();
+  $("#pgSearch").classList.remove("gone");
+  if(state.powered&&state.cur){setScene("#topScr","#scnRoom");scheduleNext(state.cur)}
+  if(!quiet&&pgOpener&&pgOpener.focus)pgOpener.focus();
+  pgOpener=null;
+}
+$("#pgClose").addEventListener("click",()=>closePg(false));
+
+/* ------------------------------------------------------------
+   Power, warning, room menu, sleep and the physical controls.
+   ------------------------------------------------------------ */
+function showMenu(){
+  if(!state.powered)return;
+  state.scene="menu";state.cur=null;stopClock();
+  setScene("#topScr","#scnLogo");setScene("#botScr","#scnMenu");
+  paintMenuFocus();announce("Choose chat room A, B, C, or D");sfx.tap();
+}
+function powerOn(){
+  state.powered=true;state.asleep=false;state.scene="warn";
+  ds.classList.add("on");ds.classList.remove("asleep");
+  setScene("#topScr","#scnLogo");setScene("#botScr","#scnWarn");
+  $("#veilTop").classList.add("flash");$("#veilBot").classList.add("flash");
+  setTimeout(()=>{$("#veilTop").classList.remove("flash");$("#veilBot").classList.remove("flash")},650);
+  sfx.power();announce("PictoPress powered on. Touch the warning screen to continue.");resetIdle();
+}
+function powerOff(){
+  stopClock();closePg(true);clearTimeout(idleTimer);
+  state.powered=false;state.asleep=false;state.scene="off";state.cur=null;
+  ds.classList.remove("on","asleep");announce("PictoPress powered off");
+}
+function togglePower(){state.powered?powerOff():powerOn()}
+function toggleSleep(forceWake){
+  if(!state.powered)return;
+  const sleeping=forceWake?false:!state.asleep;
+  state.asleep=sleeping;ds.classList.toggle("asleep",sleeping);
+  if(sleeping){stopClock();announce("Console sleeping")}
+  else{if(state.cur&&!state.pgOpen)scheduleNext(state.cur);announce("Console awake");sfx.pip();resetIdle()}
+}
+function resetIdle(){
+  clearTimeout(idleTimer);
+  if(!state.powered)return;
+  idleTimer=setTimeout(()=>{if(state.powered&&!state.pgOpen&&!state.asleep)toggleSleep()},90000);
+}
+document.addEventListener("pointerdown",()=>{if(state.asleep)toggleSleep(true);else resetIdle()},{capture:true});
+document.addEventListener("keydown",()=>{if(state.asleep)toggleSleep(true);else resetIdle()},{capture:true});
+
+$("#power").addEventListener("click",togglePower);
+$("#btnStart").addEventListener("click",()=>toggleSleep());
+$("#btnSelect").addEventListener("click",toggleSound);
+$("#scnWarn").addEventListener("click",showMenu);
+$("#scnWarn").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showMenu()}});
+
+function scrollRoom(dir){
+  if(state.scene!=="room"||!state.cur)return;
+  stacks[state.cur].scrollBy({top:dir*150,behavior:RM?"auto":"smooth"});sfx.tick();
+}
+$("#padL").addEventListener("click",()=>roomStep(-1));
+$("#padR").addEventListener("click",()=>roomStep(1));
+$("#padU").addEventListener("click",()=>state.scene==="menu"?menuStep(-1):scrollRoom(-1));
+$("#padD").addEventListener("click",()=>state.scene==="menu"?menuStep(1):scrollRoom(1));
+$("#btnA").addEventListener("click",()=>{
+  if(state.scene==="menu")enterRoom(ROOM_ORDER[menuIdx]);
+  else if(state.scene==="room")sendComposer();
+});
+$("#btnB").addEventListener("click",()=>state.pgOpen?closePg(false):undoComposer());
+$("#btnX").addEventListener("click",cycleTool);
+$("#btnY").addEventListener("click",()=>showPanel(panel==="keys"?"stamps":"keys"));
+
+function flashControl(id){
+  const el=$(id);if(!el)return;el.classList.add("hit");setTimeout(()=>el.classList.remove("hit"),100);
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&state.pgOpen){e.preventDefault();closePg(false);return}
+  if(!state.powered)return;
+  const interactive=e.target.closest&&e.target.closest("button,a");
+  if(state.scene==="warn"&&(e.key==="Enter"||e.key===" ")){e.preventDefault();showMenu();return}
+  if(interactive)return;
+  if(state.scene==="menu"){
+    if(e.key==="ArrowUp"||e.key==="ArrowLeft"){e.preventDefault();menuStep(-1);flashControl(e.key==="ArrowUp"?"#padU":"#padL")}
+    else if(e.key==="ArrowDown"||e.key==="ArrowRight"){e.preventDefault();menuStep(1);flashControl(e.key==="ArrowDown"?"#padD":"#padR")}
+    else if(e.key==="Enter"){e.preventDefault();enterRoom(ROOM_ORDER[menuIdx]);flashControl("#btnA")}
+    else if(/^[a-d]$/i.test(e.key)){e.preventDefault();enterRoom(e.key.toUpperCase())}
+    return;
+  }
+  if(state.scene!=="room")return;
+  if(e.key==="ArrowLeft"){e.preventDefault();roomStep(-1);flashControl("#padL")}
+  else if(e.key==="ArrowRight"){e.preventDefault();roomStep(1);flashControl("#padR")}
+  else if(e.key==="ArrowUp"){e.preventDefault();scrollRoom(-1);flashControl("#padU")}
+  else if(e.key==="ArrowDown"){e.preventDefault();scrollRoom(1);flashControl("#padD")}
+  else if(e.key==="Enter"){e.preventDefault();sendComposer();flashControl("#btnA")}
+  else if(e.key==="Backspace"){e.preventDefault();undoComposer();flashControl("#btnB")}
+  else if(e.key.length===1&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();stampText(e.key.toUpperCase())}
+});
+
+/* ------------------------------------------------------------
+   Assembly
+   ------------------------------------------------------------ */
+buildMenu();
+const logo=buildLogo();
+buildLogoDoodles();
+buildKeyboard();
+buildStamps();
+showPanel("keys");setTool("pen");updateSound();placeCaret();
+if(!RM){
+  const paths=logo.querySelectorAll(".tr");
+  paths.forEach((p,i)=>{
+    let len=0;try{len=p.getTotalLength()}catch(e){len=100}
+    p.style.strokeDasharray=len;p.style.strokeDashoffset=len;
+    p.style.transition=`stroke-dashoffset .35s linear ${(.05+i*.025).toFixed(2)}s`;
+    requestAnimationFrame(()=>p.style.strokeDashoffset="0");
+  });
+}
+
+</script>
+</body>
+</html>

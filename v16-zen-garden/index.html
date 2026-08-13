@@ -1,0 +1,3139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v16 · The Theme Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&amp;family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,500&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,200..700;1,8..60,200..700&amp;display=swap" rel="stylesheet">
+
+<!-- ================================================================
+     THE THEME LAB · after the CSS Zen Garden (csszengarden.com, 2003)
+     One HTML document, below, inside #stage. It is written once and
+     never edited. Eight stylesheets take turns dressing it.
+     ================================================================ -->
+
+<style id="lab-css">
+/* ---------- lab chrome (never touches the specimen) ---------- */
+:root{
+  --lab-bg:#0d100c;
+  --lab-panel:#12160f;
+  --lab-panel-2:#171c13;
+  --lab-ink:#e9e4d6;
+  --lab-dim:#98a087;
+  --lab-faint:#5b6350;
+  --lab-matcha:#a8ba6a;
+  --lab-matcha-dim:#71804d;
+  --lab-vermilion:#c65f4a;
+  --lab-hair:rgba(168,186,106,.22);
+  --lab-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --lab-serif:"Source Serif 4",Georgia,serif;
+  --lab-sans:"Inter",-apple-system,"Segoe UI",sans-serif;
+}
+html,body{height:100%;margin:0;padding:0;background:var(--lab-bg)}
+
+/* The specimen viewport. Everything inside is governed by
+   #zen-garden-style alone; the lab only provides the scroll box. */
+#stage{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:#fff;color:#000;z-index:1}
+#stage::after{content:"";display:block;height:84px} /* clearance for the curator rail */
+
+#lab-chrome,#lab-chrome *{box-sizing:border-box;margin:0;padding:0}
+#lab-chrome button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+#lab-chrome :focus-visible{outline:2px solid var(--lab-matcha);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- corner link ---------- */
+#museum-link{position:fixed;top:14px;left:14px;z-index:60;font:500 10px/1 var(--lab-mono);letter-spacing:.22em;text-transform:uppercase;text-decoration:none;color:var(--lab-ink);background:rgba(13,16,12,.82);border:1px solid var(--lab-hair);padding:8px 12px;border-radius:2px;backdrop-filter:blur(6px);transition:color .2s,border-color .2s}
+#museum-link:hover{color:var(--lab-matcha);border-color:var(--lab-matcha)}
+
+/* ---------- curator rail ---------- */
+#curatorbar{position:fixed;left:0;right:0;bottom:0;z-index:55;display:flex;align-items:center;gap:20px;min-height:60px;padding:10px 18px;background:linear-gradient(180deg,rgba(13,16,12,.88),rgba(10,12,9,.96));border-top:1px solid var(--lab-hair);backdrop-filter:blur(10px);font-family:var(--lab-mono)}
+.cb-left{flex-shrink:0;display:flex;flex-direction:column;gap:5px;min-width:190px}
+.cb-num{font:500 9px/1 var(--lab-mono);letter-spacing:.3em;color:var(--lab-matcha-dim)}
+.cb-name{font:700 13px/1 var(--lab-mono);letter-spacing:.12em;color:var(--lab-ink);text-transform:uppercase}
+.cb-year{font:400 9px/1 var(--lab-mono);letter-spacing:.28em;color:var(--lab-dim)}
+.cb-note{flex:1;font:italic 400 12.5px/1.5 var(--lab-serif);color:var(--lab-dim);max-width:760px}
+.cb-note b{color:var(--lab-ink);font-weight:600}
+.cb-right{flex-shrink:0;display:flex;align-items:center;gap:14px}
+.cb-fp{font:400 9px/1.6 var(--lab-mono);letter-spacing:.1em;color:var(--lab-faint);text-align:right}
+.cb-fp b{display:block;color:var(--lab-matcha-dim);font-weight:500}
+#btn-css{font:500 10px/1 var(--lab-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--lab-matcha);border:1px solid var(--lab-matcha-dim);padding:9px 14px;border-radius:2px;transition:background .2s,color .2s}
+#btn-css:hover,#btn-css[aria-expanded="true"]{background:var(--lab-matcha);color:#10130b}
+.cb-keys{font:400 9px/1.7 var(--lab-mono);letter-spacing:.12em;color:var(--lab-faint);text-align:right}
+.cb-keys b{color:var(--lab-dim);font-weight:500}
+
+/* ---------- morph chip ---------- */
+#veil{position:fixed;left:50%;bottom:76px;transform:translateX(-50%) translateY(6px);z-index:56;pointer-events:none;opacity:0;transition:opacity .3s,transform .3s}
+#veil.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#veil .chip{font:500 10px/1 var(--lab-mono);letter-spacing:.18em;text-transform:uppercase;color:#10130b;background:var(--lab-matcha);padding:9px 16px;border-radius:2px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+
+/* ---------- inspector ---------- */
+#inspector{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(600px,94vw);background:var(--lab-panel);border-left:1px solid var(--lab-hair);transform:translateX(102%);visibility:hidden;transition:transform .45s cubic-bezier(.22,.85,.25,1),visibility 0s .45s;display:flex;flex-direction:column;box-shadow:-30px 0 60px rgba(0,0,0,.45)}
+#inspector.open{transform:translateX(0);visibility:visible;transition:transform .45s cubic-bezier(.22,.85,.25,1)}
+.ins-head{padding:16px 18px 12px;border-bottom:1px solid var(--lab-hair);display:flex;flex-direction:column;gap:10px}
+.ins-toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ins-path{font:500 11px/1.4 var(--lab-mono);color:var(--lab-matcha);letter-spacing:.04em;word-break:break-all}
+.ins-close{font:400 14px/1 var(--lab-mono);color:var(--lab-dim);padding:6px 9px;border:1px solid transparent;border-radius:2px}
+.ins-close:hover{color:var(--lab-ink);border-color:var(--lab-hair)}
+.ins-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ins-stats{font:400 9.5px/1 var(--lab-mono);letter-spacing:.14em;color:var(--lab-faint);text-transform:uppercase}
+.ins-tabs{display:flex;gap:2px}
+.ins-tabs button{font:500 10px/1 var(--lab-mono);letter-spacing:.12em;color:var(--lab-dim);padding:7px 12px;border:1px solid var(--lab-hair);border-radius:2px;transition:all .15s}
+.ins-tabs button[aria-selected="true"]{background:var(--lab-panel-2);color:var(--lab-matcha);border-color:var(--lab-matcha-dim)}
+.ins-body{flex:1;overflow:auto;background:#0b0e09}
+.codewrap{display:flex;min-width:100%;width:max-content}
+.codewrap[hidden]{display:none}
+.codewrap .gutter{font:400 11px/1.7 var(--lab-mono);color:#39412f;text-align:right;padding:14px 10px 24px 14px;border-right:1px solid #1a2015;user-select:none;position:sticky;left:0;background:#0b0e09;margin:0;white-space:pre}
+.codewrap .code{font:400 11px/1.7 var(--lab-mono);color:#cfd4bd;padding:14px 26px 24px 14px;margin:0;white-space:pre;tab-size:2}
+.tk-com{color:#667352;font-style:italic}
+.tk-sel{color:#d8dfb8}
+.tk-at{color:#c98f5c}
+.tk-prop{color:#9fc177}
+.tk-val{color:#e0d9c3}
+.tk-pun{color:#556047}
+.tk-tag{color:#9fc177}
+.tk-attr{color:#c98f5c}
+.tk-str{color:#d8dfb8}
+.ins-foot{padding:12px 18px;border-top:1px solid var(--lab-hair);font:italic 400 11.5px/1.55 var(--lab-serif);color:var(--lab-dim)}
+.ins-foot b{color:var(--lab-matcha);font-weight:600;font-style:normal}
+
+/* ---------- lab bench (playground modal) ---------- */
+#bootmodal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(6,8,5,.78);backdrop-filter:blur(6px)}
+#bootmodal.open{display:flex}
+.bm-panel{width:min(780px,94vw);max-height:92vh;display:flex;flex-direction:column;background:var(--lab-panel);border:1px solid var(--lab-hair);border-radius:3px;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden}
+.bm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--lab-hair)}
+.bm-title{font:500 11px/1 var(--lab-mono);letter-spacing:.26em;text-transform:uppercase;color:var(--lab-matcha)}
+.bm-close{font:400 14px/1 var(--lab-mono);color:var(--lab-dim);padding:6px 9px;border-radius:2px}
+.bm-close:hover{color:var(--lab-ink)}
+.bm-body{padding:22px 22px 20px;overflow:auto}
+.bm-lede{font:italic 400 14px/1.6 var(--lab-serif);color:var(--lab-dim);margin-bottom:18px;max-width:56ch}
+.bm-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bm-opt{text-align:left;border:1px solid var(--lab-hair);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s,background .2s}
+.bm-opt:hover{border-color:var(--lab-matcha);background:var(--lab-panel-2)}
+.bm-opt .v{font:700 20px/1 var(--lab-mono);color:var(--lab-ink)}
+.bm-opt .n{font:500 10px/1 var(--lab-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--lab-matcha)}
+.bm-opt .d{font:400 11.5px/1.55 var(--lab-sans);color:var(--lab-dim)}
+.bm-note{margin-top:14px;font:400 10px/1.6 var(--lab-mono);letter-spacing:.06em;color:var(--lab-faint)}
+.bm-stage{display:none;flex:1;min-height:70vh;background:#0b0e09}
+.bm-stage iframe{width:100%;height:70vh;border:0;display:block}
+#bootmodal.booted .bm-body{display:none}
+#bootmodal.booted .bm-stage{display:block}
+
+/* ---------- splash ---------- */
+#splash{position:fixed;inset:0;z-index:90;background:radial-gradient(1100px 700px at 72% 30%,#151a10 0%,var(--lab-bg) 62%);color:var(--lab-ink);display:flex;align-items:center;justify-content:center;transition:opacity .7s,visibility .7s;overflow:auto}
+#splash.gone{opacity:0;visibility:hidden;pointer-events:none}
+.s-enso{position:absolute;top:50%;right:-140px;transform:translateY(-50%);width:620px;height:620px;opacity:.16;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M118 22 A82 82 0 1 0 172 74' fill='none' stroke='%23a8ba6a' stroke-width='11' stroke-linecap='round' opacity='.9'/%3E%3C/svg%3E") center/contain no-repeat}
+.s-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,520px) minmax(0,400px);gap:64px;align-items:center;padding:48px 40px;max-width:1100px}
+.s-kicker{font:500 9.5px/1.8 var(--lab-mono);letter-spacing:.34em;text-transform:uppercase;color:var(--lab-matcha-dim);margin-bottom:22px}
+.s-title{font:200 clamp(52px,7.5vw,88px)/0.98 var(--lab-serif);letter-spacing:-.01em;color:var(--lab-ink);margin-bottom:26px}
+.s-title em{font-style:italic;color:var(--lab-matcha)}
+.s-lede{font:400 15px/1.75 var(--lab-serif);color:var(--lab-dim);max-width:46ch;margin-bottom:30px}
+.s-lede em{color:var(--lab-ink)}
+#enter{font:500 11px/1 var(--lab-mono);letter-spacing:.3em;text-transform:uppercase;color:#10130b;background:var(--lab-matcha);padding:15px 26px;border-radius:2px;transition:transform .2s,box-shadow .2s}
+#enter:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(168,186,106,.25)}
+.s-hint{margin-top:20px;font:400 9.5px/1.9 var(--lab-mono);letter-spacing:.18em;color:var(--lab-faint);text-transform:uppercase}
+.s-hint b{color:var(--lab-dim);font-weight:500}
+
+/* splash figure: one markup, four gardens */
+.s-figbox{justify-self:center}
+#sfig{position:relative;width:320px;height:230px;border:1px solid var(--lab-hair);border-radius:3px;overflow:hidden;background:#fff;animation:sf-box 16s ease-in-out infinite}
+#sfig .fr{position:absolute;border-radius:2px;animation-duration:16s;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
+.fr-h{animation-name:sf-h}.fr-t{animation-name:sf-t}.fr-a{animation-name:sf-a}
+.fr-b{animation-name:sf-b}.fr-s{animation-name:sf-s}.fr-f{animation-name:sf-f}
+.s-cap{margin-top:12px;text-align:center;font:italic 400 11.5px/1.5 var(--lab-serif);color:var(--lab-faint)}
+@keyframes sf-box{
+  0%,18%{background:#ffffff}
+  25%,43%{background:#f4efe4}
+  50%,68%{background:#11151c}
+  75%,93%{background:#f3eee2}
+  100%{background:#ffffff}
+}
+@keyframes sf-h{
+  0%,18%{top:10px;left:20px;width:280px;height:46px;background:#4c8fca;transform:rotate(0deg)}
+  25%,43%{top:8px;left:40px;width:240px;height:30px;background:#1c1a16;transform:rotate(0deg)}
+  50%,68%{top:16px;left:84px;width:60px;height:10px;background:#4dd0c0;transform:rotate(0deg)}
+  75%,93%{top:12px;left:250px;width:44px;height:150px;background:#2a2622;transform:rotate(0deg)}
+  100%{top:10px;left:20px;width:280px;height:46px;background:#4c8fca;transform:rotate(0deg)}
+}
+@keyframes sf-t{
+  0%,18%{top:66px;left:30px;width:150px;height:14px;background:#333;transform:rotate(0deg)}
+  25%,43%{top:46px;left:20px;width:280px;height:20px;background:#1c1a16;transform:rotate(0deg)}
+  50%,68%{top:60px;left:84px;width:210px;height:26px;background:#e8eaee;transform:rotate(0deg)}
+  75%,93%{top:30px;left:40px;width:140px;height:26px;background:#2a2622;transform:rotate(-4deg)}
+  100%{top:66px;left:30px;width:150px;height:14px;background:#333;transform:rotate(0deg)}
+}
+@keyframes sf-a{
+  0%,18%{top:88px;left:30px;width:150px;height:54px;background:#c9c9c9;transform:rotate(0deg)}
+  25%,43%{top:74px;left:20px;width:135px;height:112px;background:#8f886f;transform:rotate(0deg)}
+  50%,68%{top:100px;left:84px;width:180px;height:40px;background:#3a4150;transform:rotate(0deg)}
+  75%,93%{top:80px;left:60px;width:150px;height:70px;background:#6d7f5a;transform:rotate(2deg)}
+  100%{top:88px;left:30px;width:150px;height:54px;background:#c9c9c9;transform:rotate(0deg)}
+}
+@keyframes sf-b{
+  0%,18%{top:150px;left:30px;width:150px;height:40px;background:#c9c9c9;transform:rotate(0deg)}
+  25%,43%{top:74px;left:165px;width:135px;height:112px;background:#8f886f;transform:rotate(0deg)}
+  50%,68%{top:148px;left:84px;width:180px;height:40px;background:#3a4150;transform:rotate(0deg)}
+  75%,93%{top:160px;left:30px;width:120px;height:48px;background:#b9b2a0;transform:rotate(-3deg)}
+  100%{top:150px;left:30px;width:150px;height:40px;background:#c9c9c9;transform:rotate(0deg)}
+}
+@keyframes sf-s{
+  0%,18%{top:66px;left:196px;width:94px;height:124px;background:#dfe6ee;transform:rotate(0deg)}
+  25%,43%{top:194px;left:20px;width:280px;height:14px;background:#c9c0a8;transform:rotate(0deg)}
+  50%,68%{top:0px;left:0px;width:64px;height:230px;background:#171c25;transform:rotate(0deg)}
+  75%,93%{top:170px;left:230px;width:36px;height:36px;background:#c03a2b;transform:rotate(8deg)}
+  100%{top:66px;left:196px;width:94px;height:124px;background:#dfe6ee;transform:rotate(0deg)}
+}
+@keyframes sf-f{
+  0%,18%{top:200px;left:20px;width:280px;height:18px;background:#e3e3e3;transform:rotate(0deg)}
+  25%,43%{top:214px;left:20px;width:280px;height:8px;background:#1c1a16;transform:rotate(0deg)}
+  50%,68%{top:206px;left:84px;width:160px;height:8px;background:#232a36;transform:rotate(0deg)}
+  75%,93%{top:214px;left:120px;width:80px;height:8px;background:#2a2622;transform:rotate(0deg)}
+  100%{top:200px;left:20px;width:280px;height:18px;background:#e3e3e3;transform:rotate(0deg)}
+}
+
+/* ---------- small screens ---------- */
+@media (max-width:920px){
+  .s-grid{grid-template-columns:1fr;gap:36px;padding:64px 26px}
+  .s-figbox{justify-self:start}
+  .s-enso{opacity:.08}
+  #curatorbar{flex-wrap:wrap;gap:10px 18px;padding:10px 14px}
+  .cb-note{flex-basis:100%;order:3;max-width:none}
+  .cb-keys{display:none}
+  #stage::after{height:130px}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  #sfig,#sfig .fr{animation:none}
+  .fr-h{top:10px;left:20px;width:280px;height:46px;background:#4c8fca}
+  .fr-t{top:66px;left:30px;width:150px;height:14px;background:#333}
+  .fr-a{top:88px;left:30px;width:150px;height:54px;background:#c9c9c9}
+  .fr-b{top:150px;left:30px;width:150px;height:40px;background:#c9c9c9}
+  .fr-s{top:66px;left:196px;width:94px;height:124px;background:#dfe6ee}
+  .fr-f{top:200px;left:20px;width:280px;height:18px;background:#e3e3e3}
+  #lab-chrome *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+<noscript><style>#splash,#lab-chrome{display:none}</style></noscript>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     THE SPECIMEN · one WordPress document, written once, never edited.
+     Every design in this room is #zen-garden-style acting on the markup
+     between these two rules. Nothing else changes. Ever.
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="stage" tabindex="-1" inert>
+<div id="page" class="hfeed site">
+
+  <header id="masthead" class="site-header" role="banner">
+    <p class="site-title"><a href="#home" rel="home">The Loop</a></p>
+    <p class="site-description">Notes on WordPress, posted from inside it</p>
+    <nav id="site-nav" class="site-navigation" aria-label="Site">
+      <ul class="nav-menu">
+        <li class="menu-item current-menu-item"><a href="#home">Home</a></li>
+        <li class="menu-item"><a href="#about">About</a></li>
+        <li class="menu-item"><a href="#archives">Archives</a></li>
+        <li class="menu-item"><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div id="content-wrap" class="content-area">
+
+    <main id="content" class="site-main" role="main">
+      <article id="post-1" class="post type-post status-publish hentry">
+
+        <header class="entry-header">
+          <h1 class="entry-title">The Road to Zen: How WordPress Learned to Change Its Clothes</h1>
+          <p class="entry-meta">
+            <span class="posted-on">May 27, 2023</span>
+            <span class="byline">by <a class="author" href="#curator">The Curator</a></span>
+            <span class="comments-link"><a href="#comments">4 responses</a></span>
+          </p>
+        </header>
+
+        <div class="entry-content">
+          <p class="opening">There is a version of this page — this exact page, the words you are
+          reading now — that lives in the spring of 2003. It has a white background, Times New
+          Roman, and blue underlined links, because that is what a browser does with HTML when
+          nobody intervenes. It sits one click away, in the sidebar. The markup will not change
+          when you visit it. Nothing here ever changes but the stylesheet.</p>
+
+          <p>WordPress was born that May, and at first it dressed every weblog identically. The
+          look lived inside the templates themselves, PHP and HTML tangled together in one file,
+          so redesigning your site meant opening <code>index.php</code> in a text editor, finding
+          the table you wanted to move, and hoping. Design was surgery, performed on a patient
+          who was also the operating room.</p>
+
+          <h2>A garden up the road</h2>
+
+          <p>That same month, in Vancouver, a designer named Dave Shea planted the
+          CSS&nbsp;Zen&nbsp;Garden: a single HTML file, frozen forever, which designers around
+          the world restyled into aquariums, woodcuts, subway maps, and shrines. The Garden had
+          one rule, and the rule was the whole point — you may change everything except the
+          document. Structure and presentation were not merely separable; separated, they were
+          stronger.</p>
+
+          <blockquote cite="https://csszengarden.com">
+            <p>There is a continuing need to show the power of CSS. The Zen Garden aims to
+            excite, inspire, and encourage participation.</p>
+            <cite>— Dave Shea, csszengarden.com, 2003</cite>
+          </blockquote>
+
+          <h2>Strayhorn changes everything</h2>
+
+          <p>On February 17, 2005, WordPress 1.5 “Strayhorn” shipped Themes, and the Garden’s
+          dare became a product feature. Presentation moved into a folder; your words stayed in
+          the database; switching the entire face of your site became a single click in
+          wp-admin. The default was Kubrick, by Michael Heilemann — a centered white column
+          under a blue gradient header — and for five years that was simply what “a blog”
+          looked like. Strayhorn was downloaded nine hundred thousand times in a year, and
+          every one of those downloads could now change its clothes.</p>
+
+          <h2>An economy of costumes</h2>
+
+          <p>Once a look was a folder, a look could be traded. The official Theme Directory
+          opened in 2008; premium themes turned design into a livelihood; frameworks turned it
+          into infrastructure. The costume department kept growing:</p>
+
+          <ul class="milestones">
+            <li><strong>2005</strong> — Themes arrive in 1.5 “Strayhorn”; Kubrick begins its five-year reign</li>
+            <li><strong>2008</strong> — the Theme Directory opens; the first premium themes go on sale</li>
+            <li><strong>2010</strong> — 3.0 “Thelonious” adds menus and custom headers; Twenty Ten starts the annual defaults</li>
+            <li><strong>2012</strong> — Twenty Twelve goes responsive; the Customizer arrives in 3.4</li>
+            <li><strong>2018</strong> — 5.0 “Bebo” ships the block editor, and themes feel the ground move</li>
+            <li><strong>2022</strong> — 5.9 “Josephine” ships block themes: templates, patterns, and a <code>theme.json</code></li>
+          </ul>
+
+          <h2>The garden, grown inward</h2>
+
+          <p>Block themes finished the thought the Garden started. A theme is now data — HTML
+          templates plus a JSON file of decisions — and Style Variations let one theme carry
+          many faces, switchable from a panel while your content holds still. Nineteen years
+          after Dave Shea froze one document and invited the world to dress it, WordPress
+          built the same garden into every site it powers.</p>
+
+          <p class="closing">This page is the museum’s small tribute. Its markup was written
+          once, is fingerprinted in the corner of the room, and will not be edited while you
+          are here. Only the stylesheet moves. Go on — the list is in the sidebar, the arrow
+          keys work — change its clothes.</p>
+        </div>
+
+        <footer class="entry-footer">
+          <span class="cat-links">Filed under <a href="#cat-essays" rel="category tag">Essays</a></span>
+          <span class="tag-links">Tagged <a href="#tag-themes" rel="tag">themes</a>, <a href="#tag-history" rel="tag">history</a>, <a href="#tag-css" rel="tag">css</a></span>
+          <span class="edit-link"><a href="#edit">Edit</a></span>
+        </footer>
+
+      </article>
+
+      <section id="comments" class="comments-area">
+        <h3 id="comments-title">4 responses to “The Road to Zen”</h3>
+        <ol class="comment-list">
+          <li class="comment even thread-even">
+            <div class="comment-author vcard"><span class="avatar" aria-hidden="true">RM</span>
+              <cite class="fn">Rebecca Marsh</cite> <span class="says">says:</span></div>
+            <div class="comment-metadata"><a href="#comment-1">June 2, 2023 at 9:14 am</a></div>
+            <div class="comment-body"><p>I ran WordPress 1.5 on a shared host with 30&nbsp;MB of
+            disk and switched themes three times before breakfast the week Strayhorn shipped.
+            My words survived every outfit. Eighteen years on, that still feels like the whole
+            idea of the web, condensed.</p></div>
+          </li>
+          <li class="comment odd alt pingback">
+            <div class="comment-author vcard"><span class="avatar" aria-hidden="true">↩</span>
+              <cite class="fn">Pingback: One Document, Many Gardens — weeknotes</cite></div>
+            <div class="comment-metadata"><a href="#comment-2">June 3, 2023 at 2:41 pm</a></div>
+            <div class="comment-body"><p>[…] a museum exhibit restates the Zen Garden’s dare in
+            WordPress terms: the post stays, the stylesheet auditions […]</p></div>
+          </li>
+          <li class="comment even thread-even">
+            <div class="comment-author vcard"><span class="avatar" aria-hidden="true">TF</span>
+              <cite class="fn">Tomasz Filipek</cite> <span class="says">says:</span></div>
+            <div class="comment-metadata"><a href="#comment-3">June 4, 2023 at 11:03 pm</a></div>
+            <div class="comment-body"><p>You skipped the folk-art era: everyone FTP-ing a hacked
+            Kubrick with a new header graphic and calling it a custom theme. Half the designers
+            of my generation learned CSS by breaking that blue gradient on purpose.</p></div>
+          </li>
+          <li class="comment odd alt">
+            <div class="comment-author vcard"><span class="avatar" aria-hidden="true">JO</span>
+              <cite class="fn">June Okafor</cite> <span class="says">says:</span></div>
+            <div class="comment-metadata"><a href="#comment-4">July 11, 2023 at 8:27 am</a></div>
+            <div class="comment-body"><p>Reading this in the Site Editor with the Styles panel
+            open. I switched my whole site from serif to brutalist while your page loaded.
+            The garden didn’t just win — it moved in.</p></div>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <aside id="secondary" class="widget-area" role="complementary">
+
+      <div class="widget widget_search">
+        <h3 class="widget-title">Search</h3>
+        <form id="searchform" role="search" action="#search" method="get">
+          <input type="text" id="s" name="s" aria-label="Search this weblog">
+          <input type="submit" id="searchsubmit" value="Search">
+        </form>
+      </div>
+
+      <div id="designs" class="widget widget_designs">
+        <h3 class="widget-title">Select a Theme</h3>
+        <ol class="design-list">
+          <li class="d-default"><a href="#default"><span class="design-name">Browser Default</span> <span class="design-year">2003</span> <span class="design-credit">by no one at all</span></a></li>
+          <li class="d-kubrick"><a href="#kubrick"><span class="design-name">Kubrick Blue</span> <span class="design-year">2005</span> <span class="design-credit">after Michael Heilemann</span></a></li>
+          <li class="d-gloss"><a href="#gloss"><span class="design-name">Candy Machine</span> <span class="design-year">2007</span> <span class="design-credit">by the Web 2.0 years</span></a></li>
+          <li class="d-broadsheet"><a href="#broadsheet"><span class="design-name">The Broadsheet</span> <span class="design-year">2010</span> <span class="design-credit">by the magazine era</span></a></li>
+          <li class="d-flat"><a href="#flat"><span class="design-name">Whitespace</span> <span class="design-year">2013</span> <span class="design-credit">by the great flattening</span></a></li>
+          <li class="d-nocturne"><a href="#nocturne"><span class="design-name">Nocturne</span> <span class="design-year">2016</span> <span class="design-credit">by the portfolio age</span></a></li>
+          <li class="d-blocks"><a href="#blocks"><span class="design-name">Editorial Twenty-Two</span> <span class="design-year">2022</span> <span class="design-credit">after Twenty Twenty-Two</span></a></li>
+          <li class="d-zen"><a href="#zen"><span class="design-name">Ink Garden</span> <span class="design-year">timeless</span> <span class="design-credit">after Dave Shea’s garden</span></a></li>
+        </ol>
+      </div>
+
+      <div class="widget widget_categories">
+        <h3 class="widget-title">Categories</h3>
+        <ul>
+          <li><a href="#cat-essays">Essays</a> (14)</li>
+          <li><a href="#cat-releases">Releases</a> (53)</li>
+          <li><a href="#cat-themes">Themes</a> (27)</li>
+          <li><a href="#cat-community">Community</a> (9)</li>
+        </ul>
+      </div>
+
+      <div class="widget widget_links widget_blogroll">
+        <h3 class="widget-title">Blogroll</h3>
+        <ul>
+          <li><a href="https://ma.tt" target="_blank" rel="noopener">Photo Matt</a></li>
+          <li><a href="https://binarybonsai.com" target="_blank" rel="noopener">Binary Bonsai</a></li>
+          <li><a href="https://mezzoblue.com" target="_blank" rel="noopener">mezzoblue</a></li>
+          <li><a href="https://zeldman.com" target="_blank" rel="noopener">Zeldman</a></li>
+          <li><a href="https://alexking.org" target="_blank" rel="noopener">Alex King</a></li>
+        </ul>
+      </div>
+
+      <div id="lab-bench" class="widget widget_playground">
+        <h3 class="widget-title">The Lab Bench</h3>
+        <p class="bench-note">Reading about themes is one thing. Booting one is another.</p>
+        <p class="bench-action"><a class="boot-link" id="boot-link" href="#boot">Boot a live WordPress →</a></p>
+      </div>
+
+      <div class="widget widget_meta">
+        <h3 class="widget-title">Meta</h3>
+        <ul>
+          <li><a href="#login">Log in</a></li>
+          <li class="rss-link"><a href="#feed">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+          <li><a href="#comments-feed">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+          <li class="chiclet"><a href="https://validator.w3.org" target="_blank" rel="noopener">Valid <abbr title="eXtensible HyperText Markup Language">XHTML</abbr></a></li>
+          <li><a href="https://wordpress.org" target="_blank" rel="noopener">WordPress.org</a></li>
+        </ul>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <footer id="colophon" class="site-footer" role="contentinfo">
+    <p class="site-info"><span class="powered">The Loop is proudly powered by
+      <a href="https://wordpress.org" target="_blank" rel="noopener">WordPress</a></span>
+      <span class="sep">·</span> <span class="poetry">Code is poetry.</span>
+      <span class="sep">·</span> <a class="top-link" href="#masthead">Back to top ↑</a></p>
+  </footer>
+
+</div>
+</div>
+<!-- ══════════════════ end of specimen — markup sealed ══════════════════ -->
+
+<div id="lab-chrome">
+
+  <a href="../" id="museum-link" inert>← museum</a>
+
+  <div id="curatorbar" role="region" aria-label="Curator rail" inert>
+    <div class="cb-left">
+      <span class="cb-num" id="cb-num">DESIGN 01 / 08</span>
+      <span class="cb-name" id="cb-name">Browser Default</span>
+      <span class="cb-year" id="cb-year">2003</span>
+    </div>
+    <p class="cb-note" id="cb-note"></p>
+    <div class="cb-right">
+      <span class="cb-fp" id="cb-fp"><b>doc —</b>markup constant</span>
+      <button id="btn-css" aria-expanded="false" aria-controls="inspector">View CSS</button>
+      <span class="cb-keys"><b>← →</b> change design<br><b>C</b> stylesheet · <b>1–8</b> jump</span>
+    </div>
+  </div>
+
+  <div id="veil" aria-hidden="true"><span class="chip" id="veil-chip"></span></div>
+
+  <section id="inspector" role="dialog" aria-label="Stylesheet inspector" aria-hidden="true">
+    <div class="ins-head">
+      <div class="ins-toprow">
+        <span class="ins-path" id="ins-path">wp-content/themes/…/style.css</span>
+        <button class="ins-close" id="ins-close" aria-label="Close inspector">✕ esc</button>
+      </div>
+      <div class="ins-meta">
+        <span class="ins-stats" id="ins-stats"></span>
+        <div class="ins-tabs" role="tablist" aria-label="Inspector files">
+          <button id="tab-css" role="tab" aria-selected="true" aria-controls="pane-css">style.css</button>
+          <button id="tab-html" role="tab" aria-selected="false" aria-controls="pane-html">index.html</button>
+        </div>
+      </div>
+    </div>
+    <div class="ins-body" id="ins-body" tabindex="0">
+      <div id="pane-css" class="codewrap" role="tabpanel" aria-labelledby="tab-css"></div>
+      <div id="pane-html" class="codewrap" role="tabpanel" aria-labelledby="tab-html" hidden></div>
+    </div>
+    <p class="ins-foot" id="ins-foot"></p>
+  </section>
+
+  <div id="bootmodal" role="dialog" aria-modal="true" aria-label="The Lab Bench — boot a live WordPress" aria-hidden="true">
+    <div class="bm-panel">
+      <div class="bm-head">
+        <span class="bm-title">The Lab Bench · live specimen</span>
+        <button class="bm-close" id="bm-close" aria-label="Close">✕ esc</button>
+      </div>
+      <div class="bm-body">
+        <p class="bm-lede">The lab keeps two working machines. Pick an era; a real WordPress
+        boots in your browser via Playground, themes and all.</p>
+        <div class="bm-options">
+          <button class="bm-opt" data-wp="5.9">
+            <span class="v">WordPress 5.9</span>
+            <span class="n">“Josephine” · Jan 25, 2022</span>
+            <span class="d">The release that shipped block themes. Twenty Twenty-Two — the
+            first default theme made of templates and a theme.json — is waiting inside.</span>
+          </button>
+          <button class="bm-opt" data-wp="6.8">
+            <span class="v">WordPress 6.8</span>
+            <span class="n">“Cecil” · Apr 15, 2025</span>
+            <span class="d">The modern garden: Site Editor, Style Book, style variations —
+            the Zen Garden mechanic, shipped to half the web.</span>
+          </button>
+        </div>
+        <p class="bm-note">Nothing loads until you choose — the lab boots machines only on request.</p>
+      </div>
+      <div class="bm-stage" id="bm-stage"></div>
+    </div>
+  </div>
+
+  <div id="announcer" class="sr-only" aria-live="polite"></div>
+
+  <div id="splash">
+    <div class="s-enso" aria-hidden="true"></div>
+    <div class="s-grid">
+      <div class="s-copy">
+        <p class="s-kicker">WordPress Museum · Exhibit 16 · after the CSS Zen Garden, 2003</p>
+        <h1 class="s-title">The<br>Theme <em>Lab</em></h1>
+        <p class="s-lede">One document. Eight stylesheets. In 2003 the CSS&nbsp;Zen&nbsp;Garden
+        proved a page could change everything but its markup; two years later, WordPress&nbsp;1.5
+        turned that idea into a button labelled <em>Themes</em>. The specimen inside is a single
+        WordPress post, written once and sealed. Watch its structure hold still while two
+        decades of taste move through it.</p>
+        <button id="enter">Enter the lab ⏎</button>
+        <p class="s-hint"><b>← →</b> change designs · <b>C</b> read the stylesheet · <b>esc</b> closes things</p>
+      </div>
+      <div class="s-figbox" aria-hidden="true">
+        <div id="sfig">
+          <i class="fr fr-h"></i><i class="fr fr-t"></i><i class="fr fr-a"></i>
+          <i class="fr fr-b"></i><i class="fr fr-s"></i><i class="fr fr-f"></i>
+        </div>
+        <p class="s-cap">fig. 1 — one markup, four gardens: the same six nodes, reflowed</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     THE WARDROBE · eight complete stylesheets, one per era.
+     Stored as inert text; the lab pours the chosen one into
+     #zen-garden-style. The specimen markup above never changes.
+     ══════════════════════════════════════════════════════════════════ -->
+
+<script type="text/plain" id="css-default">
+/*
+Theme Name:   Browser Default
+Theme URI:    about:blank
+Description:  May 2003. No theme system, no theme, no designer. This is
+              the specimen wearing nothing at all - user-agent styles,
+              Times New Roman, and the honest blue of an unvisited link.
+Version:      0.70
+Author:       no one at all
+Tags:         white, one-column, tables-not-included
+*/
+
+/* This stylesheet intentionally left (almost) blank. */
+
+/* The defaults, written down so you can see them: */
+
+#stage {
+  background: #ffffff;
+  color: #000000;
+  font-family: "Times New Roman", Times, serif;
+}
+
+#page {
+  margin: 8px;
+}
+
+#stage a:link { color: #0000ee; }
+#stage a:visited { color: #551a8b; }
+
+/* Everything else - the stacked lists, the numbered comments, the
+   sidebar sitting politely below the post - is the browser's own
+   idea of a webpage. In 2003, so was your blog. */
+</script>
+
+<script type="text/plain" id="css-kubrick">
+/*
+Theme Name:   Kubrick Blue
+Theme URI:    http://binarybonsai.com/kubrick/
+Description:  February 2005. WordPress 1.5 "Strayhorn" ships Themes, and
+              this centered white column under a blue gradient becomes
+              the single most-seen piece of design on the early web.
+Version:      1.5
+Author:       after Michael Heilemann
+Tags:         blue, white, two-columns, fixed-width, that-header
+*/
+
+#stage {
+  background: #d5d6d7;
+  color: #333;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#page {
+  width: 760px;
+  margin: 0 auto;
+  padding: 20px 0 0 0;
+  background: #fff;
+  border-bottom: 1px solid #b8b9ba;
+}
+
+#stage a { color: #06c; text-decoration: none; }
+#stage a:hover { color: #147; text-decoration: underline; }
+
+/* ---- the header everyone remembers ---- */
+#masthead {
+  width: 740px;
+  height: 200px;
+  margin: 0 auto 12px auto;
+  border-radius: 9px;
+  background:
+    radial-gradient(130% 90px at 50% 108%, rgba(255,255,255,.28), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #7db2e8 0%, #5697d3 46%, #3078b5 100%);
+  text-align: center;
+  position: relative;
+}
+
+.site-title {
+  margin: 0;
+  padding-top: 62px;
+  font-family: "Trebuchet MS", "Lucida Grande", Verdana, sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: .01em;
+}
+.site-title a { color: #fff; text-decoration: none; }
+.site-title a:hover { color: #fff; text-decoration: none; }
+
+.site-description {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #cfe3f5;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+#site-nav { position: absolute; left: 0; right: 0; bottom: 12px; }
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; }
+#site-nav li { display: inline; margin: 0 9px; }
+#site-nav a { color: #d8e9f8; font-size: 11px; text-decoration: none; }
+#site-nav a:hover { color: #fff; text-decoration: underline; }
+#site-nav .current-menu-item a { color: #fff; font-weight: bold; }
+
+/* ---- two columns, floated the 2005 way ---- */
+#content-wrap { width: 740px; margin: 0 auto; }
+#content-wrap:after { content: ""; display: block; clear: both; }
+
+#content {
+  float: left;
+  width: 470px;
+  padding: 0 0 20px 35px;
+}
+
+.entry-title {
+  margin: 18px 0 2px 0;
+  font-family: "Trebuchet MS", "Lucida Grande", Verdana, sans-serif;
+  font-size: 21px;
+  font-weight: bold;
+  color: #333;
+}
+
+.entry-meta {
+  margin: 0 0 14px 0;
+  font-size: 10px;
+  color: #777;
+}
+.entry-meta a { color: #777; }
+.entry-meta .byline:before { content: "· "; }
+.entry-meta .comments-link:before { content: "· "; }
+
+.entry-content { font-size: 12px; }
+.entry-content p { margin: 0 0 15px 0; line-height: 1.75; }
+
+.entry-content h2 {
+  margin: 26px 0 8px 0;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  font-size: 16px;
+  color: #333;
+}
+
+.entry-content code {
+  font: 11px/1.4 "Courier New", Courier, monospace;
+  background: #f4f4f4;
+  padding: 1px 3px;
+}
+
+.entry-content blockquote {
+  margin: 15px 0 15px 10px;
+  padding-left: 18px;
+  border-left: 5px solid #ddd;
+  color: #666;
+  font-style: italic;
+}
+.entry-content blockquote cite { display: block; margin-top: 6px; font-size: 10px; font-style: normal; }
+
+.entry-content ul.milestones { margin: 0 0 15px 0; padding-left: 26px; }
+.entry-content ul.milestones li { margin-bottom: 5px; list-style: square; color: #444; }
+
+.entry-footer {
+  margin: 8px 0 24px 0;
+  padding-top: 6px;
+  border-top: 1px dotted #ccc;
+  font-size: 10px;
+  color: #777;
+}
+.entry-footer a { color: #777; }
+.entry-footer span { margin-right: 10px; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- comments, alternating the classic way ---- */
+#comments { margin-top: 10px; }
+#comments-title {
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  font-size: 15px;
+  margin: 0 0 12px 0;
+  padding-top: 14px;
+  border-top: 1px dotted #ccc;
+}
+.comment-list { list-style: none; margin: 0; padding: 0; }
+.comment-list li.comment {
+  margin: 0 0 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #e7e7e7;
+  background: #fff;
+}
+.comment-list li.alt { background: #f8f8f8; }
+.comment-author { font-weight: bold; font-size: 12px; }
+.comment-author .avatar { display: none; }
+.comment-author .says { font-weight: normal; color: #999; }
+.comment-metadata { font-size: 10px; margin: 1px 0 6px 0; }
+.comment-metadata a { color: #999; }
+.comment-body p { margin: 0 0 8px 0; line-height: 1.65; }
+.pingback .comment-author cite { font-weight: normal; font-style: italic; color: #666; }
+
+/* ---- the sidebar: small, grey, dotted ---- */
+#secondary {
+  float: right;
+  width: 190px;
+  padding: 20px 30px 10px 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+#secondary .widget { margin-bottom: 22px; }
+
+#secondary .widget-title {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+}
+
+#secondary .widget ul,
+#secondary .design-list { list-style: none; margin: 0; padding: 0; }
+#secondary .widget li { padding: 2px 0; border-bottom: 1px dotted #e5e5e5; }
+#secondary .widget a { color: #06c; }
+
+#searchform input[type="text"] {
+  width: 120px;
+  border: 1px solid #999;
+  padding: 2px;
+  font-size: 11px;
+}
+#searchform input[type="submit"] {
+  font-size: 10px;
+  padding: 1px 5px;
+  background: #eee;
+  border: 1px solid #999;
+}
+
+/* the wardrobe, styled like any other 2005 list —
+   except the outfit being worn is bolded */
+.design-list .design-year { color: #999; font-size: 9px; }
+.design-list .design-credit { display: none; }
+#designs li.d-kubrick a { font-weight: bold; color: #333; }
+#designs li.d-kubrick a:after { content: " ← you are here"; color: #999; font-weight: normal; font-size: 9px; }
+
+#lab-bench .bench-note { margin: 0 0 5px 0; color: #666; font-style: italic; }
+#lab-bench .boot-link { font-weight: bold; }
+
+/* ---- footer ---- */
+#colophon {
+  clear: both;
+  width: 740px;
+  margin: 0 auto;
+  padding: 16px 0 30px 0;
+  text-align: center;
+  font-size: 10px;
+  color: #888;
+  border-top: 1px dotted #ccc;
+}
+#colophon a { color: #888; }
+.site-info .sep { margin: 0 4px; }
+
+@media (max-width: 860px) {
+  #page, #masthead, #content-wrap, #colophon { width: auto; margin: 0 10px; }
+  #content, #secondary { float: none; width: auto; padding: 10px 24px; }
+}
+</script>
+
+<script type="text/plain" id="css-gloss">
+/*
+Theme Name:   Candy Machine
+Theme URI:    http://example.com/beta/
+Description:  2007. Rounded corners cost real money last year; now they
+              are free and we are spending them ALL. Gloss, gel buttons,
+              a reflection under anything that stands still, and an RSS
+              badge you can see from space.
+Version:      2.0 (beta forever)
+Author:       the Web 2.0 years
+Tags:         aqua, gloss, badges, wet-floor, digg-this
+*/
+
+#stage {
+  background: linear-gradient(180deg, #cdeafd 0%, #eef8ff 340px, #f7fbff 100%);
+  color: #444;
+  font-family: "Lucida Grande", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#page { width: 960px; margin: 0 auto; padding: 26px 0 40px 0; }
+
+#stage a { color: #0b84d6; text-decoration: none; }
+#stage a:hover { color: #0668aa; text-decoration: underline; }
+
+/* ---- glossy masthead with a wet floor ---- */
+#masthead {
+  position: relative;
+  border-radius: 14px;
+  padding: 34px 36px 60px 36px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 49%,
+                    rgba(255,255,255,0) 51%, rgba(255,255,255,.06) 100%),
+    linear-gradient(180deg, #3ec1f0 0%, #1f8fd6 49%, #0d6fbe 51%, #0a5aa0 100%);
+  box-shadow: 0 10px 26px rgba(20, 90, 150, .35), inset 0 1px 0 rgba(255,255,255,.7);
+  margin-bottom: 40px;
+}
+
+.site-title { margin: 0; font-size: 46px; font-weight: bold; letter-spacing: -1px; }
+.site-title a {
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0 2px 4px rgba(0,40,80,.45);
+  -webkit-box-reflect: below 1px linear-gradient(transparent 55%, rgba(255,255,255,.28));
+}
+.site-title a:after {
+  content: "BETA";
+  display: inline-block;
+  vertical-align: super;
+  margin-left: 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(180deg, #ffa63e, #f4750b);
+  border-radius: 9px;
+  padding: 2px 8px 3px 8px;
+  text-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 2px 4px rgba(0,0,0,.25);
+}
+
+.site-description {
+  margin: 8px 0 0 0;
+  color: #d6efff;
+  font-size: 15px;
+  text-shadow: 0 1px 2px rgba(0,40,80,.4);
+}
+
+#site-nav { position: absolute; left: 30px; right: 30px; bottom: -21px; }
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; text-align: center; }
+#site-nav li { display: inline-block; margin: 0 5px; }
+#site-nav a {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #056;
+  background: linear-gradient(180deg, #ffffff 0%, #dff1fb 49%, #c2e2f6 51%, #daeefb 100%);
+  border: 1px solid #8fc4e4;
+  box-shadow: inset 0 1px 0 #fff, 0 3px 6px rgba(30,90,140,.25);
+  text-decoration: none;
+}
+#site-nav a:hover { text-decoration: none; color: #034; box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(30,90,140,.3); }
+#site-nav .current-menu-item a {
+  color: #fff;
+  background: linear-gradient(180deg, #9ad64f 0%, #6cb52e 49%, #52981c 51%, #63a827 100%);
+  border-color: #4d8c1c;
+  text-shadow: 0 1px 1px rgba(0,60,0,.4);
+}
+
+/* ---- the big shiny card ---- */
+#content-wrap { display: table; width: 100%; }
+#content { display: table-cell; vertical-align: top; width: 620px; }
+#secondary { display: table-cell; vertical-align: top; padding-left: 30px; }
+
+article.post {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #cfe4f2;
+  box-shadow: 0 12px 28px rgba(40, 100, 150, .18), inset 0 1px 0 #fff;
+  padding: 34px 38px;
+}
+
+/* the obligatory starburst */
+article.post:before {
+  content: "NEW!";
+  position: absolute;
+  top: -24px;
+  right: -18px;
+  width: 74px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(12deg);
+  font: bold 15px/1 "Arial Black", Arial, sans-serif;
+  color: #a33;
+  background: radial-gradient(circle at 35% 30%, #fff59b, #ffd83d 55%, #f4b400);
+  clip-path: polygon(50% 0%, 61% 12%, 76% 5%, 79% 21%, 95% 21%, 90% 36%, 100% 45%,
+    89% 55%, 96% 70%, 80% 72%, 79% 89%, 63% 84%, 50% 100%, 37% 84%, 21% 89%,
+    20% 72%, 4% 70%, 11% 55%, 0% 45%, 10% 36%, 5% 21%, 21% 21%, 24% 5%, 39% 12%);
+  filter: drop-shadow(0 4px 5px rgba(120, 80, 0, .35));
+}
+
+.entry-title {
+  margin: 0 0 4px 0;
+  font-size: 30px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #2aa0e0, #06699f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #06699f;
+}
+
+.entry-meta { margin: 0 0 20px 0; font-size: 11px; color: #8aa; }
+.entry-meta span { margin-right: 6px; }
+.entry-meta .posted-on {
+  background: linear-gradient(180deg, #f2fbff, #dbf0fc);
+  border: 1px solid #bcdff2;
+  border-radius: 999px;
+  padding: 3px 12px;
+  color: #2a7cab;
+  font-weight: bold;
+}
+
+.entry-content p { margin: 0 0 16px 0; }
+.entry-content h2 {
+  margin: 28px 0 10px 0;
+  font-size: 21px;
+  color: #f4750b;
+  text-shadow: 0 1px 0 #fff;
+  border-bottom: 2px dotted #ffd2a0;
+  padding-bottom: 5px;
+}
+.entry-content code {
+  font: 12px/1.4 Consolas, "Courier New", monospace;
+  background: #eef7fd;
+  border: 1px solid #cfe6f5;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.entry-content blockquote {
+  margin: 20px 0;
+  padding: 18px 22px 18px 56px;
+  position: relative;
+  background: linear-gradient(180deg, #fdfeff, #ecf6fd);
+  border: 1px solid #cfe4f2;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 #fff;
+  color: #345;
+  font-style: italic;
+}
+.entry-content blockquote:before {
+  content: "\201C";
+  position: absolute;
+  left: 16px; top: 4px;
+  font: bold 56px/1 Georgia, serif;
+  color: #9ed0ee;
+}
+.entry-content blockquote cite { display: block; margin-top: 8px; font-size: 11px; color: #789; }
+.entry-content ul.milestones { margin: 0 0 16px 0; padding: 0; list-style: none; }
+.entry-content ul.milestones li {
+  margin: 0 0 7px 0;
+  padding: 8px 14px 8px 34px;
+  background:
+    radial-gradient(circle at 14px 50%, #8cc63f 5px, #6faf27 6px, transparent 7px),
+    linear-gradient(180deg, #fbfffb, #eefaea);
+  border: 1px solid #cde8bd;
+  border-radius: 999px;
+}
+
+.entry-footer {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid #e2eff8;
+  font-size: 11px;
+  color: #8aa;
+}
+.entry-footer span { margin-right: 14px; }
+.entry-footer a {
+  background: linear-gradient(180deg, #f6fbff, #e2f1fb);
+  border: 1px solid #c5e0f1;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.entry-footer .edit-link { display: none; }
+
+/* ---- comments as speech bubbles ---- */
+#comments { margin-top: 34px; }
+#comments-title {
+  font-size: 20px;
+  color: #056;
+  margin: 0 0 18px 0;
+  text-shadow: 0 1px 0 #fff;
+}
+.comment-list { list-style: none; margin: 0; padding: 0; }
+.comment-list li.comment {
+  position: relative;
+  margin: 0 0 16px 58px;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid #cfe4f2;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(40,100,150,.12), inset 0 1px 0 #fff;
+}
+.comment-list li.comment:before {
+  content: "";
+  position: absolute;
+  left: -9px; top: 18px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-left: 1px solid #cfe4f2;
+  border-bottom: 1px solid #cfe4f2;
+  transform: rotate(45deg);
+}
+.comment-author .avatar {
+  position: absolute;
+  left: -58px; top: 6px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  font: bold 13px/1 "Lucida Grande", Arial, sans-serif;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,.3);
+  background: linear-gradient(180deg, #58b6e8 0%, #2288c8 49%, #1071ad 51%, #1f83bd 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 2px 4px rgba(0,0,0,.2);
+}
+.comment-list li.alt .comment-author .avatar {
+  background: linear-gradient(180deg, #a5d75c 0%, #77b62f 49%, #5c9c1c 51%, #6cab27 100%);
+}
+.comment-author cite { font-style: normal; font-weight: bold; color: #056; }
+.comment-author .says { color: #9bc; }
+.comment-metadata { font-size: 10px; margin: 2px 0 8px 0; }
+.comment-metadata a { color: #9bc; }
+.comment-body p { margin: 0 0 8px 0; }
+.pingback { opacity: .85; }
+
+/* ---- sidebar of glossy pills ---- */
+#secondary .widget {
+  margin-bottom: 22px;
+  background: #fff;
+  border: 1px solid #cfe4f2;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(40,100,150,.12), inset 0 1px 0 #fff;
+  overflow: hidden;
+}
+#secondary .widget-title {
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,40,80,.4);
+  background: linear-gradient(180deg, #4fb4e8 0%, #2288c8 49%, #1071ad 51%, #1f83bd 100%);
+}
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 8px 0; }
+#secondary .widget li { padding: 5px 16px; border-bottom: 1px dashed #e4f1f9; }
+#secondary .widget li:last-child { border-bottom: 0; }
+
+#searchform { padding: 12px 16px; }
+#searchform input[type="text"] {
+  width: 140px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid #a9cfe6;
+  box-shadow: inset 0 2px 4px rgba(60,110,150,.18);
+  font-size: 12px;
+}
+#searchform input[type="submit"] {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid #4d8c1c;
+  font-weight: bold;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,60,0,.4);
+  background: linear-gradient(180deg, #9ad64f 0%, #6cb52e 49%, #52981c 51%, #63a827 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 2px 4px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+
+/* the wardrobe as a Top 8 chart */
+.design-list { counter-reset: chart; }
+.design-list li:before {
+  counter-increment: chart;
+  content: counter(chart);
+  display: inline-block;
+  width: 20px; height: 20px;
+  margin-right: 8px;
+  border-radius: 50%;
+  text-align: center;
+  font: bold 11px/20px Arial, sans-serif;
+  color: #fff;
+  background: linear-gradient(180deg, #b6d9ef, #7fb5d8);
+}
+#designs li.d-gloss:before { background: linear-gradient(180deg, #ffa63e, #f4750b); }
+#designs li.d-gloss a { font-weight: bold; color: #f4750b; }
+.design-list .design-year { color: #9bc; font-size: 10px; }
+.design-list .design-credit { display: none; }
+
+#lab-bench .bench-note { padding: 10px 16px 0 16px; margin: 0; color: #789; font-style: italic; }
+#lab-bench .bench-action { padding: 10px 16px 14px 16px; margin: 0; }
+#lab-bench .boot-link {
+  display: block;
+  text-align: center;
+  padding: 11px 10px;
+  border-radius: 999px;
+  font-weight: bold;
+  color: #fff !important;
+  text-shadow: 0 1px 1px rgba(120,40,0,.4);
+  background: linear-gradient(180deg, #ffb14e 0%, #f88f12 49%, #e2760a 51%, #f4830d 100%);
+  border: 1px solid #c96a08;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 4px 8px rgba(180,90,0,.3);
+  text-decoration: none !important;
+}
+
+/* the giant RSS badge, a 2007 status symbol */
+.widget_meta .rss-link a {
+  display: block;
+  margin: 4px 0;
+  padding: 12px 12px 12px 46px;
+  position: relative;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #fff !important;
+  text-shadow: 0 1px 1px rgba(120,40,0,.4);
+  background: linear-gradient(180deg, #ffb14e 0%, #f88f12 49%, #e2760a 51%, #f4830d 100%);
+  border: 1px solid #c96a08;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 3px 6px rgba(180,90,0,.3);
+  text-decoration: none !important;
+}
+.widget_meta .rss-link a:before {
+  content: "";
+  position: absolute;
+  left: 14px; top: 50%;
+  width: 20px; height: 20px;
+  transform: translateY(-50%);
+  background:
+    radial-gradient(circle at 3px 17px, #fff 2.6px, transparent 3.4px),
+    radial-gradient(circle at 3px 17px, transparent 6px, #fff 7px, #fff 9px, transparent 10px),
+    radial-gradient(circle at 3px 17px, transparent 12px, #fff 13px, #fff 15px, transparent 16px);
+}
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* valid-xhtml chiclet, 80x15 forever */
+.widget_meta .chiclet a {
+  display: inline-block;
+  font: bold 9px/15px Verdana, sans-serif;
+  color: #fff;
+  background: linear-gradient(90deg, #1a5c1a 0 34px, #83b143 34px);
+  border: 1px solid #0c3c0c;
+  padding: 0 8px 0 6px;
+  text-decoration: none;
+}
+
+/* ---- footer strip ---- */
+#colophon {
+  margin-top: 40px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  text-align: center;
+  color: #cfe8fa;
+  font-size: 11px;
+  background: linear-gradient(180deg, #1f7ab8 0%, #0d5b96 49%, #084a7e 51%, #0b5589 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+}
+#colophon a { color: #fff; font-weight: bold; }
+.site-info .sep { margin: 0 8px; opacity: .5; }
+
+@media (max-width: 1000px) {
+  #page { width: auto; margin: 0 14px; }
+  #content-wrap, #content, #secondary { display: block; width: auto; }
+  #secondary { padding-left: 0; margin-top: 26px; }
+  article.post:before { right: 6px; }
+}
+</script>
+
+<script type="text/plain" id="css-broadsheet">
+/*
+Theme Name:   The Broadsheet
+Theme URI:    http://example.com/the-broadsheet/
+Description:  2010. WordPress 3.0 lands custom menus and headers, and
+              suddenly a blog can dress like a newsroom. Cream paper,
+              double rules, a drop cap, and text set in honest columns.
+Version:      3.0
+Author:       the magazine era
+Tags:         cream, serif, columns, drop-cap, letters-to-the-editor
+*/
+
+#stage {
+  background: #f4efe4;
+  color: #1c1a16;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+#page { max-width: 1100px; margin: 0 auto; padding: 34px 40px 60px 40px; }
+
+#stage a { color: #1c1a16; text-decoration: none; border-bottom: 1px solid #b9ab8a; }
+#stage a:hover { color: #8a2f20; border-bottom-color: #8a2f20; }
+
+/* ---- the masthead: ALL CAPS between double rules ---- */
+#masthead {
+  text-align: center;
+  border-top: 3px double #1c1a16;
+  border-bottom: 3px double #1c1a16;
+  padding: 26px 0 0 0;
+  margin-bottom: 36px;
+}
+
+.site-title {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 900;
+  font-size: 74px;
+  line-height: 1;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.site-title a { border: 0; color: #1c1a16; }
+.site-title a:hover { color: #1c1a16; }
+
+.site-description {
+  margin: 12px 0 0 0;
+  font-variant: small-caps;
+  letter-spacing: .3em;
+  font-size: 13px;
+  color: #6b6353;
+}
+.site-description:before { content: "❦   "; letter-spacing: 0; }
+.site-description:after { content: "   ❦"; letter-spacing: 0; }
+
+#site-nav {
+  margin-top: 18px;
+  border-top: 1px solid #1c1a16;
+  padding: 8px 0;
+}
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; }
+#site-nav li { display: inline; }
+#site-nav li + li:before { content: "  |  "; color: #b9ab8a; }
+#site-nav a {
+  border: 0;
+  font-variant: small-caps;
+  letter-spacing: .18em;
+  font-size: 14px;
+}
+#site-nav .current-menu-item a { color: #8a2f20; }
+
+/* ---- broadsheet grid: story left, departments right ---- */
+#content-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 268px;
+  gap: 44px;
+}
+
+.entry-title {
+  margin: 0 0 10px 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1.12;
+  letter-spacing: -.005em;
+}
+
+.entry-meta {
+  margin: 0 0 22px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1c1a16;
+  font-variant: small-caps;
+  letter-spacing: .2em;
+  font-size: 12px;
+  color: #6b6353;
+}
+.entry-meta span + span:before { content: " — "; }
+.entry-meta a { border: 0; color: #6b6353; }
+
+/* text in two honest columns */
+.entry-content {
+  columns: 2;
+  column-gap: 34px;
+  column-rule: 1px solid #d8ceb6;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+.entry-content p { margin: 0 0 14px 0; }
+.entry-content p.opening:first-letter {
+  float: left;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 900;
+  font-size: 66px;
+  line-height: .82;
+  padding: 6px 8px 0 0;
+  color: #8a2f20;
+}
+.entry-content h2 {
+  margin: 20px 0 10px 0;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: .16em;
+  font-size: 16px;
+  border-bottom: 1px solid #d8ceb6;
+  padding-bottom: 4px;
+  break-after: avoid;
+}
+.entry-content code {
+  font: 13px/1.4 "Courier New", Courier, monospace;
+  color: #4a4436;
+}
+
+/* the pull quote crosses both columns */
+.entry-content blockquote {
+  column-span: all;
+  margin: 22px 0;
+  padding: 18px 40px;
+  border-top: 3px double #1c1a16;
+  border-bottom: 3px double #1c1a16;
+  text-align: center;
+}
+.entry-content blockquote p {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 1.4;
+  color: #2e2a20;
+}
+.entry-content blockquote cite {
+  display: block;
+  margin-top: 10px;
+  font-variant: small-caps;
+  font-style: normal;
+  letter-spacing: .2em;
+  font-size: 12px;
+  color: #6b6353;
+}
+
+.entry-content ul.milestones {
+  margin: 0 0 14px 0;
+  padding: 0;
+  list-style: none;
+}
+.entry-content ul.milestones li {
+  padding: 6px 0;
+  border-bottom: 1px dotted #c9bda0;
+  text-align: left;
+  font-size: 14px;
+}
+.entry-content ul.milestones strong {
+  font-variant: small-caps;
+  letter-spacing: .1em;
+  color: #8a2f20;
+}
+
+.entry-footer {
+  margin-top: 26px;
+  padding-top: 10px;
+  border-top: 1px solid #1c1a16;
+  font-variant: small-caps;
+  letter-spacing: .16em;
+  font-size: 12px;
+  color: #6b6353;
+}
+.entry-footer span { margin-right: 18px; }
+.entry-footer a { border: 0; color: #6b6353; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- letters to the editor ---- */
+#comments { margin-top: 40px; }
+#comments-title {
+  margin: 0 0 4px 0;
+  text-align: center;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: .24em;
+  font-size: 18px;
+  border-top: 3px double #1c1a16;
+  padding-top: 14px;
+}
+#comments-title:after {
+  content: "Letters to the Editor";
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-variant: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 15px;
+  color: #6b6353;
+  margin-top: 2px;
+}
+.comment-list { list-style: none; margin: 18px 0 0 0; padding: 0; }
+.comment-list li.comment {
+  margin: 0 0 4px 0;
+  padding: 14px 0;
+  border-bottom: 1px dotted #c9bda0;
+}
+.comment-author .avatar { display: none; }
+.comment-author cite {
+  font-style: normal;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+.comment-author .says { display: none; }
+.comment-metadata { display: inline; margin-left: 10px; font-size: 12px; font-style: italic; color: #6b6353; }
+.comment-metadata a { border: 0; color: #6b6353; }
+.comment-body { margin-top: 6px; }
+.comment-body p { margin: 0 0 8px 0; }
+.pingback cite { color: #8a2f20; }
+
+/* ---- the right rail: boxed departments ---- */
+#secondary { font-size: 13px; }
+#secondary .widget {
+  border: 1px solid #1c1a16;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: #f8f4ea;
+  box-shadow: 3px 3px 0 #d8ceb6;
+}
+#secondary .widget-title {
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: .22em;
+  font-size: 13px;
+  border-bottom: 1px solid #1c1a16;
+  padding-bottom: 6px;
+}
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 0; }
+#secondary .widget li { padding: 4px 0; border-bottom: 1px dotted #d8ceb6; }
+#secondary .widget li:last-child { border-bottom: 0; }
+#secondary .widget a { border: 0; }
+
+#searchform { display: flex; gap: 6px; }
+#searchform input[type="text"] {
+  flex: 1; min-width: 0;
+  border: 1px solid #1c1a16;
+  background: #fdfbf4;
+  padding: 6px 8px;
+  font: italic 13px Georgia, serif;
+}
+#searchform input[type="submit"] {
+  border: 1px solid #1c1a16;
+  background: #1c1a16;
+  color: #f4efe4;
+  font-variant: small-caps;
+  letter-spacing: .14em;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* the wardrobe as an index of editions */
+.design-list li { display: flex; }
+.design-list a { display: flex; flex: 1; align-items: baseline; gap: 6px; }
+.design-list .design-name { font-variant: small-caps; letter-spacing: .06em; }
+.design-list .design-name:after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px dotted #b9ab8a;
+  margin: 0 4px;
+}
+.design-list a { justify-content: space-between; }
+.design-list .design-year { font-size: 11px; color: #6b6353; margin-left: auto; }
+.design-list .design-credit { display: none; }
+#designs li.d-broadsheet a .design-name { color: #8a2f20; font-weight: 700; }
+#designs li.d-broadsheet a:before { content: "☞ "; color: #8a2f20; }
+
+#lab-bench .bench-note { margin: 0 0 8px 0; font-style: italic; color: #6b6353; }
+#lab-bench .bench-action { margin: 0; text-align: center; }
+#lab-bench .boot-link {
+  display: inline-block;
+  border: 1px solid #1c1a16;
+  padding: 7px 14px;
+  font-variant: small-caps;
+  letter-spacing: .14em;
+  background: #fdfbf4;
+  box-shadow: 2px 2px 0 #d8ceb6;
+}
+#lab-bench .boot-link:hover { background: #1c1a16; color: #f4efe4; }
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* ---- colophon ---- */
+#colophon {
+  margin-top: 44px;
+  border-top: 3px double #1c1a16;
+  padding-top: 14px;
+  text-align: center;
+  font-variant: small-caps;
+  letter-spacing: .2em;
+  font-size: 12px;
+  color: #6b6353;
+}
+#colophon a { border: 0; color: #6b6353; }
+.site-info .sep { margin: 0 10px; }
+
+@media (max-width: 900px) {
+  #page { padding: 24px 18px 50px 18px; }
+  .site-title { font-size: 44px; }
+  #content-wrap { grid-template-columns: 1fr; }
+  .entry-content { columns: 1; }
+}
+</script>
+
+<script type="text/plain" id="css-flat">
+/*
+Theme Name:   Whitespace
+Theme URI:    http://example.com/whitespace/
+Description:  2013. The gradients dry out overnight. One accent color,
+              one narrow column, type you can read from the next room,
+              and margins wide enough to hear yourself think. The
+              sidebar? Sent to the footer, flat as everything else.
+Version:      3.8
+Author:       the great flattening
+Tags:         flat, white, one-column, big-type, responsive
+*/
+
+#stage {
+  background: #ffffff;
+  color: #24272c;
+  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.7;
+}
+
+#page { margin: 0; }
+
+#stage a { color: #e8503a; text-decoration: none; }
+#stage a:hover { color: #b83420; }
+
+/* ---- flat color hero ---- */
+#masthead {
+  background: #e8503a;
+  padding: 84px 24px 92px 24px;
+  text-align: center;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1;
+  text-transform: lowercase;
+}
+.site-title a { color: #fff; }
+.site-title a:hover { color: #fff; }
+
+.site-description {
+  margin: 14px 0 0 0;
+  color: rgba(255,255,255,.85);
+  font-weight: 300;
+  font-size: 19px;
+}
+
+#site-nav { margin-top: 34px; }
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; }
+#site-nav li { display: inline-block; margin: 0 4px; }
+#site-nav a {
+  display: inline-block;
+  padding: 9px 20px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border: 2px solid rgba(255,255,255,.55);
+  border-radius: 3px;
+}
+#site-nav a:hover { background: rgba(255,255,255,.14); color: #fff; }
+#site-nav .current-menu-item a { background: #fff; color: #e8503a; border-color: #fff; }
+
+/* ---- one narrow, enormous column ---- */
+#content-wrap { display: block; }
+#content { max-width: 720px; margin: 0 auto; padding: 70px 24px 40px 24px; }
+
+.entry-title {
+  margin: 0 0 22px 0;
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.06;
+}
+
+.entry-meta { margin: 0 0 48px 0; font-size: 13px; }
+.entry-meta span {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+  padding: 6px 14px;
+  border-radius: 3px;
+  background: #f2f3f5;
+  color: #6b7280;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.entry-meta a { color: #6b7280; }
+.entry-meta .posted-on { background: #e8503a; color: #fff; }
+
+.entry-content p { margin: 0 0 30px 0; }
+.entry-content h2 {
+  margin: 64px 0 20px 0;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.entry-content code {
+  font: 17px/1.5 "Menlo", Consolas, monospace;
+  background: #f2f3f5;
+  border-radius: 3px;
+  padding: 2px 7px;
+  color: #b83420;
+}
+.entry-content blockquote {
+  margin: 44px 0;
+  padding: 4px 0 4px 30px;
+  border-left: 6px solid #e8503a;
+}
+.entry-content blockquote p {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: #4b5058;
+}
+.entry-content blockquote cite {
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #9aa1ab;
+}
+.entry-content ul.milestones { margin: 0 0 30px 0; padding: 0; list-style: none; }
+.entry-content ul.milestones li { position: relative; padding: 0 0 0 30px; margin-bottom: 14px; font-size: 18px; }
+.entry-content ul.milestones li:before {
+  content: "";
+  position: absolute;
+  left: 0; top: 11px;
+  width: 12px; height: 12px;
+  background: #e8503a;
+}
+.entry-content ul.milestones strong { color: #e8503a; }
+
+.entry-footer { margin: 56px 0 0 0; font-size: 13px; color: #9aa1ab; }
+.entry-footer span { display: block; margin-bottom: 8px; letter-spacing: .05em; text-transform: uppercase; font-weight: 600; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- flat comments ---- */
+#comments { max-width: 720px; margin: 0 auto; padding: 30px 24px 60px 24px; }
+#comments-title {
+  margin: 0 0 34px 0;
+  padding-top: 44px;
+  border-top: 4px solid #24272c;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.comment-list { list-style: none; margin: 0; padding: 0; }
+.comment-list li.comment { position: relative; padding-left: 80px; min-height: 56px; margin-bottom: 40px; }
+.comment-author .avatar {
+  position: absolute;
+  left: 0; top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px; height: 56px;
+  background: #24272c;
+  color: #fff;
+  font-weight: 800;
+  font-size: 17px;
+}
+.comment-list li.alt .comment-author .avatar { background: #e8503a; }
+.comment-author cite { font-style: normal; font-weight: 800; font-size: 16px; }
+.comment-author .says { display: none; }
+.comment-metadata { margin: 2px 0 10px 0; font-size: 12.5px; }
+.comment-metadata a { color: #9aa1ab; }
+.comment-body p { margin: 0 0 10px 0; font-size: 17px; }
+.pingback .comment-author .avatar { background: #f2f3f5; color: #6b7280; }
+
+/* ---- the sidebar becomes a flat footer band ---- */
+#secondary {
+  background: #f7f8f9;
+  border-top: 1px solid #e5e8eb;
+  padding: 60px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-size: 14px;
+}
+#secondary .widget { min-width: 0; }
+#secondary .widget-title {
+  margin: 0 0 14px 0;
+  padding-top: 12px;
+  border-top: 4px solid #e8503a;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 0; }
+#secondary .widget li { padding: 5px 0; }
+#secondary .widget a { color: #4b5058; }
+#secondary .widget a:hover { color: #e8503a; }
+
+#searchform { display: flex; }
+#searchform input[type="text"] {
+  flex: 1; min-width: 0;
+  border: 2px solid #24272c;
+  padding: 9px 12px;
+  font: 14px "Inter", sans-serif;
+  border-radius: 0;
+}
+#searchform input[type="submit"] {
+  border: 2px solid #24272c;
+  border-left: 0;
+  background: #24272c;
+  color: #fff;
+  font: 700 12px "Inter", sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.design-list .design-year { color: #9aa1ab; font-size: 12px; }
+.design-list .design-credit { display: none; }
+#designs li.d-flat a { color: #e8503a; font-weight: 800; }
+#designs li.d-flat a .design-name:after { content: " — current"; font-weight: 400; font-size: 12px; }
+
+#lab-bench .bench-note { margin: 0 0 12px 0; color: #6b7280; }
+#lab-bench .bench-action { margin: 0; }
+#lab-bench .boot-link {
+  display: inline-block;
+  background: #e8503a;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 3px;
+}
+#lab-bench .boot-link:hover { background: #b83420; }
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* ---- footer ---- */
+#colophon {
+  background: #24272c;
+  color: #9aa1ab;
+  text-align: center;
+  padding: 34px 24px;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+#colophon a { color: #fff; }
+.site-info .sep { margin: 0 10px; opacity: .4; }
+
+@media (max-width: 700px) {
+  .site-title { font-size: 38px; }
+  .entry-title { font-size: 36px; }
+  #stage { font-size: 18px; }
+}
+</script>
+
+<script type="text/plain" id="css-nocturne">
+/*
+Theme Name:   Nocturne
+Theme URI:    http://example.com/nocturne/
+Description:  2016. WordPress powers a quarter of the web and dresses
+              for the part: a dark canvas, thin type, one teal accent,
+              and a full-screen hero. The sidebar gives up being a
+              sidebar and becomes the navigation rail of a portfolio.
+Version:      4.7
+Author:       the portfolio age
+Tags:         dark, hero, one-accent, letter-spacing, customizer
+*/
+
+#stage {
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(77, 208, 192, .08), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, rgba(90, 120, 190, .07), transparent 55%),
+    #0d1015;
+  color: #b7bcc4;
+  font-family: "Inter", "Helvetica Neue", sans-serif;
+  font-size: 17px;
+  line-height: 1.85;
+  font-weight: 300;
+}
+
+#page { margin: 0; }
+
+#stage a { color: #4dd0c0; text-decoration: none; transition: color .2s; }
+#stage a:hover { color: #8ee6db; }
+
+/* ---- header shrinks to a rail signature ---- */
+#masthead {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 232px;
+  z-index: 5;
+  background: rgba(15, 19, 25, .92);
+  border-right: 1px solid #1c222c;
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(6px);
+}
+
+.site-title { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: .34em; text-transform: uppercase; }
+.site-title a { color: #e8eaee; }
+.site-title a:after { content: "."; color: #4dd0c0; }
+
+.site-description {
+  margin: 12px 0 0 0;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #4d5461;
+  line-height: 1.8;
+}
+
+#site-nav { margin-top: 48px; }
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; }
+#site-nav li { margin-bottom: 4px; }
+#site-nav a {
+  display: block;
+  padding: 9px 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: #6b7280;
+  border-bottom: 1px solid #1c222c;
+}
+#site-nav a:hover { color: #e8eaee; padding-left: 6px; }
+#site-nav .current-menu-item a { color: #4dd0c0; border-bottom-color: #4dd0c0; }
+
+/* ---- everything else clears the rail ---- */
+#content-wrap, #colophon { margin-left: 232px; }
+
+/* full-screen hero built from the entry header */
+.entry-header {
+  min-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 8vw 40px 8vw;
+  position: relative;
+}
+.entry-header:after {
+  content: "︾  scroll";
+  position: absolute;
+  bottom: 26px; left: 8vw;
+  font-size: 10px;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: #4d5461;
+}
+
+.entry-title {
+  margin: 0;
+  max-width: 15em;
+  font-size: clamp(40px, 5.2vw, 72px);
+  font-weight: 200;
+  line-height: 1.12;
+  letter-spacing: .005em;
+  color: #e8eaee;
+}
+
+.entry-meta {
+  order: -1;
+  margin: 0 0 30px 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: #4dd0c0;
+}
+.entry-meta span + span:before { content: "  /  "; color: #333b47; }
+.entry-meta a { color: #4dd0c0; }
+
+/* ---- long-form column ---- */
+.entry-content { max-width: 700px; padding: 0 8vw 30px 8vw; }
+.entry-content p { margin: 0 0 26px 0; }
+.entry-content h2 {
+  margin: 70px 0 22px 0;
+  font-size: 30px;
+  font-weight: 200;
+  color: #e8eaee;
+  letter-spacing: .01em;
+}
+.entry-content h2:before {
+  content: "";
+  display: block;
+  width: 54px;
+  height: 1px;
+  background: #4dd0c0;
+  margin-bottom: 22px;
+}
+.entry-content code {
+  font: 14px/1.5 "JetBrains Mono", Menlo, monospace;
+  color: #8ee6db;
+  background: #131920;
+  border: 1px solid #1c222c;
+  border-radius: 3px;
+  padding: 2px 7px;
+}
+.entry-content blockquote {
+  margin: 50px -4vw;
+  padding: 44px 4vw;
+  background: #10141b;
+  border: 1px solid #1c222c;
+  border-left: 2px solid #4dd0c0;
+  position: relative;
+}
+.entry-content blockquote p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 200;
+  font-style: italic;
+  line-height: 1.6;
+  color: #d3d7dd;
+}
+.entry-content blockquote cite {
+  display: block;
+  margin-top: 18px;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #4d5461;
+}
+.entry-content ul.milestones { margin: 0 0 26px 0; padding: 0; list-style: none; counter-reset: mile; }
+.entry-content ul.milestones li {
+  counter-increment: mile;
+  padding: 16px 0 16px 58px;
+  position: relative;
+  border-bottom: 1px solid #1c222c;
+  font-size: 15.5px;
+}
+.entry-content ul.milestones li:before {
+  content: "0" counter(mile);
+  position: absolute;
+  left: 0; top: 15px;
+  font: 300 13px/1.6 "JetBrains Mono", monospace;
+  letter-spacing: .1em;
+  color: #4dd0c0;
+}
+.entry-content ul.milestones strong { color: #e8eaee; font-weight: 500; }
+
+.entry-footer {
+  padding: 10px 8vw 60px 8vw;
+  font-size: 10.5px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #4d5461;
+}
+.entry-footer span { margin-right: 26px; }
+.entry-footer a { color: #6b7280; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- comments as dark cards ---- */
+#comments { padding: 40px 8vw 40px 8vw; border-top: 1px solid #1c222c; }
+#comments-title {
+  margin: 0 0 36px 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+.comment-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  max-width: 1100px;
+}
+.comment-list li.comment {
+  background: #10141b;
+  border: 1px solid #1c222c;
+  padding: 26px;
+  transition: border-color .3s, transform .3s;
+}
+.comment-list li.comment:hover { border-color: #2b3442; transform: translateY(-3px); }
+.comment-author .avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  border: 1px solid #4dd0c0;
+  color: #4dd0c0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .06em;
+}
+.comment-author cite { display: block; font-style: normal; font-weight: 500; font-size: 14px; color: #e8eaee; letter-spacing: .04em; }
+.comment-author .says { display: none; }
+.comment-metadata { margin: 4px 0 14px 0; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
+.comment-metadata a { color: #4d5461; }
+.comment-body p { margin: 0; font-size: 14.5px; line-height: 1.75; }
+.pingback { opacity: .75; }
+
+/* ---- widgets condense into the rail's lower half? no —
+   they become a dark utility band before the footer ---- */
+#secondary {
+  margin-left: 232px;
+  padding: 54px 8vw;
+  border-top: 1px solid #1c222c;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 40px;
+  font-size: 13px;
+}
+#secondary .widget-title {
+  margin: 0 0 16px 0;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: #4d5461;
+}
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 0; }
+#secondary .widget li { padding: 5px 0; }
+#secondary .widget a { color: #8a919c; }
+#secondary .widget a:hover { color: #4dd0c0; }
+
+#searchform { display: flex; border-bottom: 1px solid #2b3442; }
+#searchform input[type="text"] {
+  flex: 1; min-width: 0;
+  background: transparent;
+  border: 0;
+  color: #e8eaee;
+  font: 300 14px "Inter", sans-serif;
+  padding: 8px 0;
+  outline-offset: 4px;
+}
+#searchform input[type="submit"] {
+  background: transparent;
+  border: 0;
+  color: #4dd0c0;
+  font: 500 10.5px "Inter", sans-serif;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.design-list li { padding: 5px 0; }
+.design-list .design-year { color: #4d5461; font-size: 11px; margin-left: 6px; }
+.design-list .design-credit { display: none; }
+#designs li.d-nocturne a { color: #4dd0c0; }
+#designs li.d-nocturne a .design-name { border-bottom: 1px solid #4dd0c0; padding-bottom: 2px; }
+
+#lab-bench .bench-note { margin: 0 0 14px 0; color: #6b7280; font-size: 13px; }
+#lab-bench .bench-action { margin: 0; }
+#lab-bench .boot-link {
+  display: inline-block;
+  border: 1px solid #4dd0c0;
+  color: #4dd0c0 !important;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  padding: 13px 22px;
+  transition: background .2s, color .2s;
+}
+#lab-bench .boot-link:hover { background: #4dd0c0; color: #0d1015 !important; }
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* ---- footer ---- */
+#colophon {
+  border-top: 1px solid #1c222c;
+  padding: 30px 8vw;
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #4d5461;
+}
+#colophon a { color: #6b7280; }
+.site-info .sep { margin: 0 14px; }
+
+@media (max-width: 900px) {
+  #masthead { position: static; width: auto; border-right: 0; border-bottom: 1px solid #1c222c; }
+  #content-wrap, #secondary, #colophon { margin-left: 0; }
+  .entry-header { min-height: 60vh; }
+  .entry-content blockquote { margin: 40px 0; }
+}
+</script>
+
+<script type="text/plain" id="css-blocks">
+/*
+Theme Name:   Editorial Twenty-Two
+Theme URI:    http://example.com/editorial-twenty-two/
+Description:  January 2022. WordPress 5.9 ships block themes and the
+              theme becomes data: templates, patterns, a theme.json.
+              Airy serif light-weight type, a duotone cover in two
+              greens, and - look closely - every template part wears
+              its filename, because themes are made of files you can
+              finally see.
+Version:      5.9
+Author:       after Twenty Twenty-Two
+Tags:         block-theme, airy, serif, duotone, theme-json
+*/
+
+#stage {
+  background: #fffcf5;
+  color: #1a1a1a;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 18.5px;
+  font-weight: 380;
+  line-height: 1.8;
+}
+
+#page { margin: 0; }
+
+#stage a { color: #1a1a1a; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+#stage a:hover { color: #00461f; }
+
+/* every template part wears its filename */
+#masthead, #content, #secondary, #colophon, #comments { position: relative; }
+#masthead:before, #secondary:before, #colophon:before, #comments:before {
+  position: absolute;
+  top: 10px; right: clamp(16px, 4vw, 60px);
+  font: 400 10px/1 "JetBrains Mono", Menlo, monospace;
+  letter-spacing: .08em;
+  color: #9d977f;
+  border: 1px solid #e4ddc9;
+  border-radius: 2px;
+  padding: 4px 7px;
+  background: #fffef9;
+}
+#masthead:before { content: "header.html"; }
+#comments:before { content: "comments.html"; top: 0; }
+#secondary:before { content: "sidebar.html — now a pattern"; }
+#colophon:before { content: "footer.html"; }
+
+/* ---- quiet header ---- */
+#masthead {
+  display: flex;
+  align-items: baseline;
+  gap: 26px;
+  padding: 26px clamp(16px, 4vw, 60px);
+}
+.site-title { margin: 0; font-size: 19px; font-weight: 600; }
+.site-title a { text-decoration: none; }
+.site-description { margin: 0; font-style: italic; font-size: 14.5px; color: #6f6a58; }
+#site-nav { margin-left: auto; }
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; display: flex; gap: 22px; }
+#site-nav a { text-decoration: none; font-size: 15px; }
+#site-nav a:hover { text-decoration: underline; }
+#site-nav .current-menu-item a { text-decoration: underline; text-decoration-color: #00461f; }
+
+/* ---- the duotone cover ----
+   two greens only, layered gradients standing in for the bird */
+.entry-header {
+  margin: 0 clamp(16px, 4vw, 60px) 70px clamp(16px, 4vw, 60px);
+  min-height: 66vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(24px, 5vw, 64px);
+  border-radius: 4px;
+  background:
+    radial-gradient(340px 220px at 74% 30%, #9fd3a5 0%, rgba(159, 211, 165, 0) 70%),
+    radial-gradient(200px 320px at 82% 62%, rgba(159, 211, 165, .55) 0%, rgba(159, 211, 165, 0) 66%),
+    radial-gradient(120px 90px at 68% 24%, #003b1a 0%, rgba(0, 59, 26, 0) 75%),
+    radial-gradient(1000px 700px at 20% 80%, #00461f 0%, #00320f 70%);
+  position: relative;
+  overflow: hidden;
+}
+.entry-header:after {
+  content: "cover · duotone: #00320f / #9fd3a5";
+  position: absolute;
+  top: 14px; left: 18px;
+  font: 400 10px/1 "JetBrains Mono", Menlo, monospace;
+  letter-spacing: .08em;
+  color: rgba(159, 211, 165, .75);
+}
+
+.entry-title {
+  margin: 0;
+  max-width: 14em;
+  font-size: clamp(38px, 5vw, 66px);
+  font-weight: 250;
+  line-height: 1.14;
+  color: #fffcf5;
+  letter-spacing: .002em;
+}
+
+.entry-meta { order: 1; margin: 26px 0 0 0; font-size: 14px; color: #9fd3a5; font-style: italic; }
+.entry-meta a { color: #9fd3a5; }
+.entry-meta span + span:before { content: " · "; }
+
+/* ---- narrow, airy column ---- */
+#content-wrap { display: block; }
+.entry-content { max-width: 620px; margin: 0 auto; padding: 0 24px; }
+.entry-content p { margin: 0 0 28px 0; }
+.entry-content h2 {
+  margin: 66px 0 22px 0;
+  font-size: 33px;
+  font-weight: 250;
+  line-height: 1.25;
+}
+.entry-content code {
+  font: 15px/1.5 "JetBrains Mono", Menlo, monospace;
+  background: #f4efe0;
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+.entry-content blockquote {
+  margin: 48px 0;
+  padding: 0 0 0 28px;
+  border-left: 1px solid #1a1a1a;
+}
+.entry-content blockquote p { margin: 0; font-size: 25px; font-weight: 250; line-height: 1.55; font-style: italic; }
+.entry-content blockquote cite { display: block; margin-top: 14px; font-size: 13.5px; font-style: normal; color: #6f6a58; }
+.entry-content ul.milestones { margin: 0 0 28px 0; padding: 0; list-style: none; }
+.entry-content ul.milestones li { padding: 12px 0; border-top: 1px solid #e4ddc9; font-size: 16.5px; }
+.entry-content ul.milestones li:last-child { border-bottom: 1px solid #e4ddc9; }
+.entry-content ul.milestones strong { font-weight: 600; color: #00461f; }
+
+.entry-footer {
+  max-width: 620px;
+  margin: 54px auto 0 auto;
+  padding: 18px 24px 0 24px;
+  border-top: 1px solid #1a1a1a;
+  font-size: 13.5px;
+  font-style: italic;
+  color: #6f6a58;
+}
+.entry-footer span { margin-right: 20px; }
+.entry-footer a { color: #6f6a58; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- comments, quiet and typographic ---- */
+#comments { max-width: 620px; margin: 70px auto 0 auto; padding: 24px 24px 30px 24px; }
+#comments-title { margin: 0 0 34px 0; font-size: 24px; font-weight: 250; font-style: italic; }
+.comment-list { list-style: none; margin: 0; padding: 0; }
+.comment-list li.comment { padding: 26px 0; border-top: 1px solid #e4ddc9; }
+.comment-author .avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #00461f;
+  color: #9fd3a5;
+  font: 500 11px/1 "JetBrains Mono", monospace;
+  vertical-align: middle;
+}
+.comment-author cite { font-style: normal; font-weight: 600; font-size: 16px; }
+.comment-author .says { display: none; }
+.comment-metadata { margin: 8px 0 12px 44px; font-size: 12.5px; font-style: italic; }
+.comment-metadata a { color: #9d977f; text-decoration: none; }
+.comment-body { margin-left: 44px; }
+.comment-body p { margin: 0 0 10px 0; font-size: 16px; }
+.pingback .comment-author .avatar { background: #f4efe0; color: #6f6a58; }
+
+/* ---- the sidebar becomes a pattern: three airy blocks ---- */
+#secondary {
+  max-width: 1060px;
+  margin: 80px auto 0 auto;
+  padding: 44px 24px 20px 24px;
+  border-top: 1px solid #1a1a1a;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0;
+}
+#secondary .widget { padding: 26px 30px; border-left: 1px solid #e4ddc9; min-width: 0; }
+#secondary .widget:first-child { border-left: 0; }
+#secondary .widget-title { margin: 0 0 16px 0; font-size: 15px; font-weight: 600; font-style: italic; }
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+#secondary .widget li { padding: 5px 0; }
+#secondary .widget a { text-decoration: none; }
+#secondary .widget a:hover { text-decoration: underline; }
+
+#searchform { display: flex; border: 1px solid #1a1a1a; border-radius: 3px; overflow: hidden; }
+#searchform input[type="text"] {
+  flex: 1; min-width: 0;
+  border: 0;
+  background: #fffef9;
+  padding: 10px 14px;
+  font: 380 15px "Source Serif 4", serif;
+}
+#searchform input[type="submit"] {
+  border: 0;
+  background: #1a1a1a;
+  color: #fffcf5;
+  font: 380 14px "Source Serif 4", serif;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+#searchform input[type="submit"]:hover { background: #00461f; }
+
+.design-list .design-year { font-size: 12px; color: #9d977f; font-style: italic; margin-left: 4px; }
+.design-list .design-credit { display: none; }
+#designs li.d-blocks a { color: #00461f; font-weight: 600; }
+#designs li.d-blocks a:before { content: "→ "; }
+
+#lab-bench .bench-note { margin: 0 0 14px 0; font-style: italic; font-size: 14.5px; color: #6f6a58; }
+#lab-bench .bench-action { margin: 0; }
+#lab-bench .boot-link {
+  display: inline-block;
+  background: #00461f;
+  color: #fffcf5 !important;
+  text-decoration: none !important;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 999px;
+}
+#lab-bench .boot-link:hover { background: #00320f; }
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* ---- footer ---- */
+#colophon {
+  margin-top: 60px;
+  padding: 40px clamp(16px, 4vw, 60px) 80px clamp(16px, 4vw, 60px);
+  text-align: center;
+  font-size: 15px;
+  font-style: italic;
+  color: #6f6a58;
+}
+#colophon a { color: #1a1a1a; }
+.site-info .sep { margin: 0 12px; color: #e4ddc9; }
+
+@media (max-width: 760px) {
+  #masthead { flex-wrap: wrap; gap: 8px 20px; }
+  #site-nav { margin-left: 0; width: 100%; }
+  .entry-header { min-height: 46vh; }
+  #secondary .widget { border-left: 0; border-top: 1px solid #e4ddc9; }
+}
+</script>
+
+<script type="text/plain" id="css-zen">
+/*
+Theme Name:   Ink Garden
+Theme URI:    http://www.csszengarden.com/
+Description:  The wildcard. Zen Garden designs were under no obligation
+              to look like websites, and neither is this one: washi
+              paper, an enso drawn in one stroke, a vermilion seal, and
+              the post scattered across the sand like stones. Same
+              markup. Obviously.
+Version:      one stroke
+Author:       after Dave Shea's garden
+Tags:         ink, paper, vertical-text, enso, not-a-blog
+*/
+
+#stage {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M118 22 A82 82 0 1 0 172 74' fill='none' stroke='%232a2622' stroke-width='10' stroke-linecap='round' opacity='.07'/%3E%3C/svg%3E") no-repeat right -160px top -120px,
+    repeating-linear-gradient(84deg, rgba(42, 38, 34, .022) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-3deg, rgba(42, 38, 34, .016) 0 1px, transparent 1px 5px),
+    #f3eee2;
+  background-size: 680px 680px, auto, auto, auto;
+  color: #2a2622;
+  font-family: "Source Serif 4", "Hiragino Mincho ProN", Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.9;
+}
+
+#page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 60px 40px 120px 40px;
+  position: relative;
+}
+
+#stage a { color: #2a2622; text-decoration: none; border-bottom: 1px dotted #a89f8c; }
+#stage a:hover { color: #c03a2b; border-bottom-color: #c03a2b; }
+
+/* ---- the title hangs in the right margin, written downward ---- */
+#masthead {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  width: 84px;
+  text-align: center;
+}
+
+.site-title {
+  margin: 0;
+  writing-mode: vertical-rl;
+  font-size: 40px;
+  font-weight: 250;
+  letter-spacing: .4em;
+  margin-left: auto;
+  margin-right: auto;
+}
+.site-title a { border: 0; }
+
+.site-description {
+  margin: 26px auto 0 auto;
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  letter-spacing: .3em;
+  color: #8b8271;
+  font-style: italic;
+}
+
+/* the seal */
+#site-nav {
+  margin: 30px auto 0 auto;
+  width: 46px;
+  background: #c03a2b;
+  border-radius: 3px;
+  padding: 8px 4px;
+  box-shadow: 0 1px 0 #8f2a1e inset, 1px 2px 6px rgba(42, 38, 34, .25);
+  transform: rotate(2deg);
+}
+#site-nav .nav-menu { list-style: none; margin: 0; padding: 0; }
+#site-nav li { display: block; }
+#site-nav a {
+  display: block;
+  border: 0;
+  color: #f3eee2;
+  font-size: 10px;
+  letter-spacing: .2em;
+  writing-mode: vertical-rl;
+  margin: 2px auto;
+  padding: 2px 0;
+}
+#site-nav a:hover { color: #fff; }
+#site-nav .current-menu-item a { color: #fff; text-decoration: underline; }
+
+/* ---- the post is a washi card, set slightly askew ---- */
+#content-wrap { display: block; }
+#content { max-width: 640px; }
+
+article.post {
+  background: #faf7ee;
+  border-radius: 3px 26px 4px 30px;
+  box-shadow:
+    0 1px 2px rgba(42, 38, 34, .12),
+    0 14px 34px rgba(42, 38, 34, .12),
+    -3px 3px 0 rgba(42, 38, 34, .04);
+  padding: 54px 56px;
+  transform: rotate(-0.6deg);
+}
+
+.entry-title {
+  margin: 0 0 8px 0;
+  font-size: 37px;
+  font-weight: 250;
+  line-height: 1.3;
+  position: relative;
+  padding-bottom: 20px;
+}
+/* one brushstroke under the title */
+.entry-title:after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 200px; height: 12px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'%3E%3Cpath d='M2 8 C40 2 80 10 120 6 S180 4 198 7' fill='none' stroke='%232a2622' stroke-width='4' stroke-linecap='round' opacity='.8'/%3E%3C/svg%3E") no-repeat;
+}
+
+.entry-meta { margin: 14px 0 34px 0; font-size: 12px; font-style: italic; color: #8b8271; letter-spacing: .08em; }
+.entry-meta span + span:before { content: " ・ "; }
+.entry-meta a { color: #8b8271; }
+
+.entry-content p { margin: 0 0 24px 0; }
+.entry-content h2 {
+  margin: 52px 0 18px 0;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: .06em;
+  padding-left: 20px;
+  position: relative;
+}
+.entry-content h2:before {
+  content: "";
+  position: absolute;
+  left: 0; top: 8px;
+  width: 9px; height: 22px;
+  background: #c03a2b;
+  border-radius: 2px;
+  transform: rotate(3deg);
+}
+.entry-content code {
+  font: 13.5px/1.5 "JetBrains Mono", monospace;
+  background: rgba(42, 38, 34, .06);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.entry-content blockquote {
+  margin: 40px -20px;
+  padding: 30px 34px;
+  background: #f3eee2;
+  border-radius: 20px 3px 24px 3px;
+  transform: rotate(0.8deg);
+  box-shadow: 0 1px 2px rgba(42, 38, 34, .1), 0 8px 20px rgba(42, 38, 34, .08);
+  position: relative;
+}
+.entry-content blockquote:before {
+  content: "禅";
+  position: absolute;
+  top: -16px; right: 22px;
+  width: 40px; height: 40px;
+  background: #c03a2b;
+  color: #f3eee2;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transform: rotate(-4deg);
+  box-shadow: 1px 2px 5px rgba(42, 38, 34, .25);
+}
+.entry-content blockquote p { margin: 0; font-style: italic; font-size: 19px; line-height: 1.85; }
+.entry-content blockquote cite { display: block; margin-top: 12px; font-size: 12px; font-style: normal; color: #8b8271; }
+
+/* milestones as stepping stones */
+.entry-content ul.milestones { margin: 30px 0; padding: 0; list-style: none; }
+.entry-content ul.milestones li {
+  margin: 0 0 12px 0;
+  padding: 12px 20px;
+  background: #ece5d3;
+  border-radius: 999px 6px 999px 8px;
+  font-size: 14.5px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 2px 4px rgba(42, 38, 34, .1);
+}
+.entry-content ul.milestones li:nth-child(odd) { transform: rotate(-0.8deg) translateX(-8px); }
+.entry-content ul.milestones li:nth-child(even) { transform: rotate(0.9deg) translateX(14px); }
+.entry-content ul.milestones strong { color: #c03a2b; font-weight: 600; }
+
+.entry-footer { margin-top: 40px; font-size: 12px; font-style: italic; color: #8b8271; }
+.entry-footer span { margin-right: 18px; }
+.entry-footer a { color: #8b8271; }
+.entry-footer .edit-link { display: none; }
+
+/* ---- comments: paper slips on a thread ---- */
+#comments { max-width: 560px; margin: 70px 0 0 60px; position: relative; padding-left: 40px; }
+#comments:before {
+  content: "";
+  position: absolute;
+  left: 14px; top: 10px; bottom: 10px;
+  border-left: 2px dotted #a89f8c;
+}
+#comments-title {
+  margin: 0 0 30px 0;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: .3em;
+  font-style: italic;
+  color: #8b8271;
+}
+.comment-list { list-style: none; margin: 0; padding: 0; }
+.comment-list li.comment {
+  position: relative;
+  margin-bottom: 26px;
+  background: #faf7ee;
+  padding: 20px 24px;
+  border-radius: 2px 14px 3px 16px;
+  box-shadow: 0 1px 2px rgba(42, 38, 34, .12), 0 8px 18px rgba(42, 38, 34, .1);
+}
+.comment-list li.comment:nth-child(odd) { transform: rotate(-0.7deg); }
+.comment-list li.comment:nth-child(even) { transform: rotate(0.8deg) translateX(10px); }
+.comment-list li.comment:before {
+  content: "";
+  position: absolute;
+  left: -32px; top: 26px;
+  width: 24px;
+  border-top: 2px dotted #a89f8c;
+}
+.comment-author .avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  margin-right: 8px;
+  border-radius: 50% 40% 55% 45%;
+  background: #2a2622;
+  color: #f3eee2;
+  font-size: 10px;
+  letter-spacing: .05em;
+  vertical-align: middle;
+}
+.comment-author cite { font-style: normal; font-weight: 600; font-size: 14px; }
+.comment-author .says { display: none; }
+.comment-metadata { margin: 6px 0 10px 38px; font-size: 11px; font-style: italic; }
+.comment-metadata a { color: #a89f8c; border: 0; }
+.comment-body { margin-left: 38px; }
+.comment-body p { margin: 0; font-size: 13.5px; line-height: 1.8; }
+.pingback .comment-author .avatar { background: #c03a2b; }
+
+/* ---- widgets scattered like stones on the right bank ---- */
+#secondary {
+  position: relative;
+  max-width: 700px;
+  margin: 90px 0 0 auto;
+  padding-right: 120px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+/* the raked sand under the stones */
+#secondary:before {
+  content: "";
+  position: absolute;
+  inset: -40px -20px -40px -60px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 120'%3E%3Cg fill='none' stroke='%232a2622' stroke-width='1' opacity='.10'%3E%3Cpath d='M0 20 C80 8 180 32 300 16'/%3E%3Cpath d='M0 45 C90 32 190 58 300 42'/%3E%3Cpath d='M0 70 C85 58 185 82 300 66'/%3E%3Cpath d='M0 95 C95 82 195 108 300 92'/%3E%3C/g%3E%3C/svg%3E") repeat;
+  background-size: 340px 140px;
+  z-index: 0;
+  pointer-events: none;
+}
+#secondary .widget {
+  position: relative;
+  z-index: 1;
+  width: 200px;
+  background: #ece5d3;
+  padding: 18px 20px;
+  font-size: 12.5px;
+  box-shadow: 0 1px 2px rgba(42, 38, 34, .14), 0 10px 22px rgba(42, 38, 34, .12);
+}
+#secondary .widget:nth-of-type(1) { border-radius: 60px 50px 55px 60px / 46px 60px 50px 55px; transform: rotate(-2deg); }
+#secondary .widget:nth-of-type(2) { border-radius: 20px 3px 24px 4px; transform: rotate(1.6deg) translateY(20px); width: 250px; background: #faf7ee; }
+#secondary .widget:nth-of-type(3) { border-radius: 50px 60px 45px 55px / 60px 45px 60px 50px; transform: rotate(2.4deg); }
+#secondary .widget:nth-of-type(4) { border-radius: 55px 45px 60px 50px / 50px 60px 45px 60px; transform: rotate(-1.8deg) translateY(-14px); }
+#secondary .widget:nth-of-type(5) { border-radius: 4px 22px 3px 26px; transform: rotate(-2.6deg) translateY(10px); background: #faf7ee; }
+#secondary .widget:nth-of-type(6) { border-radius: 48px 58px 50px 62px / 58px 48px 62px 50px; transform: rotate(1.2deg); }
+#secondary .widget-title {
+  margin: 0 0 10px 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .28em;
+  color: #6d6455;
+  text-transform: lowercase;
+  font-style: italic;
+}
+#secondary .widget ul, #secondary .design-list { list-style: none; margin: 0; padding: 0; }
+#secondary .widget li { padding: 3px 0; }
+
+#searchform { display: flex; gap: 6px; }
+#searchform input[type="text"] {
+  flex: 1; min-width: 0; width: 90px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #a89f8c;
+  font: italic 13px "Source Serif 4", serif;
+  padding: 3px 2px;
+  color: #2a2622;
+}
+#searchform input[type="submit"] {
+  background: #2a2622;
+  color: #f3eee2;
+  border: 0;
+  border-radius: 999px;
+  font: 11px "Source Serif 4", serif;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+/* the wardrobe as prayer tags */
+.design-list li { padding: 4px 0 !important; }
+.design-list a { border: 0; }
+.design-list .design-name { border-bottom: 1px dotted #a89f8c; }
+.design-list .design-year { display: none; }
+.design-list .design-credit { display: block; font-size: 10px; font-style: italic; color: #8b8271; }
+#designs li.d-zen .design-name { color: #c03a2b; border-bottom: 1px solid #c03a2b; }
+#designs li.d-zen a:before { content: "● "; color: #c03a2b; font-size: 9px; vertical-align: 2px; }
+
+#lab-bench .bench-note { margin: 0 0 10px 0; font-style: italic; color: #6d6455; }
+#lab-bench .bench-action { margin: 0; }
+#lab-bench .boot-link {
+  display: inline-block;
+  background: #c03a2b;
+  color: #f3eee2 !important;
+  border: 0 !important;
+  border-radius: 3px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  transform: rotate(-1deg);
+  box-shadow: 1px 2px 5px rgba(42, 38, 34, .25);
+}
+#lab-bench .boot-link:hover { background: #8f2a1e; }
+.widget_meta abbr { border: 0; text-decoration: none; }
+
+/* ---- colophon: a single line raked into the sand ---- */
+#colophon {
+  margin-top: 110px;
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: .2em;
+  color: #8b8271;
+}
+#colophon a { color: #8b8271; }
+.site-info .sep { margin: 0 14px; }
+.site-info .poetry { color: #c03a2b; }
+
+@media (max-width: 900px) {
+  #page { padding: 40px 18px 80px 18px; }
+  #masthead { position: static; width: auto; display: flex; align-items: center; gap: 18px; margin-bottom: 40px; }
+  .site-title, .site-description { writing-mode: horizontal-tb; margin: 0; }
+  #site-nav { margin: 0 0 0 auto; transform: rotate(0); display: flex; width: auto; padding: 6px 10px; }
+  #site-nav a { writing-mode: horizontal-tb; margin: 0 6px; }
+  article.post { padding: 30px 24px; transform: none; }
+  #comments { margin-left: 0; }
+  #secondary { justify-content: flex-start; padding-right: 0; margin-top: 60px; }
+}
+</script>
+
+<style id="zen-garden-style"></style>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- cast ---------- */
+var DESIGNS=[
+  {id:"default",name:"Browser Default",year:"2003",file:"browser-default",
+   note:"May 27, 2003. WordPress 0.70 ships with one look for everyone; changing it means editing <b>index.php</b> by hand. Every redesign that follows starts from here, whether it admits it or not."},
+  {id:"kubrick",name:"Kubrick Blue",year:"2005",file:"kubrick-blue",
+   note:"February 17, 2005. WordPress 1.5 <b>“Strayhorn”</b> introduces Themes, and Michael Heilemann’s Kubrick becomes the face of blogging — that blue gradient presided over five years and several million sites."},
+  {id:"gloss",name:"Candy Machine",year:"2007",file:"candy-machine",
+   note:"2007. Web 2.0 arrives wearing sixteen gradients. The <b>Theme Directory</b> opens in 2008, premium themes turn design into a market, and every sidebar sprouts badges."},
+  {id:"broadsheet",name:"The Broadsheet",year:"2010",file:"the-broadsheet",
+   note:"2010. WordPress 3.0 <b>“Thelonious”</b> brings custom menus and headers, Twenty Ten begins the annual defaults, and magazine themes teach blogs to dress like newsrooms."},
+  {id:"flat",name:"Whitespace",year:"2013",file:"whitespace",
+   note:"2013. The web sobers up: responsive grids, giant type, flat color. WordPress 3.8 <b>“Parker”</b> flattens the admin itself, and whitespace becomes a feature."},
+  {id:"nocturne",name:"Nocturne",year:"2016",file:"nocturne",
+   note:"2016. WordPress is a full CMS now — portfolios, agencies, storefronts. The <b>Customizer</b> era sells themes on mood: dark canvases, thin type, one accent."},
+  {id:"blocks",name:"Editorial Twenty-Two",year:"2022",file:"editorial-twenty-two",
+   note:"January 25, 2022. WordPress 5.9 <b>“Josephine”</b> ships block themes: a theme is now templates plus <b>theme.json</b>, and style variations put a zen garden inside every site."},
+  {id:"zen",name:"Ink Garden",year:"timeless",file:"ink-garden",
+   note:"2003, forever. In the Garden’s own spirit: a design that refuses to look like a blog at all, to make the point one last time — the markup beneath this ink is untouched."}
+];
+
+/* ---------- lookups ---------- */
+function $(s,c){return (c||document).querySelector(s)}
+function $$(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))}
+var stage=$("#stage"), styleEl=$("#zen-garden-style");
+var reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+
+/* Pristine snapshot, captured before the lab touches anything.
+   This exact string is what the fingerprint seals. */
+var PRISTINE=$("#page").outerHTML;
+
+function fingerprint(s){
+  var h=0x811c9dc5;
+  for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}
+  return "0x"+h.toString(16).toUpperCase();
+}
+var FP=fingerprint(PRISTINE);
+
+function cssFor(id){
+  var el=document.getElementById("css-"+id);
+  return el?el.textContent.trim():"";
+}
+
+/* ---------- chrome refs ---------- */
+var cbNum=$("#cb-num"),cbName=$("#cb-name"),cbYear=$("#cb-year"),cbNote=$("#cb-note"),cbFp=$("#cb-fp");
+var announcer=$("#announcer");
+var veil=$("#veil"),veilChip=$("#veil-chip"),veilTimer=null;
+var inspector=$("#inspector"),btnCss=$("#btn-css");
+var insPath=$("#ins-path"),insStats=$("#ins-stats"),insFoot=$("#ins-foot");
+var paneCss=$("#pane-css"),paneHtml=$("#pane-html"),tabCss=$("#tab-css"),tabHtml=$("#tab-html");
+var bootModal=$("#bootmodal"),bmStage=$("#bm-stage");
+var splash=$("#splash");
+
+cbFp.innerHTML="<b>doc "+FP+"</b>markup constant";
+
+/* ---------- FLIP morph: the proof that structure holds still ---------- */
+var TRACK=".site-title,.site-description,#site-nav,.entry-title,.entry-meta,"+
+  ".entry-content > *,.entry-footer,#comments-title,.comment-list > li,"+
+  "#secondary .widget,#colophon .site-info";
+var flipNodes=[],flipTimer=null;
+
+function finishFlip(){
+  if(flipTimer){clearTimeout(flipTimer);flipTimer=null;}
+  flipNodes.forEach(function(n){
+    n.style.transition="";n.style.transform="";n.style.transformOrigin="";
+    n.style.opacity="";n.style.outline="";n.style.outlineOffset="";
+  });
+  flipNodes=[];
+}
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+function runFlip(nodes,first){
+  var last=nodes.map(function(n){return n.getBoundingClientRect()});
+  var anims=[],moved=0;
+  nodes.forEach(function(n,i){
+    var a=first[i],b=last[i];
+    var aVis=a.width>2&&a.height>2,bVis=b.width>2&&b.height>2;
+    if(!bVis)return;
+    var delay=Math.min(i*14,280);
+    n.style.transition="none";
+    n.style.transformOrigin="0 0";
+    if(!aVis){n.style.opacity="0";anims.push({n:n,delay:delay});return;}
+    var dx=a.left-b.left,dy=a.top-b.top;
+    var sx=clamp(a.width/b.width,.2,5),sy=clamp(a.height/b.height,.2,5);
+    if(Math.abs(dx)<1&&Math.abs(dy)<1&&Math.abs(sx-1)<.02&&Math.abs(sy-1)<.02){
+      n.style.transition="";n.style.transformOrigin="";return;
+    }
+    moved++;
+    n.style.transform="translate("+dx+"px,"+dy+"px) scale("+sx+","+sy+")";
+    n.style.opacity="0.4";
+    n.style.outline="1px dashed rgba(168,186,106,.85)";
+    n.style.outlineOffset="2px";
+    anims.push({n:n,delay:delay});
+  });
+  flipNodes=nodes;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    anims.forEach(function(a){
+      a.n.style.transition="transform .64s cubic-bezier(.22,.85,.25,1) "+a.delay+"ms, opacity .5s ease "+a.delay+"ms";
+      a.n.style.transform="";
+      a.n.style.opacity="";
+    });
+    showVeil("same markup · new stylesheet — "+moved+" nodes reflowed, 0 edits");
+    flipTimer=setTimeout(finishFlip,1200);
+  });});
+}
+
+function showVeil(text){
+  veilChip.textContent=text;
+  veil.classList.add("show");
+  if(veilTimer)clearTimeout(veilTimer);
+  veilTimer=setTimeout(function(){veil.classList.remove("show")},1700);
+}
+
+/* ---------- design switching ---------- */
+var current=-1,started=false;
+
+function applyDesign(idx,opts){
+  opts=opts||{};
+  var n=DESIGNS.length;
+  idx=((idx%n)+n)%n;
+  if(idx===current)return;
+  var d=DESIGNS[idx];
+  finishFlip();
+  var doMorph=opts.morph!==false&&!reduceMotion.matches&&current!==-1;
+  var tracked=null,first=null;
+  if(doMorph){
+    tracked=$$(TRACK,stage);
+    first=tracked.map(function(node){return node.getBoundingClientRect()});
+  }
+  styleEl.textContent=cssFor(d.id);
+  stage.scrollTop=0;
+  if(doMorph)runFlip(tracked,first);
+  else if(current!==-1&&reduceMotion.matches)showVeil("same markup · new stylesheet — 0 edits");
+  current=idx;
+  updateChrome(d,idx);
+  if(inspector.classList.contains("open")&&activeTab==="css")renderCssPane();
+  if(history.replaceState)history.replaceState(null,"","#"+d.id);
+}
+
+function updateChrome(d,idx){
+  cbNum.textContent="DESIGN 0"+(idx+1)+" / 0"+DESIGNS.length;
+  cbName.textContent=d.name;
+  cbYear.textContent=d.year==="timeless"?"TIMELESS":"CIRCA "+d.year;
+  cbNote.innerHTML=d.note;
+  $$("#designs a",stage).forEach(function(a,i){
+    if(i===idx)a.setAttribute("aria-current","true");
+    else a.removeAttribute("aria-current");
+  });
+  announcer.textContent="Design "+(idx+1)+" of "+DESIGNS.length+": "+d.name+", "+d.year+".";
+}
+
+/* ---------- syntax highlighting ---------- */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+function tokenizeCSS(src){
+  var toks=[],i=0,n=src.length,ctx="sel",buf="";
+  function flush(){
+    if(!buf)return;
+    if(ctx==="sel")toks.push([buf.trim().charAt(0)==="@"?"at":"sel",buf]);
+    else if(ctx==="prop")toks.push(["prop",buf]);
+    else toks.push(["val",buf]);
+    buf="";
+  }
+  while(i<n){
+    if(src.charAt(i)==="/"&&src.charAt(i+1)==="*"){
+      flush();
+      var j=src.indexOf("*/",i);j=j<0?n:j+2;
+      toks.push(["com",src.slice(i,j)]);i=j;continue;
+    }
+    var ch=src.charAt(i);
+    if(ch==="{"){
+      var wasAt=/^\s*@(media|supports|keyframes|-)/.test(buf);
+      flush();toks.push(["pun",ch]);
+      ctx=wasAt?"sel":"prop";i++;continue;
+    }
+    if(ch==="}"){flush();toks.push(["pun",ch]);ctx="sel";i++;continue;}
+    if(ch===":"&&ctx==="prop"){flush();toks.push(["pun",ch]);ctx="val";i++;continue;}
+    if(ch===";"){flush();toks.push(["pun",ch]);if(ctx==="val")ctx="prop";i++;continue;}
+    buf+=ch;i++;
+  }
+  flush();
+  return toks;
+}
+
+function highlightCSS(src){
+  return tokenizeCSS(src).map(function(t){
+    return '<span class="tk-'+t[0]+'">'+esc(t[1])+"</span>";
+  }).join("");
+}
+
+function highlightHTML(src){
+  var s=esc(src);
+  s=s.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="tk-com">$1</span>');
+  s=s.replace(/(&lt;\/?)([a-zA-Z][\w-]*)([\s\S]*?)(\/?&gt;)/g,function(m,o,tag,attrs,c){
+    if(o.indexOf("!--")>-1)return m;
+    attrs=attrs.replace(/([a-zA-Z-]+)="([^"]*)"/g,
+      '<span class="tk-attr">$1</span>=<span class="tk-str">"$2"</span>');
+    return '<span class="tk-pun">'+o+'</span><span class="tk-tag">'+tag+"</span>"+attrs+
+      '<span class="tk-pun">'+c+"</span>";
+  });
+  return s;
+}
+
+function renderPane(pane,html,lineCount){
+  var nums="";
+  for(var i=1;i<=lineCount;i++)nums+=i+(i<lineCount?"\n":"");
+  pane.innerHTML='<pre class="gutter">'+nums+'</pre><pre class="code">'+html+"</pre>";
+}
+
+var htmlRendered=false,activeTab="css";
+
+function renderCssPane(){
+  var d=DESIGNS[current<0?0:current];
+  var css=cssFor(d.id);
+  insPath.textContent="wp-content/themes/"+d.file+"/style.css";
+  var bytes=css.length;
+  var kb=bytes<1024?bytes+" B":(bytes/1024).toFixed(1)+" KB";
+  insStats.textContent=css.split("\n").length+" lines · "+kb+" · swapped live";
+  renderPane(paneCss,highlightCSS(css),css.split("\n").length);
+  insFoot.innerHTML="This is the entire design — every era in this room is CSS alone, "+
+    "poured into <b>#zen-garden-style</b>. The document under it never varies.";
+}
+
+function renderHtmlPane(){
+  if(!htmlRendered){
+    renderPane(paneHtml,highlightHTML(PRISTINE),PRISTINE.split("\n").length);
+    htmlRendered=true;
+  }
+  insPath.textContent="the-loop/index.html — the sealed specimen";
+  insStats.textContent=PRISTINE.split("\n").length+" lines · fingerprint "+FP+" · constant";
+  insFoot.innerHTML="Byte-for-byte identical under all eight designs — fingerprint <b>"+FP+
+    "</b>, sealed when the lab opened. If you see it move, the exhibit is broken.";
+}
+
+function selectTab(which){
+  activeTab=which;
+  tabCss.setAttribute("aria-selected",which==="css"?"true":"false");
+  tabHtml.setAttribute("aria-selected",which==="html"?"true":"false");
+  paneCss.hidden=which!=="css";
+  paneHtml.hidden=which!=="html";
+  if(which==="css")renderCssPane();else renderHtmlPane();
+}
+
+var lastFocus=null;
+function openInspector(){
+  lastFocus=document.activeElement;
+  inspector.classList.add("open");
+  inspector.setAttribute("aria-hidden","false");
+  btnCss.setAttribute("aria-expanded","true");
+  selectTab(activeTab);
+  $("#ins-close").focus();
+}
+function closeInspector(){
+  inspector.classList.remove("open");
+  inspector.setAttribute("aria-hidden","true");
+  btnCss.setAttribute("aria-expanded","false");
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+function toggleInspector(){
+  if(inspector.classList.contains("open"))closeInspector();else openInspector();
+}
+
+/* ---------- the lab bench ---------- */
+var bootLastFocus=null;
+function openBoot(){
+  bootLastFocus=document.activeElement;
+  stage.setAttribute("inert","");
+  $("#museum-link").setAttribute("inert","");
+  $("#curatorbar").setAttribute("inert","");
+  inspector.setAttribute("inert","");
+  bootModal.classList.add("open");
+  bootModal.setAttribute("aria-hidden","false");
+  $("#bm-close").focus();
+}
+function closeBoot(){
+  bootModal.classList.remove("open","booted");
+  bootModal.setAttribute("aria-hidden","true");
+  bmStage.innerHTML="";
+  stage.removeAttribute("inert");
+  $("#museum-link").removeAttribute("inert");
+  $("#curatorbar").removeAttribute("inert");
+  inspector.removeAttribute("inert");
+  if(bootLastFocus&&bootLastFocus.focus)bootLastFocus.focus();
+}
+function bootWp(v){
+  bmStage.innerHTML="";
+  var f=document.createElement("iframe");
+  f.src="https://playground.wordpress.net/?wp="+v;
+  f.title="WordPress "+v+" running live via Playground";
+  bmStage.appendChild(f);
+  bootModal.classList.add("booted");
+}
+$$(".bm-opt").forEach(function(b){
+  b.addEventListener("click",function(){bootWp(b.getAttribute("data-wp"))});
+});
+$("#bm-close").addEventListener("click",closeBoot);
+bootModal.addEventListener("click",function(e){if(e.target===bootModal)closeBoot()});
+
+/* ---------- specimen event routing (listeners, not markup) ---------- */
+stage.addEventListener("click",function(e){
+  var a=e.target.closest?e.target.closest("a"):null;
+  if(!a)return;
+  var href=a.getAttribute("href")||"";
+  if(href.charAt(0)!=="#")return; /* external links travel freely */
+  e.preventDefault();
+  if(a.parentElement&&a.closest("#designs")){
+    var links=$$("#designs a",stage);
+    applyDesign(links.indexOf(a));
+    return;
+  }
+  if(href==="#boot"){openBoot();return;}
+  if(href==="#comments"||href==="#masthead"){
+    var t=$(href,stage);
+    if(t)t.scrollIntoView({behavior:reduceMotion.matches?"auto":"smooth"});
+    return;
+  }
+  /* every other in-page link is scenery: 2003 wants you to believe it */
+});
+
+$("#searchform",stage).addEventListener("submit",function(e){
+  e.preventDefault();
+  cbNote.innerHTML="<b>Search:</b> this archive holds exactly one post, and you are reading it. Try the wardrobe instead.";
+  setTimeout(function(){if(current>=0)cbNote.innerHTML=DESIGNS[current].note},3200);
+});
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented)return;
+  var tag=(e.target.tagName||"").toLowerCase();
+  var typing=tag==="input"||tag==="textarea"||e.target.isContentEditable;
+  if(e.key==="Escape"){
+    if(bootModal.classList.contains("open")){closeBoot();return;}
+    if(inspector.classList.contains("open")){closeInspector();return;}
+    return;
+  }
+  if(!started||typing)return;
+  if(e.key==="ArrowRight"){e.preventDefault();applyDesign(current+1);}
+  else if(e.key==="ArrowLeft"){e.preventDefault();applyDesign(current-1);}
+  else if(e.key.toLowerCase()==="c"&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();toggleInspector();}
+  else if(/^[1-8]$/.test(e.key)&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();applyDesign(parseInt(e.key,10)-1);}
+});
+
+btnCss.addEventListener("click",toggleInspector);
+$("#ins-close").addEventListener("click",closeInspector);
+tabCss.addEventListener("click",function(){selectTab("css")});
+tabHtml.addEventListener("click",function(){selectTab("html")});
+
+/* ---------- entry ---------- */
+function initialIndex(){
+  var h=(location.hash||"").replace("#","");
+  for(var i=0;i<DESIGNS.length;i++)if(DESIGNS[i].id===h)return i;
+  return 0;
+}
+
+applyDesign(initialIndex(),{morph:false});
+
+$("#enter").addEventListener("click",function(){
+  splash.classList.add("gone");
+  started=true;
+  stage.removeAttribute("inert");
+  $("#museum-link").removeAttribute("inert");
+  $("#curatorbar").removeAttribute("inert");
+  stage.focus({preventScroll:true});
+  setTimeout(function(){
+    showVeil("specimen sealed · fingerprint "+FP);
+  },reduceMotion.matches?0:400);
+});
+
+window.addEventListener("hashchange",function(){
+  if(!started)return;
+  var idx=initialIndex();
+  if(idx!==current)applyDesign(idx);
+});
+
+})();
+</script>
+</body>
+</html>

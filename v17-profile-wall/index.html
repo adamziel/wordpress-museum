@@ -1,0 +1,2110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WordPress Museum · v17 · The Profile Wall</title>
+<style>
+/* ============================================================
+   v17 · THE PROFILE WALL
+   A rescued archive capture of myspace.com/wordpress (2005),
+   with a second capture from 2011 when WordPress joined Tumblr.
+   All chrome is drawn by hand. All crimes are intentional.
+   ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  min-height:100vh;
+  font:11px Verdana,Geneva,Arial,sans-serif;
+  color:#000;
+  background-color:var(--bg-color,#0d0d33);
+  background-image:var(--bg-tile,none);
+  background-attachment:fixed;
+}
+img,svg,canvas{display:block}
+a{color:var(--link,#003399)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px dashed #ff00cc;outline-offset:2px}
+[data-mode="tumblr"] :focus-visible{outline:2px dashed #fff}
+
+#myspace[hidden],#tumblr[hidden]{display:none!important}
+.page{animation:pagein .35s ease}
+@keyframes pagein{from{opacity:0}to{opacity:1}}
+
+/* ------------------------------------------------------------
+   SKINS — themes worn as outfits over the same MySpace bones.
+   ------------------------------------------------------------ */
+body[data-skin="classic"]{
+  --bg-color:#0d0d33;
+  --bg-tile:
+    radial-gradient(1px 1px at 12px 18px,#fff 60%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 60px 44px,#ffe9f7 60%,transparent 100%),
+    radial-gradient(1px 1px at 34px 70px,#9fd0ff 60%,transparent 100%),
+    radial-gradient(2px 2px at 82px 8px,#fff 60%,transparent 100%),
+    radial-gradient(1px 1px at 96px 88px,#ffb3ef 60%,transparent 100%),
+    linear-gradient(180deg,#1a1046 0,#0d0d33 55%,#241048 100%);
+  --bg-size:110px 110px,110px 110px,110px 110px,110px 110px,110px 110px,100% 100%;
+  --f-body:Verdana,Geneva,Arial,sans-serif;
+  --panel:#fff;
+  --boxline:#6699cc;
+  --boxhead-bg:#6699cc;
+  --boxhead-fg:#fff;
+  --boxhead-r:0;
+  --cell:#d5e8fb;
+  --cellink:#336699;
+  --rhead:#ff6600;
+  --link:#003399;
+  --onbg:#fff;
+  --onbg-glow:0 1px 3px rgba(0,0,0,.9);
+  --net-bg:#fff;
+  --net-line:#000;
+  --gb-cell:#ffcc99;
+  --gb-head:#ff9933;
+}
+body[data-skin="bluedefault"]{
+  --bg-color:#7b8ea6;
+  --bg-tile:repeating-linear-gradient(90deg,#7b8ea6 0 14px,#71849c 14px 28px);
+  --f-body:Georgia,"Times New Roman",serif;
+  --panel:#fff;
+  --boxline:#334c66;
+  --boxhead-bg:#334c66;
+  --boxhead-fg:#fff;
+  --boxhead-r:0;
+  --cell:#e2e8f0;
+  --cellink:#334c66;
+  --rhead:#334c66;
+  --link:#2c5a8c;
+  --onbg:#fff;
+  --onbg-glow:0 1px 2px rgba(20,30,45,.8);
+  --net-bg:#eef2f6;
+  --net-line:#334c66;
+  --gb-cell:#d8e0ea;
+  --gb-head:#334c66;
+}
+body[data-skin="kubrick"]{
+  --bg-color:#d5d6d7;
+  --bg-tile:none;
+  --f-body:"Lucida Grande","Lucida Sans Unicode",Verdana,sans-serif;
+  --panel:#fff;
+  --boxline:#a8b8c8;
+  --boxhead-bg:linear-gradient(180deg,#69a6d8 0,#4380b0 100%);
+  --boxhead-fg:#fff;
+  --boxhead-r:8px 8px 0 0;
+  --cell:#f0f6fa;
+  --cellink:#33536e;
+  --rhead:#3672a4;
+  --link:#0066cc;
+  --onbg:#333;
+  --onbg-glow:none;
+  --net-bg:#fff;
+  --net-line:#a8b8c8;
+  --gb-cell:#e8f1f8;
+  --gb-head:#4380b0;
+}
+body[data-skin="twentyten"]{
+  --bg-color:#f1f1f1;
+  --bg-tile:none;
+  --f-body:Georgia,"Bitstream Charter",serif;
+  --panel:#fff;
+  --boxline:#000;
+  --boxhead-bg:linear-gradient(180deg,#a8c86e 0,#4e7a2e 60%,#2c4a18 100%);
+  --boxhead-fg:#fff;
+  --boxhead-r:0;
+  --cell:#eee;
+  --cellink:#000;
+  --rhead:#000;
+  --link:#0066cc;
+  --onbg:#111;
+  --onbg-glow:none;
+  --net-bg:#fff;
+  --net-line:#000;
+  --gb-cell:#e0e0e0;
+  --gb-head:#000;
+}
+body[data-skin="twentytwenty"]{
+  --bg-color:#f5efe0;
+  --bg-tile:none;
+  --f-body:"Hoefler Text","Iowan Old Style",Georgia,serif;
+  --panel:#fff;
+  --boxline:#cd2653;
+  --boxhead-bg:#cd2653;
+  --boxhead-fg:#fff;
+  --boxhead-r:0;
+  --cell:#f0e5d0;
+  --cellink:#6d6d6d;
+  --rhead:#cd2653;
+  --link:#cd2653;
+  --onbg:#000;
+  --onbg-glow:none;
+  --net-bg:#fff;
+  --net-line:#cd2653;
+  --gb-cell:#f3e3d3;
+  --gb-head:#cd2653;
+}
+body{background-size:var(--bg-size,auto)}
+#myspace{font-family:var(--f-body)}
+
+/* ------------------------------------------------------------
+   WAYBACK STRIP — the museum's archival frame + era toggle.
+   ------------------------------------------------------------ */
+#wayback{
+  background:#262626;color:#cfcfcf;
+  font:10px "Courier New",monospace;
+  padding:6px 12px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-bottom:1px solid #4a4a4a;
+}
+#wayback .wb-logo{color:#f0c419;letter-spacing:1px;font-weight:bold;white-space:nowrap}
+#wayback .wb-url{color:#8fd18f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}
+#wayback .wb-caps{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.wb-cap{
+  background:#1a1a1a;color:#cfcfcf;border:1px solid #555;
+  font:10px "Courier New",monospace;padding:2px 8px;
+}
+.wb-cap[aria-pressed="true"]{background:#f0c419;color:#1a1a1a;border-color:#f0c419;font-weight:bold}
+.wb-cap:hover{border-color:#f0c419}
+#wayback .wb-museum{color:#9fbfdf;margin-left:auto;text-decoration:none;white-space:nowrap}
+#wayback .wb-museum:hover{text-decoration:underline;color:#fff}
+#wayback .wb-note{color:#777;white-space:nowrap}
+
+/* ------------------------------------------------------------
+   MYSPACE CHROME — the blue that stayed blue no matter what
+   crimes you committed below it.
+   ------------------------------------------------------------ */
+.ms-shell{width:812px;margin:0 auto}
+.ms-topbar{
+  background:linear-gradient(180deg,#3b6ea5 0,#1d3d6e 55%,#12294f 100%);
+  border-bottom:1px solid #0a1a33;
+  padding:5px 10px;
+  display:flex;align-items:center;gap:14px;
+  font-family:Verdana,Arial,sans-serif;
+}
+.ms-logo{color:#fff;font:bold 17px Arial,sans-serif;letter-spacing:-1px;line-height:1;white-space:nowrap}
+.ms-logo span{font-weight:normal;font-size:11px;letter-spacing:0}
+.ms-logo em{display:block;font:italic 9px Arial;color:#bcd2ee;letter-spacing:0;margin-top:1px}
+.ms-search{display:flex;align-items:center;gap:4px;margin-left:auto;font-size:10px;color:#dfe9f7}
+.ms-search input{
+  font:10px Verdana;border:1px solid #12294f;padding:2px 3px;width:120px;background:#fff;
+}
+.ms-search button{
+  font:bold 10px Verdana;background:#e8eef8;border:1px outset #fff;padding:1px 7px;color:#12294f;
+}
+.ms-search .goog{font-size:8px;color:#9fb6d8;white-space:nowrap}
+.ms-acct{font-size:10px;color:#dfe9f7;white-space:nowrap}
+.ms-acct a{color:#fff}
+.ms-nav{
+  background:#6699cc;
+  border-top:1px solid #88b3dd;border-bottom:1px solid #33557f;
+  text-align:center;
+  padding:3px 4px;
+  font:bold 10px Verdana,Arial,sans-serif;
+  color:#cfe1f5;
+}
+.ms-nav a{color:#fff;text-decoration:none;padding:0 3px;white-space:nowrap}
+.ms-nav a:hover{text-decoration:underline}
+
+/* ------------------------------------------------------------
+   THE BANNER AD (which is secretly the lobby link)
+   ------------------------------------------------------------ */
+.ms-ad{
+  display:block;width:728px;margin:10px auto;
+  border:3px dashed #ff0;
+  background:
+    repeating-linear-gradient(45deg,#ff2d78 0 26px,#7a1fd1 26px 52px);
+  color:#fff;text-align:center;
+  padding:10px 12px;
+  font:bold 13px "Comic Sans MS","Comic Sans",cursive;
+  text-shadow:1px 1px 0 #000;
+  animation:adborder 1s steps(2) infinite;
+}
+@keyframes adborder{50%{border-color:#0ff}}
+.ms-ad .big{font-size:17px;letter-spacing:1px}
+.ms-ad a{color:#ffff66;text-decoration:underline}
+.ms-ad a:hover{color:#fff}
+.ms-ad .fine{display:block;font:9px Verdana;font-weight:normal;margin-top:4px;color:#ffd7ee;text-shadow:none}
+.ms-ad .arrow{display:inline-block;animation:bounce .6s ease-in-out infinite alternate}
+@keyframes bounce{from{transform:translateY(-2px)}to{transform:translateY(3px)}}
+
+/* ------------------------------------------------------------
+   PROFILE LAYOUT — the sacred two columns.
+   ------------------------------------------------------------ */
+.ms-cols{display:flex;gap:12px;padding:6px 6px 20px;align-items:flex-start}
+.ms-left{width:300px;flex:none;display:flex;flex-direction:column;gap:10px}
+.ms-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+
+.ms-name{
+  font:bold 17px Arial,sans-serif;
+  color:var(--onbg);text-shadow:var(--onbg-glow);
+  letter-spacing:.5px;
+}
+.ms-name .online{
+  font:bold 9px Verdana;color:#39e639;margin-left:8px;vertical-align:2px;
+  text-shadow:0 1px 2px rgba(0,0,0,.8);
+}
+.ms-name .online i{
+  display:inline-block;width:7px;height:7px;background:#39e639;border-radius:50%;
+  margin-right:3px;animation:blinker 1.1s steps(2) infinite;
+}
+.ms-headline{
+  font:italic 11px var(--f-body);color:var(--onbg);text-shadow:var(--onbg-glow);
+  margin:2px 0 8px;
+}
+@keyframes blinker{50%{opacity:0}}
+.blink{animation:blinker 1s steps(2) infinite}
+
+/* profile id card (pic + vitals) */
+.ms-idcard{display:flex;gap:8px}
+.ms-picframe{
+  flex:none;background:var(--panel);border:1px solid var(--boxline);padding:3px;position:relative;
+}
+.ms-picframe canvas{width:150px;height:150px;image-rendering:pixelated}
+.ms-picframe .stamp{
+  position:absolute;right:6px;bottom:6px;
+  font:bold 9px "Courier New",monospace;color:#ff9c2a;
+  text-shadow:0 0 3px rgba(0,0,0,.8);letter-spacing:1px;
+}
+.ms-vitals{font-size:11px;line-height:1.55;color:var(--onbg);text-shadow:var(--onbg-glow)}
+.ms-vitals b{font-weight:bold}
+.ms-vitals .mood{margin-top:6px}
+.ms-vitals .viewmy{margin-top:8px;font-size:10px}
+.ms-vitals .viewmy a{color:var(--onbg);font-weight:bold}
+
+/* marquee crime */
+.marq{
+  overflow:hidden;white-space:nowrap;
+  background:var(--panel);border:1px solid var(--boxline);
+  padding:3px 0;font:bold 10px Verdana;color:#cc00cc;
+}
+.marq .inner{display:inline-block;padding-left:100%;animation:marq 16s linear infinite}
+@keyframes marq{to{transform:translateX(-100%)}}
+
+/* generic left box */
+.msbox{background:var(--panel);border:1px solid var(--boxline)}
+.msbox-h{
+  background:var(--boxhead-bg);color:var(--boxhead-fg);
+  font:bold 11px Arial,var(--f-body);
+  padding:3px 6px;border-radius:var(--boxhead-r);
+}
+.msbox-b{padding:6px}
+
+/* contact box */
+.ms-contact .msbox-b{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px;padding:8px 10px}
+.ms-contact a{font-size:10px;text-decoration:none;color:var(--link);white-space:nowrap}
+.ms-contact a:hover{text-decoration:underline}
+.ms-contact .ico{display:inline-block;width:12px;text-align:center;color:#ff6600;font-weight:bold}
+
+/* url box */
+.ms-url .msbox-b{font-size:10px;word-break:break-all}
+.ms-url b{display:block;margin-bottom:2px}
+
+/* detail / interest tables */
+.ms-table{width:100%;border-collapse:separate;border-spacing:2px;background:var(--panel)}
+.ms-table td{padding:3px 5px;font-size:10px;vertical-align:top;font-family:var(--f-body)}
+.ms-table td.l{background:var(--cell);color:var(--cellink);font-weight:bold;width:76px}
+.ms-table td.v{background:var(--panel);color:#000;border:1px solid var(--cell)}
+
+/* song spot */
+.ms-player{border:1px solid var(--boxline);background:var(--panel)}
+.ms-player .deck{
+  background:linear-gradient(180deg,#25476b 0,#132c47 100%);
+  padding:8px;display:flex;align-items:center;gap:8px;
+}
+.ms-player .btn{
+  flex:none;width:34px;height:34px;border-radius:50%;
+  border:2px outset #ffb763;background:radial-gradient(circle at 35% 30%,#ffcf8a,#f07f00 70%);
+  color:#4a2600;font:bold 13px Arial;line-height:1;
+}
+.ms-player .btn:active{border-style:inset}
+.ms-player .lcd{flex:1;min-width:0;background:#04140a;border:1px inset #333;padding:4px 6px}
+.ms-player .lcd .track{
+  font:bold 10px "Courier New",monospace;color:#4dff6a;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.ms-player .lcd .sub{font:9px "Courier New",monospace;color:#2a9c41}
+.eq{flex:none;display:flex;align-items:flex-end;gap:2px;height:26px}
+.eq span{width:5px;background:linear-gradient(180deg,#ff5d5d,#ffd24d 40%,#4dff6a 70%);height:30%}
+.playing .eq span{animation:eqb .48s ease-in-out infinite alternate}
+.eq span:nth-child(1){animation-delay:0s}
+.eq span:nth-child(2){animation-delay:.13s}
+.eq span:nth-child(3){animation-delay:.05s}
+.eq span:nth-child(4){animation-delay:.21s}
+.eq span:nth-child(5){animation-delay:.09s}
+@keyframes eqb{from{height:16%}to{height:100%}}
+.ms-player .note{padding:4px 6px;font-size:9px;color:#666;font-style:italic}
+
+/* hit counter */
+.ms-counter{
+  text-align:center;color:var(--onbg);text-shadow:var(--onbg-glow);
+  font:bold 10px Verdana;padding:4px 0;
+}
+.ms-counter .digits{display:inline-flex;gap:1px;margin:0 5px;vertical-align:-3px}
+.ms-counter .digits span{
+  background:#000;color:#39ff5e;border:1px solid #2a5c33;
+  font:bold 12px "Courier New",monospace;padding:1px 3px;
+}
+
+/* ------------------------------------------------------------
+   RIGHT COLUMN — network banner, blurbs, blog, pics, top 8,
+   and the guestbook wall.
+   ------------------------------------------------------------ */
+.ms-network{
+  background:var(--net-bg);border:2px solid var(--net-line);
+  text-align:center;padding:18px 12px 12px;
+}
+.ms-network .line{font:bold 19px Arial,sans-serif;color:#000}
+.ms-network .line b{font-size:21px}
+.ms-network .sub{font:9px Verdana;color:#999;margin-top:6px}
+
+.ms-bulletin{
+  background:#fffbcc;border:2px dashed #e03030;padding:8px 10px;
+  font-size:10px;line-height:1.5;
+}
+.ms-bulletin .tag{font:bold 11px Verdana;color:#e03030}
+.ms-bulletin .go{
+  display:inline-block;margin-top:6px;
+  background:#2c4762;color:#fff;border:2px outset #7a97b3;
+  font:bold 11px Verdana;padding:4px 10px;
+}
+.ms-bulletin .go:active{border-style:inset}
+
+.rsec{background:var(--panel);border:1px solid var(--boxline);padding:8px 10px}
+.rsec>h2{
+  font:bold 15px Arial,var(--f-body);color:var(--rhead);
+  margin:0 0 6px;letter-spacing:.2px;
+}
+.rsec>h2 .sm{font:normal 9px Verdana;color:var(--link)}
+.rsec h3{font:bold 12px Arial,var(--f-body);color:var(--rhead);margin:10px 0 4px}
+.rsec p{font-size:11px;line-height:1.6}
+.rsec .deco{color:#cc33cc;font-weight:bold}
+
+/* glitter text effects (also used by guestbook) */
+.gl-rainbow{
+  font-family:"Comic Sans MS","Comic Sans",cursive;font-weight:bold;
+  background:linear-gradient(90deg,#f33,#f90,#fd3,#3c6,#39f,#93f,#f33);
+  background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:glr 3s linear infinite;
+}
+@keyframes glr{to{background-position:300% 0}}
+.gl-fire{
+  font-weight:bold;
+  background:linear-gradient(180deg,#ffe08a 0,#ff8c1a 45%,#e0301e 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:glf .28s steps(2) infinite;
+}
+@keyframes glf{50%{filter:brightness(1.35)}}
+.gl-chrome{
+  font-weight:bold;font-style:italic;font-family:Arial,sans-serif;
+  background:linear-gradient(180deg,#e8f4ff 0,#5b9bd5 38%,#dff0ff 52%,#2b6cb0 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.gl-comic{font-family:"Comic Sans MS","Comic Sans",cursive;color:#ff3399;text-shadow:1px 1px 0 #ffd7ee}
+.gl-emo{
+  font-family:"Courier New",monospace;color:#b9a3e3;background:#141414;
+  padding:1px 4px;text-transform:lowercase;
+}
+.sparkly::before,.sparkly::after{content:"✦";color:#ffcc00;margin:0 4px;animation:twinkle 1s ease-in-out infinite alternate;display:inline-block}
+.sparkly::after{content:"✧";color:#ff66cc;animation-delay:.4s}
+@keyframes twinkle{from{opacity:.3;transform:scale(.8)}to{opacity:1;transform:scale(1.15)}}
+
+/* blog preview */
+.ms-blog .entry{margin:8px 0 12px;border-bottom:1px dotted #ccc;padding-bottom:9px}
+.ms-blog .entry:last-of-type{border-bottom:0}
+.ms-blog .bdate{font:bold 10px Verdana;color:#000}
+.ms-blog .btitle{font-size:12px;font-weight:bold}
+.ms-blog .btitle a{color:var(--link)}
+.ms-blog .bmood{font:italic 9px Verdana;color:#996;margin:2px 0}
+.ms-blog .sm{font:normal 9px Verdana;color:#999}
+.ms-blog .bsnip{font-size:10px;line-height:1.6;color:#333}
+.ms-blog .viewall{font-size:10px}
+.timemachine{
+  margin-top:6px;background:#000;color:#39ff5e;border:2px outset #39ff5e;
+  font:bold 10px "Courier New",monospace;padding:4px 9px;letter-spacing:1px;
+}
+.timemachine:active{border-style:inset}
+.timemachine:hover{background:#08240f}
+
+/* pics album — outfits */
+.ms-pics .grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:6px 0}
+.polaroid{
+  background:#fdfdf6;border:1px solid #ccc;box-shadow:2px 3px 6px rgba(0,0,0,.35);
+  padding:7px 7px 4px;display:block;
+}
+.polaroid:nth-child(odd){transform:rotate(-2.5deg)}
+.polaroid:nth-child(even){transform:rotate(1.8deg)}
+.polaroid:hover,.polaroid:focus-visible{transform:rotate(0) scale(1.05);z-index:2;position:relative}
+.polaroid .cap{
+  font:11px "Comic Sans MS","Comic Sans",cursive;color:#444;
+  text-align:center;padding:4px 0 2px;max-width:120px;
+}
+.shot{width:120px;height:88px;position:relative;overflow:hidden;border:1px solid #999;background:#fff}
+.shot i{position:absolute;display:block}
+.shot .lines{background:repeating-linear-gradient(180deg,#c4c4c4 0 2px,transparent 2px 6px)}
+/* default blue (2004) */
+.s-blue{background:#fff}
+.s-blue .hd{top:0;left:0;right:0;height:20px;background:#334c66}
+.s-blue .hdt{top:5px;left:8px;width:52px;height:8px;background:#fff;opacity:.9}
+.s-blue .bd{top:26px;left:8px;width:66px;height:54px}
+.s-blue .sb{top:26px;right:6px;width:30px;height:50px;background:repeating-linear-gradient(180deg,#2c5a8c 0 2px,transparent 2px 7px)}
+/* kubrick */
+.s-kubrick{background:#d5d6d7}
+.s-kubrick .col{top:4px;left:14px;right:14px;bottom:0;background:#fff;border:1px solid #bbb}
+.s-kubrick .hd{top:4px;left:14px;right:14px;height:26px;background:linear-gradient(180deg,#69a6d8,#4380b0);border-radius:7px 7px 0 0}
+.s-kubrick .hdt{top:12px;left:30px;width:44px;height:7px;background:#fff;border-radius:2px}
+.s-kubrick .bd{top:38px;left:22px;right:22px;height:44px}
+/* twenty ten */
+.s-tten{background:#f1f1f1}
+.s-tten .bar{top:0;left:10px;right:10px;height:7px;background:#000}
+.s-tten .hd{top:7px;left:10px;right:10px;height:34px;background:linear-gradient(180deg,#b8d47e 0,#5c8a38 55%,#2c4a18 100%)}
+.s-tten .tree{bottom:47px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:16px solid #1d3510;opacity:.75}
+.s-tten .t1{left:22px}.s-tten .t2{left:52px;transform:scale(.7)}.s-tten .t3{left:86px}
+.s-tten .bd{top:48px;left:16px;width:58px;height:34px}
+.s-tten .sb{top:48px;right:14px;width:22px;height:30px;background:repeating-linear-gradient(180deg,#888 0 2px,transparent 2px 7px)}
+/* twenty twenty */
+.s-ttw{background:#f5efe0}
+.s-ttw .ttl{top:12px;left:24px;right:24px;height:9px;background:#000}
+.s-ttw .ttl2{top:26px;left:36px;right:36px;height:5px;background:#69603f;opacity:.6}
+.s-ttw .btn{top:40px;left:46px;width:28px;height:9px;background:#cd2653;border-radius:5px}
+.s-ttw .bd{top:58px;left:24px;right:24px;height:24px}
+/* live 2026 */
+.s-live{background:#000}
+.s-live .static{inset:0;background:repeating-linear-gradient(0deg,#0a0a0a 0 2px,#161616 2px 4px)}
+.s-live .facew{top:22px;left:38px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#3fa9f5,#0f5e8f 75%)}
+.s-live .facet{top:38px;left:50px;width:20px;height:12px;color:#fff;font:bold 13px Georgia;font-style:italic}
+.s-live .rec{top:6px;left:8px;color:#f33;font:bold 8px Verdana;letter-spacing:1px}
+.s-live .rec::before{content:"●";margin-right:3px;animation:blinker 1s steps(2) infinite}
+.pics-reset{font-size:9px;text-align:center;display:block;margin-top:4px}
+
+/* top 8 */
+.ms-top8 .count{font-size:11px;margin-bottom:8px}
+.ms-top8 .count .red{color:#e03030;font-weight:bold}
+.t8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;padding:4px 0}
+.t8{position:relative;text-align:center;background:none;border:0;padding:0;font-family:inherit}
+.t8 .fname{
+  font:bold 10px Arial;color:#c00;display:block;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.t8 .av{width:72px;height:72px;margin:0 auto;border:1px solid #999;background:#fff}
+.t8 .av svg{width:100%;height:100%}
+.t8 .bub{
+  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  width:170px;background:#fffef2;border:1px solid #333;padding:6px 8px;
+  font:10px "Comic Sans MS","Comic Sans",cursive;color:#222;line-height:1.5;
+  box-shadow:2px 2px 5px rgba(0,0,0,.3);z-index:6;text-align:left;
+}
+.t8 .bub::after{
+  content:"";position:absolute;top:100%;left:50%;margin-left:-6px;
+  border:6px solid transparent;border-top-color:#333;
+}
+.t8:hover .bub,.t8:focus .bub,.t8:focus-visible .bub{display:block}
+.t8-viewall{text-align:right;font-size:10px;margin-top:6px}
+
+/* guestbook / comments wall */
+.ms-gb .disp{font:bold 10px Verdana;background:var(--gb-head);color:#fff;padding:3px 6px}
+.gb-row{display:flex;border:1px solid var(--gb-head);border-top:0}
+.gb-who{
+  flex:none;width:118px;background:var(--gb-cell);padding:7px;font-size:10px;
+}
+.gb-who .n{font-weight:bold;color:#c00;word-break:break-word;display:block;margin-bottom:5px}
+.gb-who .av{width:64px;height:64px;border:1px solid #999;background:#fff}
+.gb-who .av svg{width:100%;height:100%}
+.gb-who .del{font-size:9px;color:#666;display:inline-block;margin-top:4px;background:none;border:0;text-decoration:underline;padding:0}
+.gb-msg{flex:1;min-width:0;background:var(--panel);padding:7px 9px;font-size:11px;line-height:1.6;position:relative}
+.gb-msg .d{font:bold 9px Verdana;color:#555;display:block;margin-bottom:4px}
+.gb-row.spam .gb-msg .t{text-decoration:line-through;color:#999}
+.gb-stamp{
+  position:absolute;right:10px;top:26%;transform:rotate(-9deg);
+  border:2px solid #338a3e;color:#338a3e;background:rgba(255,255,255,.88);
+  font:bold 10px Arial;padding:2px 7px;letter-spacing:.5px;
+}
+.gb-form{margin-top:12px;border:1px solid var(--boxline);background:var(--cell);padding:9px}
+.gb-form h3{margin:0 0 7px}
+.gb-form .frow{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.gb-form label{font:bold 10px Verdana;color:var(--cellink)}
+.gb-form input[type=text],.gb-form select{font:11px Verdana;border:1px solid #888;padding:2px 4px;background:#fff}
+.gb-form textarea{width:100%;height:52px;font:11px Verdana;border:1px solid #888;padding:4px;resize:vertical;background:#fff}
+.gb-form .post{
+  background:linear-gradient(180deg,#ffcf8a,#f07f00);border:2px outset #ffb763;
+  font:bold 11px Verdana;color:#4a2600;padding:3px 14px;
+}
+.gb-form .post:active{border-style:inset}
+.gb-form .fine{font-size:9px;color:#777;margin-top:4px;font-style:italic}
+
+/* footer */
+.ms-footer{
+  text-align:center;font:9px Verdana;color:#cfe1f5;
+  background:#12294f;border-top:1px solid #33557f;
+  padding:10px;margin-top:4px;
+}
+.ms-footer a{color:#fff;text-decoration:none;padding:0 3px}
+.ms-footer a:hover{text-decoration:underline}
+.ms-footer .cop{margin-top:5px;color:#7d99c4}
+
+/* cursor sparkles */
+.spark{
+  position:fixed;z-index:99;pointer-events:none;font-size:12px;
+  animation:sparkfall .8s ease-out forwards;
+}
+@keyframes sparkfall{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(26px) scale(.4)}
+}
+
+/* ------------------------------------------------------------
+   TUMBLR 2011 — same souls, new decade, dark blue everything.
+   ------------------------------------------------------------ */
+#tumblr{
+  background:#2c4762;min-height:100vh;
+  font:13px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#444;
+  padding-bottom:60px;
+}
+.tb-header{
+  background:linear-gradient(180deg,#3d5d7e 0,#2c4762 100%);
+  border-bottom:1px solid #1e3247;
+  box-shadow:0 1px 4px rgba(0,0,0,.35);
+  position:sticky;top:0;z-index:20;
+}
+.tb-hinner{
+  width:860px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:8px 10px;
+}
+.tb-logo{
+  color:#fff;font:900 26px "Arial Rounded MT Bold","Helvetica Neue",Arial,sans-serif;
+  letter-spacing:-1px;line-height:1;text-shadow:0 2px 3px rgba(0,0,0,.4);
+}
+.tb-logo .dot{color:#9fc1e0}
+.tb-search{
+  background:#22374a;border:1px solid #1a2b3b;border-radius:14px;
+  color:#c6d6e4;font:12px Helvetica,Arial;padding:5px 12px;width:200px;
+}
+.tb-search::placeholder{color:#7e97ad}
+.tb-hnav{margin-left:auto;display:flex;align-items:center;gap:14px}
+.tb-hnav a{color:#c6d6e4;text-decoration:none;font-size:12px}
+.tb-hnav a:hover{color:#fff}
+.tb-back{
+  background:#f0c419;border:1px solid #b8940d;border-radius:3px;
+  font:bold 11px Verdana;color:#4a3b02;padding:4px 9px;
+}
+.tb-back:hover{background:#ffd83d}
+
+.tb-wrap{width:860px;margin:22px auto 0;display:flex;gap:20px;align-items:flex-start}
+.tb-feed{width:540px;flex:none;display:flex;flex-direction:column;gap:18px;padding-left:56px}
+.tb-side{flex:1;display:flex;flex-direction:column;gap:14px;position:sticky;top:64px}
+
+.tb-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+/* new post bar */
+.tb-newpost{padding:12px 14px}
+.tb-newpost .hint{color:#a5a5a5;font-size:13px;margin-bottom:10px;font-style:italic}
+.tb-types{display:flex;gap:6px;justify-content:space-between}
+.tb-type{flex:1;border:0;background:none;text-align:center;padding:2px 0;border-radius:4px}
+.tb-type:hover{background:#eef4f9}
+.tb-type .sq{
+  width:38px;height:38px;margin:0 auto 4px;border-radius:5px;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font:bold 16px Georgia,serif;box-shadow:inset 0 -2px 0 rgba(0,0,0,.22);
+}
+.tb-type .lbl{font-size:10px;color:#777}
+.tt-text .sq{background:#7c8b99}
+.tt-photo .sq{background:#d95e40}
+.tt-quote .sq{background:#d9a13f}
+.tt-link .sq{background:#56a559}
+.tt-chat .sq{background:#529ecc}
+.tt-audio .sq{background:#8f6bb8}
+.tt-video .sq{background:#4aa8a2}
+
+/* posts */
+.tb-post{position:relative}
+.tb-av{
+  position:absolute;left:-56px;top:0;width:40px;height:40px;border-radius:3px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.4);background:#fff;
+}
+.tb-av svg{width:100%;height:100%}
+.tb-pbody{padding:14px 16px 10px}
+.tb-phead{font-size:13px;color:#888;margin-bottom:10px}
+.tb-phead b{color:#333}
+.tb-pbody p{line-height:1.55;margin-bottom:8px;color:#444}
+.tb-pbody p:last-child{margin-bottom:0}
+.tb-pfoot{
+  border-top:1px solid #eee;padding:8px 16px;display:flex;align-items:center;gap:10px;
+  font-size:12px;color:#a0a0a0;flex-wrap:wrap;
+}
+.tb-pfoot .notes{font-weight:bold;color:#888}
+.tb-pfoot .tags{color:#a9bdd1;flex:1;min-width:0}
+.tb-pfoot .acts{display:flex;gap:6px;margin-left:auto}
+.tb-pfoot .acts button{
+  background:none;border:0;font-size:17px;line-height:1;color:#b5b5b5;padding:2px 4px;
+}
+.tb-pfoot .acts button:hover{color:#777}
+.tb-pfoot .act-heart.on{color:#d95e40}
+.tb-pfoot .act-reblog:active{transform:rotate(180deg)}
+
+/* reblog chains */
+.tb-pbody blockquote{
+  border-left:4px solid #dcdcdc;margin:6px 0 10px;padding:2px 0 2px 12px;
+}
+.tb-pbody .src{font-size:12px;color:#999;margin-bottom:4px}
+.tb-pbody .src b{color:#529ecc}
+
+/* quote post */
+.t-quote .q{
+  font:26px/1.35 Georgia,serif;color:#333;margin-bottom:8px;
+}
+.t-quote .q::before{content:"“";color:#bbb}
+.t-quote .q::after{content:"”";color:#bbb}
+.t-quote .qsrc{font-size:13px;color:#888}
+
+/* chat post */
+.t-chat .cl{padding:7px 10px;font-size:13px;line-height:1.5}
+.t-chat .cl:nth-child(odd){background:#f4f4f4}
+.t-chat .cl b{color:#529ecc}
+
+/* link post */
+.t-link .biglink{
+  display:block;font:bold 19px/1.3 Helvetica,Arial;color:#56a559;text-decoration:none;margin-bottom:6px;
+}
+.t-link .biglink:hover{text-decoration:underline}
+.t-link .ldesc{font-size:13px;color:#777;font-style:italic}
+
+/* audio post */
+.t-audio .player{
+  background:#3a3a3a;border-radius:4px;display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:8px;
+}
+.t-audio .pbtn{
+  flex:none;width:36px;height:36px;border-radius:50%;border:0;
+  background:#fff;color:#3a3a3a;font-size:14px;line-height:1;
+}
+.t-audio .tinfo{flex:1;min-width:0;color:#eee}
+.t-audio .tinfo .tn{font-weight:bold;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-audio .tinfo .ta{font-size:11px;color:#aaa}
+.t-audio .plays{font-size:11px;color:#888}
+.t-audio .eq span{background:linear-gradient(180deg,#fff,#9fc1e0)}
+
+/* photo post */
+.t-photo .ph{border:1px solid #e5e5e5;background:#f7f7f7;padding:6px}
+.t-photo canvas{width:100%;height:auto;image-rendering:pixelated}
+.t-photo .caption{font-size:13px;color:#555;margin-top:8px;font-style:italic}
+.squad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.squad .sq-av{aspect-ratio:1;border-radius:3px;overflow:hidden;background:#fff;border:1px solid #ddd}
+.squad .sq-av svg{width:100%;height:100%}
+.db-pic{
+  height:150px;background:#101418;border-radius:4px;position:relative;overflow:hidden;
+}
+.db-pic .cyl{
+  position:absolute;left:50%;top:24px;transform:translateX(-50%);
+  width:110px;height:96px;background:linear-gradient(90deg,#28685e,#5fd4c0 30%,#28685e 90%);
+  border-radius:55px/16px;
+}
+.db-pic .cyl::before,.db-pic .cyl::after{
+  content:"";position:absolute;left:0;right:0;height:26px;border-radius:55px/13px;
+  background:linear-gradient(90deg,#2f7a6e,#74e8d4 30%,#2f7a6e 90%);
+}
+.db-pic .cyl::before{top:-8px}
+.db-pic .cyl::after{top:30px;opacity:.6}
+.db-pic .eyes{position:absolute;left:50%;top:64px;transform:translateX(-50%);color:#101418;font:bold 14px monospace;letter-spacing:12px}
+
+/* ask post */
+.t-ask .askbub{
+  background:#f4f4f4;border-radius:6px;padding:10px 12px;margin-bottom:12px;position:relative;
+}
+.t-ask .askbub::after{
+  content:"";position:absolute;top:12px;left:-8px;border:8px solid transparent;border-right-color:#f4f4f4;border-left:0;
+}
+.t-ask .asker{font-weight:bold;color:#888;font-size:12px;margin-bottom:3px}
+
+/* sidebar */
+.tb-scard{padding:12px 14px;font-size:12px}
+.tb-scard h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;color:#8aa0b5}
+.tb-me{display:flex;gap:10px;align-items:center}
+.tb-me .mav{width:48px;height:48px;border-radius:3px;overflow:hidden;flex:none}
+.tb-me .mav svg{width:100%;height:100%}
+.tb-me .mn{font-weight:bold;color:#333}
+.tb-me .md{color:#999;font-size:11px;line-height:1.45}
+.fl-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.fl-row .fav{width:24px;height:24px;border-radius:2px;overflow:hidden;flex:none;border:1px solid #e2e2e2}
+.fl-row .fav svg{width:100%;height:100%}
+.fl-row .fn{flex:1;min-width:0;color:#529ecc;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl-row .followBtn{
+  background:none;border:1px solid #c9d6e2;border-radius:3px;color:#8aa0b5;font-size:10px;padding:2px 7px;
+}
+.fl-row .followBtn:hover{border-color:#529ecc;color:#529ecc}
+.tb-radar .rr{font-size:12px;color:#666;line-height:1.6}
+.tb-radar .rr b{color:#d95e40}
+.tb-sfoot{font-size:11px;color:#8aa0b5;line-height:1.9}
+.tb-sfoot a{color:#c6d6e4;text-decoration:none}
+.tb-sfoot a:hover{color:#fff;text-decoration:underline}
+
+/* end of feed */
+#tbEnd{padding:22px;text-align:center;color:#c6d6e4;font-size:13px;line-height:2;background:none;box-shadow:none}
+#tbEnd a,#tbEnd button{color:#f0c419;background:none;border:0;font:inherit;text-decoration:underline}
+#tbEnd a:hover,#tbEnd button:hover{color:#fff}
+#tbSentinel{height:2px}
+
+/* ------------------------------------------------------------
+   XP POPUP — the Playground time machine.
+   ------------------------------------------------------------ */
+#pgModal{
+  position:fixed;inset:0;z-index:120;background:rgba(10,16,30,.62);
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+#pgModal[hidden]{display:none!important}
+.xp-win{
+  width:min(1080px,96vw);background:#ece9d8;border:3px solid #0a5ae8;border-top:0;
+  border-radius:8px 8px 3px 3px;box-shadow:0 10px 44px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;max-height:92vh;
+}
+.xp-title{
+  background:linear-gradient(180deg,#4a8df2 0,#1b63e8 45%,#0947c8 100%);
+  color:#fff;font:bold 12px Tahoma,Verdana,sans-serif;
+  padding:5px 6px 5px 9px;border-radius:6px 6px 0 0;
+  display:flex;align-items:center;gap:8px;text-shadow:0 1px 1px rgba(0,0,0,.5);
+}
+.xp-title .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xp-title .wbtns{display:flex;gap:2px}
+.xp-title .wbtns span,.xp-title .wbtns button{
+  width:21px;height:21px;border-radius:3px;border:1px solid #fff;
+  font:bold 11px Tahoma;color:#fff;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#7aa4f4,#2b63d8);
+}
+.xp-title #pgClose{background:linear-gradient(180deg,#f3a08a,#d63a1f);cursor:pointer}
+.xp-addr{
+  background:#ece9d8;border-bottom:1px solid #c9c4ae;padding:4px 8px;
+  font:11px Tahoma,Verdana;color:#333;display:flex;align-items:center;gap:6px;
+}
+.xp-addr .field{
+  flex:1;background:#fff;border:1px inset #999;padding:2px 6px;
+  font:11px Tahoma;color:#155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.xp-addr .go{font:bold 10px Tahoma;color:#2c6e2c}
+.xp-note{
+  background:#fffbcc;border-bottom:1px solid #d9d2a0;padding:5px 9px;
+  font:italic 11px Tahoma;color:#665c1e;
+}
+.xp-body{background:#fff;flex:1;min-height:0}
+.xp-body iframe{width:100%;height:min(64vh,660px);border:0;display:block}
+.xp-status{
+  background:#ece9d8;border-top:1px solid #c9c4ae;padding:3px 9px;
+  font:10px Tahoma;color:#555;display:flex;gap:16px;border-radius:0 0 2px 2px;
+}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+  background:#fffbcc;border:2px solid #e03030;color:#333;
+  font:bold 11px Verdana;padding:8px 16px;z-index:130;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);max-width:80vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+[data-mode="tumblr"] #toast{background:#fff;border-color:#529ecc;border-radius:4px}
+
+/* ------------------------------------------------------------
+   REDUCED MOTION — the era, sedated.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .marq .inner{padding-left:0}
+  .page{animation:none}
+}
+
+/* small screens get the authentic 2005 experience: sideways scrolling */
+@media (max-width:840px){
+  body{overflow-x:auto}
+  .tb-wrap,.tb-hinner{width:840px}
+}
+</style>
+</head>
+<body data-skin="classic" data-mode="myspace">
+
+<!-- ══════════════════════ ARCHIVE STRIP ══════════════════════ -->
+<div id="wayback" role="navigation" aria-label="Archived captures of this page">
+  <span class="wb-logo">⧗ WAYBACK MACHINE</span>
+  <span class="wb-url">http://www.myspace.com/wordpress</span>
+  <span class="wb-caps">captures:
+    <button id="cap2005" class="wb-cap" aria-pressed="true">Jul 27, 2005</button>
+    <button id="cap2011" class="wb-cap" aria-pressed="false">Apr 19, 2011</button>
+  </span>
+  <span class="wb-note">exhibit v17 · The Profile Wall</span>
+  <a class="wb-museum" href="../">← museum</a>
+</div>
+
+<!-- ══════════════════════ MYSPACE · 2005 ══════════════════════ -->
+<div id="myspace" class="page">
+  <div class="ms-shell">
+    <div class="ms-topbar">
+      <div class="ms-logo">myspace<span>.com</span><em>a place for friends</em></div>
+      <form class="ms-search" onsubmit="return false">
+        <label for="msq">Search:</label>
+        <input id="msq" type="text" aria-label="Search MySpace">
+        <button type="submit">Search</button>
+        <span class="goog">powered by Google™</span>
+      </form>
+      <div class="ms-acct"><a href="#gbForm">Help</a> | <a href="#gbForm">SignUp</a></div>
+    </div>
+    <nav class="ms-nav" aria-label="MySpace navigation">
+      <a href="#myspace">Home</a> | <a href="#top8">Browse</a> | <a href="#msq">Search</a> |
+      <a href="#gbForm">Invite</a> | <a href="#blog">Film</a> | <a href="#gbForm">Mail</a> |
+      <a href="#blog">Blog</a> | <a href="#pics">Favorites</a> | <a href="#top8">Forum</a> |
+      <a href="#top8">Groups</a> | <a href="#blog">Events</a> | <a href="#pics">Videos</a> |
+      <a href="#songspot">Music</a> | <a href="#gbList">Comedy</a> | <a href="#pics">Classifieds</a>
+    </nav>
+  </div>
+
+  <a class="ms-ad" href="../" aria-label="Banner ad: return to the WordPress Museum lobby">
+    <span class="big blink">☆ CONGRATULATIONS!! ☆</span><br>
+    you are the <u>1,000,000th</u> visitor to this profile!! click <span class="arrow">☞</span> HERE
+    <span class="arrow">☜</span> to claim ur FREE tour of the <u>WordPress Museum lobby</u>
+    <span class="fine">100% not a virus · no punching of monkeys required · terms apply (they do not)</span>
+  </a>
+
+  <div class="ms-shell">
+    <div class="ms-cols">
+
+      <!-- ─────────── LEFT COLUMN ─────────── -->
+      <div class="ms-left">
+        <div>
+          <h1 class="ms-name">WordPress
+            <span class="online"><i aria-hidden="true"></i>ONLINE NOW!</span>
+          </h1>
+          <div class="ms-headline">"~ code is poetry ~"</div>
+          <div class="ms-idcard">
+            <div class="ms-picframe">
+              <canvas id="msPortrait" width="24" height="24" role="img"
+                aria-label="Pixel-art portrait of the WordPress mascot, lit by camera flash"></canvas>
+              <span class="stamp" aria-hidden="true">07·27·2005</span>
+            </div>
+            <div class="ms-vitals">
+              Software<br>
+              2 years old<br>
+              The Internet,<br>Everywhere<br>
+              <b>Last Login:</b><br><span id="lastLogin">today</span>
+              <div class="mood"><b>Mood:</b> jazzy 🎷</div>
+              <div class="viewmy">View My: <a href="#pics">Pics</a> | <a href="#songspot">Videos</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="marq" aria-hidden="true">
+          <span class="inner">★·.·´¯`·.·★ thank u 4 visiting my profile!! sign my guestbook or its 7 years of broken permalinks 4 u ★·.·´¯`·.·★ best viewed in 800×600 ★ no rightclick!! (jk, view source, its GPL) ★</span>
+        </div>
+
+        <div class="msbox ms-contact">
+          <div class="msbox-h">Contacting WordPress</div>
+          <div class="msbox-b">
+            <a href="#gbForm"><span class="ico">✉</span> Send Message</a>
+            <a href="#gbForm"><span class="ico">➥</span> Forward to Friend</a>
+            <a href="#gbForm"><span class="ico">♥</span> Add to Friends</a>
+            <a href="#pics"><span class="ico">★</span> Add to Favorites</a>
+            <a href="#songspot"><span class="ico">☺</span> Instant Message</a>
+            <a href="#gbForm"><span class="ico">⊘</span> Block User</a>
+            <a href="#top8"><span class="ico">▦</span> Add to Group</a>
+            <a href="#gbForm"><span class="ico">✎</span> Rank User</a>
+          </div>
+        </div>
+
+        <div class="msbox ms-url">
+          <div class="msbox-h">MySpace URL:</div>
+          <div class="msbox-b"><b>http://www.myspace.com/wordpress</b>
+            tell ur friends. tell ur enemies. tell ur ISP.</div>
+        </div>
+
+        <div class="ms-player" id="songspot">
+          <div class="msbox-h">♫ WordPress's Profile Song</div>
+          <div class="deck" id="msDeck">
+            <button class="btn" id="msPlayBtn" aria-pressed="false" aria-label="Play profile song">▶</button>
+            <div class="lcd">
+              <div class="track">Now Playing: Miles (1.0)</div>
+              <div class="sub">the wordpress trio · 2004 · demo.tape</div>
+            </div>
+            <div class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="note">no autoplay. we grew as a society. (chiptune, made of square waves &amp; love)</div>
+        </div>
+
+        <div class="msbox">
+          <div class="msbox-h">WordPress's Interests</div>
+          <table class="ms-table">
+            <tr><td class="l">General</td><td class="v">blogging, permalinks, pingbacks, web standards, FREEDOM (the GPL kind), ~vintage typography~, democratizing publishing (its not a phase mom)</td></tr>
+            <tr><td class="l">Music</td><td class="v"><b>JAZZ. obviously.</b> miles davis, mingus, strayhorn, duke ellington, ella, coltrane. i name my children after them. all of them. forever.</td></tr>
+            <tr><td class="l">Movies</td><td class="v">anything by Kubrick (long story, ask my default theme)</td></tr>
+            <tr><td class="l">Television</td><td class="v">none. i AM the media now.</td></tr>
+            <tr><td class="l">Books</td><td class="v">The Cathedral &amp; the Bazaar, the CSS Zen Garden (its a website but it counts), my own /wp-includes (poetry section)</td></tr>
+            <tr><td class="l">Heroes</td><td class="v">b2/cafelog (rip, u live through me), every person with something to say, whoever reports security bugs NICELY</td></tr>
+          </table>
+        </div>
+
+        <div class="msbox">
+          <div class="msbox-h">WordPress's Details</div>
+          <table class="ms-table">
+            <tr><td class="l">Status</td><td class="v">In an Open Relationship (GPL — everyone is invited)</td></tr>
+            <tr><td class="l">Here for</td><td class="v">Friends, Networking, Serious Publishing</td></tr>
+            <tr><td class="l">Hometown</td><td class="v">a spare server, San Francisco-ish, The Internet</td></tr>
+            <tr><td class="l">Body type</td><td class="v">featherweight (~600 KB zipped)</td></tr>
+            <tr><td class="l">Ethnicity</td><td class="v">Open Source</td></tr>
+            <tr><td class="l">Zodiac Sign</td><td class="v">Gemini (born May 27, 2003)</td></tr>
+            <tr><td class="l">Smoke / Drink</td><td class="v">No / only coffee (the server's, mostly)</td></tr>
+            <tr><td class="l">Occupation</td><td class="v">Publishing (yours)</td></tr>
+            <tr><td class="l">Income</td><td class="v">$0.00 — free forever, its the whole point</td></tr>
+          </table>
+        </div>
+
+        <div class="ms-counter">you are visitor #
+          <span class="digits" id="hitCounter" aria-label="hit counter"></span>
+          <span class="blink">!!</span>
+        </div>
+      </div>
+
+      <!-- ─────────── RIGHT COLUMN ─────────── -->
+      <div class="ms-right">
+
+        <div class="ms-network">
+          <div class="line">WordPress is in your <b>extended network</b></div>
+          <div class="sub">(technically everyone is. ~43% of the web &amp; climbing.)</div>
+        </div>
+
+        <div class="ms-bulletin">
+          <span class="tag blink">❗ BULLETIN ❗</span>
+          &nbsp;posted <b>4/19/2011</b> — <i>"ok everyone stop asking"</i><br>
+          yes i got a tumblr. everyone is on tumblr now &amp; myspace is getting… weird
+          (justin timberlake??). same me, new wall. reblog me or lose me forever —
+          <button class="go to2011">→ visit my tumblr dashboard (2011)</button>
+        </div>
+
+        <div class="rsec">
+          <h2>WordPress's Blurbs</h2>
+          <h3>About me:</h3>
+          <p>
+            <span class="deco">~*~</span> hiiii im <b>WordPress</b>!! <span class="deco">~*~</span>
+            born may 27 2003 when matt &amp; mike adopted an abandoned little blog script
+            (b2, rip, luv u 4ever) and gave it a new name and a DREAM. i believe every
+            single person deserves a printing press — mine just happens to be written in PHP.
+            ✿ i am FREE. not free-trial free. <b>free FREE</b>. GPL means nobody can ever
+            take me away from u. ✿ hobbies include: permalinks that dont look like
+            <b>?p=87</b>, pingbacks, making databases feel loved.
+            current obsession: THEMES (see my pics, i have OUTFITS now!!).
+            <span class="sparkly"><span class="gl-rainbow">code is poetry</span></span>
+          </p>
+          <h3>Who I'd like to meet:</h3>
+          <p>
+            <b>anyone with something to say.</b> seriously. thats the whole thing.
+            if u have a voice u should have a website. also: miles davis (rip, king),
+            and whoever invented the &lt;blink&gt; tag. no questions. just respect.
+          </p>
+        </div>
+
+        <div class="rsec ms-blog" id="blog">
+          <h2>WordPress's Latest Blog Entries <span class="sm">[<a href="#blog">Subscribe to this Blog</a>]</span></h2>
+
+          <div class="entry">
+            <div class="bdate">Tuesday, May 27, 2003</div>
+            <div class="btitle"><a href="#blog">omg. we actually did it. (0.70)</a> <span class="sm">(view more)</span></div>
+            <div class="bmood">current mood: terrified ✧ listening to: the CVS server fan</div>
+            <div class="bsnip">matt said "lets fork b2" and now i EXIST. version 0.70. mike says hi.
+            nobody on earth knows we exist yet and honestly?? kind of freeing. first post. no takebacks.</div>
+          </div>
+
+          <div class="entry">
+            <div class="bdate">Saturday, January 3, 2004</div>
+            <div class="btitle"><a href="#blog">they named me after MILES DAVIS!?! (1.0)</a> <span class="sm">(view more)</span></div>
+            <div class="bmood">current mood: jazzy 🎷 ✧ listening to: Kind of Blue, forever</div>
+            <div class="bsnip">pretty permalinks. comment moderation. a real plugin API. and dad says
+            EVERY release gets a jazz name from now on. i am the coolest software alive. do not perceive me.</div>
+          </div>
+
+          <div class="entry">
+            <div class="bdate">Thursday, February 17, 2005</div>
+            <div class="btitle"><a href="#blog">THEMES. OUTFITS. KUBRICK!!! (1.5 "Strayhorn")</a> <span class="sm">(view more)</span></div>
+            <div class="bmood">current mood: ~*~transformed~*~ ✧ listening to: Lush Life</div>
+            <div class="bsnip">i can change my WHOLE LOOK without touching my soul (the database).
+            kubrick is my new favorite outfit &amp; 900,000 of u downloaded me this year??
+            we are FAMOUS. also "Pages" exist now, whatever, THEMES!!!!</div>
+            <button class="timemachine pg-open" type="button">⏳ OPEN TIME MACHINE — see me in 2026, live</button>
+          </div>
+
+          <div class="viewall">[<a href="#blog">View All Blog Entries</a>]</div>
+        </div>
+
+        <div class="rsec ms-pics" id="pics">
+          <h2>WordPress's Pics <span class="sm">— ✿ my outfits thru the years ✿ (5 photos)</span></h2>
+          <div class="grid" id="picsGrid">
+            <button class="polaroid" data-skin="bluedefault" type="button"
+              aria-label="Wear the 2004 Default outfit — reskins this whole profile">
+              <span class="shot s-blue" aria-hidden="true"><i class="hd"></i><i class="hdt"></i><i class="bd lines"></i><i class="sb"></i></span>
+              <span class="cap">me, 2004 ("Default") — baby's first CSS</span>
+            </button>
+            <button class="polaroid" data-skin="kubrick" type="button"
+              aria-label="Wear the Kubrick outfit — reskins this whole profile">
+              <span class="shot s-kubrick" aria-hidden="true"><i class="col"></i><i class="hd"></i><i class="hdt"></i><i class="bd lines"></i></span>
+              <span class="cap">KUBRICK!!! (2005) the blue gradient of destiny</span>
+            </button>
+            <button class="polaroid" data-skin="twentyten" type="button"
+              aria-label="Wear the Twenty Ten outfit — reskins this whole profile">
+              <span class="shot s-tten" aria-hidden="true"><i class="bar"></i><i class="hd"></i><i class="tree t1"></i><i class="tree t2"></i><i class="tree t3"></i><i class="bd lines"></i><i class="sb"></i></span>
+              <span class="cap">Twenty Ten (from the future, 2010. dont ask how)</span>
+            </button>
+            <button class="polaroid" data-skin="twentytwenty" type="button"
+              aria-label="Wear the Twenty Twenty outfit — reskins this whole profile">
+              <span class="shot s-ttw" aria-hidden="true"><i class="ttl"></i><i class="ttl2"></i><i class="btn"></i><i class="bd lines"></i></span>
+              <span class="cap">Twenty Twenty (2020?? my psychic era)</span>
+            </button>
+            <button class="polaroid pg-open" data-live="1" type="button"
+              aria-label="Open a live WordPress from 2026 in the Playground time machine">
+              <span class="shot s-live" aria-hidden="true"><i class="static"></i><i class="facew"></i><i class="facet">W</i><i class="rec">REC · LIVE</i></span>
+              <span class="cap">me irl, 2026 (click 2 boot me, LIVE)</span>
+            </button>
+          </div>
+          <a class="pics-reset" href="#pics" id="resetSkin">(take it all off — back to my classic sparkle layout)</a>
+        </div>
+
+        <div class="rsec ms-top8" id="top8">
+          <h2>WordPress's Friend Space</h2>
+          <div class="count">WordPress has <span class="red">8,675,309</span> friends.
+            <b>(Top 8 — hover 4 secret comments!!)</b></div>
+          <div class="t8grid" id="top8Grid"></div>
+          <div class="t8-viewall">[<a href="#top8">View All of WordPress's Friends</a>]</div>
+        </div>
+
+        <div class="rsec ms-gb" id="guestbook">
+          <h2>WordPress's Friends Comments</h2>
+          <div class="disp">Displaying <span id="gbCount">6</span> of <b>8,675,309</b> comments
+            (<a href="#gbList" style="color:#fff">View All</a> | <a href="#gbForm" style="color:#fff">Add Comment</a>)</div>
+          <div id="gbList"></div>
+
+          <form class="gb-form" id="gbForm">
+            <h3>Add a Comment ☆ sign the wall!!</h3>
+            <div class="frow">
+              <label for="gbName">Name:</label>
+              <input type="text" id="gbName" maxlength="24" placeholder="xX_YourName_Xx">
+              <label for="gbStyle">Glitter:</label>
+              <select id="gbStyle">
+                <option value="gl-rainbow">✨ Rainbow Sparkle</option>
+                <option value="gl-fire">🔥 Fire Text</option>
+                <option value="gl-chrome">💿 Blue Chrome</option>
+                <option value="gl-comic">💖 Comic Classic</option>
+                <option value="gl-emo">🖤 Emo Lowercase</option>
+                <option value="">— no glitter (coward) —</option>
+              </select>
+            </div>
+            <label for="gbText" style="display:block;margin-bottom:3px"><b>Comment:</b></label>
+            <textarea id="gbText" maxlength="280" required
+              placeholder="thanks 4 the add!! ur profile is so cool. also have u tried turning the database off and on again"></textarea>
+            <div class="frow" style="margin-top:6px">
+              <button class="post" type="submit">Post A Comment</button>
+              <span class="fine">saved in YOUR browser only (localStorage — the myspace way: it never really leaves)</span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class="ms-footer">
+      <a href="#myspace">About</a> | <a href="#myspace">FAQ</a> | <a href="#myspace">Terms</a> |
+      <a href="#myspace">Privacy</a> | <a href="#myspace">Safety Tips</a> | <a href="#myspace">Contact MySpace</a> |
+      <a href="#myspace">Promote!</a> | <a href="#myspace">Advertise</a> | <a href="../">← museum</a>
+      <div class="cop">©2003-2008 MySpace.com. All Rights Reserved. · this page is an exhibit —
+        <a href="../">WordPress Museum</a>, v17 "The Profile Wall"</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ══════════════════════ TUMBLR · 2011 ══════════════════════ -->
+<div id="tumblr" class="page" hidden>
+  <header class="tb-header">
+    <div class="tb-hinner">
+      <span class="tb-logo">tumblr<span class="dot">.</span></span>
+      <input class="tb-search" type="text" placeholder="Search Tumblr" aria-label="Search Tumblr">
+      <nav class="tb-hnav" aria-label="Tumblr navigation">
+        <a href="#tumblr">Dashboard</a>
+        <a href="#tbFeed">Explore</a>
+        <a href="#tbFeed">Inbox</a>
+        <a href="#tbFeed" aria-label="Settings">⚙</a>
+        <button class="tb-back to2005" type="button">← my myspace (2005)</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="tb-wrap">
+    <main class="tb-feed" id="tbFeed">
+
+      <div class="tb-card tb-newpost">
+        <div class="hint">wordpress · what's on your mind? (everything. always. its a blog thing.)</div>
+        <div class="tb-types" role="group" aria-label="New post types">
+          <button class="tb-type tt-text" type="button"><span class="sq">Aa</span><span class="lbl">Text</span></button>
+          <button class="tb-type tt-photo" type="button"><span class="sq">◉</span><span class="lbl">Photo</span></button>
+          <button class="tb-type tt-quote" type="button"><span class="sq">❝</span><span class="lbl">Quote</span></button>
+          <button class="tb-type tt-link" type="button"><span class="sq">➤</span><span class="lbl">Link</span></button>
+          <button class="tb-type tt-chat" type="button"><span class="sq">❯</span><span class="lbl">Chat</span></button>
+          <button class="tb-type tt-audio" type="button"><span class="sq">♪</span><span class="lbl">Audio</span></button>
+          <button class="tb-type tt-video" type="button"><span class="sq">▶</span><span class="lbl">Video</span></button>
+        </div>
+      </div>
+
+      <!-- photo post: the old profile pic -->
+      <article class="tb-post t-photo" data-notes="4206">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b></div>
+            <div class="ph"><canvas id="tbPortrait" width="24" height="24" role="img"
+              aria-label="The same pixel-art WordPress portrait from the MySpace era"></canvas></div>
+            <div class="caption">found my 2005 myspace pic. the flash. the timestamp. the AUDACITY. not deleting it.</div>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#tbt #2005 #myspace #never forget</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- THE reblog chain: 3.0 and the death of Kubrick-as-default -->
+      <article class="tb-post t-text" data-notes="12847">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b> <span>reblogged</span> <b>hellodolly</b></div>
+            <blockquote>
+              <blockquote>
+                <blockquote>
+                  <div class="src"><b>wordpress</b>:</div>
+                  <p><b>WordPress 3.0 "Thelonious" is out.</b> MU merged into core — multisite for
+                  everyone. Custom post types. Custom menus. And a brand-new default theme:
+                  <b>Twenty Ten</b>. Thank you, Kubrick. o7</p>
+                </blockquote>
+                <div class="src"><b>kubrick-forever</b>:</div>
+                <p>"thank you, kubrick." THANK YOU??? five years i was the FACE of blogging.
+                every header gradient on the internet was MY header gradient. and i get an "o7"???
+                im not crying. my rounded corners are just leaking.</p>
+              </blockquote>
+              <div class="src"><b>hellodolly</b>:</div>
+              <p>she gave us so much 🎺 anyway fun fact: i just survived ANOTHER default-theme
+              purge. you cannot kill what ships in core.</p>
+            </blockquote>
+            <p>kubrick bby you'll always be famous. (twenty ten pls stop reading the notes)</p>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#wordpress #3.0 #thelonious #twenty ten #kubrick #press f</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- chat post: the 2003 origin -->
+      <article class="tb-post t-chat" data-notes="9021">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b> · <span>the comment that started everything (2003, dramatization)</span></div>
+            <div class="chat">
+              <div class="cl"><b>photomatt:</b> my blogging software is abandoned. the b2 dev just… vanished</div>
+              <div class="cl"><b>mikelittle:</b> if you're serious about forking it, i'd be interested in contributing</div>
+              <div class="cl"><b>photomatt:</b> …</div>
+              <div class="cl"><b>photomatt:</b> ok yes. what do we call it</div>
+              <div class="cl"><b>mikelittle:</b> christine says "WordPress"</div>
+              <div class="cl"><b>photomatt:</b> perfect. shipping in two months</div>
+              <div class="cl"><b>mikelittle:</b> two MONTHS?</div>
+              <div class="cl"><b>photomatt:</b> two months.</div>
+            </div>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#origin story #2003 #b2 #one comment can change everything</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- quote post -->
+      <article class="tb-post t-quote" data-notes="30116">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="q">Code is Poetry.</div>
+            <div class="qsrc">— the footer of every WordPress site, since always</div>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#code is poetry #manifesto #still true</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- audio post: same song, new player -->
+      <article class="tb-post t-audio" data-notes="8675">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b></div>
+            <div class="player" id="tbDeck">
+              <button class="pbtn" id="tbPlayBtn" aria-pressed="false" aria-label="Play Miles (1.0)">▶</button>
+              <div class="tinfo">
+                <div class="tn">Miles (1.0)</div>
+                <div class="ta">The WordPress Trio — demo tape, 2004</div>
+              </div>
+              <div class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="plays">8,675 plays</div>
+            </div>
+            <p style="font-size:13px;color:#777;font-style:italic">found the demo tape from my myspace
+            profile song. lo-fi because the server lived in a closet. still slaps.</p>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#jazz #miles #1.0 #audio</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- link post -->
+      <article class="tb-post t-link" data-notes="2210">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b></div>
+            <a class="biglink" href="#tbFeed">WordPress 3.2 "Gershwin" drops support for PHP 4 →</a>
+            <div class="ldesc">in lieu of flowers, please upgrade your server. PHP 4 (2000–2011),
+            you were slow, but you were mine.</div>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#php4 #rip #gershwin #3.2</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ask post -->
+      <article class="tb-post t-ask" data-notes="6540">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="askbub">
+              <div class="asker">Anonymous asked:</div>
+              are you and kubrick still friends or is it weird now
+            </div>
+            <p>we don't really talk since twenty ten moved in. but i never changed the locks —
+            every install still remembers her. and she's in my top 8 forever. i don't care
+            what year it is. some headers are permanent.</p>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#ask #kubrick #its not weird YOU'RE weird</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- photoset: the squad -->
+      <article class="tb-post t-photo" data-notes="15310">
+        <div class="tb-av" data-av="wordpress"></div>
+        <div class="tb-card">
+          <div class="tb-pbody">
+            <div class="tb-phead"><b>wordpress</b></div>
+            <div class="squad" id="squadGrid"></div>
+            <div class="caption">the whole top 8 made it off myspace alive. plugins are forever. 📸</div>
+          </div>
+          <div class="tb-pfoot">
+            <span class="notes"></span>
+            <span class="tags">#top 8 #squad #plugins #we survived</span>
+            <span class="acts">
+              <button class="act-reblog" aria-label="Reblog">⟲</button>
+              <button class="act-heart" aria-label="Like" aria-pressed="false">♥</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <div id="tbSentinel" aria-hidden="true"></div>
+
+      <div class="tb-card" id="tbEnd" hidden>
+        you've reached the end of 2011. tumblr goes on forever — this exhibit doesn't.<br>
+        <button class="to2005" type="button">● back to my myspace (2005)</button> ·
+        <a href="../">← museum lobby</a>
+      </div>
+    </main>
+
+    <aside class="tb-side">
+      <div class="tb-card tb-scard tb-me">
+        <div class="mav" data-av="wordpress"></div>
+        <div>
+          <div class="mn">wordpress</div>
+          <div class="md">software · 8 yrs old · the internet<br>1,847 posts · est. 2003</div>
+        </div>
+      </div>
+
+      <div class="tb-card tb-scard">
+        <h4>Following (8)</h4>
+        <div id="followList"></div>
+      </div>
+
+      <div class="tb-card tb-scard tb-radar">
+        <h4>Radar</h4>
+        <div class="rr">trending on your dashboard:<br>
+          <b>#distraction-free writing mode</b> — 3.2 just shipped it.
+          write like nobody's watching (they are, it's a blog).</div>
+      </div>
+
+      <div class="tb-scard tb-sfoot">
+        About · Terms · Privacy · Jobs<br>
+        <button class="to2005" type="button"
+          style="background:none;border:0;color:#c6d6e4;text-decoration:underline;padding:0;font:inherit">back to 2005</button>
+        · <a href="../">← museum</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ══════════════════════ XP TIME MACHINE ══════════════════════ -->
+<div id="pgModal" role="dialog" aria-modal="true" aria-label="WordPress time machine — live WordPress in the Playground" hidden>
+  <div class="xp-win">
+    <div class="xp-title">
+      <span aria-hidden="true">🌐</span>
+      <span class="t">WordPress Time Machine — Microsoft Internet Explorer</span>
+      <span class="wbtns">
+        <span aria-hidden="true">▁</span><span aria-hidden="true">□</span>
+        <button id="pgClose" aria-label="Close time machine">✕</button>
+      </span>
+    </div>
+    <div class="xp-addr">
+      <span>Address</span>
+      <span class="field" id="pgAddr">https://playground.wordpress.net/?wp=6.8</span>
+      <span class="go">→ Go</span>
+    </div>
+    <div class="xp-note">note: time machines only go FORWARD. this is WordPress 6.8 (2025) booting
+      live in your browser via WordPress Playground. still jazz-named. still free. still me. ~*~we made it~*~</div>
+    <div class="xp-body" id="pgHolder"></div>
+    <div class="xp-status"><span>✔ Internet</span><span>Booting WordPress… (for real)</span></div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   v17 · The Profile Wall — script
+   ============================================================ */
+(function(){
+'use strict';
+
+var $  = function(s,el){ return (el||document).querySelector(s); };
+var $$ = function(s,el){ return Array.prototype.slice.call((el||document).querySelectorAll(s)); };
+var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ------------------------------------------------------------
+   toast
+   ------------------------------------------------------------ */
+var toastEl = $('#toast'), toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+}
+
+/* ------------------------------------------------------------
+   avatars — every friend drawn by hand, reused in both decades
+   ------------------------------------------------------------ */
+var AV = {
+  wordpress:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="WordPress avatar">' +
+    '<rect width="72" height="72" fill="#e8f1f8"/>' +
+    '<circle cx="36" cy="36" r="27" fill="#1e6da0"/>' +
+    '<circle cx="36" cy="36" r="27" fill="none" stroke="#12496e" stroke-width="3"/>' +
+    '<text x="36" y="47" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="32" fill="#fff">W</text></svg>',
+  akismet:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Akismet avatar">' +
+    '<rect width="72" height="72" fill="#7da832"/>' +
+    '<path d="M36 8 L60 16 V38 C60 52 50 62 36 66 C22 62 12 52 12 38 V16 Z" fill="#5c8422"/>' +
+    '<text x="36" y="49" text-anchor="middle" font-family="Georgia,serif" font-size="36" fill="#fff">a</text></svg>',
+  dolly:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Hello Dolly avatar">' +
+    '<rect width="72" height="72" fill="#8c1d1d"/>' +
+    '<path d="M0 0 Q9 30 0 72 M12 0 Q21 30 12 72 M24 0 Q33 30 24 72 M36 0 Q45 30 36 72 M48 0 Q57 30 48 72 M60 0 Q69 30 60 72" stroke="#a83232" stroke-width="5" fill="none"/>' +
+    '<text x="36" y="48" text-anchor="middle" font-family="Georgia,serif" font-size="34" fill="#ffd76e">♪</text></svg>',
+  jetpack:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Jetpack avatar">' +
+    '<rect width="72" height="72" fill="#fff"/>' +
+    '<circle cx="36" cy="36" r="26" fill="#00be28"/>' +
+    '<path d="M33 10 V36 H20 Z" fill="#fff"/>' +
+    '<path d="M39 62 V36 H52 Z" fill="#fff"/></svg>',
+  woo:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="WooCommerce avatar">' +
+    '<rect width="72" height="72" fill="#7f54b3"/>' +
+    '<rect x="8" y="18" width="56" height="30" rx="10" fill="#fff"/>' +
+    '<path d="M30 48 L26 60 L40 48 Z" fill="#fff"/>' +
+    '<text x="36" y="41" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="21" fill="#7f54b3">Woo</text></svg>',
+  yoast:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Yoast SEO avatar">' +
+    '<rect width="72" height="72" fill="#a4286a"/>' +
+    '<text x="28" y="47" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="34" fill="#fff">Y</text>' +
+    '<circle cx="52" cy="22" r="6" fill="#dc3232"/>' +
+    '<circle cx="52" cy="38" r="6" fill="#ee7c1b"/>' +
+    '<circle cx="52" cy="54" r="6" fill="#7ad03a"/></svg>',
+  cf7:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Contact Form 7 avatar">' +
+    '<rect width="72" height="72" fill="#f4f8fb"/>' +
+    '<rect x="10" y="20" width="52" height="34" rx="3" fill="#fff" stroke="#2c6e9e" stroke-width="3"/>' +
+    '<path d="M10 22 L36 42 L62 22" fill="none" stroke="#2c6e9e" stroke-width="3"/>' +
+    '<text x="55" y="62" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="24" fill="#c0392b">7</text></svg>',
+  bbpress:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="bbPress avatar">' +
+    '<rect width="72" height="72" fill="#2d7a4f"/>' +
+    '<circle cx="36" cy="34" r="22" fill="#fff"/>' +
+    '<text x="36" y="43" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="26" fill="#2d7a4f">bb</text>' +
+    '<path d="M28 54 L24 64 L38 55 Z" fill="#fff"/></svg>',
+  supercache:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="WP Super Cache avatar">' +
+    '<rect width="72" height="72" fill="#1a1a1a"/>' +
+    '<path d="M42 6 L20 40 H34 L28 66 L54 28 H38 Z" fill="#ffd21e"/></svg>',
+  tom:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Tom avatar">' +
+    '<rect width="72" height="72" fill="#b9c6ce"/>' +
+    '<rect x="6" y="8" width="60" height="34" fill="#f2f5f4" stroke="#8fa0aa" stroke-width="2"/>' +
+    '<path d="M12 16 h26 M12 24 h34 M12 32 h20" stroke="#c4d0d6" stroke-width="3"/>' +
+    '<circle cx="38" cy="42" r="13" fill="#e8c39e"/>' +
+    '<path d="M25 40 Q28 26 38 29 Q50 26 51 40 Q46 33 38 34 Q30 33 25 40 Z" fill="#3a2c20"/>' +
+    '<circle cx="33" cy="42" r="1.6" fill="#222"/><circle cx="43" cy="42" r="1.6" fill="#222"/>' +
+    '<path d="M32 48 Q38 52 44 48" stroke="#8a5c3a" stroke-width="1.6" fill="none"/>' +
+    '<path d="M20 72 Q22 54 38 56 Q54 54 56 72 Z" fill="#fff"/></svg>',
+  kubrick:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Kubrick avatar">' +
+    '<rect width="72" height="72" fill="#d5d6d7"/>' +
+    '<defs><linearGradient id="kbg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#69a6d8"/><stop offset="1" stop-color="#3f6d94"/></linearGradient></defs>' +
+    '<rect x="8" y="14" width="56" height="30" rx="10" fill="url(#kbg)"/>' +
+    '<text x="36" y="34" text-anchor="middle" font-family="Trebuchet MS,sans-serif" font-size="13" fill="#fff">Kubrick</text>' +
+    '<rect x="14" y="50" width="44" height="4" fill="#9aa8b4"/>' +
+    '<rect x="14" y="58" width="36" height="4" fill="#b4c0ca"/></svg>',
+  matt:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Matt avatar">' +
+    '<rect width="72" height="72" fill="#3d4f5c"/>' +
+    '<circle cx="36" cy="34" r="16" fill="#e8c39e"/>' +
+    '<path d="M20 32 Q20 14 36 16 Q52 14 52 32 Q52 22 36 22 Q20 22 20 32 Z" fill="#4a3626"/>' +
+    '<circle cx="30" cy="34" r="1.8" fill="#222"/><circle cx="42" cy="34" r="1.8" fill="#222"/>' +
+    '<path d="M29 42 Q36 47 43 42" stroke="#8a5c3a" stroke-width="1.8" fill="none"/>' +
+    '<path d="M18 72 Q20 54 36 55 Q52 54 54 72 Z" fill="#20313c"/>' +
+    '<text x="62" y="66" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#9ab4c4">🎷</text></svg>',
+  spam:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="No photo avatar">' +
+    '<rect width="72" height="72" fill="#d8d8d8"/>' +
+    '<circle cx="36" cy="28" r="12" fill="#b0b0b0"/>' +
+    '<path d="M14 72 Q16 48 36 48 Q56 48 58 72 Z" fill="#b0b0b0"/>' +
+    '<text x="36" y="44" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="30" fill="#888">?</text></svg>',
+  anon:
+    '<svg viewBox="0 0 72 72" role="img" aria-label="Guest avatar">' +
+    '<rect width="72" height="72" fill="#e8e0f4"/>' +
+    '<circle cx="36" cy="27" r="12" fill="#9b7fc7"/>' +
+    '<path d="M14 72 Q16 47 36 47 Q56 47 58 72 Z" fill="#9b7fc7"/>' +
+    '<text x="36" y="66" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="11" fill="#5a3f85">★new★</text></svg>'
+};
+function avSVG(name){ return AV[name] || AV.spam; }
+
+/* ------------------------------------------------------------
+   pixel portrait — the 2005 profile pic, drawn from a map
+   ------------------------------------------------------------ */
+var PIX = [
+  '........................',
+  '...kk..............kk...',
+  '..kyyk............kyyk..',
+  '..kyyyk..........kyyyk..',
+  '..kyyyyk........kyyyyk..',
+  '..kyyyyykkkkkkkkyyyyyk..',
+  '.kyyyyyyyyyyyyyyyyyyyyk.',
+  '.kyyyyyyyyyyyyyyyyyyyyk.',
+  '.kyyywkyyyyyyyyyykwyyyk.',
+  '.kyyykkyyyyyyyyyykkyyyk.',
+  '.kyyyyyyyyykkyyyyyyyyyk.',
+  '.kppyyyyyyyyyyyyyyyyppk.',
+  '.kyyyykyyyyyyyyyykyyyyk.',
+  '.kyyyyykkkkkkkkkkyyyyyk.',
+  '.kyyyyyyyyyyyyyyyyyyyyk.',
+  '..kyyyyyyyyyyyyyyyyyyk..',
+  '..kyyykkkkkkkkkkkkyyyk..',
+  '..kyykbbbbbbbbbbbbkyyk..',
+  '..kyykbwbbbwbbbwbbkyyk..',
+  '..kyykbwbbbwbbbwbbkyyk..',
+  '..kyykbbwbwbwbwbbbkyyk..',
+  '..kyykbbbbbbbbbbbbkyyk..',
+  '......kkkkkkkkkkkk......',
+  '........................'
+];
+var PAL = { k:'#22201d', y:'#ffd23e', w:'#ffffff', b:'#2a72a8', p:'#ff9db4' };
+function drawPortrait(canvas){
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  /* flash-lit bedroom wall */
+  ctx.fillStyle = '#93aac9'; ctx.fillRect(0,0,24,24);
+  ctx.fillStyle = '#7d94b3'; ctx.fillRect(0,17,24,7);
+  ctx.fillStyle = 'rgba(255,255,255,.5)';
+  ctx.fillRect(18,0,6,2); ctx.fillRect(20,2,4,2); ctx.fillRect(22,4,2,2);
+  for(var r=0;r<PIX.length;r++){
+    var row = PIX[r];
+    for(var c=0;c<row.length;c++){
+      var col = PAL[row[c]];
+      if(col){ ctx.fillStyle = col; ctx.fillRect(c,r,1,1); }
+    }
+  }
+  /* a little flash glare over one ear */
+  ctx.fillStyle = 'rgba(255,255,255,.35)';
+  ctx.fillRect(17,1,3,1); ctx.fillRect(18,2,2,1);
+}
+drawPortrait($('#msPortrait'));
+drawPortrait($('#tbPortrait'));
+
+/* ------------------------------------------------------------
+   top 8 — the sacred grid, with hover comments
+   ------------------------------------------------------------ */
+var TOP8 = [
+  { id:'akismet',    n:'Akismet',            c:'deleted 6 spam comments from ur wall while u slept. u will never see them. ur welcome ♥ (#1 spot EARNED)' },
+  { id:'dolly',      n:'xX_Hello_Dolly_Xx',  c:'im in every install since 1.2 and NO ONE knows why. (matt knows why. its jazz.)' },
+  { id:'jetpack',    n:'Jetpack',            c:'i can do stats!! backups!! forms!! search!! related posts!! pls i just want to be useful' },
+  { id:'woo',        n:'WooCommerce',        c:'brb turning ur diary into a store. cha-ching. (see u in 2011)' },
+  { id:'yoast',      n:'Yoast SEO',          c:'ur post is good BUT the meta description is 3 characters too long. green dot or death.' },
+  { id:'cf7',        n:'Contact Form 7',     c:'[your-name] [your-email] [your-message]. thats it. thats the whole personality. it works.' },
+  { id:'bbpress',    n:'bbPress',            c:'come post on my forum!! its quiet. too quiet. first reply gets mod powers, not even joking' },
+  { id:'supercache', n:'WP Super Cache',     c:'i made ur page load in 0.02s. i am SPEED. (pls remember to empty me sometimes)' }
+];
+var t8grid = $('#top8Grid');
+TOP8.forEach(function(f){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 't8';
+  b.setAttribute('aria-label', f.n + ' — ' + f.c);
+  b.innerHTML =
+    '<span class="fname">' + f.n + '</span>' +
+    '<span class="av">' + avSVG(f.id) + '</span>' +
+    '<span class="bub" aria-hidden="true">' + f.c + '</span>';
+  b.addEventListener('click', function(){ toast(f.n + ' says: ' + f.c); });
+  t8grid.appendChild(b);
+});
+
+/* ------------------------------------------------------------
+   guestbook — seeds + your comments, kept in localStorage
+   ------------------------------------------------------------ */
+var GB_KEY = 'v17-guestbook';
+var GB_SEEDS = [
+  { n:'Tom', av:'tom', d:'Jul 27 2005 6:12 PM',
+    t:'Thanks for the add! Cool profile. If you ever need anything, just ask. — Tom (everyone\'s first friend)', s:'' },
+  { n:'~*~KuBrIcK~*~', av:'kubrick', d:'Feb 17 2005 9:41 PM',
+    t:'u made me ur DEFAULT?!?! i literally cannot breathe rn. every blog on the internet is wearing MY header gradient!! blue rounded corners 4EVER. ily bestie', s:'gl-chrome' },
+  { n:'Matt', av:'matt', d:'Dec 31 2005 11:58 PM',
+    t:'Happy New Year — 2.0 "Duke" just shipped. WYSIWYG editing, image uploads, user roles, and Akismet in the box. Not bad for a b2 fork. Back to work. (Also: jazz.)', s:'' },
+  { n:'CheapRingtonez4U', av:'spam', d:'Mar 4 2006 3:33 AM',
+    t:'C0NGRATULATIONS!! u are the 999,999th visitor 2 this page!! click here 4 FREE ringtones + HOT SINGLES in ur area (THE INTERNET, EVERYWHERE)!!! www.totally-real-prizes.biz', s:'', spam:true },
+  { n:'xX_hello_dolly_Xx', av:'dolly', d:'May 22 2006 2:15 PM',
+    t:'im in ur install. i have always been in ur install. wave ur hand &amp; blow a kiss to me ♪ #dollys4ever', s:'gl-comic' },
+  { n:'bbPress', av:'bbpress', d:'Jan 9 2007 8:02 PM',
+    t:'come post on my forum. its quiet. too quiet. (heard a rumor about "widgets"?? if sidebars change i am NOT ready)', s:'' }
+];
+function gbLoad(){
+  try { return JSON.parse(localStorage.getItem(GB_KEY)) || []; }
+  catch(e){ return []; }
+}
+function gbSave(list){
+  try { localStorage.setItem(GB_KEY, JSON.stringify(list)); } catch(e){}
+}
+var gbList = $('#gbList');
+function gbRow(item, userIndex){
+  var row = document.createElement('div');
+  row.className = 'gb-row' + (item.spam ? ' spam' : '');
+  var who = document.createElement('div');
+  who.className = 'gb-who';
+  var nm = document.createElement('span');
+  nm.className = 'n';
+  nm.textContent = item.n;
+  var av = document.createElement('span');
+  av.className = 'av';
+  av.innerHTML = avSVG(item.av || 'anon');
+  who.appendChild(nm); who.appendChild(av);
+  if(typeof userIndex === 'number'){
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'del';
+    del.textContent = '(remove)';
+    del.setAttribute('aria-label','Remove your comment');
+    del.addEventListener('click', function(){
+      var list = gbLoad();
+      list.splice(userIndex, 1);
+      gbSave(list);
+      gbRender();
+      toast('comment removed. the wall forgets (rare).');
+    });
+    who.appendChild(del);
+  }
+  var msg = document.createElement('div');
+  msg.className = 'gb-msg';
+  var d = document.createElement('span');
+  d.className = 'd';
+  d.textContent = item.d;
+  var t = document.createElement('span');
+  t.className = 't' + (item.s ? ' ' + item.s : '');
+  /* seeds may carry entities; user text is always textContent */
+  if(item.seedHTML){ t.innerHTML = item.t; } else { t.textContent = item.t; }
+  msg.appendChild(d); msg.appendChild(t);
+  if(item.spam){
+    var stamp = document.createElement('span');
+    stamp.className = 'gb-stamp';
+    stamp.textContent = '⛨ MARKED AS SPAM BY AKISMET';
+    msg.appendChild(stamp);
+    var stamp2 = document.createElement('span');
+    stamp2.className = 'd';
+    stamp2.style.marginTop = '4px';
+    stamp2.style.color = '#338a3e';
+    stamp2.textContent = 'spam comment #1 of ~200,000,000,000 served';
+    msg.appendChild(stamp2);
+  }
+  row.appendChild(who); row.appendChild(msg);
+  return row;
+}
+function gbRender(){
+  gbList.innerHTML = '';
+  GB_SEEDS.forEach(function(s){
+    s.seedHTML = true;
+    gbList.appendChild(gbRow(s));
+  });
+  var mine = gbLoad();
+  mine.forEach(function(m, i){
+    gbList.appendChild(gbRow(m, i));
+  });
+  $('#gbCount').textContent = String(GB_SEEDS.length + mine.length);
+}
+gbRender();
+$('#gbForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = $('#gbName').value.trim() || 'xX_Anonymous_Xx';
+  var text = $('#gbText').value.trim();
+  if(!text){ toast('write something!! blank comments r bad luck'); return; }
+  var now = new Date();
+  var stamp = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) +
+    ' ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var list = gbLoad();
+  list.push({ n:name, t:text, s:$('#gbStyle').value, d:stamp, av:'anon' });
+  gbSave(list);
+  $('#gbText').value = '';
+  gbRender();
+  toast('☆ comment posted!! ur glitter looks amazing ☆');
+});
+
+/* ------------------------------------------------------------
+   hit counter — always going up, like the good old days
+   ------------------------------------------------------------ */
+(function(){
+  var hits = 0;
+  try {
+    hits = (parseInt(localStorage.getItem('v17-hits'),10) || 0) + 1;
+    localStorage.setItem('v17-hits', String(hits));
+  } catch(e){ hits = 1; }
+  var n = String(84206 + hits);
+  while(n.length < 7) n = '0' + n;
+  var host = $('#hitCounter');
+  n.split('').forEach(function(ch){
+    var s = document.createElement('span');
+    s.textContent = ch;
+    host.appendChild(s);
+  });
+})();
+
+/* last login: today. always today. she never left. */
+(function(){
+  var d = new Date();
+  $('#lastLogin').textContent = (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
+})();
+
+/* ------------------------------------------------------------
+   skins — outfits worn over the same bones
+   ------------------------------------------------------------ */
+var SKIN_NAMES = {
+  classic:'my classic sparkle layout',
+  bluedefault:'Default (2004)',
+  kubrick:'Kubrick (2005)',
+  twentyten:'Twenty Ten (2010)',
+  twentytwenty:'Twenty Twenty (2020)'
+};
+function setSkin(skin, silent){
+  document.body.dataset.skin = skin;
+  try { localStorage.setItem('v17-skin', skin); } catch(e){}
+  if(!silent){
+    toast('★ outfit changed: ' + (SKIN_NAMES[skin] || skin) + ' !! ur profile is SO customized ★');
+  }
+}
+$$('#picsGrid .polaroid[data-skin]').forEach(function(b){
+  b.addEventListener('click', function(){ setSkin(b.dataset.skin); });
+});
+$('#resetSkin').addEventListener('click', function(e){
+  e.preventDefault();
+  setSkin('classic', true);
+  toast('outfit off. back to sparkle. as nature intended.');
+});
+try {
+  var savedSkin = localStorage.getItem('v17-skin');
+  if(savedSkin && SKIN_NAMES[savedSkin]) setSkin(savedSkin, true);
+} catch(e){}
+
+/* ------------------------------------------------------------
+   the song — "Miles (1.0)", square waves with a swing feel.
+   OFF by default. always. we remember the autoplay years.
+   ------------------------------------------------------------ */
+var Music = (function(){
+  var ctx = null, master = null, noiseBuf = null;
+  var playing = false, timer = null, nextTime = 0, step = 0;
+  var TEMPO = 138, SPB = 60 / TEMPO;              /* seconds per beat */
+  var BARS = 8, STEPS = BARS * 8;                 /* eighth-note grid  */
+  var BASS = [                                    /* D dorian walk     */
+    38,41,45,48, 50,48,45,41, 40,43,47,50, 52,50,47,43,
+    38,41,45,48, 50,52,53,55, 57,55,53,50, 45,47,48,49
+  ];
+  var HIT1 = [62,65,69,72], HIT2 = [60,64,67,71]; /* the "so what" nod */
+
+  function midi(m){ return 440 * Math.pow(2,(m-69)/12); }
+  function ensureCtx(){
+    if(ctx) return true;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return false;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = 0.8;
+    master.connect(ctx.destination);
+    var len = Math.floor(ctx.sampleRate * 0.2);
+    noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var data = noiseBuf.getChannelData(0);
+    for(var i=0;i<len;i++) data[i] = Math.random()*2-1;
+    return true;
+  }
+  function tone(freq, type, t, dur, gain){
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(gain, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function hat(t, gain){
+    var src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+    src.buffer = noiseBuf;
+    f.type = 'highpass'; f.frequency.value = 6500;
+    g.gain.setValueAtTime(gain, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.1);
+  }
+  function scheduleStep(s, t){
+    var bar = Math.floor(s / 8), beatInBar = Math.floor((s % 8) / 2), off = s % 2;
+    if(off === 0){
+      var beatIdx = (bar * 4 + beatInBar) % BASS.length;
+      tone(midi(BASS[beatIdx]), 'triangle', t, SPB * 0.9, 0.20);
+      hat(t, (beatInBar === 1 || beatInBar === 3) ? 0.055 : 0.035);
+    } else {
+      hat(t, 0.022);
+    }
+    if(bar % 2 === 1){
+      var inBar = s % 8;
+      if(inBar === 5){ HIT1.forEach(function(m){ tone(midi(m),'square', t, 0.13, 0.045); }); }
+      if(inBar === 6){ HIT2.forEach(function(m){ tone(midi(m),'square', t, 0.34, 0.045); }); }
+    }
+  }
+  function stepTime(s, barStart){
+    var beat = Math.floor((s % 8) / 2), off = s % 2;
+    return barStart + beat * SPB + (off ? SPB * 0.66 : 0);
+  }
+  var barStartTime = 0;
+  function loop(){
+    /* if the tab was throttled, jump forward instead of bursting catch-up notes */
+    if(barStartTime < ctx.currentTime - 1){
+      barStartTime = ctx.currentTime + 0.06;
+      step = Math.floor(step / 8) * 8;
+    }
+    while(true){
+      var t = stepTime(step % STEPS, barStartTime);
+      if(t > ctx.currentTime + 0.15) break;
+      if(t >= ctx.currentTime - 0.05) scheduleStep(step % STEPS, t);
+      step++;
+      if(step % 8 === 0) barStartTime += SPB * 4;
+    }
+  }
+  function updateUI(){
+    var msBtn = $('#msPlayBtn'), tbBtn = $('#tbPlayBtn');
+    msBtn.textContent = playing ? '■' : '▶';
+    msBtn.setAttribute('aria-pressed', String(playing));
+    msBtn.setAttribute('aria-label', playing ? 'Stop profile song' : 'Play profile song');
+    tbBtn.textContent = playing ? '■' : '▶';
+    tbBtn.setAttribute('aria-pressed', String(playing));
+    tbBtn.setAttribute('aria-label', playing ? 'Stop Miles (1.0)' : 'Play Miles (1.0)');
+    $('#msDeck').classList.toggle('playing', playing);
+    $('#tbDeck').classList.toggle('playing', playing);
+  }
+  function start(){
+    if(!ensureCtx()){ toast('no Web Audio in this browser. imagine jazz.'); return; }
+    if(ctx.state === 'suspended') ctx.resume();
+    step = 0;
+    barStartTime = ctx.currentTime + 0.06;
+    timer = setInterval(loop, 30);
+    playing = true;
+    updateUI();
+  }
+  function stop(){
+    clearInterval(timer); timer = null;
+    playing = false;
+    updateUI();
+  }
+  return {
+    toggle: function(){
+      if(playing){ stop(); toast('song stopped. the silence of 2009 approaches.'); }
+      else { start(); toast('♫ now playing: Miles (1.0) — turn it up (a little)'); }
+    },
+    isPlaying: function(){ return playing; }
+  };
+})();
+$('#msPlayBtn').addEventListener('click', Music.toggle);
+$('#tbPlayBtn').addEventListener('click', Music.toggle);
+
+/* ------------------------------------------------------------
+   the time machine — Playground boots ONLY on click
+   ------------------------------------------------------------ */
+var PG_URL = 'https://playground.wordpress.net/?wp=6.8';
+var pgModal = $('#pgModal'), pgHolder = $('#pgHolder'), pgOpener = null;
+function openPG(fromEl){
+  pgOpener = fromEl || null;
+  var frame = document.createElement('iframe');
+  frame.src = PG_URL;
+  frame.title = 'WordPress 6.8 running live in WordPress Playground';
+  frame.setAttribute('loading','eager');
+  pgHolder.innerHTML = '';
+  pgHolder.appendChild(frame);
+  pgModal.hidden = false;
+  $('#pgClose').focus();
+  document.addEventListener('keydown', pgKey);
+}
+function closePG(){
+  pgHolder.innerHTML = '';        /* fully unload the boot */
+  pgModal.hidden = true;
+  document.removeEventListener('keydown', pgKey);
+  if(pgOpener && pgOpener.focus) pgOpener.focus();
+}
+function pgKey(e){ if(e.key === 'Escape') closePG(); }
+$$('.pg-open').forEach(function(b){
+  b.addEventListener('click', function(){ openPG(b); });
+});
+$('#pgClose').addEventListener('click', closePG);
+pgModal.addEventListener('click', function(e){
+  if(e.target === pgModal) closePG();
+});
+
+/* ------------------------------------------------------------
+   era shift — 2005 ⇄ 2011, same souls, new decade
+   ------------------------------------------------------------ */
+var msPage = $('#myspace'), tbPage = $('#tumblr');
+function setMode(mode, silent){
+  var tumblr = (mode === 'tumblr');
+  document.body.dataset.mode = mode;
+  msPage.hidden = tumblr;
+  tbPage.hidden = !tumblr;
+  $('#cap2005').setAttribute('aria-pressed', String(!tumblr));
+  $('#cap2011').setAttribute('aria-pressed', String(tumblr));
+  window.scrollTo(0,0);
+  try { history.replaceState(null,'', tumblr ? '#2011' : '#2005'); } catch(e){}
+  if(!silent){
+    toast(tumblr
+      ? 'welcome to 2011. everything is dark blue & feelings now.'
+      : 'back to 2005. the sparkles missed u.');
+  }
+}
+$('#cap2005').addEventListener('click', function(){ setMode('myspace'); });
+$('#cap2011').addEventListener('click', function(){ setMode('tumblr'); });
+$$('.to2011').forEach(function(b){ b.addEventListener('click', function(){ setMode('tumblr'); }); });
+$$('.to2005').forEach(function(b){ b.addEventListener('click', function(){ setMode('myspace'); }); });
+if(location.hash === '#2011') setMode('tumblr', true);
+
+/* ------------------------------------------------------------
+   tumblr dashboard wiring
+   ------------------------------------------------------------ */
+/* stamp avatars everywhere they're asked for */
+$$('[data-av]').forEach(function(el){ el.innerHTML = avSVG(el.dataset.av); });
+
+/* squad photoset + following list reuse the top 8 cast */
+var squad = $('#squadGrid');
+TOP8.forEach(function(f){
+  var d = document.createElement('div');
+  d.className = 'sq-av';
+  d.innerHTML = avSVG(f.id);
+  d.setAttribute('role','img');
+  d.setAttribute('aria-label', f.n);
+  squad.appendChild(d);
+});
+var fl = $('#followList');
+TOP8.forEach(function(f){
+  var row = document.createElement('div');
+  row.className = 'fl-row';
+  var av = document.createElement('span'); av.className = 'fav'; av.innerHTML = avSVG(f.id);
+  var nm = document.createElement('span'); nm.className = 'fn';
+  nm.textContent = f.n.toLowerCase().replace(/xx_|_xx/g,'').replace(/\s+/g,'');
+  var btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'followBtn';
+  btn.textContent = 'Following';
+  btn.setAttribute('aria-pressed','true');
+  btn.addEventListener('click', function(){
+    var on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', String(!on));
+    btn.textContent = on ? 'Follow' : 'Following';
+    toast(on ? 'unfollowed ' + f.n + '. they will hear about this.' : 'refollowed ' + f.n + '. balance restored.');
+  });
+  row.appendChild(av); row.appendChild(nm); row.appendChild(btn);
+  fl.appendChild(row);
+});
+
+/* notes counters + hearts + reblogs */
+function fmtNotes(n){ return n.toLocaleString('en-US') + ' notes'; }
+$$('.tb-post').forEach(function(post){
+  var span = $('.notes', post);
+  if(span) span.textContent = fmtNotes(parseInt(post.dataset.notes,10) || 0);
+});
+tbPage.addEventListener('click', function(e){
+  var heart = e.target.closest('.act-heart');
+  var reblog = e.target.closest('.act-reblog');
+  if(!heart && !reblog) return;
+  var post = e.target.closest('.tb-post');
+  if(!post) return;
+  var n = parseInt(post.dataset.notes,10) || 0;
+  if(heart){
+    var on = heart.classList.toggle('on');
+    heart.setAttribute('aria-pressed', String(on));
+    n += on ? 1 : -1;
+  } else {
+    n += 1;
+    toast('reblogged to your tumblr ✓ (escalating commentary optional but encouraged)');
+  }
+  post.dataset.notes = String(n);
+  var span = $('.notes', post);
+  if(span) span.textContent = fmtNotes(n);
+});
+
+/* new-post buttons are decorative, but honest about it */
+$$('.tb-type').forEach(function(b){
+  b.addEventListener('click', function(){
+    toast('drafts are disabled in the museum. reblog something instead — it\'s 2011.');
+  });
+});
+
+/* the infinite-feeling feed */
+var FILLERS = [
+  { type:'t-text', notes: 1893, body:
+    '<div class="tb-phead"><b>wordpress</b></div>' +
+    '<p>reblog if you remember editing wp-config.php by hand in notepad. likes do not count. likes NEVER counted.</p>',
+    tags:'#wp-config #veterans only' },
+  { type:'t-text', notes: 3410, body:
+    '<div class="tb-phead"><b>wordpress</b></div>' +
+    '<p><b>widgets (2007) appreciation post.</b> sidebars were never the same. drag. drop. weep.</p>',
+    tags:'#widgets #2007 #getz' },
+  { type:'t-quote', notes: 5127, body:
+    '<div class="q">just install the plugin</div><div class="qsrc">— ancient proverb, uttered ~8 million times</div>',
+    tags:'#wisdom #plugins' },
+  { type:'t-photo', notes: 7777, body:
+    '<div class="tb-phead"><b>wordpress</b></div>' +
+    '<div class="db-pic" role="img" aria-label="A teal database cylinder with tiny eyes, glowing in the dark">' +
+    '<div class="cyl"></div><div class="eyes">• •</div></div>' +
+    '<div class="caption">rare image of The Database. do not interact. she bites (but she remembers every post you ever wrote).</div>',
+    tags:'#mysql #do not interact #she is baby' },
+  { type:'t-link', notes: 2481, body:
+    '<div class="tb-phead"><b>wordpress</b></div>' +
+    '<a class="biglink" href="#tbFeed">the admin bar (3.1) now follows you everywhere →</a>' +
+    '<div class="ldesc">she hovers. she helps. she watches. we love her.</div>',
+    tags:'#admin bar #3.1 #reinhardt' },
+  { type:'t-chat', notes: 11204, body:
+    '<div class="tb-phead"><b>wordpress</b> · <span>a tragedy in two lines</span></div>' +
+    '<div class="chat"><div class="cl"><b>me:</b> one tiny edit to functions.php, what could happen</div>' +
+    '<div class="cl"><b>white screen of death:</b> hello</div></div>',
+    tags:'#wsod #functions.php #hubris' },
+  { type:'t-text', notes: 964, body:
+    '<div class="tb-phead"><b>wordpress</b></div>' +
+    '<p>day 2,922 of blogging: still free. still open source. still jazz. i am in EVERYONE\'S extended network now. #grateful</p>',
+    tags:'#grateful #gpl #jazz hands' }
+];
+var fillerIdx = 0, fillerAdded = 0, FILLER_MAX = 10;
+var tbFeed = $('#tbFeed'), tbSentinel = $('#tbSentinel'), tbEnd = $('#tbEnd');
+function addFiller(){
+  var f = FILLERS[fillerIdx % FILLERS.length];
+  fillerIdx++; fillerAdded++;
+  var art = document.createElement('article');
+  art.className = 'tb-post ' + f.type;
+  art.dataset.notes = String(f.notes + fillerAdded);
+  art.innerHTML =
+    '<div class="tb-av">' + avSVG('wordpress') + '</div>' +
+    '<div class="tb-card"><div class="tb-pbody">' + f.body + '</div>' +
+    '<div class="tb-pfoot"><span class="notes">' + fmtNotes(f.notes + fillerAdded) + '</span>' +
+    '<span class="tags">' + f.tags + '</span>' +
+    '<span class="acts"><button class="act-reblog" aria-label="Reblog">⟲</button>' +
+    '<button class="act-heart" aria-label="Like" aria-pressed="false">♥</button></span></div></div>';
+  tbFeed.insertBefore(art, tbSentinel);
+}
+if('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      if(fillerAdded >= FILLER_MAX){
+        tbEnd.hidden = false;
+        io.disconnect();
+        return;
+      }
+      addFiller();
+    });
+  }, { rootMargin: '400px 0px' });
+  io.observe(tbSentinel);
+} else {
+  for(var i=0;i<4;i++) addFiller();
+  tbEnd.hidden = false;
+}
+
+/* ------------------------------------------------------------
+   cursor sparkles — 2005 only, and never for reduced motion
+   ------------------------------------------------------------ */
+if(!RM){
+  var SPARK_CHARS = ['✦','✧','⋆','·','★'];
+  var SPARK_COLORS = ['#ffd23e','#ff66cc','#9fd0ff','#c9f','#fff'];
+  var live = 0, lastSpark = 0;
+  document.addEventListener('mousemove', function(e){
+    if(document.body.dataset.mode !== 'myspace') return;
+    var now = Date.now();
+    if(now - lastSpark < 70 || live > 22) return;
+    lastSpark = now;
+    var s = document.createElement('span');
+    s.className = 'spark';
+    s.textContent = SPARK_CHARS[Math.floor(Math.random()*SPARK_CHARS.length)];
+    s.style.color = SPARK_COLORS[Math.floor(Math.random()*SPARK_COLORS.length)];
+    s.style.left = (e.clientX + (Math.random()*14 - 7)) + 'px';
+    s.style.top  = (e.clientY + (Math.random()*10 - 4)) + 'px';
+    live++;
+    s.addEventListener('animationend', function(){ s.remove(); live--; });
+    document.body.appendChild(s);
+    /* safety net if animations are disabled mid-flight */
+    setTimeout(function(){ if(s.parentNode){ s.remove(); live--; } }, 1200);
+  });
+}
+
+})();
+</script>
+</body>
+</html>
